@@ -9,9 +9,6 @@ function SetlistHeader({ name, date, venue, songCount }: SetlistHeaderProps) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="rounded-full bg-brand-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-brand-200">
-          Gig Buddy
-        </span>
         <h1 className="text-lg font-semibold text-slate-100 sm:text-xl">
           {name}
         </h1>
