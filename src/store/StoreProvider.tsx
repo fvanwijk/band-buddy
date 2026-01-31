@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Provider } from 'tinybase/ui-react';
 
 import { initializeStore, store } from './store';
+import { createSongs } from '../mocks/songs';
 
 type StoreProviderProps = {
   children: ReactNode;
@@ -15,29 +16,14 @@ export function StoreProvider({ children }: StoreProviderProps) {
     async function init() {
       await initializeStore();
 
-      // If store is empty (first load), populate with mock data
-      // if (Object.keys(store.getTables()).length === 0) {
-      //   // Store songs
-      //   mockSetlist.songs.forEach((song) => {
-      //     store.setRow("songs", song.id, {
-      //       artist: song.artist,
-      //       title: song.title,
-      //       key: song.key,
-      //       timeSignature: song.timeSignature,
-      //     });
-      //   });
+      // If store is empty (first load), populate with seed data
+      if (Object.keys(store.getTables()).length === 0) {
+        const seedSongs = createSongs();
 
-      //   // Store setlist with song references
-      //   store.setRow("setlists", mockSetlist.id, {
-      //     name: mockSetlist.name,
-      //     date: mockSetlist.date,
-      //     venue: mockSetlist.venue,
-      //     songIds: mockSetlist.songs.map((s) => s.id).join(","),
-      //   });
-
-      //   // Mark the active setlist
-      //   store.setValue("activeSetlistId", mockSetlist.id);
-      // }
+        seedSongs.forEach(({ id, ...song }) => {
+          store.setRow('songs', id, song);
+        });
+      }
 
       setIsInitialized(true);
     }
