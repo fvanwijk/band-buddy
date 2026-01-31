@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import { store } from "../store/store";
-import { SongForm } from "../components/SongForm";
+import { useNavigate } from 'react-router-dom';
+import { store } from '../store/store';
+import { SongForm } from '../components/SongForm';
 
 function AddSongPage() {
   const navigate = useNavigate();
@@ -21,8 +21,8 @@ function AddSongPage() {
     if (data.bpm) {
       finalData.bpm = data.bpm;
     }
-    store.addRow("songs", finalData);
-    navigate("/songs");
+    store.addRow('songs', finalData);
+    navigate('/songs');
   };
 
   return <SongForm onSubmit={handleSubmit} title="Add New Song" />;

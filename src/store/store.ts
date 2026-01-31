@@ -1,11 +1,11 @@
-import { createStore } from "tinybase";
-import { createLocalPersister } from "tinybase/persisters/persister-browser";
+import { createStore } from 'tinybase';
+import { createLocalPersister } from 'tinybase/persisters/persister-browser';
 
 // Create the store
 export const store = createStore();
 
 // Create persister for localStorage
-export const persister = createLocalPersister(store, "gig-buddy-store");
+export const persister = createLocalPersister(store, 'gig-buddy-store');
 
 // Initialize and persist
 export async function initializeStore() {

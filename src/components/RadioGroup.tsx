@@ -1,4 +1,4 @@
-import type { UseFormRegisterReturn, FieldError } from "react-hook-form";
+import type { UseFormRegisterReturn, FieldError } from 'react-hook-form';
 
 type RadioOption = {
   value: string;
@@ -20,7 +20,7 @@ export function RadioGroup({
   options,
   error,
   register,
-  className = "",
+  className = '',
   children,
   required = false,
 }: RadioGroupProps) {

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
-import { Provider } from "tinybase/ui-react";
-import { store, initializeStore } from "./store";
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { Provider } from 'tinybase/ui-react';
+import { store, initializeStore } from './store';
 
 type StoreProviderProps = {
   children: ReactNode;
@@ -45,11 +45,7 @@ export function StoreProvider({ children }: StoreProviderProps) {
   }, []);
 
   if (!isInitialized) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        Loading...
-      </div>
-    );
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
   return <Provider store={store}>{children}</Provider>;

@@ -6,13 +6,7 @@ type ConfirmDialogProps = {
   message: string;
 };
 
-export function ConfirmDialog({
-  isOpen,
-  onClose,
-  onConfirm,
-  title,
-  message,
-}: ConfirmDialogProps) {
+export function ConfirmDialog({ isOpen, onClose, onConfirm, title, message }: ConfirmDialogProps) {
   if (!isOpen) return null;
 
   const handleConfirm = () => {

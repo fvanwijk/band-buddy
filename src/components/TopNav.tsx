@@ -1,16 +1,16 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 
 type NavItem = {
   label: string;
   to: string;
-  icon?: "cog";
+  icon?: 'cog';
 };
 
 const navItems: NavItem[] = [
-  { label: "Active setlist", to: "/" },
-  { label: "Manage setlists", to: "/manage" },
-  { label: "Manage songs", to: "/songs" },
-  { label: "Settings", to: "/settings", icon: "cog" },
+  { label: 'Active setlist', to: '/' },
+  { label: 'Manage setlists', to: '/manage' },
+  { label: 'Manage songs', to: '/songs' },
+  { label: 'Settings', to: '/settings', icon: 'cog' },
 ];
 
 function TopNav() {
@@ -20,23 +20,16 @@ function TopNav() {
         <NavLink
           key={item.to}
           to={item.to}
-          end={item.to === "/"}
+          end={item.to === '/'}
           className={({ isActive }) =>
             [
-              "rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition",
-              isActive
-                ? "bg-brand-400/15 text-brand-200"
-                : "text-slate-400 hover:text-slate-200",
-            ].join(" ")
+              'rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition',
+              isActive ? 'bg-brand-400/15 text-brand-200' : 'text-slate-400 hover:text-slate-200',
+            ].join(' ')
           }
         >
-          {item.icon === "cog" ? (
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+          {item.icon === 'cog' ? (
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

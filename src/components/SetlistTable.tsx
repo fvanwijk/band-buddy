@@ -1,4 +1,4 @@
-import type { Song } from "../types/setlist";
+import type { Song } from '../types/setlist';
 
 type SetlistTableProps = {
   songs: Song[];
@@ -12,17 +12,11 @@ function SongRow({ song }: SongRowProps) {
   return (
     <li className="grid gap-4 px-6 py-5 text-lg text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[3fr_1fr_1fr]">
       <span className="flex flex-col">
-        <span className="text-xl font-semibold text-slate-100">
-          {song.title}
-        </span>
+        <span className="text-xl font-semibold text-slate-100">{song.title}</span>
         <span className="text-base text-slate-400">{song.artist}</span>
       </span>
-      <span className="text-right text-xl font-semibold text-slate-100">
-        {song.timeSignature}
-      </span>
-      <span className="text-right text-xl font-semibold text-emerald-200">
-        {song.key}
-      </span>
+      <span className="text-right text-xl font-semibold text-slate-100">{song.timeSignature}</span>
+      <span className="text-right text-xl font-semibold text-emerald-200">{song.key}</span>
     </li>
   );
 }

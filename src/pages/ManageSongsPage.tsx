@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useTable } from "tinybase/ui-react";
-import { store } from "../store/store";
-import { ConfirmDialog } from "../components/ConfirmDialog";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTable } from 'tinybase/ui-react';
+import { store } from '../store/store';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 
 function ManageSongsPage() {
-  const songs = useTable("songs");
+  const songs = useTable('songs');
   const songIds = Object.keys(songs);
 
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
 
   const handleDeleteSong = () => {
     if (deletingSongId) {
-      store.delRow("songs", deletingSongId);
+      store.delRow('songs', deletingSongId);
       setDeletingSongId(null);
     }
   };
@@ -21,9 +21,7 @@ function ManageSongsPage() {
     <section className="flex h-full flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
-            Library
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Library</p>
           <h1 className="text-2xl font-semibold text-slate-100">Songs</h1>
         </div>
         <Link
@@ -59,9 +57,7 @@ function ManageSongsPage() {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-slate-100 mb-2">
-            No songs in your library
-          </h2>
+          <h2 className="text-xl font-semibold text-slate-100 mb-2">No songs in your library</h2>
           <p className="text-slate-400 max-w-md">
             Add songs to build your repertoire and use them in setlists.
           </p>
@@ -72,18 +68,11 @@ function ManageSongsPage() {
             const song = songs[songId];
 
             return (
-              <div
-                key={songId}
-                className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
-              >
+              <div key={songId} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-slate-100">
-                      {song.title as string}
-                    </h2>
-                    <p className="text-sm text-slate-400">
-                      {song.artist as string}
-                    </p>
+                    <h2 className="text-lg font-semibold text-slate-100">{song.title as string}</h2>
+                    <p className="text-sm text-slate-400">{song.artist as string}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="rounded-full bg-slate-900/70 px-3 py-1 text-xs text-slate-300">

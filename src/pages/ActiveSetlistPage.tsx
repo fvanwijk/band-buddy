@@ -1,12 +1,12 @@
-import SetlistHeader from "../components/SetlistHeader";
-import SetlistTable from "../components/SetlistTable";
-import { useValue, useRow, useTable } from "tinybase/ui-react";
-import type { Song } from "../types/setlist";
+import SetlistHeader from '../components/SetlistHeader';
+import SetlistTable from '../components/SetlistTable';
+import { useValue, useRow, useTable } from 'tinybase/ui-react';
+import type { Song } from '../types/setlist';
 
 function ActiveSetlistPage() {
-  const activeSetlistId = useValue("activeSetlistId") as string | undefined;
-  const setlist = useRow("setlists", activeSetlistId || "");
-  const songsTable = useTable("songs");
+  const activeSetlistId = useValue('activeSetlistId') as string | undefined;
+  const setlist = useRow('setlists', activeSetlistId || '');
+  const songsTable = useTable('songs');
 
   if (!activeSetlistId || !setlist) {
     return (
@@ -26,9 +26,7 @@ function ActiveSetlistPage() {
             />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold text-slate-100 mb-2">
-          No active setlist
-        </h2>
+        <h2 className="text-xl font-semibold text-slate-100 mb-2">No active setlist</h2>
         <p className="text-slate-400 max-w-md">
           Select or create a setlist to get started with your performance.
         </p>
@@ -37,7 +35,7 @@ function ActiveSetlistPage() {
   }
 
   // Get songs in the order specified in the setlist
-  const songIds = (setlist.songIds as string)?.split(",") || [];
+  const songIds = (setlist.songIds as string)?.split(',') || [];
   const songs: Song[] = songIds
     .map((id) => {
       const songRow = songsTable[id];

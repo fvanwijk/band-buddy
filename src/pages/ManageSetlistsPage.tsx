@@ -1,16 +1,14 @@
-import { useTable } from "tinybase/ui-react";
+import { useTable } from 'tinybase/ui-react';
 
 function ManageSetlistsPage() {
-  const setlists = useTable("setlists");
+  const setlists = useTable('setlists');
   const setlistIds = Object.keys(setlists);
 
   return (
     <section className="flex h-full flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
-            Manage
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Manage</p>
           <h1 className="text-2xl font-semibold text-slate-100">Setlists</h1>
         </div>
         <button className="rounded-full border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-200">
@@ -35,9 +33,7 @@ function ManageSetlistsPage() {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-slate-100 mb-2">
-            No setlists yet
-          </h2>
+          <h2 className="text-xl font-semibold text-slate-100 mb-2">No setlists yet</h2>
           <p className="text-slate-400 max-w-md">
             Create your first setlist to organize songs for your performances.
           </p>
@@ -46,17 +42,14 @@ function ManageSetlistsPage() {
         <div className="grid gap-4">
           {setlistIds.map((setlistId) => {
             const setlist = setlists[setlistId];
-            const songCount =
-              (setlist.songIds as string)?.split(",").length || 0;
+            const songCount = (setlist.songIds as string)?.split(',').length || 0;
 
             return (
               <div
                 key={setlistId}
                 className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
               >
-                <h2 className="text-lg font-semibold text-slate-100">
-                  {setlist.name as string}
-                </h2>
+                <h2 className="text-lg font-semibold text-slate-100">{setlist.name as string}</h2>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-300">
                   <span className="rounded-full bg-slate-900/70 px-3 py-1">
                     {setlist.date as string}
