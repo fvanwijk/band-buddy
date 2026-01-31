@@ -1,19 +1,28 @@
-import SetlistHeader from "./components/SetlistHeader";
-import SetlistTable from "./components/SetlistTable";
-import { mockSetlist } from "./data/setlist";
+import { Navigate, Route, Routes } from "react-router-dom";
+import TopNav from "./components/TopNav";
+import ActiveSetlistPage from "./pages/ActiveSetlistPage";
+import ManageSetlistsPage from "./pages/ManageSetlistsPage";
+import ManageSongsPage from "./pages/ManageSongsPage";
 
 function App() {
   return (
     <div className="h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto flex h-full max-w-5xl flex-col gap-3 px-4 py-4">
-        <SetlistHeader
-          name={mockSetlist.name}
-          date={mockSetlist.date}
-          venue={mockSetlist.venue}
-          songCount={mockSetlist.songs.length}
-        />
+        <div className="flex items-center justify-between gap-3">
+          <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-200">
+            Gig Buddy
+          </span>
+          <TopNav />
+        </div>
 
-        <SetlistTable songs={mockSetlist.songs} />
+        <main className="min-h-0 flex-1">
+          <Routes>
+            <Route path="/" element={<ActiveSetlistPage />} />
+            <Route path="/manage" element={<ManageSetlistsPage />} />
+            <Route path="/songs" element={<ManageSongsPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
       </div>
     </div>
   );
