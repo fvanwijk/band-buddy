@@ -4,6 +4,7 @@ export type Song = {
   title: string;
   key: string;
   timeSignature: string;
+  bpm?: number;
 };
 
 export type Setlist = {

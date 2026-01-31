@@ -7,6 +7,7 @@ type FormFieldProps = {
   placeholder?: string;
   error?: FieldError;
   register: UseFormRegisterReturn;
+  required?: boolean;
 };
 
 export function FormField({
@@ -16,6 +17,7 @@ export function FormField({
   placeholder,
   error,
   register,
+  required = false,
 }: FormFieldProps) {
   return (
     <div>
@@ -24,6 +26,7 @@ export function FormField({
         className="mb-1.5 block text-sm font-medium text-slate-300"
       >
         {label}
+        {required && <span className="ml-1 text-brand-400/70">*</span>}
       </label>
       <input
         id={id}
