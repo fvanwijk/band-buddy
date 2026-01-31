@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { SetlistCard } from '../components/SetlistCard';
 import { SortButton } from '../components/SortButton';
 import { store } from '../store/store';
 import { useSetlists } from '../store/useStore';
@@ -98,36 +99,15 @@ export function ManageSetlistsPage() {
           </div>
 
           {displaySetlists.map((setlist) => (
-            <div
+            <SetlistCard
               key={setlist.id}
-              className="group flex items-center justify-between rounded border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
-            >
-              <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-slate-900 dark:text-white">{setlist.title}</h3>
-                <div className="flex gap-3 text-sm text-slate-500 dark:text-slate-400">
-                  <span>{new Date(setlist.date).toLocaleDateString()}</span>
-                  <span>
-                    {setlist.sets.length} set{setlist.sets.length !== 1 ? 's' : ''}
-                  </span>
-                  <span>{setlist.sets.reduce((total, s) => total + s.songs.length, 0)} songs</span>
-                </div>
-              </div>
-
-              <div className="ml-4 flex gap-2">
-                <button
-                  className="rounded bg-slate-200 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-                  onClick={() => handleEdit(setlist.id)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="rounded bg-red-500 px-3 py-1 text-sm font-medium text-white hover:bg-red-600"
-                  onClick={() => handleDelete(setlist.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+              date={setlist.date}
+              onDelete={() => handleDelete(setlist.id)}
+              onEdit={() => handleEdit(setlist.id)}
+              setsCount={setlist.sets.length}
+              songsCount={setlist.sets.reduce((total, s) => total + s.songs.length, 0)}
+              title={setlist.title}
+            />
           ))}
         </div>
       )}
