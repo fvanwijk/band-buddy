@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Button } from '../components/Button';
 import {
   TRIADIC_THEMES,
   type ThemeName,
@@ -53,7 +54,7 @@ function SettingsPage() {
             const isActive = currentTheme === themeName;
 
             return (
-              <button
+              <Button
                 key={themeName}
                 onClick={() => handleThemeChange(themeName)}
                 className={[
@@ -62,6 +63,7 @@ function SettingsPage() {
                     ? 'border-brand-400 bg-brand-400/10'
                     : 'border-slate-700 bg-slate-800/50 hover:border-slate-600',
                 ].join(' ')}
+                variant="ghost"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -100,7 +102,7 @@ function SettingsPage() {
                     />
                   ))}
                 </div>
-              </button>
+              </Button>
             );
           })}
         </div>

@@ -1,3 +1,4 @@
+import { Button } from './Button';
 import { Card } from './Card';
 
 type SetlistCardProps = {
@@ -21,18 +22,12 @@ export function SetlistCard({
     <Card
       actions={
         <>
-          <button
-            className="rounded bg-slate-200 px-3 py-1 text-sm font-medium text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-            onClick={onEdit}
-          >
+          <Button variant="default" onClick={onEdit}>
             Edit
-          </button>
-          <button
-            className="rounded bg-red-500 px-3 py-1 text-sm font-medium text-white hover:bg-red-600"
-            onClick={onDelete}
-          >
+          </Button>
+          <Button variant="danger" onClick={onDelete}>
             Delete
-          </button>
+          </Button>
         </>
       }
     >

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
+import { Button } from './Button';
 import { FormField } from './FormField';
 import { RadioGroup } from './RadioGroup';
 import type { Song } from '../types/setlist';
@@ -120,9 +121,10 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
     <section className="flex h-full flex-col gap-6">
       <header>
         <div className="mb-6 flex items-center gap-3">
-          <button
-            onClick={() => navigate('/songs')}
+          <Button
             className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+            onClick={() => navigate('/songs')}
+            variant="ghost"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -132,7 +134,7 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-          </button>
+          </Button>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
               Library
@@ -233,19 +235,21 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={() => navigate('/songs')}
+            <Button
               className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700"
+              onClick={() => navigate('/songs')}
+              type="button"
+              variant="ghost"
             >
               Cancel
-            </button>
-            <button
-              type="submit"
+            </Button>
+            <Button
               className="flex-1 rounded-lg border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-sm font-medium text-brand-200 hover:bg-brand-400/20"
+              type="submit"
+              variant="ghost"
             >
               {initialData ? 'Save Changes' : 'Add Song'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

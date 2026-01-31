@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Button } from '../components/Button';
 import { SetlistCard } from '../components/SetlistCard';
 import { SortButton } from '../components/SortButton';
 import { store } from '../store/store';
@@ -63,12 +64,9 @@ export function ManageSetlistsPage() {
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Manage Setlists</h1>
-        <button
-          className="rounded bg-brand-500 px-4 py-2 font-medium text-white hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
-          onClick={() => navigate('/setlist/add')}
-        >
+        <Button onClick={() => navigate('/setlist/add')} variant="primary">
           Add Setlist
-        </button>
+        </Button>
       </div>
 
       {displaySetlists.length === 0 ? (

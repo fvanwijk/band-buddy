@@ -1,3 +1,5 @@
+import { Button } from './Button';
+
 type SortButtonProps = {
   isActive: boolean;
   label: string;
@@ -9,12 +11,9 @@ export function SortButton({ isActive, label, onClick, sortDirection }: SortButt
   const directionSymbol = isActive && sortDirection ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
 
   return (
-    <button
-      className="font-medium text-slate-700 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-400"
-      onClick={onClick}
-    >
+    <Button onClick={onClick} variant="ghost">
       {label}
       {directionSymbol}
-    </button>
+    </Button>
   );
 }

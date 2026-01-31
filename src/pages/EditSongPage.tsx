@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRow } from 'tinybase/ui-react';
 
+import { Button } from '../components/Button';
 import { SongForm } from '../components/SongForm';
 import { store } from '../store/store';
 import type { Song } from '../types/setlist';
@@ -36,12 +37,13 @@ function EditSongPage() {
     return (
       <section className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-xl text-slate-100">Song not found</p>
-        <button
-          onClick={() => navigate('/songs')}
+        <Button
           className="rounded-lg border border-brand-400/30 bg-brand-400/10 px-6 py-3 font-medium text-brand-200 hover:bg-brand-400/20"
+          onClick={() => navigate('/songs')}
+          variant="primary"
         >
           Back to Songs
-        </button>
+        </Button>
       </section>
     );
   }

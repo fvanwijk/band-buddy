@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { Button } from './Button';
 import { useSongs } from '../store/useStore';
 import type { Song, SongReference } from '../types/setlist';
 
@@ -59,13 +60,9 @@ export function SetlistSetEditor({
       <div className="flex items-center justify-between">
         <h4 className="font-semibold text-slate-900 dark:text-white">Set {set.setNumber}</h4>
         {showRemove && (
-          <button
-            className="rounded bg-red-500 px-2 py-1 text-xs font-medium text-white hover:bg-red-600"
-            onClick={() => onRemove(set.setNumber)}
-            type="button"
-          >
+          <Button onClick={() => onRemove(set.setNumber)} type="button" variant="danger">
             Remove Set
-          </button>
+          </Button>
         )}
       </div>
 
@@ -109,32 +106,32 @@ export function SetlistSetEditor({
                 )}
 
                 <div className="flex gap-1">
-                  <button
+                  <Button
                     aria-label="Move up"
-                    className="rounded bg-slate-200 px-2 py-1 text-xs hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:hover:bg-slate-600"
                     disabled={index === 0 || isDeleted}
                     onClick={() => handleMoveSong(index, 'up')}
                     type="button"
+                    variant="default"
                   >
                     ↑
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     aria-label="Move down"
-                    className="rounded bg-slate-200 px-2 py-1 text-xs hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:hover:bg-slate-600"
                     disabled={index === set.songs.length - 1 || isDeleted}
                     onClick={() => handleMoveSong(index, 'down')}
                     type="button"
+                    variant="default"
                   >
                     ↓
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     aria-label="Remove song"
-                    className="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
                     onClick={() => handleRemoveSong(index)}
                     type="button"
+                    variant="danger"
                   >
                     ✕
-                  </button>
+                  </Button>
                 </div>
               </div>
             );
@@ -142,13 +139,9 @@ export function SetlistSetEditor({
         )}
       </div>
 
-      <button
-        className="w-full rounded border border-dashed border-brand-300 bg-brand-50 px-3 py-2 text-sm font-medium text-brand-600 hover:border-brand-400 hover:bg-brand-100 dark:border-brand-700 dark:bg-brand-950 dark:text-brand-400 dark:hover:bg-brand-900"
-        onClick={handleAddSong}
-        type="button"
-      >
+      <Button className="w-full" onClick={handleAddSong} type="button" variant="outline">
         + Add Song to Set
-      </button>
+      </Button>
     </div>
   );
 }

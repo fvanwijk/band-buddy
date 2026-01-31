@@ -1,9 +1,11 @@
+import { Button } from './Button';
+
 type ConfirmDialogProps = {
   isOpen: boolean;
+  message: string;
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  message: string;
 };
 
 export function ConfirmDialog({ isOpen, onClose, onConfirm, title, message }: ConfirmDialogProps) {
@@ -25,20 +27,22 @@ export function ConfirmDialog({ isOpen, onClose, onConfirm, title, message }: Co
         <p className="mb-6 text-sm text-slate-400">{message}</p>
 
         <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onClose}
+          <Button
             className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700"
+            onClick={onClose}
+            type="button"
+            variant="ghost"
           >
             Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleConfirm}
+          </Button>
+          <Button
             className="flex-1 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-500/20"
+            onClick={handleConfirm}
+            type="button"
+            variant="ghost"
           >
             Delete
-          </button>
+          </Button>
         </div>
       </div>
     </div>

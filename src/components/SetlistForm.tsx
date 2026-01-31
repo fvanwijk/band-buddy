@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { Button } from './Button';
 import { SetlistSetEditor } from './SetlistSetEditor';
 import type { Setlist, SetlistSet, SongReference } from '../types/setlist';
 
@@ -99,13 +100,9 @@ export function SetlistForm({ initialData, onSubmit, title }: SetlistFormProps) 
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Sets</h3>
           {sets.length < 3 && (
-            <button
-              className="rounded bg-brand-500 px-3 py-1 text-sm font-medium text-white hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
-              onClick={handleAddSet}
-              type="button"
-            >
+            <Button onClick={handleAddSet} type="button" variant="primary">
               Add Set
-            </button>
+            </Button>
           )}
         </div>
 
@@ -121,12 +118,9 @@ export function SetlistForm({ initialData, onSubmit, title }: SetlistFormProps) 
       </div>
 
       <div className="flex gap-3 pt-4">
-        <button
-          className="flex-1 rounded bg-brand-500 px-4 py-2 font-medium text-white hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
-          type="submit"
-        >
+        <Button className="flex-1" type="submit" variant="primary">
           Save Setlist
-        </button>
+        </Button>
       </div>
     </form>
   );
