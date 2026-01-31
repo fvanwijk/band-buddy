@@ -1,13 +1,14 @@
+import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+
 import TopNav from './components/TopNav';
+import { applyTheme, getStoredTheme } from './config/triadicThemes';
 import ActiveSetlistPage from './pages/ActiveSetlistPage';
-import ManageSetlistsPage from './pages/ManageSetlistsPage';
-import ManageSongsPage from './pages/ManageSongsPage';
 import AddSongPage from './pages/AddSongPage';
 import EditSongPage from './pages/EditSongPage';
+import ManageSetlistsPage from './pages/ManageSetlistsPage';
+import ManageSongsPage from './pages/ManageSongsPage';
 import SettingsPage from './pages/SettingsPage';
-import { useEffect } from 'react';
-import { applyTheme, getStoredTheme } from './config/triadicThemes';
 
 function App() {
   useEffect(() => {

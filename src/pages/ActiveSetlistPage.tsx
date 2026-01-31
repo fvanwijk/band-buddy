@@ -1,6 +1,7 @@
+import { useValue, useRow, useTable } from 'tinybase/ui-react';
+
 import SetlistHeader from '../components/SetlistHeader';
 import SetlistTable from '../components/SetlistTable';
-import { useValue, useRow, useTable } from 'tinybase/ui-react';
 import type { Song } from '../types/setlist';
 
 function ActiveSetlistPage() {
