@@ -3,6 +3,8 @@ import TopNav from "./components/TopNav";
 import ActiveSetlistPage from "./pages/ActiveSetlistPage";
 import ManageSetlistsPage from "./pages/ManageSetlistsPage";
 import ManageSongsPage from "./pages/ManageSongsPage";
+import AddSongPage from "./pages/AddSongPage";
+import EditSongPage from "./pages/EditSongPage";
 import SettingsPage from "./pages/SettingsPage";
 import { useEffect } from "react";
 import { applyTheme, getStoredTheme } from "./config/triadicThemes";
@@ -28,6 +30,8 @@ function App() {
             <Route path="/" element={<ActiveSetlistPage />} />
             <Route path="/manage" element={<ManageSetlistsPage />} />
             <Route path="/songs" element={<ManageSongsPage />} />
+            <Route path="/songs/add" element={<AddSongPage />} />
+            <Route path="/songs/edit/:id" element={<EditSongPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

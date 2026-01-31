@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Provider } from "tinybase/ui-react";
 import { store, initializeStore } from "./store";
-import { mockSetlist } from "../data/setlist";
 
 type StoreProviderProps = {
   children: ReactNode;

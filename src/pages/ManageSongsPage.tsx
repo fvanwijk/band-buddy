@@ -1,8 +1,21 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTable } from "tinybase/ui-react";
+import { store } from "../store/store";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 
 function ManageSongsPage() {
   const songs = useTable("songs");
   const songIds = Object.keys(songs);
+
+  const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
+
+  const handleDeleteSong = () => {
+    if (deletingSongId) {
+      store.delRow("songs", deletingSongId);
+      setDeletingSongId(null);
+    }
+  };
 
   return (
     <section className="flex h-full flex-col gap-6">
@@ -13,10 +26,21 @@ function ManageSongsPage() {
           </p>
           <h1 className="text-2xl font-semibold text-slate-100">Songs</h1>
         </div>
-        <button className="rounded-full border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-200">
+        <Link
+          to="/songs/add"
+          className="rounded-full border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-200 hover:bg-brand-400/20"
+        >
           New song
-        </button>
+        </Link>
       </header>
+
+      <ConfirmDialog
+        isOpen={deletingSongId !== null}
+        onClose={() => setDeletingSongId(null)}
+        onConfirm={handleDeleteSong}
+        title="Delete Song"
+        message="Are you sure you want to delete this song? This action cannot be undone."
+      />
 
       {songIds.length === 0 ? (
         <div className="flex flex-col items-center justify-center flex-1 text-center py-16">
@@ -53,7 +77,7 @@ function ManageSongsPage() {
                 className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
               >
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
+                  <div className="flex-1">
                     <h2 className="text-lg font-semibold text-slate-100">
                       {song.title as string}
                     </h2>
@@ -61,19 +85,29 @@ function ManageSongsPage() {
                       {song.artist as string}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-                    <span className="rounded-full bg-slate-900/70 px-3 py-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-slate-900/70 px-3 py-1 text-xs text-slate-300">
                       {song.timeSignature as string}
                     </span>
-                    <span className="rounded-full bg-brand-400/10 px-3 py-1 text-brand-200">
+                    <span className="rounded-full bg-brand-400/10 px-3 py-1 text-xs text-brand-200">
                       {song.key as string}
                     </span>
                   </div>
                 </div>
-                <p className="mt-4 text-sm text-slate-400">
-                  Reuse this song in multiple setlists once persistence is
-                  added.
-                </p>
+                <div className="mt-4 flex gap-2">
+                  <Link
+                    to={`/songs/edit/${songId}`}
+                    className="rounded-lg border border-brand-400/30 bg-brand-400/10 px-3 py-1.5 text-xs font-medium text-brand-200 hover:bg-brand-400/20"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => setDeletingSongId(songId)}
+                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             );
           })}
