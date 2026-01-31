@@ -5,16 +5,51 @@ import { useTable } from 'tinybase/ui-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { store } from '../store/store';
 
+type SortField = 'artist' | 'key' | 'title';
+type SortDirection = 'asc' | 'desc' | 'none';
+
 function ManageSongsPage() {
   const songs = useTable('songs');
-  const songIds = Object.keys(songs);
+  let songIds = Object.keys(songs);
 
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('none');
+
+  // Sort songs
+  if (sortDirection !== 'none' && sortBy) {
+    songIds = [...songIds].sort((idA, idB) => {
+      const songA = songs[idA];
+      const songB = songs[idB];
+
+      const valueA = (songA[sortBy] as string).toLowerCase();
+      const valueB = (songB[sortBy] as string).toLowerCase();
+
+      const comparison = valueA.localeCompare(valueB);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }
 
   const handleDeleteSong = () => {
     if (deletingSongId) {
       store.delRow('songs', deletingSongId);
       setDeletingSongId(null);
+    }
+  };
+
+  const handleSortFieldClick = (field: SortField) => {
+    if (sortBy === field) {
+      // Same field clicked: cycle through directions
+      const cycle: Record<SortDirection, SortDirection> = {
+        asc: 'desc',
+        desc: 'none',
+        none: 'asc',
+      };
+      setSortDirection(cycle[sortDirection]);
+    } else {
+      // Different field clicked: start with ascending
+      setSortBy(field);
+      setSortDirection('asc');
     }
   };
 
@@ -64,43 +99,93 @@ function ManageSongsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {songIds.map((songId) => {
-            const song = songs[songId];
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-1.5">
+            {(['title', 'artist', 'key'] as const).map((field) => {
+              const isActive = sortBy === field && sortDirection !== 'none';
+              const directionSymbol = isActive ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
 
-            return (
-              <div key={songId} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-slate-100">{song.title as string}</h2>
-                    <p className="text-sm text-slate-400">{song.artist as string}</p>
+              return (
+                <button
+                  key={field}
+                  onClick={() => handleSortFieldClick(field)}
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    isActive
+                      ? 'border border-brand-400/50 bg-brand-400/20 text-brand-100'
+                      : 'border border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
+                  }`}
+                >
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                  {directionSymbol}
+                </button>
+              );
+            })}
+          </div>
+          <div className="grid gap-2">
+            {songIds.map((songId) => {
+              const song = songs[songId];
+
+              return (
+                <div
+                  key={songId}
+                  className="group flex items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-2 transition-colors hover:bg-slate-900/80"
+                >
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-sm font-semibold text-slate-100 truncate">
+                      {song.title as string}
+                    </h2>
+                    <p className="text-xs text-slate-500">{song.artist as string}</p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-slate-900/70 px-3 py-1 text-xs text-slate-300">
-                      {song.timeSignature as string}
-                    </span>
-                    <span className="rounded-full bg-brand-400/10 px-3 py-1 text-xs text-brand-200">
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <span className="hidden text-xs text-slate-400 sm:inline">
                       {song.key as string}
                     </span>
+                    <span className="hidden text-xs text-slate-400 sm:inline">
+                      {song.timeSignature as string}
+                    </span>
+                    <Link
+                      to={`/songs/edit/${songId}`}
+                      className="rounded-md border border-brand-400/20 bg-brand-400/5 p-1.5 text-brand-300 opacity-0 transition-all hover:bg-brand-400/15 group-hover:opacity-100"
+                      title="Edit"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </Link>
+                    <button
+                      onClick={() => setDeletingSongId(songId)}
+                      className="rounded-md border border-red-500/20 bg-red-500/5 p-1.5 text-red-400 opacity-0 transition-all hover:bg-red-500/15 group-hover:opacity-100"
+                      title="Delete"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
-                <div className="mt-4 flex gap-2">
-                  <Link
-                    to={`/songs/edit/${songId}`}
-                    className="rounded-lg border border-brand-400/30 bg-brand-400/10 px-3 py-1.5 text-xs font-medium text-brand-200 hover:bg-brand-400/20"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => setDeletingSongId(songId)}
-                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
     </section>
