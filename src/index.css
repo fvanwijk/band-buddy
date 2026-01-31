@@ -1,1 +1,46 @@
 @import "tailwindcss";
+
+@theme {
+  /* Emerald theme (default) */
+  --color-brand-50: oklch(0.979 0.021 166.113);
+  --color-brand-100: oklch(0.95 0.052 163.051);
+  --color-brand-200: oklch(0.905 0.093 164.15);
+  --color-brand-300: oklch(0.845 0.143 164.978);
+  --color-brand-400: oklch(0.765 0.177 163.223);
+  --color-brand-500: oklch(0.696 0.17 162.48);
+  --color-brand-600: oklch(0.596 0.145 163.225);
+  --color-brand-700: oklch(0.508 0.118 165.612);
+  --color-brand-800: oklch(0.432 0.095 166.913);
+  --color-brand-900: oklch(0.378 0.077 168.94);
+  --color-brand-950: oklch(0.262 0.051 172.552);
+}
+
+/* Orange theme */
+[data-theme="orange"] {
+  --color-brand-50: oklch(0.98 0.016 73.684);
+  --color-brand-100: oklch(0.954 0.038 75.164);
+  --color-brand-200: oklch(0.901 0.076 70.697);
+  --color-brand-300: oklch(0.837 0.128 66.29);
+  --color-brand-400: oklch(0.75 0.183 55.934);
+  --color-brand-500: oklch(0.705 0.213 47.604);
+  --color-brand-600: oklch(0.646 0.222 41.116);
+  --color-brand-700: oklch(0.553 0.195 38.402);
+  --color-brand-800: oklch(0.47 0.157 37.304);
+  --color-brand-900: oklch(0.408 0.123 38.172);
+  --color-brand-950: oklch(0.266 0.079 36.259);
+}
+
+/* Violet theme */
+[data-theme="violet"] {
+  --color-brand-50: oklch(0.969 0.016 293.756);
+  --color-brand-100: oklch(0.943 0.029 294.588);
+  --color-brand-200: oklch(0.894 0.057 293.283);
+  --color-brand-300: oklch(0.811 0.111 293.571);
+  --color-brand-400: oklch(0.702 0.183 293.541);
+  --color-brand-500: oklch(0.606 0.25 292.717);
+  --color-brand-600: oklch(0.541 0.281 293.009);
+  --color-brand-700: oklch(0.491 0.27 292.581);
+  --color-brand-800: oklch(0.432 0.232 292.759);
+  --color-brand-900: oklch(0.38 0.189 293.745);
+  --color-brand-950: oklch(0.283 0.141 291.089);
+}

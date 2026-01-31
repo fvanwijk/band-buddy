@@ -5,12 +5,12 @@ function ManageSongsPage() {
     <section className="flex h-full flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
             Library
           </p>
           <h1 className="text-2xl font-semibold text-slate-100">Songs</h1>
         </div>
-        <button className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-200">
+        <button className="rounded-full border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-200">
           New song
         </button>
       </header>
@@ -32,7 +32,7 @@ function ManageSongsPage() {
                 <span className="rounded-full bg-slate-900/70 px-3 py-1">
                   {song.timeSignature}
                 </span>
-                <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-emerald-200">
+                <span className="rounded-full bg-brand-400/10 px-3 py-1 text-brand-200">
                   {song.key}
                 </span>
               </div>
