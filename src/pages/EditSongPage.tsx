@@ -21,9 +21,9 @@ function EditSongPage() {
     if (!id) return;
     const finalData: Record<string, string | number> = {
       artist: data.artist,
-      title: data.title,
       key: data.key,
       timeSignature: data.timeSignature,
+      title: data.title,
     };
     if (data.bpm) {
       finalData.bpm = data.bpm;
@@ -47,12 +47,12 @@ function EditSongPage() {
   }
 
   const song: Song = {
-    id: id,
     artist: songRow.artist as string,
-    title: songRow.title as string,
+    bpm: songRow.bpm as number | undefined,
+    id: id,
     key: songRow.key as string,
     timeSignature: songRow.timeSignature as string,
-    bpm: songRow.bpm as number | undefined,
+    title: songRow.title as string,
   };
 
   return <SongForm initialData={song} onSubmit={handleSubmit} title="Edit Song" />;

@@ -1,4 +1,4 @@
-import type { UseFormRegisterReturn, FieldError } from 'react-hook-form';
+import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
 type FormFieldProps = {
   label: string;

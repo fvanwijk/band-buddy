@@ -3,6 +3,7 @@ import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import importPlugin from 'eslint-plugin-import';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import sortKeysFixPlugin from 'eslint-plugin-sort-keys-fix';
 import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
 
@@ -22,6 +23,7 @@ export default tseslint.config([
     },
     plugins: {
       import: importPlugin,
+      'sort-keys-fix': sortKeysFixPlugin,
     },
     rules: {
       'import/order': [
@@ -32,6 +34,8 @@ export default tseslint.config([
           'newlines-between': 'always',
         },
       ],
+      'sort-imports': ['error', { ignoreDeclarationSort: true }],
+      'sort-keys-fix/sort-keys-fix': 'warn',
     },
   },
 ]);

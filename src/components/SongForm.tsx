@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,11 +38,11 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
   } = useForm<SongFormData>({
     defaultValues: {
       artist: initialData?.artist || '',
-      title: initialData?.title || '',
+      bpm: initialData?.bpm || undefined,
       keyNote: existingNote,
       keyQuality: existingQuality,
       timeSignature: initialData?.timeSignature || '4/4',
-      bpm: initialData?.bpm || undefined,
+      title: initialData?.title || '',
     },
   });
 
@@ -55,44 +55,44 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
 
   const noteOptions = useFlats
     ? [
-        { value: 'C', label: 'C' },
-        { value: 'Db', label: 'D♭' },
-        { value: 'D', label: 'D' },
-        { value: 'Eb', label: 'E♭' },
-        { value: 'E', label: 'E' },
-        { value: 'F', label: 'F' },
-        { value: 'Gb', label: 'G♭' },
-        { value: 'G', label: 'G' },
-        { value: 'Ab', label: 'A♭' },
-        { value: 'A', label: 'A' },
-        { value: 'Bb', label: 'B♭' },
-        { value: 'B', label: 'B' },
+        { label: 'C', value: 'C' },
+        { label: 'D♭', value: 'Db' },
+        { label: 'D', value: 'D' },
+        { label: 'E♭', value: 'Eb' },
+        { label: 'E', value: 'E' },
+        { label: 'F', value: 'F' },
+        { label: 'G♭', value: 'Gb' },
+        { label: 'G', value: 'G' },
+        { label: 'A♭', value: 'Ab' },
+        { label: 'A', value: 'A' },
+        { label: 'B♭', value: 'Bb' },
+        { label: 'B', value: 'B' },
       ]
     : [
-        { value: 'C', label: 'C' },
-        { value: 'C#', label: 'C♯' },
-        { value: 'D', label: 'D' },
-        { value: 'D#', label: 'D♯' },
-        { value: 'E', label: 'E' },
-        { value: 'F', label: 'F' },
-        { value: 'F#', label: 'F♯' },
-        { value: 'G', label: 'G' },
-        { value: 'G#', label: 'G♯' },
-        { value: 'A', label: 'A' },
-        { value: 'A#', label: 'A♯' },
-        { value: 'B', label: 'B' },
+        { label: 'C', value: 'C' },
+        { label: 'C♯', value: 'C#' },
+        { label: 'D', value: 'D' },
+        { label: 'D♯', value: 'D#' },
+        { label: 'E', value: 'E' },
+        { label: 'F', value: 'F' },
+        { label: 'F♯', value: 'F#' },
+        { label: 'G', value: 'G' },
+        { label: 'G♯', value: 'G#' },
+        { label: 'A', value: 'A' },
+        { label: 'A♯', value: 'A#' },
+        { label: 'B', value: 'B' },
       ];
 
   const qualityOptions = [
-    { value: '', label: 'Major' },
-    { value: 'm', label: 'Minor' },
+    { label: 'Major', value: '' },
+    { label: 'Minor', value: 'm' },
   ];
 
   const timeSignatureOptions = [
-    { value: '4/4', label: '4/4' },
-    { value: '3/4', label: '3/4' },
-    { value: '6/8', label: '6/8' },
-    { value: '2/4', label: '2/4' },
+    { label: '4/4', value: '4/4' },
+    { label: '3/4', value: '3/4' },
+    { label: '6/8', value: '6/8' },
+    { label: '2/4', value: '2/4' },
   ];
 
   const handleFormSubmit = (data: SongFormData) => {
@@ -106,9 +106,9 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
       bpm?: number;
     } = {
       artist: data.artist,
-      title: data.title,
       key,
       timeSignature: data.timeSignature,
+      title: data.title,
     };
     if (data.bpm) {
       finalData.bpm = data.bpm;
@@ -222,9 +222,9 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
               min="0"
               max="200"
               {...register('bpm', {
+                max: { message: 'BPM must be at most 200', value: 200 },
+                min: { message: 'BPM must be at least 0', value: 0 },
                 valueAsNumber: true,
-                min: { value: 0, message: 'BPM must be at least 0' },
-                max: { value: 200, message: 'BPM must be at most 200' },
               })}
               className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
               placeholder="Enter BPM (0-200)"

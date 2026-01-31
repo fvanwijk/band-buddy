@@ -2,16 +2,16 @@ export type ThemeName = 'emerald' | 'orange' | 'violet';
 
 export const TRIADIC_THEMES = {
   emerald: {
-    name: 'Emerald',
     color: 'emerald',
+    name: 'Emerald',
   },
   orange: {
-    name: 'Orange',
     color: 'orange',
+    name: 'Orange',
   },
   violet: {
-    name: 'Violet',
     color: 'violet',
+    name: 'Violet',
   },
 } as const;
 

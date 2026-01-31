@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
 import {
-  applyTheme,
-  getStoredTheme,
   TRIADIC_THEMES,
   type ThemeName,
+  applyTheme,
+  getStoredTheme,
 } from '../config/triadicThemes';
 
 // Color preview swatches for each theme

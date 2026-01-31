@@ -1,4 +1,4 @@
-import { useValue, useRow, useTable } from 'tinybase/ui-react';
+import { useRow, useTable, useValue } from 'tinybase/ui-react';
 
 import SetlistHeader from '../components/SetlistHeader';
 import SetlistTable from '../components/SetlistTable';
@@ -42,11 +42,11 @@ function ActiveSetlistPage() {
       const songRow = songsTable[id];
       if (!songRow) return null;
       return {
-        id,
         artist: songRow.artist as string,
-        title: songRow.title as string,
+        id,
         key: songRow.key as string,
         timeSignature: songRow.timeSignature as string,
+        title: songRow.title as string,
       };
     })
     .filter((song): song is Song => song !== null);

@@ -10,7 +10,7 @@ const navItems: NavItem[] = [
   { label: 'Active setlist', to: '/' },
   { label: 'Manage setlists', to: '/manage' },
   { label: 'Manage songs', to: '/songs' },
-  { label: 'Settings', to: '/settings', icon: 'cog' },
+  { icon: 'cog', label: 'Settings', to: '/settings' },
 ];
 
 function TopNav() {

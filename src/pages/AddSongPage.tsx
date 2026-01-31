@@ -15,9 +15,9 @@ function AddSongPage() {
   }) => {
     const finalData: Record<string, string | number> = {
       artist: data.artist,
-      title: data.title,
       key: data.key,
       timeSignature: data.timeSignature,
+      title: data.title,
     };
     if (data.bpm) {
       finalData.bpm = data.bpm;
