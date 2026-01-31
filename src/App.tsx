@@ -4,9 +4,11 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import TopNav from './components/TopNav';
 import { applyTheme, getStoredTheme } from './config/triadicThemes';
 import ActiveSetlistPage from './pages/ActiveSetlistPage';
+import { AddSetlistPage } from './pages/AddSetlistPage';
 import AddSongPage from './pages/AddSongPage';
+import { EditSetlistPage } from './pages/EditSetlistPage';
 import EditSongPage from './pages/EditSongPage';
-import ManageSetlistsPage from './pages/ManageSetlistsPage';
+import { ManageSetlistsPage } from './pages/ManageSetlistsPage';
 import ManageSongsPage from './pages/ManageSongsPage';
 import SettingsPage from './pages/SettingsPage';
 
@@ -29,7 +31,9 @@ function App() {
         <main className="min-h-0 flex-1">
           <Routes>
             <Route path="/" element={<ActiveSetlistPage />} />
-            <Route path="/manage" element={<ManageSetlistsPage />} />
+            <Route path="/setlist" element={<ManageSetlistsPage />} />
+            <Route path="/setlist/add" element={<AddSetlistPage />} />
+            <Route path="/setlist/edit/:id" element={<EditSetlistPage />} />
             <Route path="/songs" element={<ManageSongsPage />} />
             <Route path="/songs/add" element={<AddSongPage />} />
             <Route path="/songs/edit/:id" element={<EditSongPage />} />

@@ -8,7 +8,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { label: 'Active setlist', to: '/' },
-  { label: 'Manage setlists', to: '/manage' },
+  { label: 'Manage setlists', to: '/setlist' },
   { label: 'Manage songs', to: '/songs' },
   { icon: 'cog', label: 'Settings', to: '/settings' },
 ];

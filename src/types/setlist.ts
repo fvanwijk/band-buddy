@@ -7,10 +7,19 @@ export type Song = {
   bpm?: number;
 };
 
+export type SongReference = {
+  songId: string;
+  isDeleted?: boolean;
+};
+
+export type SetlistSet = {
+  setNumber: number;
+  songs: SongReference[];
+};
+
 export type Setlist = {
   id: string;
-  name: string;
   date: string;
-  venue: string;
-  songs: Song[];
+  sets: SetlistSet[];
+  title: string;
 };

@@ -145,7 +145,7 @@ function ManageSongsPage() {
                     </span>
                     <Link
                       to={`/songs/edit/${songId}`}
-                      className="rounded-md border border-brand-400/20 bg-brand-400/5 p-1.5 text-brand-300 opacity-0 transition-all hover:bg-brand-400/15 group-hover:opacity-100"
+                      className="rounded-md border border-brand-400/20 bg-brand-400/5 p-1.5 text-brand-300 transition-all hover:bg-brand-400/15"
                       title="Edit"
                     >
                       <svg
@@ -164,7 +164,7 @@ function ManageSongsPage() {
                     </Link>
                     <button
                       onClick={() => setDeletingSongId(songId)}
-                      className="rounded-md border border-red-500/20 bg-red-500/5 p-1.5 text-red-400 opacity-0 transition-all hover:bg-red-500/15 group-hover:opacity-100"
+                      className="rounded-md border border-red-500/20 bg-red-500/5 p-1.5 text-red-400 transition-all hover:bg-red-500/15"
                       title="Delete"
                     >
                       <svg
