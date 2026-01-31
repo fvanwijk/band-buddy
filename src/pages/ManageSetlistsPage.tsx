@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { SortButton } from '../components/SortButton';
 import { store } from '../store/store';
 import { useSetlists } from '../store/useStore';
 
@@ -55,13 +56,6 @@ export function ManageSetlistsPage() {
     }
   };
 
-  const getSortSymbol = (field: 'title' | 'date') => {
-    if (sortBy !== field) return '';
-    if (sortDirection === 'asc') return ' ↑';
-    if (sortDirection === 'desc') return ' ↓';
-    return '';
-  };
-
   const displaySetlists = getSortedSetlists();
 
   return (
@@ -84,19 +78,23 @@ export function ManageSetlistsPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          <div className="mb-4 flex gap-4 text-sm">
-            <button
-              className="font-medium text-slate-700 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-400"
+          <div className="mb-4 flex gap-1.5">
+            <SortButton
+              isActive={sortBy === 'title' && sortDirection !== 'none'}
+              label="Title"
               onClick={() => handleSort('title')}
-            >
-              Title{getSortSymbol('title')}
-            </button>
-            <button
-              className="font-medium text-slate-700 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-400"
+              sortDirection={
+                sortBy === 'title' && sortDirection !== 'none' ? sortDirection : undefined
+              }
+            />
+            <SortButton
+              isActive={sortBy === 'date' && sortDirection !== 'none'}
+              label="Date"
               onClick={() => handleSort('date')}
-            >
-              Date{getSortSymbol('date')}
-            </button>
+              sortDirection={
+                sortBy === 'date' && sortDirection !== 'none' ? sortDirection : undefined
+              }
+            />
           </div>
 
           {displaySetlists.map((setlist) => (

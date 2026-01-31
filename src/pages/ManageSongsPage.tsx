@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTable } from 'tinybase/ui-react';
 
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { SortButton } from '../components/SortButton';
 import { store } from '../store/store';
 
 type SortField = 'artist' | 'key' | 'title';
@@ -100,24 +101,18 @@ function ManageSongsPage() {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap gap-1.5">
+          <div className="mb-4 flex gap-4">
             {(['title', 'artist', 'key'] as const).map((field) => {
               const isActive = sortBy === field && sortDirection !== 'none';
-              const directionSymbol = isActive ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
 
               return (
-                <button
+                <SortButton
                   key={field}
+                  isActive={isActive}
+                  label={field.charAt(0).toUpperCase() + field.slice(1)}
                   onClick={() => handleSortFieldClick(field)}
-                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                    isActive
-                      ? 'border border-brand-400/50 bg-brand-400/20 text-brand-100'
-                      : 'border border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700'
-                  }`}
-                >
-                  {field.charAt(0).toUpperCase() + field.slice(1)}
-                  {directionSymbol}
-                </button>
+                  sortDirection={isActive ? sortDirection : undefined}
+                />
               );
             })}
           </div>
