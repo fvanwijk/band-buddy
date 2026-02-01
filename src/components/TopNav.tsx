@@ -1,17 +1,38 @@
-import { IconSettings } from '@tabler/icons-react';
+import { IconMusic, IconPlaylist, IconPlaylistOff, IconSettings } from '@tabler/icons-react';
 import { NavLink } from 'react-router-dom';
 
 type NavItem = {
+  icon: React.ReactNode;
   label: string;
+  shortLabel: string;
   to: string;
-  icon?: 'cog';
 };
 
 const navItems: NavItem[] = [
-  { label: 'Active setlist', to: '/' },
-  { label: 'Manage setlists', to: '/setlist' },
-  { label: 'Manage songs', to: '/songs' },
-  { icon: 'cog', label: 'Settings', to: '/settings' },
+  {
+    icon: <IconPlaylistOff className="h-4 w-4" />,
+    label: 'Active setlist',
+    shortLabel: 'Active',
+    to: '/',
+  },
+  {
+    icon: <IconPlaylist className="h-4 w-4" />,
+    label: 'Manage setlists',
+    shortLabel: 'Setlists',
+    to: '/setlist',
+  },
+  {
+    icon: <IconMusic className="h-4 w-4" />,
+    label: 'Manage songs',
+    shortLabel: 'Songs',
+    to: '/songs',
+  },
+  {
+    icon: <IconSettings className="h-4 w-4" />,
+    label: 'Settings',
+    shortLabel: 'Settings',
+    to: '/settings',
+  },
 ];
 
 function TopNav() {
@@ -24,12 +45,20 @@ function TopNav() {
           end={item.to === '/'}
           className={({ isActive }) =>
             [
-              'rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition',
+              'rounded-full transition',
+              'px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em]',
+              'sm:px-4 sm:py-2 md:gap-2 md:inline-flex md:items-center md:px-3 md:py-2 md:text-xs',
+              'lg:gap-2 lg:inline-flex lg:items-center lg:px-4 lg:py-2 lg:text-xs',
               isActive ? 'bg-brand-400/15 text-brand-200' : 'text-slate-400 hover:text-slate-200',
             ].join(' ')
           }
+          aria-label={item.label}
+          title={item.label}
         >
-          {item.icon === 'cog' ? <IconSettings className="h-4 w-4" /> : item.label}
+          <span className="hidden md:inline">{item.icon}</span>
+          <span className="md:hidden">{item.icon}</span>
+          <span className="hidden lg:inline">{item.label}</span>
+          <span className="hidden md:inline lg:hidden">{item.shortLabel}</span>
         </NavLink>
       ))}
     </nav>
