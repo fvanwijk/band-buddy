@@ -3,7 +3,7 @@ import { formatDuration, parseDuration } from '../utils/duration';
 
 type SetlistTableProps = {
   sets: SetlistSet[];
-  songsMap: Record<string, Song>;
+  songsMap: Map<string, Song>;
 };
 
 type SongRowProps = {
@@ -35,7 +35,7 @@ function SetlistTable({ sets, songsMap }: SetlistTableProps) {
     return (
       total +
       set.songs.reduce((setTotal, songRef) => {
-        const song = songsMap[songRef.songId];
+        const song = songsMap.get(songRef.songId);
         return setTotal + parseDuration(song?.duration);
       }, 0)
     );
@@ -47,7 +47,7 @@ function SetlistTable({ sets, songsMap }: SetlistTableProps) {
         {sets.map((set) => {
           // Calculate set duration
           const setSeconds = set.songs.reduce((total, songRef) => {
-            const song = songsMap[songRef.songId];
+            const song = songsMap.get(songRef.songId);
             return total + parseDuration(song?.duration);
           }, 0);
 
@@ -76,7 +76,7 @@ function SetlistTable({ sets, songsMap }: SetlistTableProps) {
                   {/* Songs */}
                   <ul className="divide-y divide-slate-800">
                     {set.songs.map((songRef, index) => {
-                      const song = songsMap[songRef.songId];
+                      const song = songsMap.get(songRef.songId);
                       if (!song) return null;
                       return <SongRow key={songRef.songId} index={index + 1} song={song} />;
                     })}

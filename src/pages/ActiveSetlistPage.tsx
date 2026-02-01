@@ -1,18 +1,20 @@
 import { IconPlaylistOff } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
-import { useRow, useTable, useValue } from 'tinybase/ui-react';
+import { useValue } from 'tinybase/ui-react';
 
 import { EmptyState } from '../components/EmptyState';
 import SetlistHeader from '../components/SetlistHeader';
 import SetlistTable from '../components/SetlistTable';
-import type { Setlist, Song } from '../types';
+import { useGetSetlist } from '../hooks/useSetlist';
+import { useGetSongs } from '../hooks/useSong';
+import type { Song } from '../types';
 
 function ActiveSetlistPage() {
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;
-  const setlistRow = useRow('setlists', activeSetlistId || '');
-  const songsTable = useTable('songs');
+  const setlist = useGetSetlist(activeSetlistId);
+  const songs = useGetSongs();
 
-  if (!activeSetlistId || !setlistRow) {
+  if (!activeSetlistId || !setlist) {
     return (
       <div className="flex h-full">
         <EmptyState
@@ -32,26 +34,10 @@ function ActiveSetlistPage() {
     );
   }
 
-  // Parse setlist data
-  let setlist: Setlist;
-  try {
-    const data = setlistRow?.data as string | undefined;
-    setlist = data ? JSON.parse(data) : { date: '', id: activeSetlistId, sets: [], title: '' };
-  } catch {
-    setlist = { date: '', id: activeSetlistId, sets: [], title: '' };
-  }
-
   // Build songs map for quick lookup
-  const songsMap: Record<string, Song> = {};
-  Object.entries(songsTable || {}).forEach(([id, song]) => {
-    songsMap[id] = {
-      artist: song.artist as string,
-      duration: song.duration as string | undefined,
-      id,
-      key: song.key as string,
-      timeSignature: song.timeSignature as string,
-      title: song.title as string,
-    };
+  const songsMap = new Map<string, Song>();
+  songs.forEach((song) => {
+    songsMap.set(song.id, song);
   });
 
   // Calculate total songs
