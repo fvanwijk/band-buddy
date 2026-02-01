@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { Page } from '../components/Page';
 import { SetlistCard } from '../components/SetlistCard';
@@ -8,7 +8,6 @@ import { store } from '../store/store';
 import { useSetlists } from '../store/useStore';
 
 export function ManageSetlistsPage() {
-  const navigate = useNavigate();
   const setlists = useSetlists();
   const [sortBy, setSortBy] = useState<'title' | 'date' | 'none'>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('desc');
@@ -46,10 +45,6 @@ export function ManageSetlistsPage() {
     });
 
     return sorted;
-  };
-
-  const handleEdit = (id: string) => {
-    navigate(`/setlist/edit/${id}`);
   };
 
   const handleDelete = (id: string) => {

@@ -33,8 +33,8 @@ export function SetlistCard({
         </>
       }
     >
-      <h3 className="font-semibold text-slate-900 dark:text-white">{title}</h3>
-      <div className="flex gap-3 text-sm text-slate-500 dark:text-slate-400">
+      <h3 className="font-semibold text-white">{title}</h3>
+      <div className="flex gap-3 text-sm text-slate-400">
         <span>{new Date(date).toLocaleDateString()}</span>
         <span>
           {setsCount} set{setsCount !== 1 ? 's' : ''}
