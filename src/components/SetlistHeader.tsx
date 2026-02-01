@@ -1,3 +1,5 @@
+import { formatDate } from '../utils/date';
+
 type SetlistHeaderProps = {
   name: string;
   date: string;
@@ -12,7 +14,7 @@ function SetlistHeader({ name, date, venue, songCount }: SetlistHeaderProps) {
         <h1 className="text-lg font-semibold text-slate-100 sm:text-xl">{name}</h1>
       </div>
       <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-        <span className="rounded-full bg-slate-900/70 px-3 py-1">{date}</span>
+        <span className="rounded-full bg-slate-900/70 px-3 py-1">{formatDate(date)}</span>
         {venue && <span className="rounded-full bg-slate-900/70 px-3 py-1">{venue}</span>}
         <span className="rounded-full bg-brand-400/10 px-3 py-1 text-brand-200">
           {songCount} songs
