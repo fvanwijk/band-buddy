@@ -1,7 +1,7 @@
 import { IconMusic } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useTable } from 'tinybase/ui-react';
+import { useStore, useTable } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -10,11 +10,11 @@ import { PageHeader } from '../components/PageHeader';
 import { SongCard } from '../components/SongCard';
 import { SortButtonsBar } from '../components/SortButtonsBar';
 import { useSortState } from '../hooks/useSortState';
-import { store } from '../store/store';
 
 type SortField = 'artist' | 'key' | 'title';
 
 function ManageSongsPage() {
+  const store = useStore();
   const songs = useTable('songs');
   let songIds = Object.keys(songs);
 
@@ -36,7 +36,7 @@ function ManageSongsPage() {
   }
 
   const handleDeleteSong = () => {
-    if (deletingSongId) {
+    if (store && deletingSongId) {
       store.delRow('songs', deletingSongId);
       setDeletingSongId(null);
     }

@@ -1,6 +1,6 @@
 import { IconPlaylist } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useValue } from 'tinybase/ui-react';
+import { useStore, useValue } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
@@ -9,12 +9,12 @@ import { PageHeader } from '../components/PageHeader';
 import { SetlistCard } from '../components/SetlistCard';
 import { SortButtonsBar } from '../components/SortButtonsBar';
 import { useSortState } from '../hooks/useSortState';
-import { store } from '../store/store';
 import { useSetlists } from '../store/useStore';
 
 type SortField = 'date' | 'title';
 
 export function ManageSetlistsPage() {
+  const store = useStore();
   const setlists = useSetlists();
   const navigate = useNavigate();
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;
@@ -42,11 +42,13 @@ export function ManageSetlistsPage() {
   };
 
   const handleActivate = (id: string) => {
+    if (!store) return;
     store.setValue('activeSetlistId', id);
     navigate('/');
   };
 
   const handleDelete = (id: string) => {
+    if (!store) return;
     if (window.confirm('Are you sure you want to delete this setlist?')) {
       store.delRow('setlists', id);
     }

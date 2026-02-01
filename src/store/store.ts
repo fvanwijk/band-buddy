@@ -1,17 +1,38 @@
+import type { Store } from 'tinybase';
 import { createStore } from 'tinybase';
 import { createLocalPersister } from 'tinybase/persisters/persister-browser';
 
-// Create the store
-export const store = createStore();
+/**
+ * Create a new store with schema configuration
+ */
+export function createAppStore(): Store {
+  const store = createStore()
+    .setSchema({
+      setlists: {
+        data: { type: 'string' }, // Stores JSON-stringified Setlist
+      },
+      settings: {
+        locale: { type: 'string' },
+      },
+      songs: {
+        artist: { type: 'string' },
+        bpm: { type: 'number' },
+        duration: { type: 'string' },
+        key: { type: 'string' },
+        timeSignature: { type: 'string' },
+        title: { type: 'string' },
+      },
+    })
+    .setValuesSchema({
+      activeSetlistId: { type: 'string' },
+    });
 
-// Create persister for localStorage
-export const persister = createLocalPersister(store, 'gig-buddy-store');
+  return store;
+}
 
-// Initialize and persist
-export async function initializeStore() {
-  // Try to load from localStorage first
-  await persister.load();
-
-  // Start auto-save
-  await persister.startAutoSave();
+/**
+ * Create a persister for the given store
+ */
+export function createStorePersister(store: Store) {
+  return createLocalPersister(store, 'gig-buddy-store');
 }

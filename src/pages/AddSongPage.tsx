@@ -1,19 +1,22 @@
 import { useNavigate } from 'react-router-dom';
+import { useStore } from 'tinybase/ui-react';
 
 import { SongForm } from '../components/SongForm';
-import { store } from '../store/store';
 
 function AddSongPage() {
   const backPath = '/songs';
   const navigate = useNavigate();
+  const store = useStore();
 
   const handleSubmit = (data: {
     artist: string;
-    title: string;
+    bpm?: number;
+    duration?: string;
     key: string;
     timeSignature: string;
-    bpm?: number;
+    title: string;
   }) => {
+    if (!store) return;
     const finalData: Record<string, string | number> = {
       artist: data.artist,
       key: data.key,
@@ -22,6 +25,9 @@ function AddSongPage() {
     };
     if (data.bpm) {
       finalData.bpm = data.bpm;
+    }
+    if (data.duration) {
+      finalData.duration = data.duration;
     }
     store.addRow('songs', finalData);
     navigate(backPath);

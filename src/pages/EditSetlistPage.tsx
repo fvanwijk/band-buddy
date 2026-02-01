@@ -1,12 +1,13 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import { useStore } from 'tinybase/ui-react';
 
 import { SetlistForm } from '../components/SetlistForm';
-import { store } from '../store/store';
 import { useSetlists } from '../store/useStore';
 
 export function EditSetlistPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const store = useStore();
   const setlists = useSetlists();
 
   const setlist = setlists.find((s) => s.id === id);
@@ -24,10 +25,8 @@ export function EditSetlistPage() {
     sets: Array<{ setNumber: number; songs: Array<{ songId: string; isDeleted?: boolean }> }>;
     title: string;
   }) => {
-    store.setRow('setlists', id!, { data: JSON.stringify(data) } as Record<
-      string,
-      string | number
-    >);
+    if (!id || !store) return;
+    store.setRow('setlists', id, { data: JSON.stringify(data) });
     navigate('/setlist');
   };
 

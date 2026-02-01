@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useStore } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { SelectField } from '../components/SelectField';
@@ -31,8 +32,11 @@ const themeColors = {
 } as const;
 
 function SettingsPage() {
+  const store = useStore();
   const [currentTheme, setCurrentTheme] = useState<ThemeName>(getStoredTheme());
-  const [currentLocale, setCurrentLocale] = useState<SupportedLocale>(getStoredLocale());
+  const [currentLocale, setCurrentLocale] = useState<SupportedLocale>(
+    store ? getStoredLocale(store) : 'en-US',
+  );
 
   const handleThemeChange = (themeName: ThemeName) => {
     applyTheme(themeName);
@@ -40,7 +44,9 @@ function SettingsPage() {
   };
 
   const handleLocaleChange = (locale: string) => {
-    setStoredLocale(locale as SupportedLocale);
+    if (store) {
+      setStoredLocale(store, locale as SupportedLocale);
+    }
     setCurrentLocale(locale as SupportedLocale);
   };
 
