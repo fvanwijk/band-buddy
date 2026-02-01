@@ -5,6 +5,7 @@ import { BackButton } from '../components/BackButton';
 import { Button } from '../components/Button';
 import { LyricsBlock } from '../components/LyricsBlock';
 import { Page } from '../components/Page';
+import { SongStats } from '../components/SongStats';
 import { useGetSetlist } from '../hooks/useSetlist';
 import { useGetSongs } from '../hooks/useSong';
 import type { Song } from '../types';
@@ -89,28 +90,7 @@ function SongDetailPage() {
           <h1 className="text-2xl font-bold text-slate-100">{currentSong.title}</h1>
           <p className="text-sm text-slate-400">{currentSong.artist}</p>
         </div>
-        <div className="flex gap-4 text-right text-sm">
-          <div>
-            <p className="text-xs text-slate-500">Key</p>
-            <p className="font-semibold text-brand-200">{currentSong.key}</p>
-          </div>
-          <div>
-            <p className="text-xs text-slate-500">Time</p>
-            <p className="font-semibold text-slate-100">{currentSong.timeSignature}</p>
-          </div>
-          {currentSong.bpm && (
-            <div>
-              <p className="text-xs text-slate-500">BPM</p>
-              <p className="font-semibold text-slate-100">{currentSong.bpm}</p>
-            </div>
-          )}
-          {currentSong.duration && (
-            <div>
-              <p className="text-xs text-slate-500">Duration</p>
-              <p className="font-semibold text-slate-100">{currentSong.duration}</p>
-            </div>
-          )}
-        </div>
+        <SongStats song={currentSong} />
       </header>
 
       <LyricsBlock lyrics={currentSong.lyrics} />
