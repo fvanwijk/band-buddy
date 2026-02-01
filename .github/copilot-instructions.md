@@ -261,7 +261,6 @@ The Button component uses `class-variance-authority` for composable, type-safe s
   icon                      // Icon-only: boolean (sets p-2)
   iconStart={<Icon />}      // Icon on left: ReactNode
   iconEnd={<Icon />}        // Icon on right: ReactNode
-  size="default"            // Size: 'default' | 'icon'
   variant="outlined"        // Variant: 'filled' | 'outlined' | 'ghost'
   href="/path"              // When using as="a"
   className="custom"        // Extra classes
@@ -525,7 +524,6 @@ src/
 7. ❌ Don't create standalone button elements → ✅ Use the `Button` component with props
 8. ❌ Don't use dark: prefixes → ✅ App is dark mode only, use base classes
 9. ❌ Don't use inline SVGs for icons → ✅ Use tabler icons (`IconMusic`, `IconPlus`, etc.)
-10. ❌ Don't pass both `icon` and `size="icon"` → ✅ Use `icon` prop which has priority
 
 ## Code Formatting
 

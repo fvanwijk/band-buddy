@@ -27,6 +27,7 @@ type SongFormProps = {
     lyrics?: string;
     timeSignature: string;
     title: string;
+    transpose?: number;
   }) => void;
   title: string;
 };
@@ -126,6 +127,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       lyrics?: string;
       timeSignature: string;
       title: string;
+      transpose?: number;
     } = {
       artist: data.artist,
       key,
@@ -140,6 +142,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     }
     if (data.lyrics) {
       finalData.lyrics = data.lyrics;
+    }
+    if (initialData?.transpose !== undefined) {
+      finalData.transpose = initialData.transpose;
     }
     onSubmit(finalData);
   };

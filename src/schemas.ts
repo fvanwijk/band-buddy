@@ -12,6 +12,7 @@ export const songSchema = z.object({
   lyrics: z.string().optional(),
   timeSignature: z.string(),
   title: z.string(),
+  transpose: z.number().optional(),
 });
 
 /**
@@ -25,6 +26,7 @@ export const songTableSchema = z.object({
   lyrics: z.string().optional(),
   timeSignature: z.string(),
   title: z.string(),
+  transpose: z.number().optional(),
 });
 
 /**

@@ -60,6 +60,9 @@ export function useAddSong(onSuccess?: () => void) {
       if (data.duration) {
         finalData.duration = data.duration;
       }
+      if (data.transpose !== undefined) {
+        finalData.transpose = data.transpose;
+      }
       return finalData;
     },
     [navigate, onSuccess],
@@ -92,6 +95,9 @@ export function useUpdateSong(id: string | undefined, onSuccess?: () => void) {
       }
       if (data.lyrics) {
         finalData.lyrics = data.lyrics;
+      }
+      if (data.transpose !== undefined) {
+        finalData.transpose = data.transpose;
       }
       return finalData;
     },

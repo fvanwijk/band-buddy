@@ -7,6 +7,7 @@ export type Song = {
   lyrics?: string;
   timeSignature: string;
   title: string;
+  transpose?: number;
 };
 
 export type SongReference = {
