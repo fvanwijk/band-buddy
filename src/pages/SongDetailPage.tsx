@@ -93,7 +93,7 @@ function SongDetailPage() {
         <SongStats song={currentSong} />
       </header>
 
-      <LyricsBlock lyrics={currentSong.lyrics} />
+      <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
 
       {/* Navigation Footer */}
       <div className="flex gap-3">
