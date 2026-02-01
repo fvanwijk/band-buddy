@@ -1,35 +1,24 @@
-import { useState } from 'react';
+import { IconPlaylist } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '../components/Button';
+import { EmptyState } from '../components/EmptyState';
 import { Page } from '../components/Page';
 import { PageHeader } from '../components/PageHeader';
 import { SetlistCard } from '../components/SetlistCard';
-import { SortButton } from '../components/SortButton';
+import { SortButtonsBar } from '../components/SortButtonsBar';
+import { useSortState } from '../hooks/useSortState';
 import { store } from '../store/store';
 import { useSetlists } from '../store/useStore';
 
+type SortField = 'date' | 'title';
+
 export function ManageSetlistsPage() {
   const setlists = useSetlists();
-  const [sortBy, setSortBy] = useState<'title' | 'date' | 'none'>('date');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | 'none'>('desc');
-
-  const handleSort = (field: 'title' | 'date') => {
-    if (sortBy === field) {
-      // Cycle through: asc -> desc -> none
-      if (sortDirection === 'asc') setSortDirection('desc');
-      else if (sortDirection === 'desc') {
-        setSortDirection('none');
-        setSortBy('none');
-      }
-    } else {
-      setSortBy(field);
-      setSortDirection('asc');
-    }
-  };
+  const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>('date', 'desc');
 
   const getSortedSetlists = () => {
-    if (sortBy === 'none' || sortDirection === 'none') {
+    if (!sortBy || sortDirection === 'none') {
       return setlists;
     }
 
@@ -69,41 +58,33 @@ export function ManageSetlistsPage() {
       />
 
       {displaySetlists.length === 0 ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-8 text-center">
-          <p className="text-slate-400">No setlists yet. Create one to get started!</p>
-        </div>
+        <EmptyState
+          description="Create your first setlist to get started!"
+          icon={<IconPlaylist className="w-12 h-12" />}
+          title="No setlists yet"
+        />
       ) : (
-        <div className="space-y-2">
-          <div className="mb-4 flex gap-1.5">
-            <SortButton
-              isActive={sortBy === 'title' && sortDirection !== 'none'}
-              label="Title"
-              onClick={() => handleSort('title')}
-              sortDirection={
-                sortBy === 'title' && sortDirection !== 'none' ? sortDirection : undefined
-              }
-            />
-            <SortButton
-              isActive={sortBy === 'date' && sortDirection !== 'none'}
-              label="Date"
-              onClick={() => handleSort('date')}
-              sortDirection={
-                sortBy === 'date' && sortDirection !== 'none' ? sortDirection : undefined
-              }
-            />
-          </div>
+        <div className="flex flex-col gap-4">
+          <SortButtonsBar
+            fields={['date', 'title'] as const}
+            isActive={isActive}
+            onSort={handleSort}
+            sortDirection={sortDirection}
+          />
 
-          {displaySetlists.map((setlist) => (
-            <SetlistCard
-              key={setlist.id}
-              date={setlist.date}
-              id={setlist.id}
-              onDelete={() => handleDelete(setlist.id)}
-              setsCount={setlist.sets.length}
-              songsCount={setlist.sets.reduce((total, s) => total + s.songs.length, 0)}
-              title={setlist.title}
-            />
-          ))}
+          <div className="grid gap-2">
+            {displaySetlists.map((setlist) => (
+              <SetlistCard
+                key={setlist.id}
+                date={setlist.date}
+                id={setlist.id}
+                onDelete={() => handleDelete(setlist.id)}
+                setsCount={setlist.sets.length}
+                songsCount={setlist.sets.reduce((total, s) => total + s.songs.length, 0)}
+                title={setlist.title}
+              />
+            ))}
+          </div>
         </div>
       )}
     </Page>

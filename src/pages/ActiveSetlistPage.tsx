@@ -1,5 +1,7 @@
+import { IconPlaylistOff } from '@tabler/icons-react';
 import { useRow, useTable, useValue } from 'tinybase/ui-react';
 
+import { EmptyState } from '../components/EmptyState';
 import SetlistHeader from '../components/SetlistHeader';
 import SetlistTable from '../components/SetlistTable';
 import type { Song } from '../types/setlist';
@@ -11,26 +13,12 @@ function ActiveSetlistPage() {
 
   if (!activeSetlistId || !setlist) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 text-center py-16">
-        <div className="rounded-full bg-brand-400/10 p-6 mb-4">
-          <svg
-            className="w-12 h-12 text-brand-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-            />
-          </svg>
-        </div>
-        <h2 className="text-xl font-semibold text-slate-100 mb-2">No active setlist</h2>
-        <p className="text-slate-400 max-w-md">
-          Select or create a setlist to get started with your performance.
-        </p>
+      <div className="flex h-full">
+        <EmptyState
+          description="Select or create a setlist to get started with your performance."
+          icon={<IconPlaylistOff className="w-12 h-12" />}
+          title="No active setlist"
+        />
       </div>
     );
   }

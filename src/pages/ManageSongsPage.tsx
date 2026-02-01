@@ -1,24 +1,25 @@
+import { IconMusic } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTable } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { EmptyState } from '../components/EmptyState';
 import { PageHeader } from '../components/PageHeader';
 import { SongCard } from '../components/SongCard';
-import { SortButton } from '../components/SortButton';
+import { SortButtonsBar } from '../components/SortButtonsBar';
+import { useSortState } from '../hooks/useSortState';
 import { store } from '../store/store';
 
 type SortField = 'artist' | 'key' | 'title';
-type SortDirection = 'asc' | 'desc' | 'none';
 
 function ManageSongsPage() {
   const songs = useTable('songs');
   let songIds = Object.keys(songs);
 
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<SortField | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('none');
+  const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(null, 'none');
 
   // Sort songs
   if (sortDirection !== 'none' && sortBy) {
@@ -38,22 +39,6 @@ function ManageSongsPage() {
     if (deletingSongId) {
       store.delRow('songs', deletingSongId);
       setDeletingSongId(null);
-    }
-  };
-
-  const handleSortFieldClick = (field: SortField) => {
-    if (sortBy === field) {
-      // Same field clicked: cycle through directions
-      const cycle: Record<SortDirection, SortDirection> = {
-        asc: 'desc',
-        desc: 'none',
-        none: 'asc',
-      };
-      setSortDirection(cycle[sortDirection]);
-    } else {
-      // Different field clicked: start with ascending
-      setSortBy(field);
-      setSortDirection('asc');
     }
   };
 
@@ -77,44 +62,19 @@ function ManageSongsPage() {
       />
 
       {songIds.length === 0 ? (
-        <div className="flex flex-col items-center justify-center flex-1 text-center py-16">
-          <div className="rounded-full bg-brand-400/10 p-6 mb-4">
-            <svg
-              className="w-12 h-12 text-brand-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-slate-100 mb-2">No songs in your library</h2>
-          <p className="text-slate-400 max-w-md">
-            Add songs to build your repertoire and use them in setlists.
-          </p>
-        </div>
+        <EmptyState
+          description="Add songs to build your repertoire and use them in setlists."
+          icon={<IconMusic className="w-12 h-12" />}
+          title="No songs in your library"
+        />
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="mb-4 flex gap-4">
-            {(['title', 'artist', 'key'] as const).map((field) => {
-              const isActive = sortBy === field && sortDirection !== 'none';
-
-              return (
-                <SortButton
-                  key={field}
-                  isActive={isActive}
-                  label={field.charAt(0).toUpperCase() + field.slice(1)}
-                  onClick={() => handleSortFieldClick(field)}
-                  sortDirection={isActive ? sortDirection : undefined}
-                />
-              );
-            })}
-          </div>
+          <SortButtonsBar
+            fields={['title', 'artist', 'key'] as const}
+            isActive={isActive}
+            onSort={handleSort}
+            sortDirection={sortDirection}
+          />
           <div className="grid gap-2">
             {songIds.map((songId) => {
               const song = songs[songId];
