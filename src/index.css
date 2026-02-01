@@ -44,3 +44,8 @@
   --color-brand-900: oklch(0.38 0.189 293.745);
   --color-brand-950: oklch(0.283 0.141 291.089);
 }
+
+/* Link styling */
+.link {
+  @apply text-brand-300 transition-colors hover:text-brand-200 underline decoration-brand-300/50 hover:decoration-brand-200;
+}

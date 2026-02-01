@@ -1,4 +1,5 @@
 import { IconPlaylistOff } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
 import { useRow, useTable, useValue } from 'tinybase/ui-react';
 
 import { EmptyState } from '../components/EmptyState';
@@ -15,7 +16,15 @@ function ActiveSetlistPage() {
     return (
       <div className="flex h-full">
         <EmptyState
-          description="Select or create a setlist to get started with your performance."
+          description={
+            <>
+              Select or create a{' '}
+              <Link className="link" to="/setlists">
+                setlist
+              </Link>{' '}
+              to get started with your performance.
+            </>
+          }
           icon={<IconPlaylistOff className="w-12 h-12" />}
           title="No active setlist"
         />

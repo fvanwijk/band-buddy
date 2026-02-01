@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
     icon: <IconPlaylist className="h-4 w-4" />,
     label: 'Manage setlists',
     shortLabel: 'Setlists',
-    to: '/setlist',
+    to: '/setlists',
   },
   {
     icon: <IconMusic className="h-4 w-4" />,

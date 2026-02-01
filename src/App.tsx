@@ -31,9 +31,9 @@ function App() {
         <main className="min-h-0 flex-1">
           <Routes>
             <Route path="/" element={<ActiveSetlistPage />} />
-            <Route path="/setlist" element={<ManageSetlistsPage />} />
-            <Route path="/setlist/add" element={<AddSetlistPage />} />
-            <Route path="/setlist/edit/:id" element={<EditSetlistPage />} />
+            <Route path="/setlists" element={<ManageSetlistsPage />} />
+            <Route path="/setlists/add" element={<AddSetlistPage />} />
+            <Route path="/setlists/edit/:id" element={<EditSetlistPage />} />
             <Route path="/songs" element={<ManageSongsPage />} />
             <Route path="/songs/add" element={<AddSongPage />} />
             <Route path="/songs/edit/:id" element={<EditSongPage />} />
