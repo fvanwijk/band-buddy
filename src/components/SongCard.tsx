@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { Button } from './Button';
 import { Card } from './Card';
-import { formatDuration } from '../utils/duration';
+import { FormattedDuration } from './FormattedDuration';
 import { parseDuration } from '../utils/duration';
 
 type SongCardProps = {
@@ -51,7 +51,9 @@ export function SongCard({
         <span className="hidden text-xs text-slate-400 sm:inline">{keyNote}</span>
         <span className="hidden text-xs text-slate-400 sm:inline">{timeSignature}</span>
         {duration && (
-          <span className="text-xs text-slate-400">{formatDuration(parseDuration(duration))}</span>
+          <span className="text-xs text-slate-400">
+            <FormattedDuration seconds={parseDuration(duration)} />
+          </span>
         )}
       </div>
     </Card>

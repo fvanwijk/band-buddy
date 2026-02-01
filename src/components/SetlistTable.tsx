@@ -1,5 +1,6 @@
+import { FormattedDuration } from './FormattedDuration';
 import type { SetlistSet, Song } from '../types';
-import { formatDuration, parseDuration } from '../utils/duration';
+import { parseDuration } from '../utils/duration';
 
 type SetlistTableProps = {
   sets: SetlistSet[];
@@ -13,7 +14,6 @@ type SongRowProps = {
 
 function SongRow({ index, song }: SongRowProps) {
   const durationSeconds = parseDuration(song.duration);
-  const durationDisplay = formatDuration(durationSeconds);
 
   return (
     <li className="grid gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[0.5fr_3fr_1fr_1fr_1fr]">
@@ -24,7 +24,9 @@ function SongRow({ index, song }: SongRowProps) {
       </span>
       <span className="text-right text-sm font-semibold text-slate-100">{song.timeSignature}</span>
       <span className="text-right text-sm font-semibold text-brand-200">{song.key}</span>
-      <span className="text-right text-sm text-slate-400">{durationDisplay}</span>
+      <span className="text-right text-sm text-slate-400">
+        <FormattedDuration seconds={durationSeconds} />
+      </span>
     </li>
   );
 }
@@ -56,7 +58,9 @@ function SetlistTable({ sets, songsMap }: SetlistTableProps) {
               {/* Set Header */}
               <div className="sticky top-0 flex items-center justify-between border-b border-slate-700 bg-slate-800/50 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300 backdrop-blur-sm">
                 <span>Set {set.setNumber}</span>
-                <span className="text-slate-400">{formatDuration(setSeconds)}</span>
+                <span className="text-slate-400">
+                  <FormattedDuration seconds={setSeconds} />
+                </span>
               </div>
 
               {/* Songs in Set */}
@@ -89,9 +93,11 @@ function SetlistTable({ sets, songsMap }: SetlistTableProps) {
       </div>
 
       {/* Total Duration Footer */}
-      <div className="border-t border-slate-800 bg-slate-900/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300 flex items-center justify-between">
-        <span>Total Duration</span>
-        <span className="text-lg font-bold">{formatDuration(totalSeconds)}</span>
+      <div className="border-t border-slate-800 bg-slate-900/30 px-6 py-3 text-xs font-semibold  tracking-[0.2em] text-brand-300 flex items-center justify-between">
+        <span className="uppercase">Total Duration</span>
+        <span className="text-lg font-bold">
+          <FormattedDuration seconds={totalSeconds} />
+        </span>
       </div>
     </section>
   );

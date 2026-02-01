@@ -17,6 +17,7 @@ export function parseDuration(duration: string | undefined): number {
 
 /**
  * Format seconds to "Xh Ym Zs" format (e.g., "1h 5m 30s" or "5m 30s")
+ * @deprecated Use FormattedDuration component instead for styled output
  */
 export function formatDuration(totalSeconds: number): string {
   if (totalSeconds <= 0) return '—';
