@@ -9,6 +9,7 @@ import EditSongPage from './pages/EditSongPage';
 import { ManageSetlistsPage } from './pages/ManageSetlistsPage';
 import ManageSongsPage from './pages/ManageSongsPage';
 import SettingsPage from './pages/SettingsPage';
+import SongDetailPage from './pages/SongDetailPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <main className="min-h-0 flex-1">
           <Routes>
             <Route path="/" element={<ActiveSetlistPage />} />
+            <Route path="/setlist/:setlistId/song/:songId" element={<SongDetailPage />} />
             <Route path="/setlists" element={<ManageSetlistsPage />} />
             <Route path="/setlists/add" element={<AddSetlistPage />} />
             <Route path="/setlists/edit/:id" element={<EditSetlistPage />} />

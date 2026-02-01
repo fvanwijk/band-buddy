@@ -1,22 +1,29 @@
+import { useNavigate } from 'react-router-dom';
+
 import { FormattedDuration } from './FormattedDuration';
 import type { SetlistSet, Song } from '../types';
 import { parseDuration } from '../utils/duration';
 
 type SetlistTableProps = {
+  setlistId?: string;
   sets: SetlistSet[];
   songsMap: Map<string, Song>;
 };
 
 type SongRowProps = {
   index: number;
+  onNavigate: (songId: string) => void;
   song: Song;
 };
 
-function SongRow({ index, song }: SongRowProps) {
+function SongRow({ index, onNavigate, song }: SongRowProps) {
   const durationSeconds = parseDuration(song.duration);
 
   return (
-    <li className="grid gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[0.5fr_3fr_1fr_1fr_1fr]">
+    <li
+      className="grid cursor-pointer gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[0.5fr_3fr_1fr_1fr_1fr]"
+      onClick={() => onNavigate(song.id)}
+    >
       <span className="text-right text-slate-500">{index}</span>
       <span className="flex flex-col">
         <span className="text-base font-semibold text-slate-100">{song.title}</span>
@@ -31,7 +38,15 @@ function SongRow({ index, song }: SongRowProps) {
   );
 }
 
-function SetlistTable({ sets, songsMap }: SetlistTableProps) {
+function SetlistTable({ setlistId, sets, songsMap }: SetlistTableProps) {
+  const navigate = useNavigate();
+
+  const handleSongClick = (songId: string) => {
+    if (setlistId) {
+      navigate(`/setlist/${setlistId}/song/${songId}`);
+    }
+  };
+
   // Calculate total duration
   const totalSeconds = sets.reduce((total, set) => {
     return (
@@ -82,7 +97,14 @@ function SetlistTable({ sets, songsMap }: SetlistTableProps) {
                     {set.songs.map((songRef, index) => {
                       const song = songsMap.get(songRef.songId);
                       if (!song) return null;
-                      return <SongRow key={songRef.songId} index={index + 1} song={song} />;
+                      return (
+                        <SongRow
+                          key={songRef.songId}
+                          index={index + 1}
+                          onNavigate={handleSongClick}
+                          song={song}
+                        />
+                      );
                     })}
                   </ul>
                 </>

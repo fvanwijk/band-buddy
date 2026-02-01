@@ -52,7 +52,7 @@ function ActiveSetlistPage() {
         venue={setlist.venue}
       />
 
-      <SetlistTable sets={setlist.sets} songsMap={songsMap} />
+      <SetlistTable setlistId={activeSetlistId} sets={setlist.sets} songsMap={songsMap} />
     </div>
   );
 }
