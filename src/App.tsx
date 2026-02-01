@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import TopNav from './components/TopNav';
-import { applyTheme, getStoredTheme } from './config/triadicThemes';
 import ActiveSetlistPage from './pages/ActiveSetlistPage';
 import { AddSetlistPage } from './pages/AddSetlistPage';
 import AddSongPage from './pages/AddSongPage';
@@ -13,11 +11,6 @@ import ManageSongsPage from './pages/ManageSongsPage';
 import SettingsPage from './pages/SettingsPage';
 
 function App() {
-  useEffect(() => {
-    // Apply stored theme on mount
-    applyTheme(getStoredTheme());
-  }, []);
-
   return (
     <div className="h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto flex h-full max-w-5xl flex-col gap-3 px-4 py-4">

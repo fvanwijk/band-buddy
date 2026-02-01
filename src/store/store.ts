@@ -13,6 +13,7 @@ export function createAppStore(): Store {
       },
       settings: {
         locale: { type: 'string' },
+        theme: { type: 'string' },
       },
       songs: {
         artist: { type: 'string' },

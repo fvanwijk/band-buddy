@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { Provider, useCreateStore } from 'tinybase/ui-react';
 
 import { createAppStore, createStorePersister } from './store';
+import { detectLocale } from '../config/locales';
+import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
 import { createSetlists } from '../mocks/setlists';
 import { createSongs } from '../mocks/songs';
 
@@ -33,6 +35,18 @@ export function StoreProvider({ children }: StoreProviderProps) {
         seedSetlists.forEach(({ id, ...setlist }) => {
           store.setRow('setlists', id, { data: JSON.stringify(setlist) });
         });
+
+        // Initialize settings with defaults
+        store.setCell('settings', 'app', 'locale', detectLocale());
+        store.setCell('settings', 'app', 'theme', DEFAULT_THEME);
+      }
+
+      // Apply theme from store
+      const storedTheme = store.getCell('settings', 'app', 'theme') as string | undefined;
+      if (storedTheme) {
+        applyTheme(storedTheme as ThemeName);
+      } else {
+        applyTheme(DEFAULT_THEME);
       }
 
       // Start auto-save

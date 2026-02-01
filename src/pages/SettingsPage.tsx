@@ -1,16 +1,8 @@
-import { useState } from 'react';
-import { useStore } from 'tinybase/ui-react';
-
 import { Button } from '../components/Button';
 import { SelectField } from '../components/SelectField';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '../config/locales';
-import { getStoredLocale, setStoredLocale } from '../config/settings';
-import {
-  TRIADIC_THEMES,
-  type ThemeName,
-  applyTheme,
-  getStoredTheme,
-} from '../config/triadicThemes';
+import { THEMES, type ThemeName } from '../config/themes';
+import { useGetLocale, useGetTheme, useSetLocale, useSetTheme } from '../hooks/useSettings';
 
 // Color preview swatches for each theme
 const themeColors = {
@@ -32,23 +24,10 @@ const themeColors = {
 } as const;
 
 function SettingsPage() {
-  const store = useStore();
-  const [currentTheme, setCurrentTheme] = useState<ThemeName>(getStoredTheme());
-  const [currentLocale, setCurrentLocale] = useState<SupportedLocale>(
-    store ? getStoredLocale(store) : 'en-US',
-  );
-
-  const handleThemeChange = (themeName: ThemeName) => {
-    applyTheme(themeName);
-    setCurrentTheme(themeName);
-  };
-
-  const handleLocaleChange = (locale: string) => {
-    if (store) {
-      setStoredLocale(store, locale as SupportedLocale);
-    }
-    setCurrentLocale(locale as SupportedLocale);
-  };
+  const currentTheme = useGetTheme();
+  const currentLocale = useGetLocale();
+  const setTheme = useSetTheme();
+  const setLocale = useSetLocale();
 
   return (
     <section className="flex h-full flex-col gap-6">
@@ -64,14 +43,14 @@ function SettingsPage() {
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          {Object.entries(TRIADIC_THEMES).map(([key, theme]) => {
+          {Object.entries(THEMES).map(([key, theme]) => {
             const themeName = key as ThemeName;
             const isActive = currentTheme === themeName;
 
             return (
               <Button
                 key={themeName}
-                onClick={() => handleThemeChange(themeName)}
+                onClick={() => setTheme(themeName)}
                 className={[
                   'group relative overflow-hidden rounded-xl border p-6 text-left transition block! p-3!',
                   isActive
@@ -138,7 +117,7 @@ function SettingsPage() {
               value: locale,
             }))}
             value={currentLocale}
-            onChange={handleLocaleChange}
+            onChange={(locale) => setLocale(locale as SupportedLocale)}
           />
         </div>
       </div>
