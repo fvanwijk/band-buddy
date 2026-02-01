@@ -12,11 +12,17 @@ You are helping develop Gig Buddy, a React/TypeScript pianist companion app. Fol
 - React Router DOM for navigation
 - React Hook Form for form management and validation
 - Tinybase for state management with localStorage persistence
-- Tailwind CSS 4.1.18 with CSS variables for theming
+- Tailwind CSS 4.1.18 with CSS variables for theming (dark mode only)
 - Vite 7.0.4 as build tool
 - Prettier & ESLint for automatic formatting
+- class-variance-authority (CVA) for composable component variants
+- @tabler/icons-react for consistent icon system
 
-Run `npm run lint -- --fix` to auto-fix formatting issues.
+**Development Commands:**
+
+- `npm run lint -- --fix` - Auto-fix formatting and linting issues
+- `npm run typecheck` - Quick TypeScript type checking (use during development)
+- `npm run build` - Full build with type checking and bundling
 
 ## Mandatory Sorting Rules
 
@@ -241,38 +247,207 @@ const handleFormSubmit = (data: FormData) => {
 - Conditionally add optional fields (don't pass `undefined`)
 - Call parent callback with processed data
 
-## Component Props Pattern
+## Button Component with CVA
+
+Location: `src/components/Button.tsx`
+
+The Button component uses `class-variance-authority` for composable, type-safe styling:
 
 ```typescript
-type MyComponentProps = {
-  error?: FieldError;
-  id: string;
-  label: string;
-  placeholder?: string;
-  register: UseFormRegisterReturn;
-  required?: boolean;
-  type?: string;
-};
-
-export function MyComponent({
-  error,
-  id,
-  label,
-  placeholder,
-  register,
-  required = false,
-  type = 'text',
-}: MyComponentProps) {
-  // implementation
-}
+// Props
+<Button
+  as="a"                    // Polymorphic: 'button' | 'a' | etc
+  color="primary"           // Color: 'default' | 'primary' | 'danger'
+  icon                      // Icon-only: boolean (sets p-2)
+  iconStart={<Icon />}      // Icon on left: ReactNode
+  iconEnd={<Icon />}        // Icon on right: ReactNode
+  size="default"            // Size: 'default' | 'icon'
+  variant="outlined"        // Variant: 'filled' | 'outlined' | 'ghost'
+  href="/path"              // When using as="a"
+  className="custom"        // Extra classes
+  onClick={() => {}}        // Event handlers
+>
+  Content
+</Button>
 ```
 
 **Rules:**
 
-- Props type has alphabetically sorted properties
-- Destructuring matches type order
-- Default values in destructuring for optional props
-- Use `?` for optional properties
+- Combine `color` + `variant` for any combination
+- Use `icon={true}` for standalone icon buttons (applies p-2)
+- Use `iconStart` or `iconEnd` for icon + text combinations
+- `icon` prop takes priority over `size` variant padding
+- Polymorphic `as` prop lets it render as `<button>`, `<a>`, or custom elements
+- All combinations are type-safe with `VariantProps<typeof buttonVariants>`
+
+**Common patterns:**
+
+```tsx
+// Icon button
+<Button color="primary" icon onClick={() => {}}>
+  <IconPlus className="h-4 w-4" />
+</Button>
+
+// Icon + text
+<Button iconStart={<IconPlus className="h-4 w-4" />}>
+  Add Item
+</Button>
+
+// Danger ghost variant
+<Button color="danger" variant="ghost">
+  Delete
+</Button>
+
+// Link-style button
+<Button as={Link} color="primary" to="/path" variant="outlined">
+  Navigate
+</Button>
+```
+
+## Reusable Components
+
+### PageHeader
+
+Location: `src/components/PageHeader.tsx`
+
+Consistent header for list pages with title, subtitle, and action button:
+
+```typescript
+<PageHeader
+  title="Songs"
+  subtitle="Library"                    // Default: "Library"
+  action={<Button>New song</Button>}    // Optional action button
+/>
+```
+
+### EmptyState
+
+Location: `src/components/EmptyState.tsx`
+
+Consistent empty state UI across all pages:
+
+```typescript
+import { IconMusic } from '@tabler/icons-react';
+
+<EmptyState
+  title="No songs in your library"
+  description="Add songs to build your repertoire."
+  icon={<IconMusic className="w-12 h-12" />}
+/>
+```
+
+### BackButton
+
+Location: `src/components/BackButton.tsx`
+
+Link-based back navigation button:
+
+```typescript
+<BackButton to="/songs" />        // Navigate to specific path
+<BackButton />                    // Navigate back one page
+```
+
+### Page
+
+Location: `src/components/Page.tsx`
+
+Consistent page layout wrapper with flex column, full height, and gap:
+
+```typescript
+<Page>
+  <PageHeader title="Title" />
+  {/* Page content */}
+</Page>
+```
+
+### FormField & SelectField
+
+Location: `src/components/FormField.tsx`, `src/components/SelectField.tsx`
+
+Reusable form inputs with validation display:
+
+```typescript
+// FormField (text input)
+<FormField
+  error={errors.title}
+  id="title"
+  label="Song Title"
+  placeholder="Enter title"
+  register={register('title', { required: 'Title is required' })}
+  required
+/>
+
+// SelectField (supports both controlled and uncontrolled)
+<SelectField
+  options={[{ label: 'Major', value: 'major' }]}
+  register={register('scale')}    // Uncontrolled
+  value={value}                   // Or: controlled with onChange
+  onChange={(e) => {}}
+/>
+```
+
+### SortButtonsBar
+
+Location: `src/components/SortButtonsBar.tsx`
+
+Renders sort buttons dynamically for list pages:
+
+```typescript
+<SortButtonsBar
+  fields={['title', 'artist', 'key'] as const}
+  isActive={(field) => field === activeSortField}
+  onSort={(field) => handleSort(field)}
+  sortDirection="asc"
+/>
+```
+
+## Custom Hooks
+
+### useSortState
+
+Location: `src/hooks/useSortState.ts`
+
+Generic hook for managing sort state with cycling logic:
+
+```typescript
+const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(
+  'title', // Initial field
+  'asc', // Initial direction
+);
+
+// Returns:
+// - sortBy: Current sort field or null
+// - sortDirection: 'asc' | 'desc' | 'none'
+// - handleSort(field): Cycles through directions
+// - isActive(field): boolean
+```
+
+Cycling logic: `asc` → `desc` → `none` (clears sort)
+
+## Icons
+
+Location: `@tabler/icons-react`
+
+Use tabler icons throughout the app for consistency:
+
+```typescript
+import { IconMusic, IconPlaylist, IconPlus, IconArrowUp, IconTrash } from '@tabler/icons-react';
+
+// Usage
+<IconMusic className="h-4 w-4" />
+```
+
+**Common icons used:**
+
+- `IconMusic`: Songs list
+- `IconPlaylist`: Setlists
+- `IconPlaylistOff`: No active setlist
+- `IconPlus`: Add actions
+- `IconArrowUp`, `IconArrowDown`: Move/reorder
+- `IconTrash`: Delete
+- `IconPencil`: Edit
+- `IconArrowLeft`: Back navigation
+- `IconSettings`: Settings
 
 ## Theming
 
@@ -300,26 +475,44 @@ Use OKLCH color space for perceptually uniform theming.
 
 ```
 src/
-├── components/      # Reusable UI components
-├── mocks/          # Test/seed factories
-├── pages/          # Route page components
-├── store/          # Tinybase store setup
-├── config/         # Theme configurations
-├── types/          # TypeScript types
-├── App.tsx         # Main router
-├── main.tsx        # Entry point
-└── index.css       # Global styles + theme
+├── components/           # Reusable UI components
+│   ├── Button.tsx       # Polymorphic button with CVA variants
+│   ├── Page.tsx         # Consistent page layout wrapper
+│   ├── PageHeader.tsx   # Page header with title and action
+│   ├── BackButton.tsx   # Link-based back navigation
+│   ├── EmptyState.tsx   # Consistent empty state UI
+│   ├── FormField.tsx    # Text input with validation
+│   ├── SelectField.tsx  # Select input (controlled/uncontrolled)
+│   ├── SortButtonsBar.tsx # Dynamic sort buttons
+│   ├── SongCard.tsx     # Song list item card
+│   ├── SetlistCard.tsx  # Setlist list item card
+│   └── ...              # Other components
+├── hooks/               # Custom React hooks
+│   └── useSortState.ts  # Generic sort state management
+├── mocks/              # Test/seed factories
+├── pages/              # Route page components
+├── store/              # Tinybase store setup
+├── types/              # TypeScript types
+├── App.tsx             # Main router
+├── main.tsx            # Entry point
+└── index.css           # Global styles + theme
 ```
 
 ## Key Patterns
 
-| What            | Where                  | Example                               |
-| --------------- | ---------------------- | ------------------------------------- |
-| Mock factories  | `src/mocks/*.ts`       | `createSong()`, `createSongs()`       |
-| Form components | `src/components/*.tsx` | `SongForm.tsx` with validation        |
-| Page routes     | `src/pages/*.tsx`      | `AddSongPage.tsx`, `EditSongPage.tsx` |
-| Types           | `src/types/*.ts`       | `Song`, `Setlist` interfaces          |
-| Store setup     | `src/store/store.ts`   | Tinybase initialization               |
+| What                  | Where                               | Example                                       |
+| --------------------- | ----------------------------------- | --------------------------------------------- |
+| Button component      | `src/components/Button.tsx`         | `<Button color="primary" variant="outlined">` |
+| Page layout           | `src/components/Page.tsx`           | `<Page><PageHeader />{content}</Page>`        |
+| Empty states          | `src/components/EmptyState.tsx`     | `<EmptyState icon={...} title="..." />`       |
+| Back navigation       | `src/components/BackButton.tsx`     | `<BackButton to="/songs" />`                  |
+| Sort management       | `src/hooks/useSortState.ts`         | `useSortState<'title' \| 'date'>()`           |
+| Sort button rendering | `src/components/SortButtonsBar.tsx` | `<SortButtonsBar fields={[...]} />`           |
+| Mock factories        | `src/mocks/*.ts`                    | `createSong()`, `createSongs()`               |
+| Form components       | `src/components/*.tsx`              | `SongForm.tsx` with FormProvider              |
+| Page routes           | `src/pages/*.tsx`                   | `AddSongPage.tsx`, `ManageSongsPage.tsx`      |
+| Types                 | `src/types/*.ts`                    | `Song`, `Setlist` interfaces                  |
+| Store setup           | `src/store/store.ts`                | Tinybase initialization                       |
 
 ## Important Gotchas
 
@@ -329,6 +522,10 @@ src/
 4. ❌ Don't mix import groups → ✅ Separate external and internal with blank line
 5. ❌ Don't forget `errors` destructuring from `formState` → ✅ `const { errors } = formState`
 6. ❌ Don't use unsorted imports or object keys → ✅ Run `npm run lint -- --fix` before committing
+7. ❌ Don't create standalone button elements → ✅ Use the `Button` component with props
+8. ❌ Don't use dark: prefixes → ✅ App is dark mode only, use base classes
+9. ❌ Don't use inline SVGs for icons → ✅ Use tabler icons (`IconMusic`, `IconPlus`, etc.)
+10. ❌ Don't pass both `icon` and `size="icon"` → ✅ Use `icon` prop which has priority
 
 ## Code Formatting
 
