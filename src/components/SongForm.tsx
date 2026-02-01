@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
+import { BackButton } from './BackButton';
 import { Button } from './Button';
 import { FormField } from './FormField';
 import { RadioGroup } from './RadioGroup';
@@ -121,20 +122,7 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
     <section className="flex h-full flex-col gap-6">
       <header>
         <div className="mb-6 flex items-center gap-3">
-          <Button
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
-            onClick={() => navigate('/songs')}
-            variant="ghost"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </Button>
+          <BackButton onClick={() => navigate('/songs')} />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
               Library

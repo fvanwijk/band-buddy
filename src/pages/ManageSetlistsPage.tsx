@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { Button } from '../components/Button';
+import { Page } from '../components/Page';
 import { SetlistCard } from '../components/SetlistCard';
 import { SortButton } from '../components/SortButton';
 import { store } from '../store/store';
@@ -61,19 +61,23 @@ export function ManageSetlistsPage() {
   const displaySetlists = getSortedSetlists();
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Manage Setlists</h1>
-        <Button onClick={() => navigate('/setlist/add')} variant="primary">
-          Add Setlist
-        </Button>
-      </div>
+    <Page>
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Library</p>
+          <h1 className="text-2xl font-semibold text-slate-100">Setlists</h1>
+        </div>
+        <Link
+          to="/setlist/add"
+          className="rounded-full border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-200 hover:bg-brand-400/20"
+        >
+          New setlist
+        </Link>
+      </header>
 
       {displaySetlists.length === 0 ? (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900">
-          <p className="text-slate-600 dark:text-slate-400">
-            No setlists yet. Create one to get started!
-          </p>
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-8 text-center">
+          <p className="text-slate-400">No setlists yet. Create one to get started!</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -100,8 +104,8 @@ export function ManageSetlistsPage() {
             <SetlistCard
               key={setlist.id}
               date={setlist.date}
+              id={setlist.id}
               onDelete={() => handleDelete(setlist.id)}
-              onEdit={() => handleEdit(setlist.id)}
               setsCount={setlist.sets.length}
               songsCount={setlist.sets.reduce((total, s) => total + s.songs.length, 0)}
               title={setlist.title}
@@ -109,6 +113,6 @@ export function ManageSetlistsPage() {
           ))}
         </div>
       )}
-    </div>
+    </Page>
   );
 }

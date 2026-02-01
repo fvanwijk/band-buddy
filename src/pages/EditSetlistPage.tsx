@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Button } from '../components/Button';
 import { SetlistForm } from '../components/SetlistForm';
 import { store } from '../store/store';
 import { useSetlists } from '../store/useStore';
@@ -14,9 +13,9 @@ export function EditSetlistPage() {
 
   if (!setlist) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-slate-600 dark:text-slate-400">Setlist not found</p>
-      </div>
+      <section className="flex h-full flex-col items-center justify-center gap-4">
+        <p className="text-xl text-slate-100">Setlist not found</p>
+      </section>
     );
   }
 
@@ -32,12 +31,5 @@ export function EditSetlistPage() {
     navigate('/setlist');
   };
 
-  return (
-    <div className="mx-auto max-w-2xl space-y-4 p-4">
-      <Button onClick={() => navigate('/setlist')} variant="secondary">
-        ← Back to Setlists
-      </Button>
-      <SetlistForm initialData={setlist} onSubmit={handleSubmit} title="Edit Setlist" />
-    </div>
-  );
+  return <SetlistForm initialData={setlist} onSubmit={handleSubmit} title="Edit Setlist" />;
 }

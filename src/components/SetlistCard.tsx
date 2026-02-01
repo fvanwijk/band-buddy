@@ -1,10 +1,12 @@
+import { Link } from 'react-router-dom';
+
 import { Button } from './Button';
 import { Card } from './Card';
 
 type SetlistCardProps = {
   date: string;
+  id: string;
   onDelete: () => void;
-  onEdit: () => void;
   setsCount: number;
   songsCount: number;
   title: string;
@@ -12,8 +14,8 @@ type SetlistCardProps = {
 
 export function SetlistCard({
   date,
+  id,
   onDelete,
-  onEdit,
   setsCount,
   songsCount,
   title,
@@ -22,7 +24,7 @@ export function SetlistCard({
     <Card
       actions={
         <>
-          <Button variant="default" onClick={onEdit}>
+          <Button as={Link} to={`/setlist/edit/${id}`} variant="default">
             Edit
           </Button>
           <Button variant="danger" onClick={onDelete}>
