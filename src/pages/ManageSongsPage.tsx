@@ -1,7 +1,7 @@
 import { IconMusic } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useDelRowCallback, useTable } from 'tinybase/ui-react';
+import { useTable } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -10,6 +10,7 @@ import { PageHeader } from '../components/PageHeader';
 import { SongCard } from '../components/SongCard';
 import { SortButtonsBar } from '../components/SortButtonsBar';
 import { useSortState } from '../hooks/useSortState';
+import { useDeleteSong } from '../hooks/useSong';
 
 type SortField = 'artist' | 'key' | 'title';
 
@@ -19,15 +20,11 @@ function ManageSongsPage() {
 
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(null, 'none');
-
-  const delRow = useDelRowCallback('songs', (id: string) => {
-    setDeletingSongId(null);
-    return id;
-  });
+  const deleteSong = useDeleteSong(() => setDeletingSongId(null));
 
   const handleDeleteSong = () => {
     if (deletingSongId) {
-      delRow(deletingSongId);
+      deleteSong(deletingSongId);
     }
   };
 

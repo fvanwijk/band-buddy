@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { Button } from './Button';
 import { SelectField } from './SelectField';
-import { useSongs } from '../store/useStore';
+import { useGetSongs } from '../hooks/useSong';
 import type { Song, SongReference } from '../types';
 
 type SetlistSetEditorProps = {
@@ -22,7 +22,7 @@ export function SetlistSetEditor({
 }: SetlistSetEditorProps) {
   const { register, setValue, watch } = useFormContext();
   const songs = watch(`sets.${index}.songs`) as SongReference[];
-  const allSongs = useSongs();
+  const allSongs = useGetSongs();
 
   const songMap = useMemo(() => {
     const map: Record<string, Song> = {};

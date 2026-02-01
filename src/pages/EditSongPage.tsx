@@ -1,57 +1,17 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useRow, useSetRowCallback } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { SongForm } from '../components/SongForm';
-import type { Song } from '../types';
+import { useGetSong, useUpdateSong } from '../hooks/useSong';
 
 function EditSongPage() {
   const backPath = '/songs';
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const song = useGetSong(id);
+  const updateSong = useUpdateSong(id, () => navigate(backPath));
 
-  const songRow = useRow('songs', id || '');
-
-  const setRow = useSetRowCallback(
-    'songs',
-    id!,
-    (data: {
-      artist: string;
-      bpm?: number;
-      duration?: string;
-      key: string;
-      timeSignature: string;
-      title: string;
-    }) => {
-      const finalData: Record<string, string | number> = {
-        artist: data.artist,
-        key: data.key,
-        timeSignature: data.timeSignature,
-        title: data.title,
-      };
-      if (data.bpm) {
-        finalData.bpm = data.bpm;
-      }
-      if (data.duration) {
-        finalData.duration = data.duration;
-      }
-      return finalData;
-    },
-  );
-
-  const handleSubmit = (data: {
-    artist: string;
-    bpm?: number;
-    duration?: string;
-    key: string;
-    timeSignature: string;
-    title: string;
-  }) => {
-    setRow(data);
-    navigate(backPath);
-  };
-
-  if (!id || !songRow) {
+  if (!id || !song) {
     return (
       <section className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-xl text-slate-100">Song not found</p>
@@ -62,18 +22,8 @@ function EditSongPage() {
     );
   }
 
-  const song: Song = {
-    artist: songRow.artist as string,
-    bpm: songRow.bpm as number | undefined,
-    duration: songRow.duration as string | undefined,
-    id: id,
-    key: songRow.key as string,
-    timeSignature: songRow.timeSignature as string,
-    title: songRow.title as string,
-  };
-
   return (
-    <SongForm backPath={backPath} initialData={song} onSubmit={handleSubmit} title="Edit Song" />
+    <SongForm backPath={backPath} initialData={song} onSubmit={updateSong} title="Edit Song" />
   );
 }
 

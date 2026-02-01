@@ -1,6 +1,6 @@
 import { IconPlaylist } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDelRowCallback, useSetValueCallback, useValue } from 'tinybase/ui-react';
+import { useValue } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
@@ -9,30 +9,26 @@ import { PageHeader } from '../components/PageHeader';
 import { SetlistCard } from '../components/SetlistCard';
 import { SortButtonsBar } from '../components/SortButtonsBar';
 import { useSortState } from '../hooks/useSortState';
-import { useSetlists } from '../store/useStore';
+import { useDeleteSetlist, useGetSetlists } from '../hooks/useSetlist';
+import { useActivateSetlist } from '../hooks/useSettings';
 
 type SortField = 'date' | 'title';
 
 export function ManageSetlistsPage() {
-  const setlists = useSetlists();
   const navigate = useNavigate();
+  const setlists = useGetSetlists();
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>('date', 'desc');
-
-  const setValue = useSetValueCallback('activeSetlistId', (id: string) => {
-    navigate('/');
-    return id;
-  });
-
-  const delRow = useDelRowCallback('setlists', (id: string) => id);
+  const activateSetlist = useActivateSetlist(() => navigate('/'));
+  const deleteSetlist = useDeleteSetlist();
 
   const handleActivate = (id: string) => {
-    setValue(id);
+    activateSetlist(id);
   };
 
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this setlist?')) {
-      delRow(id);
+      deleteSetlist(id);
     }
   };
 
