@@ -7,7 +7,7 @@ import { Button } from './Button';
 import { FormField } from './FormField';
 import { PageHeader } from './PageHeader';
 import { SetlistSetEditor } from './SetlistSetEditor';
-import type { Setlist, SetlistSet } from '../types/setlist';
+import type { Setlist, SetlistSet } from '../types';
 
 type FormData = Omit<Setlist, 'id' | 'sets'> & {
   sets: SetlistSet[];

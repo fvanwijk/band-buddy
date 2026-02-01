@@ -1,4 +1,4 @@
-import type { SetlistSet, Song } from '../types/setlist';
+import type { SetlistSet, Song } from '../types';
 import { formatDuration, parseDuration } from '../utils/duration';
 
 type SetlistTableProps = {

@@ -1,4 +1,4 @@
-import type { Setlist } from '../types/setlist';
+import type { Setlist } from '../types';
 
 export const mockSetlist: Setlist = {
   date: '2026-01-31',

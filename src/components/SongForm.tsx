@@ -8,7 +8,7 @@ import { Button } from './Button';
 import { FormField } from './FormField';
 import { PageHeader } from './PageHeader';
 import { RadioGroup } from './RadioGroup';
-import type { Song } from '../types/setlist';
+import type { Song } from '../types';
 import { calculateMeasures } from '../utils/measures';
 
 type SongFormData = Omit<Song, 'id'> & {

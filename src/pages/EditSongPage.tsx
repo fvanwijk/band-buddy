@@ -4,7 +4,7 @@ import { useRow } from 'tinybase/ui-react';
 import { Button } from '../components/Button';
 import { SongForm } from '../components/SongForm';
 import { store } from '../store/store';
-import type { Song } from '../types/setlist';
+import type { Song } from '../types';
 
 function EditSongPage() {
   const backPath = '/songs';

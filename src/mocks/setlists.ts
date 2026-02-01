@@ -1,4 +1,4 @@
-import type { Setlist, SetlistSet } from '../types/setlist';
+import type { Setlist, SetlistSet } from '../types';
 
 export const createSetlistSet = (
   setNumber: number,

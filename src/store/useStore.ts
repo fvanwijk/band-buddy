@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
 import { StoreContext } from './StoreProvider';
-import type { Setlist, Song } from '../types/setlist';
+import type { Setlist, Song } from '../types';
 
 export function useSetlists(): Setlist[] {
   const context = useContext(StoreContext);

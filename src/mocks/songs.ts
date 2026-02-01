@@ -1,4 +1,4 @@
-import type { Song } from '../types/setlist';
+import type { Song } from '../types';
 
 export const createSong = (overrides: Partial<Song> = {}): Song => ({
   artist: 'Queen',

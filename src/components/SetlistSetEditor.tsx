@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { Button } from './Button';
 import { SelectField } from './SelectField';
 import { useSongs } from '../store/useStore';
-import type { Song, SongReference } from '../types/setlist';
+import type { Song, SongReference } from '../types';
 
 type SetlistSetEditorProps = {
   index: number;

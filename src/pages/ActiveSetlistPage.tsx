@@ -5,7 +5,7 @@ import { useRow, useTable, useValue } from 'tinybase/ui-react';
 import { EmptyState } from '../components/EmptyState';
 import SetlistHeader from '../components/SetlistHeader';
 import SetlistTable from '../components/SetlistTable';
-import type { Setlist, Song } from '../types/setlist';
+import type { Setlist, Song } from '../types';
 
 function ActiveSetlistPage() {
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;

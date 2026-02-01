@@ -5,7 +5,7 @@ import { Provider, useTable } from 'tinybase/ui-react';
 import { initializeStore, store } from './store';
 import { createSetlists } from '../mocks/setlists';
 import { createSongs } from '../mocks/songs';
-import type { Setlist, Song } from '../types/setlist';
+import type { Setlist, Song } from '../types';
 
 type StoreProviderProps = {
   children: ReactNode;
