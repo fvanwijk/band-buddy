@@ -61,7 +61,12 @@ function SetlistTable({ setlistId, sets, songsMap }: SetlistTableProps) {
   return (
     <section className="flex min-h-0 flex-1 flex-col rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl shadow-black/40 overflow-hidden">
       <div className="flex-1 overflow-y-auto">
-        {sets.map((set) => {
+        {sets.map((set, setIndex) => {
+          // Calculate cumulative song count before this set
+          const songsBefore = sets
+            .slice(0, setIndex)
+            .reduce((total, s) => total + s.songs.length, 0);
+
           // Calculate set duration
           const setSeconds = set.songs.reduce((total, songRef) => {
             const song = songsMap.get(songRef.songId);
@@ -100,7 +105,7 @@ function SetlistTable({ setlistId, sets, songsMap }: SetlistTableProps) {
                       return (
                         <SongRow
                           key={songRef.songId}
-                          index={index + 1}
+                          index={songsBefore + index + 1}
                           onNavigate={handleSongClick}
                           song={song}
                         />
