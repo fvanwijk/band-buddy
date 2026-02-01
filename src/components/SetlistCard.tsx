@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { Button } from './Button';
 import { Card } from './Card';
+import { formatDate } from '../utils/date';
 
 type SetlistCardProps = {
   date: string;
@@ -43,7 +44,7 @@ export function SetlistCard({
     >
       <h3 className="font-semibold text-white">{title}</h3>
       <div className="flex gap-3 text-sm text-slate-400">
-        <span>{new Date(date).toLocaleDateString()}</span>
+        <span>{formatDate(date)}</span>
         <span>
           {setsCount} set{setsCount !== 1 ? 's' : ''}
         </span>

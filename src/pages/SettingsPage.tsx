@@ -1,6 +1,9 @@
 import { useState } from 'react';
 
 import { Button } from '../components/Button';
+import { SelectField } from '../components/SelectField';
+import { SUPPORTED_LOCALES, type SupportedLocale } from '../config/locales';
+import { getStoredLocale, setStoredLocale } from '../config/settings';
 import {
   TRIADIC_THEMES,
   type ThemeName,
@@ -29,10 +32,16 @@ const themeColors = {
 
 function SettingsPage() {
   const [currentTheme, setCurrentTheme] = useState<ThemeName>(getStoredTheme());
+  const [currentLocale, setCurrentLocale] = useState<SupportedLocale>(getStoredLocale());
 
   const handleThemeChange = (themeName: ThemeName) => {
     applyTheme(themeName);
     setCurrentTheme(themeName);
+  };
+
+  const handleLocaleChange = (locale: string) => {
+    setStoredLocale(locale as SupportedLocale);
+    setCurrentLocale(locale as SupportedLocale);
   };
 
   return (
@@ -105,6 +114,26 @@ function SettingsPage() {
               </Button>
             );
           })}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <h2 className="text-lg font-semibold text-slate-100">Locale</h2>
+        <p className="mt-2 text-sm text-slate-400">
+          Select your preferred locale for date and number formatting.
+        </p>
+
+        <div className="mt-6">
+          <SelectField
+            id="locale-select"
+            label="Locale"
+            options={SUPPORTED_LOCALES.map(({ locale, name }) => ({
+              label: name,
+              value: locale,
+            }))}
+            value={currentLocale}
+            onChange={handleLocaleChange}
+          />
         </div>
       </div>
     </section>
