@@ -113,15 +113,13 @@ function SongDetailPage() {
       </header>
 
       <div className="flex flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-        <div className="flex-1 overflow-auto rounded-lg border border-slate-700 bg-slate-950/50 p-4">
-          {currentSong.lyrics ? (
-            <pre className="whitespace-pre-wrap font-mono text-sm text-slate-200 leading-relaxed">
-              {currentSong.lyrics}
-            </pre>
-          ) : (
-            <p className="text-slate-400">No lyrics added yet</p>
-          )}
-        </div>
+        {currentSong.lyrics ? (
+          <pre className="whitespace-pre-wrap font-mono text-sm text-slate-200 leading-relaxed">
+            {currentSong.lyrics}
+          </pre>
+        ) : (
+          <p className="text-slate-400">No lyrics added yet</p>
+        )}
       </div>
 
       {/* Navigation Footer */}
