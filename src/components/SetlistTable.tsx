@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { FormattedDuration } from './FormattedDuration';
 import type { SetlistSet, Song } from '../types';
@@ -12,41 +12,37 @@ type SetlistTableProps = {
 
 type SongRowProps = {
   index: number;
-  onNavigate: (songId: string) => void;
+  setlistId?: string;
   song: Song;
 };
 
-function SongRow({ index, onNavigate, song }: SongRowProps) {
+function SongRow({ index, setlistId, song }: SongRowProps) {
   const durationSeconds = parseDuration(song.duration);
 
   return (
-    <li
-      className="grid cursor-pointer gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[0.5fr_3fr_1fr_1fr_1fr]"
-      onClick={() => onNavigate(song.id)}
-    >
-      <span className="text-right text-slate-500">{index}</span>
-      <span className="flex flex-col">
-        <span className="text-base font-semibold text-slate-100">{song.title}</span>
-        <span className="text-xs text-slate-400">{song.artist}</span>
-      </span>
-      <span className="text-right text-sm font-semibold text-slate-100">{song.timeSignature}</span>
-      <span className="text-right text-sm font-semibold text-brand-200">{song.key}</span>
-      <span className="text-right text-sm text-slate-400">
-        <FormattedDuration seconds={durationSeconds} />
-      </span>
+    <li>
+      <Link
+        className="grid cursor-pointer gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[0.5fr_3fr_1fr_1fr_1fr]"
+        to={setlistId ? `/setlist/${setlistId}/song/${song.id}` : '#'}
+      >
+        <span className="text-right text-slate-500">{index}</span>
+        <span className="flex flex-col">
+          <span className="text-base font-semibold text-slate-100">{song.title}</span>
+          <span className="text-xs text-slate-400">{song.artist}</span>
+        </span>
+        <span className="text-right text-sm font-semibold text-slate-100">
+          {song.timeSignature}
+        </span>
+        <span className="text-right text-sm font-semibold text-brand-200">{song.key}</span>
+        <span className="text-right text-sm text-slate-400">
+          <FormattedDuration seconds={durationSeconds} />
+        </span>
+      </Link>
     </li>
   );
 }
 
 function SetlistTable({ setlistId, sets, songsMap }: SetlistTableProps) {
-  const navigate = useNavigate();
-
-  const handleSongClick = (songId: string) => {
-    if (setlistId) {
-      navigate(`/setlist/${setlistId}/song/${songId}`);
-    }
-  };
-
   // Calculate total duration
   const totalSeconds = sets.reduce((total, set) => {
     return (
@@ -106,7 +102,7 @@ function SetlistTable({ setlistId, sets, songsMap }: SetlistTableProps) {
                         <SongRow
                           key={songRef.songId}
                           index={songsBefore + index + 1}
-                          onNavigate={handleSongClick}
+                          setlistId={setlistId}
                           song={song}
                         />
                       );
