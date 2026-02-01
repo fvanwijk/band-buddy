@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { BackButton } from '../components/BackButton';
 import { Button } from '../components/Button';
+import { LyricsBlock } from '../components/LyricsBlock';
 import { Page } from '../components/Page';
 import { useGetSetlist } from '../hooks/useSetlist';
 import { useGetSongs } from '../hooks/useSong';
@@ -112,15 +113,7 @@ function SongDetailPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-        {currentSong.lyrics ? (
-          <pre className="whitespace-pre-wrap font-mono text-sm text-slate-200 leading-relaxed">
-            {currentSong.lyrics}
-          </pre>
-        ) : (
-          <p className="text-slate-400">No lyrics added yet</p>
-        )}
-      </div>
+      <LyricsBlock lyrics={currentSong.lyrics} />
 
       {/* Navigation Footer */}
       <div className="flex gap-3">
