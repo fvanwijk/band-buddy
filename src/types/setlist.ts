@@ -1,10 +1,11 @@
 export type Song = {
-  id: string;
   artist: string;
-  title: string;
+  bpm?: number;
+  duration?: string;
+  id: string;
   key: string;
   timeSignature: string;
-  bpm?: number;
+  title: string;
 };
 
 export type SongReference = {

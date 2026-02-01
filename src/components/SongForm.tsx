@@ -8,6 +8,7 @@ import { Button } from './Button';
 import { FormField } from './FormField';
 import { RadioGroup } from './RadioGroup';
 import type { Song } from '../types/setlist';
+import { calculateMeasures } from '../utils/measures';
 
 type SongFormData = Omit<Song, 'id'> & {
   keyNote?: string;
@@ -19,16 +20,18 @@ type SongFormProps = {
   initialData?: Song;
   onSubmit: (data: {
     artist: string;
-    title: string;
+    bpm?: number;
+    duration?: string;
     key: string;
     timeSignature: string;
-    bpm?: number;
+    title: string;
   }) => void;
   title: string;
 };
 
 export function SongForm({ backPath, initialData, onSubmit, title }: SongFormProps) {
   const [useFlats, setUseFlats] = useState(false);
+  const [calculatedMeasures, setCalculatedMeasures] = useState<number | null>(null);
 
   const existingKey = initialData?.key || 'C';
   const existingNote = existingKey.replace(/m$/, '');
@@ -38,16 +41,27 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<SongFormData>({
     defaultValues: {
       artist: initialData?.artist || '',
       bpm: initialData?.bpm || undefined,
+      duration: initialData?.duration || '',
       keyNote: existingNote,
       keyQuality: existingQuality,
       timeSignature: initialData?.timeSignature || '4/4',
       title: initialData?.title || '',
     },
   });
+
+  const duration = watch('duration');
+  const bpm = watch('bpm');
+  const timeSignature = watch('timeSignature');
+
+  useEffect(() => {
+    const measures = calculateMeasures(duration, bpm, timeSignature);
+    setCalculatedMeasures(measures);
+  }, [duration, bpm, timeSignature]);
 
   useEffect(() => {
     // Auto-detect if the existing key uses flats
@@ -103,10 +117,11 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     const key = (data.keyNote || existingNote) + (data.keyQuality || '');
     const finalData: {
       artist: string;
-      title: string;
+      bpm?: number;
+      duration?: string;
       key: string;
       timeSignature: string;
-      bpm?: number;
+      title: string;
     } = {
       artist: data.artist,
       key,
@@ -115,6 +130,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     };
     if (data.bpm) {
       finalData.bpm = data.bpm;
+    }
+    if (data.duration) {
+      finalData.duration = data.duration;
     }
     onSubmit(finalData);
   };
@@ -221,6 +239,33 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               placeholder="Enter BPM (0-200)"
             />
             {errors.bpm && <p className="mt-1 text-xs text-red-400">{errors.bpm.message}</p>}
+          </div>
+
+          {/* Duration */}
+          <div>
+            <label htmlFor="duration" className="mb-1.5 block text-sm font-medium text-slate-300">
+              Duration (optional)
+            </label>
+            <input
+              id="duration"
+              type="text"
+              {...register('duration', {
+                pattern: {
+                  message: 'Duration must be in mm:ss format',
+                  value: /^\d{1,3}:[0-5]\d$/,
+                },
+              })}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
+              placeholder="Enter duration (mm:ss)"
+            />
+            {errors.duration && (
+              <p className="mt-1 text-xs text-red-400">{errors.duration.message}</p>
+            )}
+            {calculatedMeasures !== null && (
+              <p className="mt-1 text-xs text-slate-500">
+                ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
+              </p>
+            )}
           </div>
 
           <div className="flex gap-3 pt-4">
