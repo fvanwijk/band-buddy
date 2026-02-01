@@ -4,6 +4,7 @@ export type Song = {
   duration?: string;
   id: string;
   key: string;
+  lyrics?: string;
   timeSignature: string;
   title: string;
 };

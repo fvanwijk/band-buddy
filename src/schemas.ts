@@ -9,6 +9,7 @@ export const songSchema = z.object({
   duration: z.string().optional(),
   id: z.string(),
   key: z.string(),
+  lyrics: z.string().optional(),
   timeSignature: z.string(),
   title: z.string(),
 });
@@ -21,6 +22,7 @@ export const songTableSchema = z.object({
   bpm: z.number().optional(),
   duration: z.string().optional(),
   key: z.string(),
+  lyrics: z.string().optional(),
   timeSignature: z.string(),
   title: z.string(),
 });

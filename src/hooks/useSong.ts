@@ -90,6 +90,9 @@ export function useUpdateSong(id: string | undefined, onSuccess?: () => void) {
       if (data.duration) {
         finalData.duration = data.duration;
       }
+      if (data.lyrics) {
+        finalData.lyrics = data.lyrics;
+      }
       return finalData;
     },
     [id, onSuccess],

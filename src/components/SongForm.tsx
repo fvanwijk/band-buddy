@@ -24,6 +24,7 @@ type SongFormProps = {
     bpm?: number;
     duration?: string;
     key: string;
+    lyrics?: string;
     timeSignature: string;
     title: string;
   }) => void;
@@ -50,6 +51,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       duration: initialData?.duration || '',
       keyNote: existingNote,
       keyQuality: existingQuality,
+      lyrics: initialData?.lyrics || '',
       timeSignature: initialData?.timeSignature || '4/4',
       title: initialData?.title || '',
     },
@@ -121,6 +123,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       bpm?: number;
       duration?: string;
       key: string;
+      lyrics?: string;
       timeSignature: string;
       title: string;
     } = {
@@ -134,6 +137,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     }
     if (data.duration) {
       finalData.duration = data.duration;
+    }
+    if (data.lyrics) {
+      finalData.lyrics = data.lyrics;
     }
     onSubmit(finalData);
   };
@@ -247,6 +253,24 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                 ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
               </p>
             )}
+          </div>
+
+          {/* Chords and Lyrics */}
+          <div>
+            <label htmlFor="lyrics" className="mb-1.5 block text-sm font-medium text-slate-300">
+              Chords & Lyrics
+            </label>
+            <textarea
+              id="lyrics"
+              rows={10}
+              {...register('lyrics')}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 font-mono text-sm text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
+              placeholder="Enter chords and lyrics..."
+            />
+            <p className="mt-1 text-xs text-slate-500">
+              💡 Chords separated by whitespace will be automatically detected
+            </p>
+            {errors.lyrics && <p className="mt-1 text-xs text-red-400">{errors.lyrics.message}</p>}
           </div>
 
           <div className="flex gap-3 pt-4">
