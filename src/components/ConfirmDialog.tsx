@@ -27,19 +27,15 @@ export function ConfirmDialog({ isOpen, onClose, onConfirm, title, message }: Co
         <p className="mb-6 text-sm text-slate-400">{message}</p>
 
         <div className="flex gap-3">
-          <Button
-            className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700"
-            onClick={onClose}
-            type="button"
-            variant="ghost"
-          >
+          <Button className="flex-1" onClick={onClose} type="button" variant="outlined">
             Cancel
           </Button>
           <Button
-            className="flex-1 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-500/20"
+            color="danger"
+            className="flex-1"
             onClick={handleConfirm}
             type="button"
-            variant="ghost"
+            variant="filled"
           >
             Delete
           </Button>

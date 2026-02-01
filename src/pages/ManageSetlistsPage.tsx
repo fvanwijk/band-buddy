@@ -1,16 +1,18 @@
 import { IconPlaylist } from '@tabler/icons-react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useValue } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { EmptyState } from '../components/EmptyState';
 import { Page } from '../components/Page';
 import { PageHeader } from '../components/PageHeader';
 import { SetlistCard } from '../components/SetlistCard';
 import { SortButtonsBar } from '../components/SortButtonsBar';
-import { useSortState } from '../hooks/useSortState';
 import { useDeleteSetlist, useGetSetlists } from '../hooks/useSetlist';
 import { useActivateSetlist } from '../hooks/useSettings';
+import { useSortState } from '../hooks/useSortState';
 
 type SortField = 'date' | 'title';
 
@@ -18,17 +20,18 @@ export function ManageSetlistsPage() {
   const navigate = useNavigate();
   const setlists = useGetSetlists();
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;
+  const [deletingSetlistId, setDeletingSetlistId] = useState<string | null>(null);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>('date', 'desc');
   const activateSetlist = useActivateSetlist(() => navigate('/'));
-  const deleteSetlist = useDeleteSetlist();
+  const deleteSetlist = useDeleteSetlist(() => setDeletingSetlistId(null));
 
   const handleActivate = (id: string) => {
     activateSetlist(id);
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this setlist?')) {
-      deleteSetlist(id);
+  const handleDeleteSetlist = () => {
+    if (deletingSetlistId) {
+      deleteSetlist(deletingSetlistId);
     }
   };
 
@@ -66,6 +69,14 @@ export function ManageSetlistsPage() {
         title="Setlists"
       />
 
+      <ConfirmDialog
+        isOpen={deletingSetlistId !== null}
+        message="Are you sure you want to delete this setlist? This action cannot be undone."
+        onClose={() => setDeletingSetlistId(null)}
+        onConfirm={handleDeleteSetlist}
+        title="Delete Setlist"
+      />
+
       {displaySetlists.length === 0 ? (
         <EmptyState
           description="Create your first setlist to get started!"
@@ -89,7 +100,7 @@ export function ManageSetlistsPage() {
                 id={setlist.id}
                 isActive={activeSetlistId === setlist.id}
                 onActivate={() => handleActivate(setlist.id)}
-                onDelete={() => handleDelete(setlist.id)}
+                onDelete={() => setDeletingSetlistId(setlist.id)}
                 setsCount={setlist.sets.length}
                 songsCount={setlist.sets.reduce((total, s) => total + s.songs.length, 0)}
                 title={setlist.title}
