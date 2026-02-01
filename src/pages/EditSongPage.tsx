@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useRow, useStore } from 'tinybase/ui-react';
+import { useRow, useSetRowCallback } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { SongForm } from '../components/SongForm';
@@ -9,9 +9,35 @@ function EditSongPage() {
   const backPath = '/songs';
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const store = useStore();
 
   const songRow = useRow('songs', id || '');
+
+  const setRow = useSetRowCallback(
+    'songs',
+    id!,
+    (data: {
+      artist: string;
+      bpm?: number;
+      duration?: string;
+      key: string;
+      timeSignature: string;
+      title: string;
+    }) => {
+      const finalData: Record<string, string | number> = {
+        artist: data.artist,
+        key: data.key,
+        timeSignature: data.timeSignature,
+        title: data.title,
+      };
+      if (data.bpm) {
+        finalData.bpm = data.bpm;
+      }
+      if (data.duration) {
+        finalData.duration = data.duration;
+      }
+      return finalData;
+    },
+  );
 
   const handleSubmit = (data: {
     artist: string;
@@ -21,20 +47,7 @@ function EditSongPage() {
     timeSignature: string;
     title: string;
   }) => {
-    if (!id || !store) return;
-    const finalData: Record<string, string | number> = {
-      artist: data.artist,
-      key: data.key,
-      timeSignature: data.timeSignature,
-      title: data.title,
-    };
-    if (data.bpm) {
-      finalData.bpm = data.bpm;
-    }
-    if (data.duration) {
-      finalData.duration = data.duration;
-    }
-    store.setRow('songs', id, finalData);
+    setRow(data);
     navigate(backPath);
   };
 

@@ -1,22 +1,33 @@
 import { useNavigate } from 'react-router-dom';
-import { useStore } from 'tinybase/ui-react';
+import { useAddRowCallback } from 'tinybase/ui-react';
 
 import { SetlistForm } from '../components/SetlistForm';
 
 export function AddSetlistPage() {
+  const backPath = '/setlists';
   const navigate = useNavigate();
-  const store = useStore();
+
+  const setRow = useAddRowCallback(
+    'setlists',
+    (data: {
+      date: string;
+      sets: Array<{ setNumber: number; songs: Array<{ songId: string; isDeleted?: boolean }> }>;
+      title: string;
+    }) => ({ data: JSON.stringify(data) }),
+    [navigate, backPath],
+    undefined,
+    () => {
+      navigate(backPath);
+    },
+  );
 
   const handleSubmit = (data: {
     date: string;
     sets: Array<{ setNumber: number; songs: Array<{ songId: string; isDeleted?: boolean }> }>;
     title: string;
   }) => {
-    if (!store) return;
-    const id = Date.now().toString();
-    store.setRow('setlists', id, { data: JSON.stringify(data) });
-    navigate('/setlist');
+    setRow(data);
   };
 
-  return <SetlistForm onSubmit={handleSubmit} title="Add New Setlist" />;
+  return <SetlistForm backPath={backPath} onSubmit={handleSubmit} title="Add New Setlist" />;
 }

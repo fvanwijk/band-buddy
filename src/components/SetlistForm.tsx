@@ -14,18 +14,13 @@ type FormData = Omit<Setlist, 'id' | 'sets'> & {
 };
 
 type SetlistFormProps = {
-  backPath?: string;
+  backPath: string;
   initialData?: Setlist;
   onSubmit: (data: FormData) => void;
   title: string;
 };
 
-export function SetlistForm({
-  backPath = '/setlist',
-  initialData,
-  onSubmit,
-  title,
-}: SetlistFormProps) {
+export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistFormProps) {
   const methods = useForm<FormData>({
     defaultValues: {
       date: initialData?.date || new Date().toISOString().split('T')[0],

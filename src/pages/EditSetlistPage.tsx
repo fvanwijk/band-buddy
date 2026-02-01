@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useStore } from 'tinybase/ui-react';
+import { useSetRowCallback } from 'tinybase/ui-react';
 
 import { SetlistForm } from '../components/SetlistForm';
 import { useSetlists } from '../store/useStore';
@@ -7,10 +7,19 @@ import { useSetlists } from '../store/useStore';
 export function EditSetlistPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const store = useStore();
   const setlists = useSetlists();
 
   const setlist = setlists.find((s) => s.id === id);
+
+  const setRow = useSetRowCallback(
+    'setlists',
+    id!,
+    (data: {
+      date: string;
+      sets: Array<{ setNumber: number; songs: Array<{ songId: string; isDeleted?: boolean }> }>;
+      title: string;
+    }) => ({ data: JSON.stringify(data) }),
+  );
 
   if (!setlist) {
     return (
@@ -25,9 +34,8 @@ export function EditSetlistPage() {
     sets: Array<{ setNumber: number; songs: Array<{ songId: string; isDeleted?: boolean }> }>;
     title: string;
   }) => {
-    if (!id || !store) return;
-    store.setRow('setlists', id, { data: JSON.stringify(data) });
-    navigate('/setlist');
+    setRow(data);
+    navigate('/setlists');
   };
 
   return <SetlistForm initialData={setlist} onSubmit={handleSubmit} title="Edit Setlist" />;

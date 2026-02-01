@@ -1,7 +1,7 @@
 import { IconMusic } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useStore, useTable } from 'tinybase/ui-react';
+import { useDelRowCallback, useTable } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -14,12 +14,22 @@ import { useSortState } from '../hooks/useSortState';
 type SortField = 'artist' | 'key' | 'title';
 
 function ManageSongsPage() {
-  const store = useStore();
   const songs = useTable('songs');
   let songIds = Object.keys(songs);
 
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(null, 'none');
+
+  const delRow = useDelRowCallback('songs', (id: string) => {
+    setDeletingSongId(null);
+    return id;
+  });
+
+  const handleDeleteSong = () => {
+    if (deletingSongId) {
+      delRow(deletingSongId);
+    }
+  };
 
   // Sort songs
   if (sortDirection !== 'none' && sortBy) {
@@ -34,13 +44,6 @@ function ManageSongsPage() {
       return sortDirection === 'asc' ? comparison : -comparison;
     });
   }
-
-  const handleDeleteSong = () => {
-    if (store && deletingSongId) {
-      store.delRow('songs', deletingSongId);
-      setDeletingSongId(null);
-    }
-  };
 
   return (
     <section className="flex h-full flex-col gap-6">
