@@ -45,7 +45,12 @@ function ActiveSetlistPage() {
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <SetlistHeader date={setlist.date} name={setlist.title} songCount={songCount} venue="" />
+      <SetlistHeader
+        date={setlist.date}
+        name={setlist.title}
+        songCount={songCount}
+        venue={setlist.venue}
+      />
 
       <SetlistTable sets={setlist.sets} songsMap={songsMap} />
     </div>

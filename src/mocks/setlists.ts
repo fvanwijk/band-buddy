@@ -14,6 +14,7 @@ export const createSetlist = (overrides: Partial<Setlist> = {}): Setlist => ({
   id: '1',
   sets: [createSetlistSet(1), createSetlistSet(2), createSetlistSet(3)],
   title: 'Main Setlist',
+  venue: 'The Grand Arena',
   ...overrides,
 });
 

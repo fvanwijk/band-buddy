@@ -19,8 +19,9 @@ export type SetlistSet = {
 };
 
 export type Setlist = {
-  id: string;
   date: string;
+  id: string;
   sets: SetlistSet[];
   title: string;
+  venue?: string;
 };

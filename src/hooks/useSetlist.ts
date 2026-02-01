@@ -50,12 +50,18 @@ export function useGetSetlists(): Setlist[] {
           songs,
         }));
 
-      return {
+      const setlist: Setlist = {
         date: result.data.date,
         id: result.data.id,
         sets,
         title: result.data.title,
       };
+
+      if (result.data.venue) {
+        setlist.venue = result.data.venue;
+      }
+
+      return setlist;
     })
     .filter((setlist): setlist is Setlist => setlist !== null)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -105,12 +111,18 @@ export function useGetSetlist(id: string | undefined): Setlist | null {
       songs,
     }));
 
-  return {
+  const setlist: Setlist = {
     date: result.data.date,
     id: result.data.id,
     sets,
     title: result.data.title,
   };
+
+  if (result.data.venue) {
+    setlist.venue = result.data.venue;
+  }
+
+  return setlist;
 }
 
 /**
@@ -122,7 +134,16 @@ export function useAddSetlist(onSuccess?: () => void) {
   return useAddRowCallback(
     'setlists',
     (data: Omit<Setlist, 'id'>) => {
-      if (!store) return { date: data.date, title: data.title };
+      const row: Record<string, string> = {
+        date: data.date,
+        title: data.title,
+      };
+
+      if (data.venue) {
+        row.venue = data.venue;
+      }
+
+      if (!store) return row;
 
       const setlistId = Date.now().toString();
 
@@ -140,7 +161,7 @@ export function useAddSetlist(onSuccess?: () => void) {
         });
       });
 
-      return { date: data.date, title: data.title };
+      return row;
     },
     [store, onSuccess],
     undefined,
@@ -160,7 +181,16 @@ export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void)
     'setlists',
     id!,
     (data: Omit<Setlist, 'id'>) => {
-      if (!store) return { date: data.date, title: data.title };
+      const row: Record<string, string> = {
+        date: data.date,
+        title: data.title,
+      };
+
+      if (data.venue) {
+        row.venue = data.venue;
+      }
+
+      if (!store) return row;
 
       // Delete existing setlist songs
       const setlistSongsData = store.getTable('setlistSongs') || {};
@@ -184,7 +214,7 @@ export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void)
         });
       });
 
-      return { date: data.date, title: data.title };
+      return row;
     },
     [id, store, onSuccess],
     undefined,

@@ -60,6 +60,7 @@ export const setlistMetadataSchema = z.object({
   date: z.string(),
   id: z.string(),
   title: z.string(),
+  venue: z.string().optional(),
 });
 
 /**
@@ -68,6 +69,7 @@ export const setlistMetadataSchema = z.object({
 export const setlistMetadataTableSchema = z.object({
   date: z.string(),
   title: z.string(),
+  venue: z.string().optional(),
 });
 
 /**
@@ -94,6 +96,7 @@ export const setlistSchema = z.object({
   id: z.string(),
   sets: z.array(setlistSetSchema),
   title: z.string(),
+  venue: z.string().optional(),
 });
 
 /**

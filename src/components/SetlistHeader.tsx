@@ -1,7 +1,7 @@
 type SetlistHeaderProps = {
   name: string;
   date: string;
-  venue: string;
+  venue?: string;
   songCount: number;
 };
 
@@ -13,7 +13,7 @@ function SetlistHeader({ name, date, venue, songCount }: SetlistHeaderProps) {
       </div>
       <div className="flex flex-wrap gap-2 text-xs text-slate-300">
         <span className="rounded-full bg-slate-900/70 px-3 py-1">{date}</span>
-        <span className="rounded-full bg-slate-900/70 px-3 py-1">{venue}</span>
+        {venue && <span className="rounded-full bg-slate-900/70 px-3 py-1">{venue}</span>}
         <span className="rounded-full bg-brand-400/10 px-3 py-1 text-brand-200">
           {songCount} songs
         </span>

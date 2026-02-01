@@ -214,47 +214,34 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
             })}
           />
 
-          {/* BPM */}
-          <div>
-            <label htmlFor="bpm" className="mb-1.5 block text-sm font-medium text-slate-300">
-              BPM (optional)
-            </label>
-            <input
-              id="bpm"
-              type="number"
-              min="0"
-              max="200"
-              {...register('bpm', {
-                max: { message: 'BPM must be at most 200', value: 200 },
-                min: { message: 'BPM must be at least 0', value: 0 },
-                valueAsNumber: true,
-              })}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
-              placeholder="Enter BPM (0-200)"
-            />
-            {errors.bpm && <p className="mt-1 text-xs text-red-400">{errors.bpm.message}</p>}
-          </div>
+          <FormField
+            error={errors.bpm}
+            id="bpm"
+            label="BPM"
+            max="200"
+            min="0"
+            placeholder="Enter BPM (0-200)"
+            register={register('bpm', {
+              max: { message: 'BPM must be at most 200', value: 200 },
+              min: { message: 'BPM must be at least 0', value: 0 },
+              valueAsNumber: true,
+            })}
+            type="number"
+          />
 
-          {/* Duration */}
           <div>
-            <label htmlFor="duration" className="mb-1.5 block text-sm font-medium text-slate-300">
-              Duration (optional)
-            </label>
-            <input
+            <FormField
+              error={errors.duration}
               id="duration"
-              type="text"
-              {...register('duration', {
+              label="Duration"
+              placeholder="Enter duration (mm:ss)"
+              register={register('duration', {
                 pattern: {
                   message: 'Duration must be in mm:ss format',
                   value: /^\d{1,3}:[0-5]\d$/,
                 },
               })}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
-              placeholder="Enter duration (mm:ss)"
             />
-            {errors.duration && (
-              <p className="mt-1 text-xs text-red-400">{errors.duration.message}</p>
-            )}
             {calculatedMeasures !== null && (
               <p className="mt-1 text-xs text-slate-500">
                 ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}

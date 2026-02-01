@@ -26,6 +26,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
       date: initialData?.date || new Date().toISOString().split('T')[0],
       sets: initialData?.sets || [{ setNumber: 1, songs: [] }],
       title: initialData?.title || '',
+      venue: initialData?.venue || '',
     },
   });
 
@@ -89,6 +90,14 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
               register={register('date', { required: 'Date is required' })}
               required
               type="date"
+            />
+
+            <FormField
+              error={errors.venue}
+              id="venue"
+              label="Venue"
+              placeholder="Enter venue"
+              register={register('venue')}
             />
 
             <div className="space-y-4">
