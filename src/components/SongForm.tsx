@@ -6,9 +6,10 @@ import { Link } from 'react-router-dom';
 import { BackButton } from './BackButton';
 import { Button } from './Button';
 import { FormField } from './FormField';
+import { PageHeader } from './PageHeader';
 import { RadioGroup } from './RadioGroup';
-import type { Song } from '../types/setlist';
 import { calculateMeasures } from '../utils/measures';
+import type { Song } from '../types/setlist';
 
 type SongFormData = Omit<Song, 'id'> & {
   keyNote?: string;
@@ -139,17 +140,10 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
 
   return (
     <section className="flex h-full flex-col gap-6">
-      <header>
-        <div className="mb-6 flex items-center gap-3">
-          <BackButton to={backPath} />
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
-              Library
-            </p>
-            <h1 className="text-2xl font-semibold text-slate-100">{title}</h1>
-          </div>
-        </div>
-      </header>
+      <div className="flex items-center gap-3">
+        <BackButton to={backPath} />
+        <PageHeader title={title} />
+      </div>
 
       <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
         <form
