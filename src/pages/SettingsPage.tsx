@@ -58,7 +58,7 @@ function SettingsPage() {
                 key={themeName}
                 onClick={() => handleThemeChange(themeName)}
                 className={[
-                  'group relative overflow-hidden rounded-xl border p-6 text-left transition',
+                  'group relative overflow-hidden rounded-xl border p-6 text-left transition block! p-3!',
                   isActive
                     ? 'border-brand-400 bg-brand-400/10'
                     : 'border-slate-700 bg-slate-800/50 hover:border-slate-600',

@@ -1,6 +1,7 @@
+import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { BackButton } from './BackButton';
 import { Button } from './Button';
@@ -14,6 +15,7 @@ type SongFormData = Omit<Song, 'id'> & {
 };
 
 type SongFormProps = {
+  backPath: string;
   initialData?: Song;
   onSubmit: (data: {
     artist: string;
@@ -25,8 +27,7 @@ type SongFormProps = {
   title: string;
 };
 
-export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
-  const navigate = useNavigate();
+export function SongForm({ backPath, initialData, onSubmit, title }: SongFormProps) {
   const [useFlats, setUseFlats] = useState(false);
 
   const existingKey = initialData?.key || 'C';
@@ -122,7 +123,7 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
     <section className="flex h-full flex-col gap-6">
       <header>
         <div className="mb-6 flex items-center gap-3">
-          <BackButton onClick={() => navigate('/songs')} />
+          <BackButton to={backPath} />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
               Library
@@ -223,20 +224,17 @@ export function SongForm({ initialData, onSubmit, title }: SongFormProps) {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button
-              className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700"
-              onClick={() => navigate('/songs')}
-              type="button"
-              variant="ghost"
-            >
+            <Button as={Link} className="flex-1" to={backPath} type="button" variant="outlined">
               Cancel
             </Button>
             <Button
-              className="flex-1 rounded-lg border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-sm font-medium text-brand-200 hover:bg-brand-400/20"
+              className="flex-1"
+              color="primary"
+              iconStart={<IconDeviceFloppy className="h-4 w-4" />}
               type="submit"
-              variant="ghost"
+              variant="filled"
             >
-              {initialData ? 'Save Changes' : 'Add Song'}
+              {initialData ? 'Save Changes' : 'Add song'}
             </Button>
           </div>
         </form>

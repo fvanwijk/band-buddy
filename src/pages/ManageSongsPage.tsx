@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useTable } from 'tinybase/ui-react';
 
+import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { SongCard } from '../components/SongCard';
 import { SortButton } from '../components/SortButton';
@@ -62,12 +62,9 @@ function ManageSongsPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Library</p>
           <h1 className="text-2xl font-semibold text-slate-100">Songs</h1>
         </div>
-        <Link
-          to="/songs/add"
-          className="rounded-full border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-200 hover:bg-brand-400/20"
-        >
+        <Button as="a" color="primary" href="/songs/add" variant="outlined">
           New song
-        </Link>
+        </Button>
       </header>
 
       <ConfirmDialog

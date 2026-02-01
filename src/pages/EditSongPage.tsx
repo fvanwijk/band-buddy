@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useRow } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
@@ -7,6 +7,7 @@ import { store } from '../store/store';
 import type { Song } from '../types/setlist';
 
 function EditSongPage() {
+  const backPath = '/songs';
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -30,18 +31,14 @@ function EditSongPage() {
       finalData.bpm = data.bpm;
     }
     store.setRow('songs', id, finalData);
-    navigate('/songs');
+    navigate(backPath);
   };
 
   if (!id || !songRow) {
     return (
       <section className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-xl text-slate-100">Song not found</p>
-        <Button
-          className="rounded-lg border border-brand-400/30 bg-brand-400/10 px-6 py-3 font-medium text-brand-200 hover:bg-brand-400/20"
-          onClick={() => navigate('/songs')}
-          variant="primary"
-        >
+        <Button as={Link} color="primary" to={backPath}>
           Back to Songs
         </Button>
       </section>
@@ -57,7 +54,9 @@ function EditSongPage() {
     title: songRow.title as string,
   };
 
-  return <SongForm initialData={song} onSubmit={handleSubmit} title="Edit Song" />;
+  return (
+    <SongForm backPath={backPath} initialData={song} onSubmit={handleSubmit} title="Edit Song" />
+  );
 }
 
 export default EditSongPage;

@@ -1,3 +1,4 @@
+import { IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -58,7 +59,13 @@ export function SetlistSetEditor({
       <div className="flex items-center justify-between">
         <h4 className="font-semibold text-white">Set {setNumber}</h4>
         {showRemove && (
-          <Button onClick={onRemove} type="button" variant="danger">
+          <Button
+            color="danger"
+            iconStart={<IconTrash className="h-4 w-4" />}
+            onClick={onRemove}
+            type="button"
+            variant="ghost"
+          >
             Remove Set
           </Button>
         )}
@@ -101,28 +108,32 @@ export function SetlistSetEditor({
                   <Button
                     aria-label="Move up"
                     disabled={songIndex === 0 || isDeleted}
+                    icon
                     onClick={() => handleMoveSong(songIndex, 'up')}
                     type="button"
-                    variant="default"
+                    variant="ghost"
                   >
-                    ↑
+                    <IconArrowUp className="h-4 w-4" />
                   </Button>
                   <Button
                     aria-label="Move down"
                     disabled={songIndex === songs.length - 1 || isDeleted}
+                    icon
                     onClick={() => handleMoveSong(songIndex, 'down')}
                     type="button"
-                    variant="default"
+                    variant="ghost"
                   >
-                    ↓
+                    <IconArrowDown className="h-4 w-4" />
                   </Button>
                   <Button
                     aria-label="Remove song"
+                    color="danger"
+                    icon
                     onClick={() => handleRemoveSong(songIndex)}
                     type="button"
-                    variant="danger"
+                    variant="outlined"
                   >
-                    ✕
+                    <IconTrash className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -131,8 +142,15 @@ export function SetlistSetEditor({
         )}
       </div>
 
-      <Button className="w-full" onClick={handleAddSong} type="button" variant="outline">
-        + Add Song to Set
+      <Button
+        className="w-full border-dashed"
+        color="primary"
+        iconStart={<IconPlus className="h-4 w-4" />}
+        onClick={handleAddSong}
+        type="button"
+        variant="outlined"
+      >
+        Add Song to Set
       </Button>
     </div>
   );

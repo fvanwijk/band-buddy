@@ -4,6 +4,7 @@ import { SongForm } from '../components/SongForm';
 import { store } from '../store/store';
 
 function AddSongPage() {
+  const backPath = '/songs';
   const navigate = useNavigate();
 
   const handleSubmit = (data: {
@@ -23,10 +24,10 @@ function AddSongPage() {
       finalData.bpm = data.bpm;
     }
     store.addRow('songs', finalData);
-    navigate('/songs');
+    navigate(backPath);
   };
 
-  return <SongForm onSubmit={handleSubmit} title="Add New Song" />;
+  return <SongForm backPath={backPath} onSubmit={handleSubmit} title="Add New Song" />;
 }
 
 export default AddSongPage;

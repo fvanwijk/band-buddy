@@ -1,3 +1,4 @@
+import { IconPencil, IconTrash } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from './Button';
@@ -24,11 +25,18 @@ export function SetlistCard({
     <Card
       actions={
         <>
-          <Button as={Link} to={`/setlist/edit/${id}`} variant="default">
-            Edit
+          <Button
+            aria-label="Edit"
+            as={Link}
+            color="primary"
+            icon
+            to={`/setlist/edit/${id}`}
+            variant="outlined"
+          >
+            <IconPencil className="h-4 w-4" />
           </Button>
-          <Button variant="danger" onClick={onDelete}>
-            Delete
+          <Button aria-label="Delete" color="danger" onClick={onDelete} icon variant="outlined">
+            <IconTrash className="h-4 w-4" />
           </Button>
         </>
       }

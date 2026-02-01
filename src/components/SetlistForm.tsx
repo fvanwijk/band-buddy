@@ -1,5 +1,6 @@
+import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { BackButton } from './BackButton';
 import { Button } from './Button';
@@ -24,7 +25,6 @@ export function SetlistForm({
   onSubmit,
   title,
 }: SetlistFormProps) {
-  const navigate = useNavigate();
   const methods = useForm<FormData>({
     defaultValues: {
       date: initialData?.date || new Date().toISOString().split('T')[0],
@@ -72,7 +72,7 @@ export function SetlistForm({
       <section className="flex h-full flex-col gap-6">
         <header>
           <div className="mb-6 flex items-center gap-3">
-            <BackButton onClick={() => navigate(backPath)} />
+            <BackButton to={backPath} />
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
                 Library
@@ -108,9 +108,11 @@ export function SetlistForm({
                 {fields.length < 3 && (
                   <Button
                     className="text-xs"
+                    color="primary"
+                    iconStart={<IconPlus className="h-4 w-4" />}
                     onClick={handleAddSet}
                     type="button"
-                    variant="primary"
+                    variant="ghost"
                   >
                     Add Set
                   </Button>
@@ -129,18 +131,15 @@ export function SetlistForm({
             </div>
 
             <div className="flex gap-3 pt-4">
-              <Button
-                className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700"
-                onClick={() => navigate(backPath)}
-                type="button"
-                variant="ghost"
-              >
+              <Button as={Link} className="flex-1" to={backPath} type="button" variant="outlined">
                 Cancel
               </Button>
               <Button
-                className="flex-1 rounded-lg border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-sm font-medium text-brand-200 hover:bg-brand-400/20"
+                className="flex-1"
+                color="primary"
+                iconStart={<IconDeviceFloppy className="h-4 w-4" />}
                 type="submit"
-                variant="ghost"
+                variant="filled"
               >
                 {initialData ? 'Save Changes' : 'Create Setlist'}
               </Button>
