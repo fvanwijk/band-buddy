@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTable } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { PageHeader } from '../components/PageHeader';
 import { SongCard } from '../components/SongCard';
 import { SortButton } from '../components/SortButton';
 import { store } from '../store/store';
@@ -57,15 +59,14 @@ function ManageSongsPage() {
 
   return (
     <section className="flex h-full flex-col gap-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Library</p>
-          <h1 className="text-2xl font-semibold text-slate-100">Songs</h1>
-        </div>
-        <Button as="a" color="primary" href="/songs/add" variant="outlined">
-          New song
-        </Button>
-      </header>
+      <PageHeader
+        action={
+          <Button as={Link} color="primary" to="/songs/add" variant="outlined">
+            New song
+          </Button>
+        }
+        title="Songs"
+      />
 
       <ConfirmDialog
         isOpen={deletingSongId !== null}

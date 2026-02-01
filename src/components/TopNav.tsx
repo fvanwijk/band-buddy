@@ -1,4 +1,4 @@
-import { IconFileSettings, IconSettings } from '@tabler/icons-react';
+import { IconSettings } from '@tabler/icons-react';
 import { NavLink } from 'react-router-dom';
 
 type NavItem = {

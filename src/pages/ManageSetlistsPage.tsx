@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { Button } from '../components/Button';
 import { Page } from '../components/Page';
+import { PageHeader } from '../components/PageHeader';
 import { SetlistCard } from '../components/SetlistCard';
 import { SortButton } from '../components/SortButton';
 import { store } from '../store/store';
@@ -57,18 +59,14 @@ export function ManageSetlistsPage() {
 
   return (
     <Page>
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Library</p>
-          <h1 className="text-2xl font-semibold text-slate-100">Setlists</h1>
-        </div>
-        <Link
-          to="/setlist/add"
-          className="rounded-full border border-brand-400/30 bg-brand-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-brand-200 hover:bg-brand-400/20"
-        >
-          New setlist
-        </Link>
-      </header>
+      <PageHeader
+        action={
+          <Button as={Link} color="primary" to="/setlist/add" variant="outlined">
+            New setlist
+          </Button>
+        }
+        title="Setlists"
+      />
 
       {displaySetlists.length === 0 ? (
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-8 text-center">
