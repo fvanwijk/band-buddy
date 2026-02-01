@@ -1,34 +1,46 @@
 import type { Store } from 'tinybase';
 import { createStore } from 'tinybase';
 import { createLocalPersister } from 'tinybase/persisters/persister-browser';
+import { createZodSchematizer } from 'tinybase/schematizers/schematizer-zod';
+
+import {
+  activeSetlistIdSchema,
+  localeSchema,
+  setlistMetadataTableSchema,
+  setlistSongTableSchema,
+  songTableSchema,
+  themeSchema,
+} from '../schemas';
 
 /**
- * Create a new store with schema configuration
+ * Create a new store with proper relational schema using Zod
+ *
+ * Tables:
+ * - songs: Individual songs with their properties
+ * - setlists: Setlist metadata (title, date)
+ * - setlistSongs: Join table connecting setlists to songs with set/order info
+ *
+ * Values:
+ * - activeSetlistId: ID of the currently active setlist
+ * - locale: User's preferred locale
+ * - theme: User's preferred theme
  */
 export function createAppStore(): Store {
-  const store = createStore()
-    .setSchema({
-      setlists: {
-        data: { type: 'string' }, // Stores JSON-stringified Setlist
-      },
-      settings: {
-        locale: { type: 'string' },
-        theme: { type: 'string' },
-      },
-      songs: {
-        artist: { type: 'string' },
-        bpm: { type: 'number' },
-        duration: { type: 'string' },
-        key: { type: 'string' },
-        timeSignature: { type: 'string' },
-        title: { type: 'string' },
-      },
-    })
-    .setValuesSchema({
-      activeSetlistId: { type: 'string' },
-    });
+  const schematizer = createZodSchematizer();
 
-  return store;
+  const tablesSchema = schematizer.toTablesSchema({
+    setlistSongs: setlistSongTableSchema,
+    setlists: setlistMetadataTableSchema,
+    songs: songTableSchema,
+  });
+
+  const valuesSchema = schematizer.toValuesSchema({
+    activeSetlistId: activeSetlistIdSchema,
+    locale: localeSchema,
+    theme: themeSchema,
+  });
+
+  return createStore().setTablesSchema(tablesSchema).setValuesSchema(valuesSchema);
 }
 
 /**

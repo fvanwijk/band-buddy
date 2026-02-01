@@ -32,17 +32,32 @@ export function StoreProvider({ children }: StoreProviderProps) {
         });
 
         const seedSetlists = createSetlists();
-        seedSetlists.forEach(({ id, ...setlist }) => {
-          store.setRow('setlists', id, { data: JSON.stringify(setlist) });
+        seedSetlists.forEach(({ id, sets, ...metadata }) => {
+          // Add setlist metadata
+          store.setRow('setlists', id, metadata);
+
+          // Add setlist songs
+          sets.forEach((set) => {
+            set.songs.forEach((songRef, index) => {
+              const songRowId = `${id}_${set.setNumber}_${index}`;
+              store.setRow('setlistSongs', songRowId, {
+                isDeleted: songRef.isDeleted || false,
+                setNumber: set.setNumber,
+                setlistId: id,
+                songId: songRef.songId,
+                songIndex: index,
+              });
+            });
+          });
         });
 
         // Initialize settings with defaults
-        store.setCell('settings', 'app', 'locale', detectLocale());
-        store.setCell('settings', 'app', 'theme', DEFAULT_THEME);
+        store.setValue('locale', detectLocale());
+        store.setValue('theme', DEFAULT_THEME);
       }
 
       // Apply theme from store
-      const storedTheme = store.getCell('settings', 'app', 'theme') as string | undefined;
+      const storedTheme = store.getValue('theme') as string | undefined;
       if (storedTheme) {
         applyTheme(storedTheme as ThemeName);
       } else {

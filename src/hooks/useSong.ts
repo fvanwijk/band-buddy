@@ -7,6 +7,7 @@ import {
   useTable,
 } from 'tinybase/ui-react';
 
+import { songSchema } from '../schemas';
 import type { Song } from '../types';
 
 /**
@@ -16,13 +17,11 @@ export function useGetSongs(): Song[] {
   const songsData = useTable('songs') || {};
 
   return Object.entries(songsData)
-    .map(
-      ([id, data]) =>
-        ({
-          ...data,
-          id,
-        }) as Song,
-    )
+    .map(([id, data]) => {
+      const result = songSchema.safeParse({ ...data, id });
+      return result.success ? result.data : null;
+    })
+    .filter((song): song is Song => song !== null)
     .sort((a, b) => a.title.localeCompare(b.title));
 }
 
@@ -36,15 +35,8 @@ export function useGetSong(id: string | undefined): Song | null {
     return null;
   }
 
-  return {
-    artist: songRow.artist as string,
-    bpm: songRow.bpm as number | undefined,
-    duration: songRow.duration as string | undefined,
-    id,
-    key: songRow.key as string,
-    timeSignature: songRow.timeSignature as string,
-    title: songRow.title as string,
-  };
+  const result = songSchema.safeParse({ ...songRow, id });
+  return result.success ? result.data : null;
 }
 
 /**

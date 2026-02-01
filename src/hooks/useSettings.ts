@@ -1,48 +1,40 @@
-import { useCell, useSetCellCallback, useSetValueCallback } from 'tinybase/ui-react';
+import { useSetValueCallback, useValue } from 'tinybase/ui-react';
 
 import type { SupportedLocale } from '../config/locales';
 import { detectLocale } from '../config/locales';
-import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
-
-const SETTINGS_TABLE = 'settings';
-const SETTINGS_ROW = 'app';
+import { DEFAULT_THEME, applyTheme, type ThemeName } from '../config/themes';
+import { localeSchema, themeSchema } from '../schemas';
 
 /**
  * Hook to get the current locale
  */
 export function useGetLocale(): SupportedLocale {
-  const locale = useCell(SETTINGS_TABLE, SETTINGS_ROW, 'locale') as SupportedLocale | undefined;
-  return locale || detectLocale();
+  const locale = useValue('locale');
+  const result = localeSchema.safeParse(locale);
+  return result.success ? (result.data as SupportedLocale) : detectLocale();
 }
 
 /**
  * Hook to set the locale
  */
 export function useSetLocale() {
-  return useSetCellCallback(
-    SETTINGS_TABLE,
-    SETTINGS_ROW,
-    'locale',
-    (locale: SupportedLocale) => locale,
-    [],
-  );
+  return useSetValueCallback('locale', (locale: SupportedLocale) => locale, []);
 }
 
 /**
  * Hook to get the current theme
  */
 export function useGetTheme(): ThemeName {
-  const theme = useCell(SETTINGS_TABLE, SETTINGS_ROW, 'theme') as ThemeName | undefined;
-  return theme || DEFAULT_THEME;
+  const theme = useValue('theme');
+  const result = themeSchema.safeParse(theme);
+  return result.success ? (result.data as ThemeName) : DEFAULT_THEME;
 }
 
 /**
  * Hook to set the theme
  */
 export function useSetTheme() {
-  return useSetCellCallback(
-    SETTINGS_TABLE,
-    SETTINGS_ROW,
+  return useSetValueCallback(
     'theme',
     (theme: ThemeName) => {
       applyTheme(theme);

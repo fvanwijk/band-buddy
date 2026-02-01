@@ -1,39 +1,63 @@
-import { useDelRowCallback, useRow, useSetRowCallback, useTable } from 'tinybase/ui-react';
+import {
+  useAddRowCallback,
+  useDelRowCallback,
+  useRow,
+  useSetRowCallback,
+  useStore,
+  useTable,
+} from 'tinybase/ui-react';
 
-import type { Setlist } from '../types';
+import { setlistMetadataSchema, setlistSongSchema } from '../schemas';
+import type { Setlist, SetlistSet, SongReference } from '../types';
 
 /**
  * Get all setlists from the store
  */
 export function useGetSetlists(): Setlist[] {
   const setlistsData = useTable('setlists') || {};
+  const setlistSongsData = useTable('setlistSongs') || {};
 
   return Object.entries(setlistsData)
     .map(([id, data]) => {
-      try {
-        const dataStr = data?.data as string | undefined;
-        const parsed = dataStr ? JSON.parse(dataStr) : null;
-        if (parsed) {
-          return {
-            ...parsed,
-            id,
-          };
+      const result = setlistMetadataSchema.safeParse({ ...data, id });
+      if (!result.success) return null;
+
+      // Get all songs for this setlist, grouped by set number
+      const setlistSongs = Object.entries(setlistSongsData)
+        .map(([songRowId, songData]) => {
+          const songResult = setlistSongSchema.safeParse({ ...songData, id: songRowId });
+          return songResult.success ? songResult.data : null;
+        })
+        .filter((song): song is NonNullable<typeof song> => song !== null && song.setlistId === id);
+
+      // Group by set number
+      const setsMap = new Map<number, SongReference[]>();
+      setlistSongs.forEach((song) => {
+        if (!setsMap.has(song.setNumber)) {
+          setsMap.set(song.setNumber, []);
         }
-        return {
-          date: new Date().toISOString().split('T')[0],
-          id,
-          sets: [],
-          title: 'Unknown',
-        };
-      } catch {
-        return {
-          date: new Date().toISOString().split('T')[0],
-          id,
-          sets: [],
-          title: 'Unknown',
-        };
-      }
+        setsMap.get(song.setNumber)!.push({
+          isDeleted: song.isDeleted,
+          songId: song.songId,
+        });
+      });
+
+      // Convert to sorted array of sets
+      const sets: SetlistSet[] = Array.from(setsMap.entries())
+        .sort(([a], [b]) => a - b)
+        .map(([setNumber, songs]) => ({
+          setNumber,
+          songs,
+        }));
+
+      return {
+        date: result.data.date,
+        id: result.data.id,
+        sets,
+        title: result.data.title,
+      };
     })
+    .filter((setlist): setlist is Setlist => setlist !== null)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
@@ -42,36 +66,83 @@ export function useGetSetlists(): Setlist[] {
  */
 export function useGetSetlist(id: string | undefined): Setlist | null {
   const setlistRow = useRow('setlists', id || '');
+  const setlistSongsData = useTable('setlistSongs') || {};
 
   if (!id || !setlistRow) {
     return null;
   }
 
-  try {
-    const data = setlistRow?.data as string | undefined;
-    const parsed = data ? JSON.parse(data) : null;
-    if (parsed) {
-      return {
-        ...parsed,
-        id,
-      };
-    }
-  } catch {
-    // Fall through to return null
-  }
+  const result = setlistMetadataSchema.safeParse({ ...setlistRow, id });
+  if (!result.success) return null;
 
-  return null;
+  // Get all songs for this setlist
+  const setlistSongs = Object.entries(setlistSongsData)
+    .map(([songRowId, songData]) => {
+      const songResult = setlistSongSchema.safeParse({ ...songData, id: songRowId });
+      return songResult.success ? songResult.data : null;
+    })
+    .filter((song): song is NonNullable<typeof song> => song !== null && song.setlistId === id);
+
+  // Group by set number
+  const setsMap = new Map<number, SongReference[]>();
+  setlistSongs
+    .sort((a, b) => a.songIndex - b.songIndex)
+    .forEach((song) => {
+      if (!setsMap.has(song.setNumber)) {
+        setsMap.set(song.setNumber, []);
+      }
+      setsMap.get(song.setNumber)!.push({
+        isDeleted: song.isDeleted,
+        songId: song.songId,
+      });
+    });
+
+  // Convert to sorted array of sets
+  const sets: SetlistSet[] = Array.from(setsMap.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([setNumber, songs]) => ({
+      setNumber,
+      songs,
+    }));
+
+  return {
+    date: result.data.date,
+    id: result.data.id,
+    sets,
+    title: result.data.title,
+  };
 }
 
 /**
  * Hook to add a new setlist
  */
 export function useAddSetlist(onSuccess?: () => void) {
-  return useSetRowCallback(
+  const store = useStore();
+
+  return useAddRowCallback(
     'setlists',
-    (_data: Omit<Setlist, 'id'>) => Date.now().toString(),
-    (data: Omit<Setlist, 'id'>) => ({ data: JSON.stringify(data) }),
-    [onSuccess],
+    (data: Omit<Setlist, 'id'>) => {
+      if (!store) return { date: data.date, title: data.title };
+
+      const setlistId = Date.now().toString();
+
+      // Add the songs to setlistSongs table
+      data.sets.forEach((set) => {
+        set.songs.forEach((songRef, index) => {
+          const songRowId = `${setlistId}_${set.setNumber}_${index}`;
+          store.setRow('setlistSongs', songRowId, {
+            isDeleted: songRef.isDeleted || false,
+            setNumber: set.setNumber,
+            setlistId,
+            songId: songRef.songId,
+            songIndex: index,
+          });
+        });
+      });
+
+      return { date: data.date, title: data.title };
+    },
+    [store, onSuccess],
     undefined,
     () => {
       onSuccess?.();
@@ -83,11 +154,39 @@ export function useAddSetlist(onSuccess?: () => void) {
  * Hook to update an existing setlist
  */
 export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void) {
+  const store = useStore();
+
   return useSetRowCallback(
     'setlists',
-    (_data: Omit<Setlist, 'id'>) => id!,
-    (data: Omit<Setlist, 'id'>) => ({ data: JSON.stringify(data) }),
-    [id, onSuccess],
+    id!,
+    (data: Omit<Setlist, 'id'>) => {
+      if (!store) return { date: data.date, title: data.title };
+
+      // Delete existing setlist songs
+      const setlistSongsData = store.getTable('setlistSongs') || {};
+      Object.entries(setlistSongsData).forEach(([songRowId, songData]) => {
+        if ((songData as any).setlistId === id) {
+          store.delRow('setlistSongs', songRowId);
+        }
+      });
+
+      // Add updated songs
+      data.sets.forEach((set) => {
+        set.songs.forEach((songRef, index) => {
+          const songRowId = `${id}_${set.setNumber}_${index}`;
+          store.setRow('setlistSongs', songRowId, {
+            isDeleted: songRef.isDeleted || false,
+            setNumber: set.setNumber,
+            setlistId: id!,
+            songId: songRef.songId,
+            songIndex: index,
+          });
+        });
+      });
+
+      return { date: data.date, title: data.title };
+    },
+    [id, store, onSuccess],
     undefined,
     () => {
       onSuccess?.();
@@ -99,7 +198,18 @@ export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void)
  * Hook to delete a setlist
  */
 export function useDeleteSetlist(onSuccess?: () => void) {
+  const store = useStore();
+
   return useDelRowCallback('setlists', (id: string) => {
+    if (store) {
+      // Delete associated setlist songs
+      const setlistSongsData = store.getTable('setlistSongs') || {};
+      Object.entries(setlistSongsData).forEach(([songRowId, songData]) => {
+        if ((songData as any).setlistId === id) {
+          store.delRow('setlistSongs', songRowId);
+        }
+      });
+    }
     onSuccess?.();
     return id;
   });
