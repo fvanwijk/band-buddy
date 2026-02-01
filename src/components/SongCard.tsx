@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 
 import { Button } from './Button';
 import { Card } from './Card';
+import { formatDuration } from '../utils/duration';
+import { parseDuration } from '../utils/duration';
 
 type SongCardProps = {
   artist: string;
+  duration?: string;
   keyNote: string;
   onDelete: () => void;
   songId: string;
@@ -15,6 +18,7 @@ type SongCardProps = {
 
 export function SongCard({
   artist,
+  duration,
   keyNote,
   onDelete,
   songId,
@@ -46,6 +50,9 @@ export function SongCard({
       <div className="flex shrink-0 items-center gap-1.5">
         <span className="hidden text-xs text-slate-400 sm:inline">{keyNote}</span>
         <span className="hidden text-xs text-slate-400 sm:inline">{timeSignature}</span>
+        {duration && (
+          <span className="text-xs text-slate-400">{formatDuration(parseDuration(duration))}</span>
+        )}
       </div>
     </Card>
   );

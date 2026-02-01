@@ -5,14 +5,14 @@ import { useRow, useTable, useValue } from 'tinybase/ui-react';
 import { EmptyState } from '../components/EmptyState';
 import SetlistHeader from '../components/SetlistHeader';
 import SetlistTable from '../components/SetlistTable';
-import type { Song } from '../types/setlist';
+import type { Setlist, Song } from '../types/setlist';
 
 function ActiveSetlistPage() {
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;
-  const setlist = useRow('setlists', activeSetlistId || '');
+  const setlistRow = useRow('setlists', activeSetlistId || '');
   const songsTable = useTable('songs');
 
-  if (!activeSetlistId || !setlist) {
+  if (!activeSetlistId || !setlistRow) {
     return (
       <div className="flex h-full">
         <EmptyState
@@ -32,32 +32,36 @@ function ActiveSetlistPage() {
     );
   }
 
-  // Get songs in the order specified in the setlist
-  const songIds = (setlist.songIds as string)?.split(',') || [];
-  const songs: Song[] = songIds
-    .map((id) => {
-      const songRow = songsTable[id];
-      if (!songRow) return null;
-      return {
-        artist: songRow.artist as string,
-        id,
-        key: songRow.key as string,
-        timeSignature: songRow.timeSignature as string,
-        title: songRow.title as string,
-      };
-    })
-    .filter((song): song is Song => song !== null);
+  // Parse setlist data
+  let setlist: Setlist;
+  try {
+    const data = setlistRow?.data as string | undefined;
+    setlist = data ? JSON.parse(data) : { date: '', id: activeSetlistId, sets: [], title: '' };
+  } catch {
+    setlist = { date: '', id: activeSetlistId, sets: [], title: '' };
+  }
+
+  // Build songs map for quick lookup
+  const songsMap: Record<string, Song> = {};
+  Object.entries(songsTable || {}).forEach(([id, song]) => {
+    songsMap[id] = {
+      artist: song.artist as string,
+      duration: song.duration as string | undefined,
+      id,
+      key: song.key as string,
+      timeSignature: song.timeSignature as string,
+      title: song.title as string,
+    };
+  });
+
+  // Calculate total songs
+  const songCount = setlist.sets.reduce((total, s) => total + s.songs.length, 0);
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <SetlistHeader
-        name={setlist.name as string}
-        date={setlist.date as string}
-        venue={setlist.venue as string}
-        songCount={songs.length}
-      />
+      <SetlistHeader date={setlist.date} name={setlist.title} songCount={songCount} venue="" />
 
-      <SetlistTable songs={songs} />
+      <SetlistTable sets={setlist.sets} songsMap={songsMap} />
     </div>
   );
 }

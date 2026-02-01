@@ -1,5 +1,6 @@
 import { IconPlaylist } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useValue } from 'tinybase/ui-react';
 
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
@@ -15,6 +16,8 @@ type SortField = 'date' | 'title';
 
 export function ManageSetlistsPage() {
   const setlists = useSetlists();
+  const navigate = useNavigate();
+  const activeSetlistId = useValue('activeSetlistId') as string | undefined;
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>('date', 'desc');
 
   const getSortedSetlists = () => {
@@ -38,6 +41,11 @@ export function ManageSetlistsPage() {
     return sorted;
   };
 
+  const handleActivate = (id: string) => {
+    store.setValue('activeSetlistId', id);
+    navigate('/');
+  };
+
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this setlist?')) {
       store.delRow('setlists', id);
@@ -50,7 +58,7 @@ export function ManageSetlistsPage() {
     <Page>
       <PageHeader
         action={
-          <Button as={Link} color="primary" to="/setlist/add" variant="outlined">
+          <Button as={Link} color="primary" to="/setlists/add" variant="outlined">
             New setlist
           </Button>
         }
@@ -78,6 +86,8 @@ export function ManageSetlistsPage() {
                 key={setlist.id}
                 date={setlist.date}
                 id={setlist.id}
+                isActive={activeSetlistId === setlist.id}
+                onActivate={() => handleActivate(setlist.id)}
                 onDelete={() => handleDelete(setlist.id)}
                 setsCount={setlist.sets.length}
                 songsCount={setlist.sets.reduce((total, s) => total + s.songs.length, 0)}

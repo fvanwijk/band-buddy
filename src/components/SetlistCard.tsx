@@ -1,4 +1,4 @@
-import { IconPencil, IconTrash } from '@tabler/icons-react';
+import { IconPencil, IconPlayerPlay, IconTrash } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from './Button';
@@ -8,6 +8,8 @@ import { formatDate } from '../utils/date';
 type SetlistCardProps = {
   date: string;
   id: string;
+  isActive?: boolean;
+  onActivate: () => void;
   onDelete: () => void;
   setsCount: number;
   songsCount: number;
@@ -17,6 +19,8 @@ type SetlistCardProps = {
 export function SetlistCard({
   date,
   id,
+  isActive = false,
+  onActivate,
   onDelete,
   setsCount,
   songsCount,
@@ -27,11 +31,21 @@ export function SetlistCard({
       actions={
         <>
           <Button
+            aria-label="Activate"
+            color={isActive ? 'primary' : 'default'}
+            icon
+            onClick={onActivate}
+            title={isActive ? 'Active setlist' : 'Activate setlist'}
+            variant={isActive ? 'filled' : 'outlined'}
+          >
+            <IconPlayerPlay className="h-4 w-4" />
+          </Button>
+          <Button
             aria-label="Edit"
             as={Link}
             color="primary"
             icon
-            to={`/setlist/edit/${id}`}
+            to={`/setlists/edit/${id}`}
             variant="outlined"
           >
             <IconPencil className="h-4 w-4" />

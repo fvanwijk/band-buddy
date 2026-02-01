@@ -8,8 +8,8 @@ import { Button } from './Button';
 import { FormField } from './FormField';
 import { PageHeader } from './PageHeader';
 import { RadioGroup } from './RadioGroup';
-import { calculateMeasures } from '../utils/measures';
 import type { Song } from '../types/setlist';
+import { calculateMeasures } from '../utils/measures';
 
 type SongFormData = Omit<Song, 'id'> & {
   keyNote?: string;

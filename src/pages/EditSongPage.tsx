@@ -48,6 +48,7 @@ function EditSongPage() {
   const song: Song = {
     artist: songRow.artist as string,
     bpm: songRow.bpm as number | undefined,
+    duration: songRow.duration as string | undefined,
     id: id,
     key: songRow.key as string,
     timeSignature: songRow.timeSignature as string,
