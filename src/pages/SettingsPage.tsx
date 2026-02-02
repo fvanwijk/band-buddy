@@ -1,13 +1,19 @@
-import { IconPlus } from '@tabler/icons-react';
+import { IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 
-import { AddInstrumentDialog } from '../components/AddInstrumentDialog';
 import { Button } from '../components/Button';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { InstrumentDialog } from '../components/InstrumentDialog';
 import { MidiDeviceStatus } from '../components/MidiDeviceStatus';
 import { SelectField } from '../components/SelectField';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '../config/locales';
 import { THEMES, type ThemeName } from '../config/themes';
-import { useAddInstrument, useGetInstruments } from '../hooks/useInstruments';
+import {
+  useAddInstrument,
+  useDeleteInstrument,
+  useGetInstruments,
+  useUpdateInstrument,
+} from '../hooks/useInstruments';
 import { useMidiDevices } from '../hooks/useMidiDevices';
 import { useGetLocale, useGetTheme, useSetLocale, useSetTheme } from '../hooks/useSettings';
 import type { Instrument } from '../types';
@@ -38,9 +44,13 @@ function SettingsPage() {
   const setLocale = useSetLocale();
   const instruments = useGetInstruments();
   const addInstrument = useAddInstrument();
+  const deleteInstrument = useDeleteInstrument();
   const { error, inputs, isReady, isSupported, outputs } = useMidiDevices();
 
+  const [deleteInstrumentId, setDeleteInstrumentId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingInstrumentId, setEditingInstrumentId] = useState<string | null>(null);
+  const updateInstrument = useUpdateInstrument(editingInstrumentId || undefined);
 
   const inputOptions = useMemo(
     () => [
@@ -74,6 +84,16 @@ function SettingsPage() {
     [outputs],
   );
 
+  const editingInstrument = useMemo(
+    () => instruments.find((instrument) => instrument.id === editingInstrumentId),
+    [editingInstrumentId, instruments],
+  );
+
+  const deleteInstrumentTarget = useMemo(
+    () => instruments.find((instrument) => instrument.id === deleteInstrumentId),
+    [deleteInstrumentId, instruments],
+  );
+
   const canAddInstrument = isSupported && isReady && inputs.length > 0;
 
   const handleAddInstrument = (data: { midiInId: string; midiOutId: string; name: string }) => {
@@ -83,7 +103,7 @@ function SettingsPage() {
       ? outputsById.get(data.midiOutId) || data.midiOutId
       : undefined;
 
-    const newInstrument: Omit<Instrument, 'id'> = {
+    const instrumentData: Omit<Instrument, 'id'> = {
       midiInId: data.midiInId,
       midiInName,
       midiOutId: data.midiOutId || undefined,
@@ -91,8 +111,39 @@ function SettingsPage() {
       name: trimmedName,
     };
 
-    addInstrument(newInstrument);
+    if (editingInstrumentId) {
+      updateInstrument(instrumentData);
+    } else {
+      addInstrument(instrumentData);
+    }
+
     setIsDialogOpen(false);
+    setEditingInstrumentId(null);
+  };
+
+  const handleEditInstrument = (id: string) => {
+    setEditingInstrumentId(id);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setEditingInstrumentId(null);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteInstrumentId(null);
+  };
+
+  const handleConfirmDeleteInstrument = () => {
+    if (deleteInstrumentId) {
+      deleteInstrument(deleteInstrumentId);
+    }
+    setDeleteInstrumentId(null);
+  };
+
+  const handleRequestDeleteInstrument = (id: string) => {
+    setDeleteInstrumentId(id);
   };
 
   return (
@@ -118,10 +169,10 @@ function SettingsPage() {
                 key={themeName}
                 onClick={() => setTheme(themeName)}
                 className={[
-                  'group relative overflow-hidden rounded-xl border text-left transition',
+                  'group relative overflow-hidden rounded-xl border text-left transition block! p-3!',
                   isActive
-                    ? 'border-brand-400 bg-brand-400/10 p-6'
-                    : 'border-slate-700 bg-slate-800/50 p-6 hover:border-slate-600',
+                    ? 'border-brand-400 bg-brand-400/10 '
+                    : 'border-slate-700 bg-slate-800/50  hover:border-slate-600',
                 ].join(' ')}
                 variant="ghost"
               >
@@ -200,7 +251,10 @@ function SettingsPage() {
             color="primary"
             disabled={!canAddInstrument}
             iconStart={<IconPlus className="h-4 w-4" />}
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => {
+              setEditingInstrumentId(null);
+              setIsDialogOpen(true);
+            }}
             variant="outlined"
           >
             Add Instrument
@@ -236,8 +290,26 @@ function SettingsPage() {
                   key={instrument.id}
                   className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-4"
                 >
-                  <div>
+                  <div className="flex items-center justify-between gap-3">
                     <p className="text-sm font-semibold text-slate-100">{instrument.name}</p>
+                    <div className="flex gap-2">
+                      <Button
+                        color="primary"
+                        icon
+                        onClick={() => handleEditInstrument(instrument.id)}
+                        variant="outlined"
+                      >
+                        <IconPencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        color="danger"
+                        icon
+                        onClick={() => handleRequestDeleteInstrument(instrument.id)}
+                        variant="outlined"
+                      >
+                        <IconTrash className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <MidiDeviceStatus
@@ -249,7 +321,7 @@ function SettingsPage() {
                       <MidiDeviceStatus
                         isAvailable={midiOutAvailable}
                         label="MIDI Out"
-                        name={instrument.midiOutName || instrument.midiOutId}
+                        name={instrument.midiOutName || instrument.midiOutId || 'Unknown'}
                       />
                     ) : (
                       <MidiDeviceStatus isOptional label="MIDI Out" name="None" />
@@ -262,10 +334,20 @@ function SettingsPage() {
         </div>
       </div>
 
-      <AddInstrumentDialog
+      <ConfirmDialog
+        isOpen={!!deleteInstrumentId}
+        message={`Are you sure you want to delete "${
+          deleteInstrumentTarget?.name || 'this instrument'
+        }"? This cannot be undone.`}
+        onClose={handleCloseDeleteDialog}
+        onConfirm={handleConfirmDeleteInstrument}
+        title="Delete instrument"
+      />
+      <InstrumentDialog
+        initialInstrument={editingInstrument}
         inputOptions={inputOptions}
         isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={handleCloseDialog}
         onSubmit={handleAddInstrument}
         outputOptions={outputOptions}
       />

@@ -1,28 +1,36 @@
+import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
+import type { Instrument } from '../types';
 import { Button } from './Button';
 import { FormField } from './FormField';
 import { SelectField } from './SelectField';
 
-type AddInstrumentDialogProps = {
+type InstrumentDialogProps = {
   inputOptions: Array<{ label: string; value: string }>;
+  initialInstrument?: Instrument;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: { midiInId: string; midiOutId: string; name: string }) => void;
   outputOptions: Array<{ label: string; value: string }>;
 };
 
-export function AddInstrumentDialog({
+export function InstrumentDialog({
   inputOptions,
+  initialInstrument,
   isOpen,
   onClose,
   onSubmit,
   outputOptions,
-}: AddInstrumentDialogProps) {
+}: InstrumentDialogProps) {
+  const isEditing = !!initialInstrument;
+
   const {
     handleSubmit,
     register,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<{
     midiInId: string;
@@ -30,11 +38,21 @@ export function AddInstrumentDialog({
     name: string;
   }>({
     defaultValues: {
-      midiInId: '',
-      midiOutId: '',
-      name: '',
+      midiInId: initialInstrument?.midiInId || '',
+      midiOutId: initialInstrument?.midiOutId || '',
+      name: initialInstrument?.name || '',
     },
   });
+
+  useEffect(() => {
+    if (isOpen && initialInstrument) {
+      setValue('midiInId', initialInstrument.midiInId);
+      setValue('midiOutId', initialInstrument.midiOutId || '');
+      setValue('name', initialInstrument.name);
+    } else if (isOpen && !initialInstrument) {
+      reset();
+    }
+  }, [isOpen, initialInstrument, setValue, reset]);
 
   const handleClose = () => {
     reset();
@@ -51,11 +69,10 @@ export function AddInstrumentDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70" onClick={handleClose} />
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-        <h2 className="mb-3 text-xl font-semibold text-slate-100">Add Instrument</h2>
-        <p className="mb-6 text-sm text-slate-400">
-          Select MIDI devices for this instrument. MIDI in is required.
-        </p>
+      <div className="relative z-10 w-full max-w-xl rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
+        <h2 className="mb-6 text-xl font-semibold text-slate-100">
+          {isEditing ? 'Edit Instrument' : 'Add Instrument'}
+        </h2>
 
         <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
           <FormField
@@ -87,8 +104,14 @@ export function AddInstrumentDialog({
             <Button className="flex-1" onClick={handleClose} type="button" variant="outlined">
               Cancel
             </Button>
-            <Button className="flex-1" color="primary" type="submit" variant="filled">
-              Add Instrument
+            <Button
+              className="flex-1"
+              color="primary"
+              iconStart={<IconDeviceFloppy className="w-4 h-4" />}
+              type="submit"
+              variant="filled"
+            >
+              {isEditing ? 'Save instrument' : 'Add instrument'}
             </Button>
           </div>
         </form>

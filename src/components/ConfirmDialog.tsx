@@ -1,3 +1,5 @@
+import { IconTrash } from '@tabler/icons-react';
+
 import { Button } from './Button';
 
 type ConfirmDialogProps = {
@@ -33,6 +35,7 @@ export function ConfirmDialog({ isOpen, onClose, onConfirm, title, message }: Co
           <Button
             color="danger"
             className="flex-1"
+            iconStart={<IconTrash className="w-4 h-4" />}
             onClick={handleConfirm}
             type="button"
             variant="filled"

@@ -1,4 +1,10 @@
-import { useAddRowCallback, useRow, useSetRowCallback, useTable } from 'tinybase/ui-react';
+import {
+  useAddRowCallback,
+  useDelRowCallback,
+  useRow,
+  useSetRowCallback,
+  useTable,
+} from 'tinybase/ui-react';
 
 import { instrumentSchema } from '../schemas';
 import type { Instrument } from '../types';
@@ -62,6 +68,16 @@ export function useAddInstrument(onSuccess?: () => void) {
       onSuccess?.();
     },
   );
+}
+
+/**
+ * Hook to delete an instrument
+ */
+export function useDeleteInstrument(onSuccess?: () => void) {
+  return useDelRowCallback('instruments', (id: string) => {
+    onSuccess?.();
+    return id;
+  });
 }
 
 /**
