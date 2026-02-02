@@ -24,6 +24,14 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 - `npm run lint -- --fix` - Auto-fix formatting and linting issues
 - `npm run typecheck` - Quick TypeScript type checking (use during development)
 - `npm run build` - Full build with type checking and bundling
+- `npm run test` - Run Vitest unit tests
+
+## Testing
+
+- Use Vitest with @testing-library/react
+- Prefer `renderHook()` for testing hooks
+- Colocate tests next to related code as `src/**/*.test.tsx`
+- Use `@testing-library/jest-dom` matchers (configured in `src/test/setup.ts`)
 
 ## Mandatory Sorting Rules
 

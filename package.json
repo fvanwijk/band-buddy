@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
-    "typecheck": "tsc -b",
+    "dev": "vite",
     "lint": "eslint . --max-warnings=0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "@headlessui/react": "2.2.8",
@@ -29,6 +30,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.8.0",
+    "@testing-library/react": "16.3.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
@@ -39,9 +43,11 @@
     "eslint-plugin-sort-keys-fix": "1.1.2",
     "eslint-plugin-unused-imports": "4.3.0",
     "globals": "^16.3.0",
+    "jsdom": "25.0.1",
     "prettier": "3.8.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vitest": "3.2.4"
   }
 }
