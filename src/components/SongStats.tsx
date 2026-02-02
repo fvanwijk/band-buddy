@@ -4,6 +4,7 @@ import { useUpdateSong } from '../hooks/useSong';
 import type { Song } from '../types';
 import { Button } from './Button';
 import { SongStat } from './SongStat';
+import { cn } from '../utils/cn';
 
 type SongStatsProps = {
   song: Song;
@@ -36,7 +37,10 @@ export function SongStats({ song }: SongStatsProps) {
           <IconMinus className="h-4 w-4" />
         </Button>
         <span
-          className={`min-w-8 text-center text-xs ${transpose !== 0 ? 'text-brand-200 font-semibold' : 'text-slate-400'}`}
+          className={cn(
+            'min-w-8 text-center text-xs',
+            transpose !== 0 ? 'text-brand-200 font-semibold' : 'text-slate-400',
+          )}
         >
           {formatTranspose(transpose)}
         </span>
