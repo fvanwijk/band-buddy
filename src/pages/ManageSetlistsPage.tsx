@@ -1,4 +1,4 @@
-import { IconPlaylist } from '@tabler/icons-react';
+import { IconPlaylist, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useValue } from 'tinybase/ui-react';
@@ -62,7 +62,13 @@ export function ManageSetlistsPage() {
     <Page>
       <PageHeader
         action={
-          <Button as={Link} color="primary" to="/setlists/add" variant="outlined">
+          <Button
+            as={Link}
+            iconStart={<IconPlus className="h-4 w-4" />}
+            color="primary"
+            to="/setlists/add"
+            variant="outlined"
+          >
             New setlist
           </Button>
         }

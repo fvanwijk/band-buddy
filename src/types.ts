@@ -10,6 +10,15 @@ export type Song = {
   transpose?: number;
 };
 
+export type Instrument = {
+  id: string;
+  midiInId: string;
+  midiInName: string;
+  midiOutId?: string;
+  midiOutName?: string;
+  name: string;
+};
+
 export type SongReference = {
   songId: string;
   isDeleted?: boolean;

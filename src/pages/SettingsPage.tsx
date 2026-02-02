@@ -1,8 +1,17 @@
+import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import { Button } from '../components/Button';
+import { FormField } from '../components/FormField';
+import { MidiDeviceStatus } from '../components/MidiDeviceStatus';
 import { SelectField } from '../components/SelectField';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '../config/locales';
 import { THEMES, type ThemeName } from '../config/themes';
+import { useAddInstrument, useGetInstruments } from '../hooks/useInstruments';
+import { useMidiDevices } from '../hooks/useMidiDevices';
 import { useGetLocale, useGetTheme, useSetLocale, useSetTheme } from '../hooks/useSettings';
+import type { Instrument } from '../types';
 
 // Color preview swatches for each theme
 const themeColors = {
@@ -28,6 +37,83 @@ function SettingsPage() {
   const currentLocale = useGetLocale();
   const setTheme = useSetTheme();
   const setLocale = useSetLocale();
+  const instruments = useGetInstruments();
+  const addInstrument = useAddInstrument();
+  const { error, inputs, isReady, isSupported, outputs } = useMidiDevices();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm<{
+    midiInId: string;
+    midiOutId: string;
+    name: string;
+  }>({
+    defaultValues: {
+      midiInId: '',
+      midiOutId: '',
+      name: '',
+    },
+  });
+
+  const inputOptions = useMemo(
+    () => [
+      { label: 'Select MIDI input', value: '' },
+      ...inputs.map((device) => ({
+        label: device.name,
+        value: device.id,
+      })),
+    ],
+    [inputs],
+  );
+
+  const outputOptions = useMemo(
+    () => [
+      { label: 'None', value: '' },
+      ...outputs.map((device) => ({
+        label: device.name,
+        value: device.id,
+      })),
+    ],
+    [outputs],
+  );
+
+  const inputsById = useMemo(
+    () => new Map(inputs.map((device) => [device.id, device.name])),
+    [inputs],
+  );
+
+  const outputsById = useMemo(
+    () => new Map(outputs.map((device) => [device.id, device.name])),
+    [outputs],
+  );
+
+  const canAddInstrument = isSupported && isReady && inputs.length > 0;
+
+  const handleAddInstrument = (data: { midiInId: string; midiOutId: string; name: string }) => {
+    const trimmedName = data.name.trim();
+    const midiInName = inputsById.get(data.midiInId) || data.midiInId;
+    const midiOutName = data.midiOutId
+      ? outputsById.get(data.midiOutId) || data.midiOutId
+      : undefined;
+
+    const newInstrument: Omit<Instrument, 'id'> = {
+      midiInId: data.midiInId,
+      midiInName,
+      midiOutId: data.midiOutId || undefined,
+      midiOutName,
+      name: trimmedName,
+    };
+
+    addInstrument(newInstrument);
+
+    reset();
+    setIsDialogOpen(false);
+  };
 
   return (
     <section className="flex h-full flex-col gap-6">
@@ -121,6 +207,135 @@ function SettingsPage() {
           />
         </div>
       </div>
+
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-100">Instruments</h2>
+            <p className="mt-2 text-sm text-slate-400">
+              Track connected instruments for program changes and MIDI device routing.
+            </p>
+          </div>
+          <Button
+            color="primary"
+            iconStart={<IconPlus className="h-4 w-4" />}
+            onClick={() => setIsDialogOpen(true)}
+            disabled={!canAddInstrument}
+            variant="outlined"
+          >
+            Add Instrument
+          </Button>
+        </div>
+
+        {!isSupported && (
+          <p className="mt-4 text-sm text-red-300">Web MIDI is not supported in this browser.</p>
+        )}
+        {isSupported && !isReady && (
+          <p className="mt-4 text-sm text-slate-400">Detecting MIDI devices...</p>
+        )}
+        {error && <p className="mt-4 text-sm text-red-300">{error}</p>}
+
+        {isSupported && isReady && inputs.length === 0 && (
+          <p className="mt-4 text-sm text-slate-400">
+            No MIDI inputs detected. Connect a device to enable adding instruments.
+          </p>
+        )}
+
+        <div className="mt-6 space-y-3">
+          {instruments.length === 0 ? (
+            <p className="text-sm text-slate-400">No instruments added yet.</p>
+          ) : (
+            instruments.map((instrument) => {
+              const midiInAvailable = inputsById.has(instrument.midiInId);
+              const midiOutAvailable = instrument.midiOutId
+                ? outputsById.has(instrument.midiOutId)
+                : true;
+
+              return (
+                <div
+                  key={instrument.id}
+                  className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-4"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-slate-100">{instrument.name}</p>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <MidiDeviceStatus
+                      label="MIDI In"
+                      name={instrument.midiInName}
+                      isAvailable={midiInAvailable}
+                    />
+                    {instrument.midiOutId ? (
+                      <MidiDeviceStatus
+                        label="MIDI Out"
+                        name={instrument.midiOutName || instrument.midiOutId}
+                        isAvailable={midiOutAvailable}
+                      />
+                    ) : (
+                      <MidiDeviceStatus label="MIDI Out" name="None" isOptional />
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {isDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setIsDialogOpen(false)} />
+          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
+            <h2 className="mb-3 text-xl font-semibold text-slate-100">Add Instrument</h2>
+            <form className="space-y-4" onSubmit={handleSubmit(handleAddInstrument)}>
+              <FormField
+                error={errors.name}
+                id="instrument-name"
+                label="Instrument Name"
+                placeholder="Enter instrument name"
+                register={register('name', { required: 'Instrument name is required' })}
+                required
+              />
+
+              <SelectField
+                error={errors.midiInId}
+                id="midi-in"
+                label="MIDI In"
+                options={inputOptions}
+                register={register('midiInId', { required: 'MIDI in is required' })}
+                required
+              />
+
+              <SelectField
+                id="midi-out"
+                label="MIDI Out (Optional)"
+                options={outputOptions}
+                register={register('midiOutId')}
+              />
+
+              <div className="flex gap-3 pt-2">
+                <Button
+                  className="flex-1"
+                  onClick={() => setIsDialogOpen(false)}
+                  type="button"
+                  variant="outlined"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1"
+                  color="primary"
+                  iconStart={<IconDeviceFloppy className="h-4 w-4" />}
+                  type="submit"
+                  variant="outlined"
+                >
+                  Add Instrument
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

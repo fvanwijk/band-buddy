@@ -1,4 +1,4 @@
-import { IconMusic } from '@tabler/icons-react';
+import { IconMusic, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTable } from 'tinybase/ui-react';
@@ -9,8 +9,8 @@ import { EmptyState } from '../components/EmptyState';
 import { PageHeader } from '../components/PageHeader';
 import { SongCard } from '../components/SongCard';
 import { SortButtonsBar } from '../components/SortButtonsBar';
-import { useSortState } from '../hooks/useSortState';
 import { useDeleteSong } from '../hooks/useSong';
+import { useSortState } from '../hooks/useSortState';
 
 type SortField = 'artist' | 'key' | 'title';
 
@@ -46,7 +46,13 @@ function ManageSongsPage() {
     <section className="flex h-full flex-col gap-6">
       <PageHeader
         action={
-          <Button as={Link} color="primary" to="/songs/add" variant="outlined">
+          <Button
+            as={Link}
+            color="primary"
+            iconStart={<IconPlus className="h-4 w-4" />}
+            to="/songs/add"
+            variant="outlined"
+          >
             New song
           </Button>
         }

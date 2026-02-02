@@ -30,6 +30,29 @@ export const songTableSchema = z.object({
 });
 
 /**
+ * Instrument schema (full, with id)
+ */
+export const instrumentSchema = z.object({
+  id: z.string(),
+  midiInId: z.string(),
+  midiInName: z.string(),
+  midiOutId: z.string().optional(),
+  midiOutName: z.string().optional(),
+  name: z.string(),
+});
+
+/**
+ * Instrument table schema (without id, for Tinybase table)
+ */
+export const instrumentTableSchema = z.object({
+  midiInId: z.string(),
+  midiInName: z.string(),
+  midiOutId: z.string().optional(),
+  midiOutName: z.string().optional(),
+  name: z.string(),
+});
+
+/**
  * Song without ID (for creating/updating)
  */
 export const songWithoutIdSchema = songSchema.omit({ id: true });
