@@ -13,11 +13,18 @@ import { useGetSongs } from '../hooks/useSong';
 import type { Song } from '../types';
 
 function SongDetailPage() {
-  const { setlistId, songId } = useParams<{ setlistId: string; songId: string }>();
+  const { setlistId, songId, tab } = useParams<{
+    setlistId: string;
+    songId: string;
+    tab: string;
+  }>();
   const navigate = useNavigate();
 
   const setlist = useGetSetlist(setlistId);
   const songs = useGetSongs();
+
+  // Default to 'details' tab if not specified
+  const selectedTab = tab && ['details', 'midi'].includes(tab) ? tab : 'details';
 
   // Create songs map
   const songsMap = new Map<string, Song>();
@@ -74,14 +81,18 @@ function SongDetailPage() {
 
   const handlePrevious = () => {
     if (previousSongId) {
-      navigate(`/setlist/${setlistId}/song/${previousSongId}`);
+      navigate(`/setlist/${setlistId}/song/${previousSongId}/${selectedTab}`);
     }
   };
 
   const handleNext = () => {
     if (nextSongId) {
-      navigate(`/setlist/${setlistId}/song/${nextSongId}`);
+      navigate(`/setlist/${setlistId}/song/${nextSongId}/${selectedTab}`);
     }
+  };
+
+  const handleTabChange = (tabId: string) => {
+    navigate(`/setlist/${setlistId}/song/${songId}/${tabId}`);
   };
 
   return (
@@ -97,17 +108,19 @@ function SongDetailPage() {
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
         <Tabs
+          activeTabId={selectedTab}
+          onTabChange={handleTabChange}
           tabs={[
             {
               content: (
                 <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
               ),
-              id: 'lyrics',
+              id: 'details',
               label: 'Lyrics',
             },
             {
               content: <MidiButtonsDisplay midiEvents={currentSong.midiEvents} />,
-              id: 'midi-buttons',
+              id: 'midi',
               label: 'MIDI buttons',
             },
           ]}

@@ -1,5 +1,6 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 
 type TabItem = {
   content: ReactNode;
@@ -8,12 +9,34 @@ type TabItem = {
 };
 
 type TabsProps = {
+  activeTabId?: string;
+  onTabChange?: (tabId: string) => void;
   tabs: TabItem[];
 };
 
-export function Tabs({ tabs }: TabsProps) {
+export function Tabs({ activeTabId, onTabChange, tabs }: TabsProps) {
+  const [uncontrolledIndex, setUncontrolledIndex] = useState(0);
+
+  // Determine if this is controlled or uncontrolled
+  const isControlled = activeTabId !== undefined;
+
+  // Calculate the selected index
+  const controlledIndex = tabs.findIndex((tab) => tab.id === activeTabId);
+  const selectedIndex = isControlled
+    ? Math.max(0, controlledIndex)
+    : Math.min(uncontrolledIndex, tabs.length - 1);
+
+  const handleTabChange = (index: number) => {
+    // Update internal state if uncontrolled
+    if (!isControlled) {
+      setUncontrolledIndex(index);
+    }
+    // Call the callback if provided
+    onTabChange?.(tabs[index].id);
+  };
+
   return (
-    <TabGroup>
+    <TabGroup selectedIndex={selectedIndex} onChange={handleTabChange}>
       <TabList className="flex gap-2 border-b border-slate-800">
         {tabs.map((tab) => (
           <Tab

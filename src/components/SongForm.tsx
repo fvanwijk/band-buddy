@@ -1,7 +1,7 @@
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { BackButton } from './BackButton';
 import { Button } from './Button';
@@ -40,6 +40,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const [useFlats, setUseFlats] = useState(false);
   const [calculatedMeasures, setCalculatedMeasures] = useState<number | null>(null);
   const [midiEvents, setMidiEvents] = useState<MidiEvent[]>(initialData?.midiEvents || []);
+
+  const { id, tab } = useParams<{ id?: string; tab?: string }>();
+  const navigate = useNavigate();
 
   const instruments = useGetInstruments();
 
@@ -80,6 +83,13 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       setUseFlats(true);
     }
   }, [existingNote]);
+
+  const selectedTab = tab && ['details', 'midi'].includes(tab) ? tab : 'details';
+  const songFormBasePath = id ? `/songs/edit/${id}` : '/songs/add';
+
+  const handleTabChange = (tabId: string) => {
+    navigate(`${songFormBasePath}/${tabId}`);
+  };
 
   const noteOptions = useFlats
     ? [
@@ -186,6 +196,8 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
         noValidate
       >
         <Tabs
+          activeTabId={selectedTab}
+          onTabChange={handleTabChange}
           tabs={[
             {
               content: (
@@ -302,7 +314,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                   </div>
                 </div>
               ),
-              id: 'song-details',
+              id: 'details',
               label: 'Song details',
             },
             {
@@ -314,7 +326,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                   onDeleteEvent={handleDeleteMidiEvent}
                 />
               ),
-              id: 'midi-events',
+              id: 'midi',
               label: 'MIDI events',
             },
           ]}

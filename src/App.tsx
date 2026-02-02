@@ -24,13 +24,22 @@ function App() {
       <main className="min-h-0 flex-1 pt-1.5">
         <Routes>
           <Route path="/" element={<ActiveSetlistPage />} />
-          <Route path="/setlist/:setlistId/song/:songId" element={<SongDetailPage />} />
+          <Route path="/setlist/:setlistId/song/:songId">
+            <Route index element={<Navigate to="details" replace />} />
+            <Route path=":tab" element={<SongDetailPage />} />
+          </Route>
           <Route path="/setlists" element={<ManageSetlistsPage />} />
           <Route path="/setlists/add" element={<AddSetlistPage />} />
           <Route path="/setlists/edit/:id" element={<EditSetlistPage />} />
           <Route path="/songs" element={<ManageSongsPage />} />
-          <Route path="/songs/add" element={<AddSongPage />} />
-          <Route path="/songs/edit/:id" element={<EditSongPage />} />
+          <Route path="/songs/add">
+            <Route index element={<Navigate to="details" replace />} />
+            <Route path=":tab" element={<AddSongPage />} />
+          </Route>
+          <Route path="/songs/edit/:id">
+            <Route index element={<Navigate to="details" replace />} />
+            <Route path=":tab" element={<EditSongPage />} />
+          </Route>
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
