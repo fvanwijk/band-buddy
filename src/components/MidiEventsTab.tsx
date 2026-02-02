@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { AddMidiButtonDialog } from './AddMidiButtonDialog';
 import { Button } from './Button';
+import { useMidiDevices } from '../hooks/useMidiDevices';
 import type { Instrument, MidiEvent } from '../types';
 
 type MidiEventsTabProps = {
@@ -19,10 +20,13 @@ export function MidiEventsTab({
   onDeleteEvent,
 }: MidiEventsTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { isReady, outputs } = useMidiDevices();
 
   const handleAddEvent = (event: Omit<MidiEvent, 'id'>) => {
     onAddEvent?.(event);
   };
+
+  const outputsById = new Map(outputs.map((output) => [output.id, output]));
 
   return (
     <div className="space-y-6">
@@ -55,6 +59,8 @@ export function MidiEventsTab({
           <div className="space-y-2">
             {midiEvents.map((event) => {
               const instrument = instruments.find((inst) => inst.id === event.instrumentId);
+              const isAvailable =
+                isReady && instrument?.midiInId && outputsById.has(instrument.midiInId);
               return (
                 <div
                   key={event.id}
@@ -62,8 +68,16 @@ export function MidiEventsTab({
                 >
                   <div className="flex-1">
                     <p className="font-medium text-slate-200">{event.label}</p>
-                    <p className="text-xs text-slate-500">
-                      Program Change {event.programChange} → {instrument?.name || 'Unknown'}
+                    <p className="flex items-center gap-2 text-xs text-slate-500">
+                      <span>Program Change {event.programChange} →</span>
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className={`h-2 w-2 rounded-full ${
+                            isAvailable ? 'bg-green-500' : 'bg-red-500'
+                          }`}
+                        />
+                        {instrument?.name || 'Unknown'}
+                      </span>
                     </p>
                   </div>
                   <Button
