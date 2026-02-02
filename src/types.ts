@@ -1,3 +1,10 @@
+export type MidiEvent = {
+  id: string;
+  instrumentId: string;
+  label: string;
+  programChange: number;
+};
+
 export type Song = {
   artist: string;
   bpm?: number;
@@ -5,6 +12,7 @@ export type Song = {
   id: string;
   key: string;
   lyrics?: string;
+  midiEvents?: MidiEvent[];
   timeSignature: string;
   title: string;
   transpose?: number;

@@ -18,7 +18,17 @@ export function useGetSongs(): Song[] {
 
   return Object.entries(songsData)
     .map(([id, data]) => {
-      const result = songSchema.safeParse({ ...data, id });
+      const songData = data as Record<string, unknown>;
+      const parsedData: Record<string, unknown> = { ...songData, id };
+      // Parse midiEvents if stored as JSON string
+      if (typeof songData.midiEvents === 'string') {
+        try {
+          parsedData.midiEvents = JSON.parse(songData.midiEvents);
+        } catch {
+          parsedData.midiEvents = undefined;
+        }
+      }
+      const result = songSchema.safeParse(parsedData);
       return result.success ? result.data : null;
     })
     .filter((song): song is Song => song !== null)
@@ -35,7 +45,18 @@ export function useGetSong(id: string | undefined): Song | null {
     return null;
   }
 
-  const result = songSchema.safeParse({ ...songRow, id });
+  const songData = songRow as Record<string, unknown>;
+  const parsedData: Record<string, unknown> = { ...songData, id };
+  // Parse midiEvents if stored as JSON string
+  if (typeof songData.midiEvents === 'string') {
+    try {
+      parsedData.midiEvents = JSON.parse(songData.midiEvents);
+    } catch {
+      parsedData.midiEvents = undefined;
+    }
+  }
+
+  const result = songSchema.safeParse(parsedData);
   return result.success ? result.data : null;
 }
 
@@ -59,6 +80,12 @@ export function useAddSong(onSuccess?: () => void) {
       }
       if (data.duration) {
         finalData.duration = data.duration;
+      }
+      if (data.lyrics) {
+        finalData.lyrics = data.lyrics;
+      }
+      if (data.midiEvents && data.midiEvents.length > 0) {
+        finalData.midiEvents = JSON.stringify(data.midiEvents);
       }
       if (data.transpose !== undefined) {
         finalData.transpose = data.transpose;
@@ -95,6 +122,9 @@ export function useUpdateSong(id: string | undefined, onSuccess?: () => void) {
       }
       if (data.lyrics) {
         finalData.lyrics = data.lyrics;
+      }
+      if (data.midiEvents && data.midiEvents.length > 0) {
+        finalData.midiEvents = JSON.stringify(data.midiEvents);
       }
       if (data.transpose !== undefined) {
         finalData.transpose = data.transpose;

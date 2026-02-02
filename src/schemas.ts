@@ -1,6 +1,16 @@
 import { z } from 'zod';
 
 /**
+ * MIDI event schema
+ */
+export const midiEventSchema = z.object({
+  id: z.string(),
+  instrumentId: z.string(),
+  label: z.string(),
+  programChange: z.number(),
+});
+
+/**
  * Song schema (full, with id)
  */
 export const songSchema = z.object({
@@ -10,6 +20,7 @@ export const songSchema = z.object({
   id: z.string(),
   key: z.string(),
   lyrics: z.string().optional(),
+  midiEvents: z.array(midiEventSchema).optional(),
   timeSignature: z.string(),
   title: z.string(),
   transpose: z.number().optional(),
@@ -24,6 +35,7 @@ export const songTableSchema = z.object({
   duration: z.string().optional(),
   key: z.string(),
   lyrics: z.string().optional(),
+  midiEvents: z.string().optional(), // Stored as JSON string
   timeSignature: z.string(),
   title: z.string(),
   transpose: z.number().optional(),

@@ -4,8 +4,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { BackButton } from '../components/BackButton';
 import { Button } from '../components/Button';
 import { LyricsBlock } from '../components/LyricsBlock';
+import { MidiButtonsDisplay } from '../components/MidiButtonsDisplay';
 import { Page } from '../components/Page';
 import { SongStats } from '../components/SongStats';
+import { Tabs } from '../components/Tabs';
 import { useGetSetlist } from '../hooks/useSetlist';
 import { useGetSongs } from '../hooks/useSong';
 import type { Song } from '../types';
@@ -93,7 +95,24 @@ function SongDetailPage() {
         <SongStats song={currentSong} />
       </header>
 
-      <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <Tabs
+          tabs={[
+            {
+              content: (
+                <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
+              ),
+              id: 'lyrics',
+              label: 'Lyrics',
+            },
+            {
+              content: <MidiButtonsDisplay midiEvents={currentSong.midiEvents} />,
+              id: 'midi-buttons',
+              label: 'MIDI buttons',
+            },
+          ]}
+        />
+      </div>
 
       {/* Navigation Footer */}
       <div className="flex gap-3">

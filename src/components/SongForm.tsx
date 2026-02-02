@@ -6,13 +6,15 @@ import { Link } from 'react-router-dom';
 import { BackButton } from './BackButton';
 import { Button } from './Button';
 import { FormField } from './FormField';
+import { MidiEventsTab } from './MidiEventsTab';
 import { PageHeader } from './PageHeader';
 import { RadioGroup } from './RadioGroup';
 import { Tabs } from './Tabs';
-import type { Song } from '../types';
+import { useGetInstruments } from '../hooks/useInstruments';
+import type { MidiEvent, Song } from '../types';
 import { calculateMeasures } from '../utils/measures';
 
-type SongFormData = Omit<Song, 'id'> & {
+type SongFormData = Omit<Song, 'id' | 'midiEvents'> & {
   keyNote?: string;
   keyQuality?: string;
 };
@@ -26,6 +28,7 @@ type SongFormProps = {
     duration?: string;
     key: string;
     lyrics?: string;
+    midiEvents?: MidiEvent[];
     timeSignature: string;
     title: string;
     transpose?: number;
@@ -36,6 +39,9 @@ type SongFormProps = {
 export function SongForm({ backPath, initialData, onSubmit, title }: SongFormProps) {
   const [useFlats, setUseFlats] = useState(false);
   const [calculatedMeasures, setCalculatedMeasures] = useState<number | null>(null);
+  const [midiEvents, setMidiEvents] = useState<MidiEvent[]>(initialData?.midiEvents || []);
+
+  const instruments = useGetInstruments();
 
   const existingKey = initialData?.key || 'C';
   const existingNote = existingKey.replace(/m$/, '');
@@ -126,6 +132,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       duration?: string;
       key: string;
       lyrics?: string;
+      midiEvents?: MidiEvent[];
       timeSignature: string;
       title: string;
       transpose?: number;
@@ -144,10 +151,25 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     if (data.lyrics) {
       finalData.lyrics = data.lyrics;
     }
+    if (midiEvents.length > 0) {
+      finalData.midiEvents = midiEvents;
+    }
     if (initialData?.transpose !== undefined) {
       finalData.transpose = initialData.transpose;
     }
     onSubmit(finalData);
+  };
+
+  const handleAddMidiEvent = (event: Omit<MidiEvent, 'id'>) => {
+    const newEvent: MidiEvent = {
+      ...event,
+      id: `midi-${Date.now()}`,
+    };
+    setMidiEvents([...midiEvents, newEvent]);
+  };
+
+  const handleDeleteMidiEvent = (eventId: string) => {
+    setMidiEvents(midiEvents.filter((event) => event.id !== eventId));
   };
 
   return (
@@ -157,17 +179,17 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
         <PageHeader title={title} />
       </div>
 
-      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+      <form
+        onSubmit={handleSubmit(handleFormSubmit)}
+        className="flex flex-1 flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
+        autoComplete="off"
+        noValidate
+      >
         <Tabs
           tabs={[
             {
               content: (
-                <form
-                  onSubmit={handleSubmit(handleFormSubmit)}
-                  className="space-y-4"
-                  autoComplete="off"
-                  noValidate
-                >
+                <div className="space-y-4">
                   <FormField
                     label="Artist"
                     id="artist"
@@ -278,43 +300,41 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                       <p className="mt-1 text-xs text-red-400">{errors.lyrics.message}</p>
                     )}
                   </div>
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      as={Link}
-                      className="flex-1"
-                      to={backPath}
-                      type="button"
-                      variant="outlined"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      className="flex-1"
-                      color="primary"
-                      iconStart={<IconDeviceFloppy className="h-4 w-4" />}
-                      type="submit"
-                      variant="filled"
-                    >
-                      {initialData ? 'Save Changes' : 'Add song'}
-                    </Button>
-                  </div>
-                </form>
+                </div>
               ),
               id: 'song-details',
               label: 'Song details',
             },
             {
               content: (
-                <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-6 text-sm text-slate-400">
-                  MIDI events configuration will be available here soon.
-                </div>
+                <MidiEventsTab
+                  instruments={instruments}
+                  midiEvents={midiEvents}
+                  onAddEvent={handleAddMidiEvent}
+                  onDeleteEvent={handleDeleteMidiEvent}
+                />
               ),
               id: 'midi-events',
               label: 'MIDI events',
             },
           ]}
         />
-      </div>
+
+        <div className="flex gap-3 pt-4">
+          <Button as={Link} className="flex-1" to={backPath} type="button" variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            className="flex-1"
+            color="primary"
+            iconStart={<IconDeviceFloppy className="h-4 w-4" />}
+            type="submit"
+            variant="filled"
+          >
+            {initialData ? 'Save Changes' : 'Add song'}
+          </Button>
+        </div>
+      </form>
     </section>
   );
 }
