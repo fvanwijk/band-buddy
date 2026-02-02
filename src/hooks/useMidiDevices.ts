@@ -26,8 +26,7 @@ export function useMidiDevices(): MidiDevicesState {
 
     const initMidi = async () => {
       try {
-        await WebMidi.enable();
-
+        await WebMidi.enable({ sysex: true });
         if (!isMounted) return;
 
         const nextInputs = WebMidi.inputs.map((input) => ({

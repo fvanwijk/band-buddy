@@ -1,5 +1,7 @@
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
+import { useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { WebMidi } from 'webmidi';
 
 import { BackButton } from '../components/BackButton';
 import { Button } from '../components/Button';
@@ -8,6 +10,8 @@ import { MidiButtonsDisplay } from '../components/MidiButtonsDisplay';
 import { Page } from '../components/Page';
 import { SongStats } from '../components/SongStats';
 import { Tabs } from '../components/Tabs';
+import { useGetInstruments } from '../hooks/useInstruments';
+import { useMidiDevices } from '../hooks/useMidiDevices';
 import { useGetSetlist } from '../hooks/useSetlist';
 import { useGetSongs } from '../hooks/useSong';
 import type { Song } from '../types';
@@ -21,7 +25,9 @@ function SongDetailPage() {
   const navigate = useNavigate();
 
   const setlist = useGetSetlist(setlistId);
+  const instruments = useGetInstruments();
   const songs = useGetSongs();
+  const { isReady, isSupported } = useMidiDevices();
 
   // Default to 'details' tab if not specified
   const selectedTab = tab && ['details', 'midi'].includes(tab) ? tab : 'details';
@@ -31,6 +37,32 @@ function SongDetailPage() {
   songs.forEach((song) => {
     songsMap.set(song.id, song);
   });
+
+  const instrumentsById = useMemo(
+    () => new Map(instruments.map((instrument) => [instrument.id, instrument])),
+    [instruments],
+  );
+
+  const isMidiButtonDisabled = useCallback(
+    (event: { instrumentId: string }) => {
+      if (!isSupported || !isReady) {
+        return true;
+      }
+
+      const instrument = instrumentsById.get(event.instrumentId);
+      if (!instrument) {
+        console.warn('Instrument not found for MIDI button');
+        return true;
+      }
+
+      const output = WebMidi.getOutputById(instrument.midiInId);
+      if (!output) {
+        console.warn('The MIDI input that is configured for the instrument is not available');
+      }
+      return !output;
+    },
+    [isReady, isSupported, instrumentsById],
+  );
 
   if (!setlist || !songId) {
     return (
@@ -95,6 +127,28 @@ function SongDetailPage() {
     navigate(`/setlist/${setlistId}/song/${songId}/${tabId}`);
   };
 
+  const handleTriggerMidiEvent = (event: { instrumentId: string; programChange: number }) => {
+    if (!isSupported || !isReady) {
+      return;
+    }
+
+    const instrument = instrumentsById.get(event.instrumentId);
+    if (!instrument) {
+      console.warn('Instrument not found for MIDI button');
+      return;
+    }
+    const selectedDevice = instrument.midiInId;
+    if (!selectedDevice) {
+      console.warn('No MIDI input device configured for the instrument');
+      return;
+    }
+
+    const output = WebMidi.getOutputById(selectedDevice);
+    if (output) {
+      output.sendProgramChange(event.programChange);
+    }
+  };
+
   return (
     <Page>
       <header className="flex items-start justify-between gap-3 flex-wrap">
@@ -119,7 +173,13 @@ function SongDetailPage() {
               label: 'Lyrics',
             },
             {
-              content: <MidiButtonsDisplay midiEvents={currentSong.midiEvents} />,
+              content: (
+                <MidiButtonsDisplay
+                  isDisabled={isMidiButtonDisabled}
+                  midiEvents={currentSong.midiEvents}
+                  onTriggerEvent={handleTriggerMidiEvent}
+                />
+              ),
               id: 'midi',
               label: 'MIDI buttons',
             },

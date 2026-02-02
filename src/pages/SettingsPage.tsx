@@ -52,20 +52,11 @@ function SettingsPage() {
   const [editingInstrumentId, setEditingInstrumentId] = useState<string | null>(null);
   const updateInstrument = useUpdateInstrument(editingInstrumentId || undefined);
 
+  // Important: Input and output options are swapped because
+  // the MIDI input of the computer (=webmidi package) corresponds to the output of the instrument and vice versa.
   const inputOptions = useMemo(
     () => [
       { label: 'Select MIDI input', value: '' },
-      ...inputs.map((device) => ({
-        label: device.name,
-        value: device.id,
-      })),
-    ],
-    [inputs],
-  );
-
-  const outputOptions = useMemo(
-    () => [
-      { label: 'None', value: '' },
       ...outputs.map((device) => ({
         label: device.name,
         value: device.id,
@@ -74,14 +65,25 @@ function SettingsPage() {
     [outputs],
   );
 
-  const inputsById = useMemo(
-    () => new Map(inputs.map((device) => [device.id, device.name])),
+  const outputOptions = useMemo(
+    () => [
+      { label: 'None', value: '' },
+      ...inputs.map((device) => ({
+        label: device.name,
+        value: device.id,
+      })),
+    ],
     [inputs],
   );
 
-  const outputsById = useMemo(
+  const inputsById = useMemo(
     () => new Map(outputs.map((device) => [device.id, device.name])),
     [outputs],
+  );
+
+  const outputsById = useMemo(
+    () => new Map(inputs.map((device) => [device.id, device.name])),
+    [inputs],
   );
 
   const editingInstrument = useMemo(
@@ -269,7 +271,7 @@ function SettingsPage() {
         )}
         {error && <p className="mt-4 text-sm text-red-300">{error}</p>}
 
-        {isSupported && isReady && inputs.length === 0 && (
+        {isSupported && isReady && outputs.length === 0 && (
           <p className="mt-4 text-sm text-slate-400">
             No MIDI inputs detected. Connect a device to enable adding instruments.
           </p>
