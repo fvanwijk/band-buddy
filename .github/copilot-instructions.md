@@ -16,6 +16,7 @@ You are helping develop Gig Buddy, a React/TypeScript pianist companion app. Fol
 - Vite 7.0.4 as build tool
 - Prettier & ESLint for automatic formatting
 - class-variance-authority (CVA) for composable component variants
+- clsx + tailwind-merge for conditional classname merging
 - @tabler/icons-react for consistent icon system
 
 **Development Commands:**
@@ -303,21 +304,61 @@ The Button component uses `class-variance-authority` for composable, type-safe s
 </Button>
 ```
 
+## Utility Functions
+
+### cn (Conditional Classnames)
+
+Location: `src/utils/cn.ts`
+
+Utility for merging conditional Tailwind classes using `clsx` and `tailwind-merge`:
+
+```typescript
+import { cn } from '../utils/cn';
+
+// Use for conditional styling
+<span className={cn(
+  'base-classes',
+  condition ? 'conditional-classes' : 'alternative-classes',
+  anotherCondition && 'more-classes'
+)}>
+```
+
+**Rules:**
+
+- Use `cn()` instead of template literals for conditional classes
+- First argument(s): base/static classes
+- Subsequent arguments: conditional classes or boolean conditions
+- `tailwind-merge` handles conflicting classes (e.g., multiple `text-` or `bg-` classes)
+
 ## Reusable Components
 
 ### PageHeader
 
 Location: `src/components/PageHeader.tsx`
 
-Consistent header for list pages with title, subtitle, and action button:
+Consistent header for list pages with title, subtitle, action button, and optional back button:
 
 ```typescript
+// Without back button
 <PageHeader
   title="Songs"
   subtitle="Library"                    // Default: "Library"
   action={<Button>New song</Button>}    // Optional action button
 />
+
+// With back button (automatically wraps header)
+<PageHeader
+  backPath="/songs"                     // Shows BackButton, wraps in flex container
+  title="Edit Song"
+  subtitle="Library"
+/>
 ```
+
+**Rules:**
+
+- When `backPath` is provided, automatically renders wrapper div with BackButton
+- When `backPath` is omitted, renders just the header without wrapper
+- Don't manually wrap PageHeader with BackButton - use the `backPath` prop instead
 
 ### EmptyState
 
@@ -400,6 +441,118 @@ Renders sort buttons dynamically for list pages:
 />
 ```
 
+## Route-Based Form Management Pattern
+
+Use dedicated routes for add/edit operations instead of dialogs. Follow this pattern consistently:
+
+### Structure
+
+1. **Reusable Form Component** (`src/components/*Form.tsx`)
+   - Accepts `initialData`, `onSubmit`, `backPath`, and `title` props
+   - Handles form state with react-hook-form
+   - Returns complete page layout with `<Page>`, `<PageHeader backPath={backPath}>`, and form
+
+2. **Add Page** (`src/pages/Add*Page.tsx`)
+   - Minimal component that renders Form with `useAdd*` hook
+   - Example: `AddSongPage.tsx`, `AddInstrumentPage.tsx`
+
+3. **Edit Page** (`src/pages/Edit*Page.tsx`)
+   - Fetches existing data by ID from route params
+   - Renders Form with `initialData` and `useUpdate*` hook
+   - Shows "not found" state if ID invalid
+
+### Example Implementation
+
+```typescript
+// 1. Form Component (InstrumentForm.tsx)
+type InstrumentFormProps = {
+  backPath: string;
+  initialData?: Instrument;
+  onSubmit: (data: InstrumentData) => void;
+  title: string;
+};
+
+export function InstrumentForm({ backPath, initialData, onSubmit, title }: InstrumentFormProps) {
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    defaultValues: {
+      name: initialData?.name || '',
+      // ... other fields
+    },
+  });
+
+  return (
+    <Page>
+      <PageHeader backPath={backPath} subtitle="Settings" title={title} />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Form fields */}
+      </form>
+    </Page>
+  );
+}
+
+// 2. Add Page (AddInstrumentPage.tsx)
+function AddInstrumentPage() {
+  const backPath = '/settings/instruments';
+  const navigate = useNavigate();
+  const addInstrument = useAddInstrument(() => navigate(backPath));
+
+  return <InstrumentForm backPath={backPath} onSubmit={addInstrument} title="Add Instrument" />;
+}
+
+// 3. Edit Page (EditInstrumentPage.tsx)
+function EditInstrumentPage() {
+  const backPath = '/settings/instruments';
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const instrument = useGetInstrument(id);
+  const updateInstrument = useUpdateInstrument(id, () => navigate(backPath));
+
+  if (!id || !instrument) {
+    return (
+      <section className="flex h-full flex-col items-center justify-center gap-4">
+        <p className="text-xl text-slate-100">Instrument not found</p>
+        <Button as={Link} color="primary" to={backPath}>
+          Back to Settings
+        </Button>
+      </section>
+    );
+  }
+
+  return (
+    <InstrumentForm
+      backPath={backPath}
+      initialData={instrument}
+      onSubmit={updateInstrument}
+      title="Edit Instrument"
+    />
+  );
+}
+
+// 4. Routes (App.tsx)
+<Route path="/settings/instruments/add" element={<AddInstrumentPage />} />
+<Route path="/settings/instruments/:id/edit" element={<EditInstrumentPage />} />
+
+// 5. Navigation (SettingsPage.tsx)
+// Add button
+<Button as={Link} color="primary" iconStart={<IconPlus className="h-4 w-4" />} to="/settings/instruments/add">
+  Add instrument
+</Button>
+
+// Edit button
+<Button as={Link} color="primary" to={`/settings/instruments/${id}/edit`} icon variant="outlined">
+  <IconPencil className="h-4 w-4" />
+</Button>
+```
+
+**Rules:**
+
+- ❌ Don't use dialogs for add/edit forms → ✅ Use dedicated routes
+- Form component should be self-contained with full page layout
+- Add/Edit pages are thin wrappers that handle data fetching and callbacks
+- Use `Link` or `as={Link}` for navigation buttons (not `onClick` handlers)
+- Edit pages must handle "not found" state gracefully
+- Success callbacks should navigate back to the list page
+
 ## Custom Hooks
 
 ### useSortState
@@ -422,6 +575,81 @@ const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(
 ```
 
 Cycling logic: `asc` → `desc` → `none` (clears sort)
+
+## MIDI Integration
+
+### Critical: Input/Output Perspective Swap
+
+**WebMIDI's perspective (computer-centric):**
+
+- `inputs` = MIDI inputs **to the computer** (messages sent FROM instruments)
+- `outputs` = MIDI outputs **from the computer** (messages sent TO instruments)
+
+**App's perspective (instrument-centric):**
+
+- `midiInId` = MIDI IN **on the instrument** (receives messages from computer) = WebMIDI's `inputs`
+- `midiOutId` = MIDI OUT **on the instrument** (sends messages to computer) = WebMIDI's `outputs`
+
+**This means inputs and outputs are intentionally swapped in the codebase:**
+
+```typescript
+// ⚠️ IMPORTANT: Inputs and outputs are swapped because we reason from the instrument's perspective
+const inputOptions = useMemo(
+  () => [
+    { label: 'Select MIDI input', value: '' },
+    ...outputs.map((device) => ({
+      // ← WebMIDI outputs = instrument inputs
+      label: device.name,
+      value: device.id,
+    })),
+  ],
+  [outputs],
+);
+
+const outputOptions = useMemo(
+  () => [
+    { label: 'None', value: '' },
+    ...inputs.map((device) => ({
+      // ← WebMIDI inputs = instrument outputs
+      label: device.name,
+      value: device.id,
+    })),
+  ],
+  [inputs],
+);
+```
+
+**Always include this comment when mapping MIDI devices:**
+
+```typescript
+// Important: Input and output options are swapped because
+// the MIDI input of the computer (=webmidi package) corresponds to the output of the instrument and vice versa.
+```
+
+But also remind the developer to fix this source of confusion properly.
+
+### MIDI Hooks
+
+Location: `src/hooks/useMidiDevices.ts`
+
+Hook for accessing MIDI device information:
+
+```typescript
+const { error, inputs, isReady, isSupported, outputs } = useMidiDevices();
+
+// Returns:
+// - isSupported: boolean (browser supports Web MIDI)
+// - isReady: boolean (MIDI system initialized)
+// - inputs: MIDIInput[] (devices that send TO computer = instrument outputs)
+// - outputs: MIDIOutput[] (devices that receive FROM computer = instrument inputs)
+// - error: string | null (initialization errors)
+```
+
+**Rules:**
+
+- Always check `isSupported` before showing MIDI features
+- Check `isReady` before accessing `inputs` and `outputs`
+- Remember the perspective swap when mapping to instruments
 
 ## Icons
 
@@ -504,13 +732,14 @@ src/
 | Button component      | `src/components/Button.tsx`         | `<Button color="primary" variant="outlined">` |
 | Page layout           | `src/components/Page.tsx`           | `<Page><PageHeader />{content}</Page>`        |
 | Empty states          | `src/components/EmptyState.tsx`     | `<EmptyState icon={...} title="..." />`       |
-| Back navigation       | `src/components/BackButton.tsx`     | `<BackButton to="/songs" />`                  |
+| Back navigation       | `src/components/PageHeader.tsx`     | `<PageHeader backPath="/songs" />`            |
+| Conditional classes   | `src/utils/cn.ts`                   | `cn('base', condition && 'extra')`            |
 | Sort management       | `src/hooks/useSortState.ts`         | `useSortState<'title' \| 'date'>()`           |
 | Sort button rendering | `src/components/SortButtonsBar.tsx` | `<SortButtonsBar fields={[...]} />`           |
 | Mock factories        | `src/mocks/*.ts`                    | `createSong()`, `createSongs()`               |
-| Form components       | `src/components/*.tsx`              | `SongForm.tsx` with FormProvider              |
-| Page routes           | `src/pages/*.tsx`                   | `AddSongPage.tsx`, `ManageSongsPage.tsx`      |
-| Types                 | `src/types/*.ts`                    | `Song`, `Setlist` interfaces                  |
+| Form components       | `src/components/*.tsx`              | `SongForm.tsx`, `InstrumentForm.tsx`          |
+| Add/Edit pages        | `src/pages/*.tsx`                   | `AddSongPage.tsx`, `EditInstrumentPage.tsx`   |
+| Types                 | `src/types/*.ts`                    | `Song`, `Setlist`, `Instrument` interfaces    |
 | Store setup           | `src/store/store.ts`                | Tinybase initialization                       |
 
 ## Important Gotchas
@@ -523,7 +752,11 @@ src/
 6. ❌ Don't use unsorted imports or object keys → ✅ Run `npm run lint -- --fix` before committing
 7. ❌ Don't create standalone button elements → ✅ Use the `Button` component with props
 8. ❌ Don't use dark: prefixes → ✅ App is dark mode only, use base classes
-9. ❌ Don't use inline SVGs for icons → ✅ Use tabler icons (`IconMusic`, `IconPlus`, etc.)
+9. ❌ Don't use inline SVGs for icons → ✅ Use tabler icons (`IconMusic`, `IconPlus`, etc.). Icons must have explicit size classes (e.g., `className="h-4 w-4"`)
+10. ❌ Don't use dialogs for add/edit operations → ✅ Use route-based forms with dedicated pages
+11. ❌ Don't use template literals for conditional classes → ✅ Use `cn()` utility function
+12. ❌ Don't manually add BackButton wrapper → ✅ Use `backPath` prop on PageHeader
+13. ❌ Don't mix up MIDI input/output terminology → ✅ WebMIDI inputs = instrument outputs, WebMIDI outputs = instrument inputs (always add explanatory comment)
 
 ## Code Formatting
 
