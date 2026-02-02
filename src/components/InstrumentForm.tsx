@@ -2,6 +2,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { Alert } from './Alert';
 import { Button } from './Button';
 import { InputField } from './InputField';
 import { Page } from './Page';
@@ -103,91 +104,79 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
     });
   };
 
-  if (!isSupported) {
-    return (
-      <Page>
-        <PageHeader backPath={backPath} subtitle="Settings" title={title} />
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <p className="text-sm text-red-300">Web MIDI is not supported in this browser.</p>
-        </div>
-      </Page>
-    );
-  }
+  const getErrorAlert = () => {
+    if (!isSupported) {
+      return <Alert severity="error">Web MIDI is not supported in this browser.</Alert>;
+    }
+    if (!isReady) {
+      return <Alert severity="info">Detecting MIDI devices...</Alert>;
+    }
+    if (outputs.length === 0) {
+      return (
+        <Alert severity="warning">
+          No MIDI inputs detected. Connect a device to add instruments.
+        </Alert>
+      );
+    }
+    return null;
+  };
 
-  if (!isReady) {
-    return (
-      <Page>
-        <PageHeader backPath={backPath} subtitle="Settings" title={title} />
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <p className="text-sm text-slate-400">Detecting MIDI devices...</p>
-        </div>
-      </Page>
-    );
-  }
-
-  if (outputs.length === 0) {
-    return (
-      <Page>
-        <PageHeader backPath={backPath} subtitle="Settings" title={title} />
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <p className="text-sm text-slate-400">
-            No MIDI inputs detected. Connect a device to add instruments.
-          </p>
-        </div>
-      </Page>
-    );
-  }
+  const errorAlert = getErrorAlert();
 
   return (
     <Page>
       <PageHeader backPath={backPath} subtitle="Settings" title={title} />
 
-      <form
-        className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
-        onSubmit={handleSubmit(handleFormSubmit)}
-      >
-        <div className="space-y-4">
-          <InputField
-            error={errors.name}
-            id="instrument-name"
-            label="Instrument Name"
-            placeholder="Enter instrument name"
-            register={register('name', { required: 'Instrument name is required' })}
-            required
-          />
+      {errorAlert ? (
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">{errorAlert}</div>
+      ) : (
+        <form
+          className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
+          onSubmit={handleSubmit(handleFormSubmit)}
+        >
+          <div className="space-y-4">
+            <InputField
+              error={errors.name}
+              id="instrument-name"
+              label="Instrument Name"
+              placeholder="Enter instrument name"
+              register={register('name', { required: 'Instrument name is required' })}
+              required
+            />
 
-          <SelectField
-            error={errors.midiInId}
-            id="midi-in"
-            label="MIDI In"
-            options={inputOptions}
-            register={register('midiInId', { required: 'MIDI in is required' })}
-            required
-          />
+            <SelectField
+              error={errors.midiInId}
+              id="midi-in"
+              label="MIDI In"
+              options={inputOptions}
+              register={register('midiInId', { required: 'MIDI in is required' })}
+              required
+            />
 
-          <SelectField
-            id="midi-out"
-            label="MIDI Out (Optional)"
-            options={outputOptions}
-            register={register('midiOutId')}
-          />
-        </div>
+            <SelectField
+              id="midi-out"
+              label="MIDI Out (Optional)"
+              options={outputOptions}
+              register={register('midiOutId')}
+            />
+          </div>
 
-        <div className="mt-6 flex gap-3">
-          <Button as="a" className="flex-1" href={backPath} variant="outlined">
-            Cancel
-          </Button>
-          <Button
-            className="flex-1"
-            color="primary"
-            iconStart={<IconDeviceFloppy className="w-4 h-4" />}
-            type="submit"
-            variant="filled"
-          >
-            {initialData ? 'Save instrument' : 'Add instrument'}
-          </Button>
-        </div>
-      </form>
+          <div className="mt-6 flex gap-3">
+            <Button as="a" className="flex-1" href={backPath} variant="outlined">
+              Cancel
+            </Button>
+            <Button
+              className="flex-1"
+              color="primary"
+              iconStart={<IconDeviceFloppy className="w-4 h-4" />}
+              type="submit"
+              variant="filled"
+            >
+              {initialData ? 'Save instrument' : 'Add instrument'}
+            </Button>
+          </div>
+        </form>
+      )}
     </Page>
   );
 }
