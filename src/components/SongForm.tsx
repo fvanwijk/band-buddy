@@ -135,6 +135,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   ];
 
   const handleFormSubmit = (data: SongFormData) => {
+    console.log('!!!');
     // Combine note and quality for the key
     const key = (data.keyNote || existingNote) + (data.keyQuality || '');
     const finalData: {
