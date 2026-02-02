@@ -6,6 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { BackButton } from './BackButton';
 import { Button } from './Button';
 import { FormField } from './FormField';
+import { LyricsTab } from './LyricsTab';
 import { MidiEventsTab } from './MidiEventsTab';
 import { PageHeader } from './PageHeader';
 import { RadioGroup } from './RadioGroup';
@@ -84,7 +85,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     }
   }, [existingNote]);
 
-  const selectedTab = tab && ['details', 'midi'].includes(tab) ? tab : 'details';
+  const selectedTab = tab && ['details', 'lyrics', 'midi'].includes(tab) ? tab : 'details';
   const songFormBasePath = id ? `/songs/edit/${id}` : '/songs/add';
 
   const handleTabChange = (tabId: string) => {
@@ -291,31 +292,15 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                       </p>
                     )}
                   </div>
-                  <div>
-                    <label
-                      htmlFor="lyrics"
-                      className="mb-1.5 block text-sm font-medium text-slate-300"
-                    >
-                      Chords & Lyrics
-                    </label>
-                    <textarea
-                      id="lyrics"
-                      rows={10}
-                      {...register('lyrics')}
-                      className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 font-mono text-sm text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
-                      placeholder="Enter chords and lyrics..."
-                    />
-                    <p className="mt-1 text-xs text-slate-500">
-                      💡 Chords separated by whitespace will be automatically detected
-                    </p>
-                    {errors.lyrics && (
-                      <p className="mt-1 text-xs text-red-400">{errors.lyrics.message}</p>
-                    )}
-                  </div>
                 </div>
               ),
               id: 'details',
               label: 'Song details',
+            },
+            {
+              content: <LyricsTab error={errors.lyrics} register={register('lyrics')} />,
+              id: 'lyrics',
+              label: 'Lyrics',
             },
             {
               content: (
