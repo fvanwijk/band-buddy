@@ -40,6 +40,11 @@ export function MidiEventsTab({
 
       {/* Events List */}
       <div>
+        <p className="text-xs text-slate-500 mb-3">
+          Create buttons that send MIDI program changes to your instruments. During a performance,
+          click these buttons to instantly switch sounds and effects on your connected MIDI devices.
+        </p>
+
         <div className="flex items-center gap-4 mb-3">
           <h3 className="text-sm font-semibold text-slate-200">MIDI Buttons </h3>
           <Button
@@ -54,7 +59,11 @@ export function MidiEventsTab({
         </div>
         {!midiEvents || midiEvents.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/40 p-4 text-center text-sm text-slate-400">
-            No MIDI buttons yet. Create one above.
+            No MIDI buttons yet.{' '}
+            <button className="link" onClick={() => setIsDialogOpen(true)} type="button">
+              Create one
+            </button>
+            .
           </div>
         ) : (
           <div className="space-y-2">
