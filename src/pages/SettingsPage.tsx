@@ -1,9 +1,8 @@
-import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 
+import { AddInstrumentDialog } from '../components/AddInstrumentDialog';
 import { Button } from '../components/Button';
-import { FormField } from '../components/FormField';
 import { MidiDeviceStatus } from '../components/MidiDeviceStatus';
 import { SelectField } from '../components/SelectField';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '../config/locales';
@@ -42,23 +41,6 @@ function SettingsPage() {
   const { error, inputs, isReady, isSupported, outputs } = useMidiDevices();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const {
-    handleSubmit,
-    register,
-    reset,
-    formState: { errors },
-  } = useForm<{
-    midiInId: string;
-    midiOutId: string;
-    name: string;
-  }>({
-    defaultValues: {
-      midiInId: '',
-      midiOutId: '',
-      name: '',
-    },
-  });
 
   const inputOptions = useMemo(
     () => [
@@ -110,8 +92,6 @@ function SettingsPage() {
     };
 
     addInstrument(newInstrument);
-
-    reset();
     setIsDialogOpen(false);
   };
 
@@ -138,10 +118,10 @@ function SettingsPage() {
                 key={themeName}
                 onClick={() => setTheme(themeName)}
                 className={[
-                  'group relative overflow-hidden rounded-xl border p-6 text-left transition block! p-3!',
+                  'group relative overflow-hidden rounded-xl border text-left transition',
                   isActive
-                    ? 'border-brand-400 bg-brand-400/10'
-                    : 'border-slate-700 bg-slate-800/50 hover:border-slate-600',
+                    ? 'border-brand-400 bg-brand-400/10 p-6'
+                    : 'border-slate-700 bg-slate-800/50 p-6 hover:border-slate-600',
                 ].join(' ')}
                 variant="ghost"
               >
@@ -218,9 +198,9 @@ function SettingsPage() {
           </div>
           <Button
             color="primary"
+            disabled={!canAddInstrument}
             iconStart={<IconPlus className="h-4 w-4" />}
             onClick={() => setIsDialogOpen(true)}
-            disabled={!canAddInstrument}
             variant="outlined"
           >
             Add Instrument
@@ -261,18 +241,18 @@ function SettingsPage() {
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <MidiDeviceStatus
+                      isAvailable={midiInAvailable}
                       label="MIDI In"
                       name={instrument.midiInName}
-                      isAvailable={midiInAvailable}
                     />
                     {instrument.midiOutId ? (
                       <MidiDeviceStatus
+                        isAvailable={midiOutAvailable}
                         label="MIDI Out"
                         name={instrument.midiOutName || instrument.midiOutId}
-                        isAvailable={midiOutAvailable}
                       />
                     ) : (
-                      <MidiDeviceStatus label="MIDI Out" name="None" isOptional />
+                      <MidiDeviceStatus isOptional label="MIDI Out" name="None" />
                     )}
                   </div>
                 </div>
@@ -282,60 +262,13 @@ function SettingsPage() {
         </div>
       </div>
 
-      {isDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setIsDialogOpen(false)} />
-          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-            <h2 className="mb-3 text-xl font-semibold text-slate-100">Add Instrument</h2>
-            <form className="space-y-4" onSubmit={handleSubmit(handleAddInstrument)}>
-              <FormField
-                error={errors.name}
-                id="instrument-name"
-                label="Instrument Name"
-                placeholder="Enter instrument name"
-                register={register('name', { required: 'Instrument name is required' })}
-                required
-              />
-
-              <SelectField
-                error={errors.midiInId}
-                id="midi-in"
-                label="MIDI In"
-                options={inputOptions}
-                register={register('midiInId', { required: 'MIDI in is required' })}
-                required
-              />
-
-              <SelectField
-                id="midi-out"
-                label="MIDI Out (Optional)"
-                options={outputOptions}
-                register={register('midiOutId')}
-              />
-
-              <div className="flex gap-3 pt-2">
-                <Button
-                  className="flex-1"
-                  onClick={() => setIsDialogOpen(false)}
-                  type="button"
-                  variant="outlined"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1"
-                  color="primary"
-                  iconStart={<IconDeviceFloppy className="h-4 w-4" />}
-                  type="submit"
-                  variant="outlined"
-                >
-                  Add Instrument
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <AddInstrumentDialog
+        inputOptions={inputOptions}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSubmit={handleAddInstrument}
+        outputOptions={outputOptions}
+      />
     </section>
   );
 }
