@@ -1,10 +1,11 @@
 import { IconPlus } from '@tabler/icons-react';
 import { createPortal } from 'react-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { Button } from './Button';
 import { InputField } from './InputField';
 import { SelectField } from './SelectField';
+import { useNordProgramOptions } from '../hooks/useNordProgramOptions';
 import type { Instrument, MidiEvent } from '../types';
 
 type FormData = Omit<MidiEvent, 'id'>;
@@ -23,6 +24,7 @@ export function AddMidiButtonDialog({
   onClose,
 }: AddMidiButtonDialogProps) {
   const {
+    control,
     handleSubmit,
     register,
     reset,
@@ -34,6 +36,13 @@ export function AddMidiButtonDialog({
       programChange: 0,
     },
   });
+
+  const selectedInstrumentId = useWatch({ control, name: 'instrumentId' });
+
+  const selectedInstrument = instruments.find((inst) => inst.id === selectedInstrumentId);
+  const isNordInstrument = selectedInstrument?.name.includes('Nord') ?? false;
+
+  const nordProgramOptions = useNordProgramOptions();
 
   if (!isOpen) return null;
 
@@ -82,22 +91,36 @@ export function AddMidiButtonDialog({
               required
             />
 
-            <InputField
-              error={errors.programChange}
-              id="midi-programChange"
-              label="Program Change Number"
-              max="511"
-              min="0"
-              placeholder="0-511"
-              register={register('programChange', {
-                max: { message: 'Program change must be at most 511', value: 511 },
-                min: { message: 'Program change must be at least 0', value: 0 },
-                required: 'Program change is required',
-                valueAsNumber: true,
-              })}
-              required
-              type="number"
-            />
+            {isNordInstrument ? (
+              <SelectField
+                error={errors.programChange}
+                id="midi-programChange"
+                label="Program"
+                options={nordProgramOptions}
+                register={register('programChange', {
+                  required: 'Program is required',
+                  valueAsNumber: true,
+                })}
+                required
+              />
+            ) : (
+              <InputField
+                error={errors.programChange}
+                id="midi-programChange"
+                label="Program Change Number"
+                max="511"
+                min="0"
+                placeholder="0-511"
+                register={register('programChange', {
+                  max: { message: 'Program change must be at most 511', value: 511 },
+                  min: { message: 'Program change must be at least 0', value: 0 },
+                  required: 'Program change is required',
+                  valueAsNumber: true,
+                })}
+                required
+                type="number"
+              />
+            )}
           </div>
 
           <div className="mt-6 flex gap-3">

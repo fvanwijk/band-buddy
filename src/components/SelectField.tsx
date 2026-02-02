@@ -1,11 +1,15 @@
 import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
+type SelectOption =
+  | { label: string; value: string }
+  | { label: string; options: Array<{ label: string; value: string }> };
+
 type SelectFieldProps = {
   error?: FieldError;
   id?: string;
   label?: string;
   onChange?: (value: string) => void;
-  options: Array<{ label: string; value: string }>;
+  options: SelectOption[];
   register?: UseFormRegisterReturn;
   required?: boolean;
   value?: string;
@@ -47,11 +51,24 @@ export function SelectField({
         id={id}
         {...selectProps}
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+        {options.map((option) => {
+          if ('value' in option) {
+            return (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            );
+          }
+          return (
+            <optgroup key={option.label} label={option.label}>
+              {option.options.map((groupOption) => (
+                <option key={groupOption.value} value={groupOption.value}>
+                  {groupOption.label}
+                </option>
+              ))}
+            </optgroup>
+          );
+        })}
       </select>
       {error && <p className="mt-1 text-xs text-red-400">{error.message}</p>}
     </div>
