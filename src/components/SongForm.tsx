@@ -8,6 +8,7 @@ import { Button } from './Button';
 import { FormField } from './FormField';
 import { PageHeader } from './PageHeader';
 import { RadioGroup } from './RadioGroup';
+import { Tabs } from './Tabs';
 import type { Song } from '../types';
 import { calculateMeasures } from '../utils/measures';
 
@@ -157,142 +158,162 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       </div>
 
       <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-        <form
-          onSubmit={handleSubmit(handleFormSubmit)}
-          className="space-y-4"
-          autoComplete="off"
-          noValidate
-        >
-          <FormField
-            label="Artist"
-            id="artist"
-            placeholder="Enter artist name"
-            error={errors.artist}
-            register={register('artist', { required: 'Artist is required' })}
-            required
-          />
-
-          <FormField
-            label="Title"
-            id="title"
-            placeholder="Enter song title"
-            error={errors.title}
-            register={register('title', { required: 'Title is required' })}
-            required
-          />
-
-          {/* Key Note Selection */}
-          <RadioGroup
-            label="Key (Note)"
-            options={noteOptions}
-            error={errors.keyNote}
-            register={register('keyNote', { required: 'Key note is required' })}
-            required
-          >
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setUseFlats(!useFlats)}
-                className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
-                  useFlats ? 'bg-brand-400/30' : 'bg-slate-700'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-slate-100 transition-transform ${
-                    useFlats ? 'translate-x-7' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span className="text-xs font-medium text-slate-400">{useFlats ? '♭' : '♯'}</span>
-            </div>
-          </RadioGroup>
-
-          {/* Key Quality Selection */}
-          <RadioGroup
-            label="Key (Quality)"
-            options={qualityOptions}
-            error={errors.keyQuality}
-            register={register('keyQuality')}
-          />
-
-          {/* Time Signature */}
-          <RadioGroup
-            label="Time Signature"
-            options={timeSignatureOptions}
-            error={errors.timeSignature}
-            register={register('timeSignature', {
-              required: 'Time signature is required',
-            })}
-          />
-
-          <FormField
-            error={errors.bpm}
-            id="bpm"
-            label="BPM"
-            max="200"
-            min="0"
-            placeholder="Enter BPM (0-200)"
-            register={register('bpm', {
-              max: { message: 'BPM must be at most 200', value: 200 },
-              min: { message: 'BPM must be at least 0', value: 0 },
-              valueAsNumber: true,
-            })}
-            type="number"
-          />
-
-          <div>
-            <FormField
-              error={errors.duration}
-              id="duration"
-              label="Duration"
-              placeholder="Enter duration (mm:ss)"
-              register={register('duration', {
-                pattern: {
-                  message: 'Duration must be in mm:ss format',
-                  value: /^\d{1,3}:[0-5]\d$/,
-                },
-              })}
-            />
-            {calculatedMeasures !== null && (
-              <p className="mt-1 text-xs text-slate-500">
-                ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
-              </p>
-            )}
-          </div>
-
-          {/* Chords and Lyrics */}
-          <div>
-            <label htmlFor="lyrics" className="mb-1.5 block text-sm font-medium text-slate-300">
-              Chords & Lyrics
-            </label>
-            <textarea
-              id="lyrics"
-              rows={10}
-              {...register('lyrics')}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 font-mono text-sm text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
-              placeholder="Enter chords and lyrics..."
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              💡 Chords separated by whitespace will be automatically detected
-            </p>
-            {errors.lyrics && <p className="mt-1 text-xs text-red-400">{errors.lyrics.message}</p>}
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <Button as={Link} className="flex-1" to={backPath} type="button" variant="outlined">
-              Cancel
-            </Button>
-            <Button
-              className="flex-1"
-              color="primary"
-              iconStart={<IconDeviceFloppy className="h-4 w-4" />}
-              type="submit"
-              variant="filled"
-            >
-              {initialData ? 'Save Changes' : 'Add song'}
-            </Button>
-          </div>
-        </form>
+        <Tabs
+          tabs={[
+            {
+              content: (
+                <form
+                  onSubmit={handleSubmit(handleFormSubmit)}
+                  className="space-y-4"
+                  autoComplete="off"
+                  noValidate
+                >
+                  <FormField
+                    label="Artist"
+                    id="artist"
+                    placeholder="Enter artist name"
+                    error={errors.artist}
+                    register={register('artist', { required: 'Artist is required' })}
+                    required
+                  />
+                  <FormField
+                    label="Title"
+                    id="title"
+                    placeholder="Enter song title"
+                    error={errors.title}
+                    register={register('title', { required: 'Title is required' })}
+                    required
+                  />
+                  <RadioGroup
+                    label="Key (Note)"
+                    options={noteOptions}
+                    error={errors.keyNote}
+                    register={register('keyNote', { required: 'Key note is required' })}
+                    required
+                  >
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setUseFlats(!useFlats)}
+                        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                          useFlats ? 'bg-brand-400/30' : 'bg-slate-700'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-slate-100 transition-transform ${
+                            useFlats ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <span className="text-xs font-medium text-slate-400">
+                        {useFlats ? '♭' : '♯'}
+                      </span>
+                    </div>
+                  </RadioGroup>
+                  <RadioGroup
+                    label="Key (Quality)"
+                    options={qualityOptions}
+                    error={errors.keyQuality}
+                    register={register('keyQuality')}
+                  />
+                  <RadioGroup
+                    label="Time Signature"
+                    options={timeSignatureOptions}
+                    error={errors.timeSignature}
+                    register={register('timeSignature', {
+                      required: 'Time signature is required',
+                    })}
+                  />
+                  <FormField
+                    error={errors.bpm}
+                    id="bpm"
+                    label="BPM"
+                    max="200"
+                    min="0"
+                    placeholder="Enter BPM (0-200)"
+                    register={register('bpm', {
+                      max: { message: 'BPM must be at most 200', value: 200 },
+                      min: { message: 'BPM must be at least 0', value: 0 },
+                      valueAsNumber: true,
+                    })}
+                    type="number"
+                  />
+                  <div>
+                    <FormField
+                      error={errors.duration}
+                      id="duration"
+                      label="Duration"
+                      placeholder="Enter duration (mm:ss)"
+                      register={register('duration', {
+                        pattern: {
+                          message: 'Duration must be in mm:ss format',
+                          value: /^\d{1,3}:[0-5]\d$/,
+                        },
+                      })}
+                    />
+                    {calculatedMeasures !== null && (
+                      <p className="mt-1 text-xs text-slate-500">
+                        ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="lyrics"
+                      className="mb-1.5 block text-sm font-medium text-slate-300"
+                    >
+                      Chords & Lyrics
+                    </label>
+                    <textarea
+                      id="lyrics"
+                      rows={10}
+                      {...register('lyrics')}
+                      className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 font-mono text-sm text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
+                      placeholder="Enter chords and lyrics..."
+                    />
+                    <p className="mt-1 text-xs text-slate-500">
+                      💡 Chords separated by whitespace will be automatically detected
+                    </p>
+                    {errors.lyrics && (
+                      <p className="mt-1 text-xs text-red-400">{errors.lyrics.message}</p>
+                    )}
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      as={Link}
+                      className="flex-1"
+                      to={backPath}
+                      type="button"
+                      variant="outlined"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      color="primary"
+                      iconStart={<IconDeviceFloppy className="h-4 w-4" />}
+                      type="submit"
+                      variant="filled"
+                    >
+                      {initialData ? 'Save Changes' : 'Add song'}
+                    </Button>
+                  </div>
+                </form>
+              ),
+              id: 'song-details',
+              label: 'Song details',
+            },
+            {
+              content: (
+                <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-6 text-sm text-slate-400">
+                  MIDI events configuration will be available here soon.
+                </div>
+              ),
+              id: 'midi-events',
+              label: 'MIDI events',
+            },
+          ]}
+        />
       </div>
     </section>
   );
