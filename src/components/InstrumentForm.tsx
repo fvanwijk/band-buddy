@@ -1,6 +1,7 @@
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 import { Alert } from './Alert';
 import { Button } from './Button';
@@ -179,7 +180,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
           </div>
 
           <div className="mt-6 flex gap-3">
-            <Button as="a" className="flex-1" href={backPath} variant="outlined">
+            <Button as={Link} className="flex-1" to={backPath} variant="outlined">
               Cancel
             </Button>
             <Button

@@ -257,13 +257,13 @@ The Button component uses `class-variance-authority` for composable, type-safe s
 ```typescript
 // Props
 <Button
-  as="a"                    // Polymorphic: 'button' | 'a' | etc
+  as={Link}                 // Polymorphic: Link | 'button' | 'a' | etc
   color="primary"           // Color: 'default' | 'primary' | 'danger'
   icon                      // Icon-only: boolean (sets p-2)
   iconStart={<Icon />}      // Icon on left: ReactNode
   iconEnd={<Icon />}        // Icon on right: ReactNode
   variant="outlined"        // Variant: 'filled' | 'outlined' | 'ghost'
-  href="/path"              // When using as="a"
+  to="/path"                // When using as={Link}
   className="custom"        // Extra classes
   onClick={() => {}}        // Event handlers
 >
