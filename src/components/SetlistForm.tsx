@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { BackButton } from './BackButton';
 import { Button } from './Button';
-import { FormField } from './FormField';
+import { InputField } from './InputField';
 import { PageHeader } from './PageHeader';
 import { SetlistSetEditor } from './SetlistSetEditor';
 import type { Setlist, SetlistSet } from '../types';
@@ -74,7 +74,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
 
         <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
-            <FormField
+            <InputField
               error={errors.title}
               id="title"
               label="Setlist Title"
@@ -83,7 +83,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
               required
             />
 
-            <FormField
+            <InputField
               error={errors.date}
               id="date"
               label="Performance Date"
@@ -92,7 +92,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
               type="date"
             />
 
-            <FormField
+            <InputField
               error={errors.venue}
               id="venue"
               label="Venue"

@@ -1,6 +1,6 @@
 import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
-type FormFieldProps = {
+type InputFieldProps = {
   error?: FieldError;
   id: string;
   label: string;
@@ -12,7 +12,7 @@ type FormFieldProps = {
   type?: string;
 };
 
-export function FormField({
+export function InputField({
   error,
   id,
   label,
@@ -22,7 +22,7 @@ export function FormField({
   register,
   required = false,
   type = 'text',
-}: FormFieldProps) {
+}: InputFieldProps) {
   return (
     <div>
       <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-slate-300">

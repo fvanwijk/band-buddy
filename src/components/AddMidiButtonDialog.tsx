@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 
 import { Button } from './Button';
-import { FormField } from './FormField';
+import { InputField } from './InputField';
 import { SelectField } from './SelectField';
 import type { Instrument, MidiEvent } from '../types';
 
@@ -64,7 +64,7 @@ export function AddMidiButtonDialog({
 
         <form onSubmit={handleFormSubmit} autoComplete="off" noValidate>
           <div className="space-y-4">
-            <FormField
+            <InputField
               error={errors.label}
               id="midi-label"
               label="Button label"
@@ -82,7 +82,7 @@ export function AddMidiButtonDialog({
               required
             />
 
-            <FormField
+            <InputField
               error={errors.programChange}
               id="midi-programChange"
               label="Program Change Number"

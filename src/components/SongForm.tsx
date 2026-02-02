@@ -5,7 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { BackButton } from './BackButton';
 import { Button } from './Button';
-import { FormField } from './FormField';
+import { InputField } from './InputField';
 import { LyricsTab } from './LyricsTab';
 import { MidiEventsTab } from './MidiEventsTab';
 import { PageHeader } from './PageHeader';
@@ -203,7 +203,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
             {
               content: (
                 <div className="space-y-4">
-                  <FormField
+                  <InputField
                     label="Artist"
                     id="artist"
                     placeholder="Enter artist name"
@@ -211,7 +211,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                     register={register('artist', { required: 'Artist is required' })}
                     required
                   />
-                  <FormField
+                  <InputField
                     label="Title"
                     id="title"
                     placeholder="Enter song title"
@@ -259,7 +259,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                       required: 'Time signature is required',
                     })}
                   />
-                  <FormField
+                  <InputField
                     error={errors.bpm}
                     id="bpm"
                     label="BPM"
@@ -274,7 +274,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                     type="number"
                   />
                   <div>
-                    <FormField
+                    <InputField
                       error={errors.duration}
                       id="duration"
                       label="Duration"

@@ -359,15 +359,15 @@ Consistent page layout wrapper with flex column, full height, and gap:
 </Page>
 ```
 
-### FormField & SelectField
+### InputField & SelectField
 
-Location: `src/components/FormField.tsx`, `src/components/SelectField.tsx`
+Location: `src/components/InputField.tsx`, `src/components/SelectField.tsx`
 
 Reusable form inputs with validation display:
 
 ```typescript
-// FormField (text input)
-<FormField
+// InputField (text input)
+<InputField
   error={errors.title}
   id="title"
   label="Song Title"

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 
 import type { Instrument } from '../types';
 import { Button } from './Button';
-import { FormField } from './FormField';
+import { InputField } from './InputField';
 import { SelectField } from './SelectField';
 
 type InstrumentDialogProps = {
@@ -75,7 +75,7 @@ export function InstrumentDialog({
         </h2>
 
         <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
-          <FormField
+          <InputField
             error={errors.name}
             id="instrument-name"
             label="Instrument Name"
