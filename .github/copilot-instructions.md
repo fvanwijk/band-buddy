@@ -2,9 +2,9 @@
 applyTo: '**'
 ---
 
-# Gig Buddy - Copilot Instructions
+# BandBuddy - Copilot Instructions
 
-You are helping develop Gig Buddy, a React/TypeScript pianist companion app. Follow these coding conventions and patterns strictly.
+You are helping develop BandBuddy, a React/TypeScript musician companion app. Follow these coding conventions and patterns strictly.
 
 ## Tech Stack
 

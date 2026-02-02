@@ -1,3 +1,4 @@
+import { IconMusic, IconVinyl } from '@tabler/icons-react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import TopNav from './components/TopNav';
@@ -17,8 +18,12 @@ function App() {
   return (
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-4 pt-2">
       <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-900 bg-slate-950/80 backdrop-blur py-2">
-        <span className="rounded-full bg-brand-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-brand-200">
-          Gig Buddy
+        <span className="text-brand-400 font-bold text-md sm:text-2xl">
+          Band
+          <span className="font-semibold text-brand-600">
+            b<IconMusic className="inline h-4 w-4 rotate-180 -mx-0.5" />
+            ddy
+          </span>
         </span>
         <TopNav />
       </header>
