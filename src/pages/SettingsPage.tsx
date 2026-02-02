@@ -1,11 +1,14 @@
 import { IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
+import { Alert } from '../components/Alert';
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { InstrumentDialog } from '../components/InstrumentDialog';
 import { MidiDeviceStatus } from '../components/MidiDeviceStatus';
 import { SelectField } from '../components/SelectField';
+import { Tabs } from '../components/Tabs';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '../config/locales';
 import { THEMES, type ThemeName } from '../config/themes';
 import {
@@ -38,6 +41,8 @@ const themeColors = {
 } as const;
 
 function SettingsPage() {
+  const { tab } = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
   const currentTheme = useGetTheme();
   const currentLocale = useGetLocale();
   const setTheme = useSetTheme();
@@ -148,13 +153,14 @@ function SettingsPage() {
     setDeleteInstrumentId(id);
   };
 
-  return (
-    <section className="flex h-full flex-col gap-6">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Settings</p>
-        <h1 className="text-2xl font-semibold text-slate-100">Preferences</h1>
-      </header>
+  const selectedTab = tab && ['general', 'instruments'].includes(tab) ? tab : 'general';
 
+  const handleTabChange = (tabId: string) => {
+    navigate(`/settings/${tabId}`);
+  };
+
+  const generalContent = (
+    <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
         <h2 className="text-lg font-semibold text-slate-100">Color Theme</h2>
         <p className="mt-2 text-sm text-slate-400">
@@ -240,101 +246,131 @@ function SettingsPage() {
           />
         </div>
       </div>
+    </div>
+  );
 
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-100">Instruments</h2>
-            <p className="mt-2 text-sm text-slate-400">
-              Track connected instruments for program changes and MIDI device routing.
-            </p>
-          </div>
-          <Button
-            color="primary"
-            disabled={!canAddInstrument}
-            iconStart={<IconPlus className="h-4 w-4" />}
-            onClick={() => {
-              setEditingInstrumentId(null);
-              setIsDialogOpen(true);
-            }}
-            variant="outlined"
-          >
-            Add Instrument
-          </Button>
-        </div>
-
-        {!isSupported && (
-          <p className="mt-4 text-sm text-red-300">Web MIDI is not supported in this browser.</p>
-        )}
-        {isSupported && !isReady && (
-          <p className="mt-4 text-sm text-slate-400">Detecting MIDI devices...</p>
-        )}
-        {error && <p className="mt-4 text-sm text-red-300">{error}</p>}
-
-        {isSupported && isReady && outputs.length === 0 && (
-          <p className="mt-4 text-sm text-slate-400">
-            No MIDI inputs detected. Connect a device to enable adding instruments.
+  const instrumentsContent = (
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-100">Instruments</h2>
+          <p className="mt-2 text-sm text-slate-400">
+            Track connected instruments for program changes and MIDI device routing.
           </p>
-        )}
+        </div>
+        <Button
+          color="primary"
+          disabled={!canAddInstrument}
+          iconStart={<IconPlus className="h-4 w-4" />}
+          onClick={() => {
+            setEditingInstrumentId(null);
+            setIsDialogOpen(true);
+          }}
+          variant="outlined"
+        >
+          Add Instrument
+        </Button>
+      </div>
 
-        <div className="mt-6 space-y-3">
-          {instruments.length === 0 ? (
-            <p className="text-sm text-slate-400">No instruments added yet.</p>
-          ) : (
-            instruments.map((instrument) => {
-              const midiInAvailable = inputsById.has(instrument.midiInId);
-              const midiOutAvailable = instrument.midiOutId
-                ? outputsById.has(instrument.midiOutId)
-                : true;
+      {!isSupported && (
+        <p className="mt-4 text-sm text-red-300">Web MIDI is not supported in this browser.</p>
+      )}
+      {isSupported && !isReady && (
+        <p className="mt-4 text-sm text-slate-400">Detecting MIDI devices...</p>
+      )}
+      {error && <p className="mt-4 text-sm text-red-300">{error}</p>}
 
-              return (
-                <div
-                  key={instrument.id}
-                  className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-4"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-slate-100">{instrument.name}</p>
-                    <div className="flex gap-2">
-                      <Button
-                        color="primary"
-                        icon
-                        onClick={() => handleEditInstrument(instrument.id)}
-                        variant="outlined"
-                      >
-                        <IconPencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        color="danger"
-                        icon
-                        onClick={() => handleRequestDeleteInstrument(instrument.id)}
-                        variant="outlined"
-                      >
-                        <IconTrash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <MidiDeviceStatus
-                      isAvailable={midiInAvailable}
-                      label="MIDI In"
-                      name={instrument.midiInName}
-                    />
-                    {instrument.midiOutId ? (
-                      <MidiDeviceStatus
-                        isAvailable={midiOutAvailable}
-                        label="MIDI Out"
-                        name={instrument.midiOutName || instrument.midiOutId || 'Unknown'}
-                      />
-                    ) : (
-                      <MidiDeviceStatus isOptional label="MIDI Out" name="None" />
-                    )}
+      {isSupported && isReady && outputs.length === 0 && (
+        <div className="mt-4">
+          <Alert severity="warning">
+            No MIDI inputs detected. Connect a device to enable adding instruments.
+          </Alert>
+        </div>
+      )}
+
+      <div className="mt-6 space-y-3">
+        {instruments.length === 0 ? (
+          <p className="text-sm text-slate-400">No instruments added yet.</p>
+        ) : (
+          instruments.map((instrument) => {
+            const midiInAvailable = inputsById.has(instrument.midiInId);
+            const midiOutAvailable = instrument.midiOutId
+              ? outputsById.has(instrument.midiOutId)
+              : true;
+
+            return (
+              <div
+                key={instrument.id}
+                className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-4"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-100">{instrument.name}</p>
+                  <div className="flex gap-2">
+                    <Button
+                      color="primary"
+                      icon
+                      onClick={() => handleEditInstrument(instrument.id)}
+                      variant="outlined"
+                    >
+                      <IconPencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      color="danger"
+                      icon
+                      onClick={() => handleRequestDeleteInstrument(instrument.id)}
+                      variant="outlined"
+                    >
+                      <IconTrash className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              );
-            })
-          )}
-        </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <MidiDeviceStatus
+                    isAvailable={midiInAvailable}
+                    label="MIDI In"
+                    name={instrument.midiInName}
+                  />
+                  {instrument.midiOutId ? (
+                    <MidiDeviceStatus
+                      isAvailable={midiOutAvailable}
+                      label="MIDI Out"
+                      name={instrument.midiOutName || instrument.midiOutId || 'Unknown'}
+                    />
+                  ) : (
+                    <MidiDeviceStatus isOptional label="MIDI Out" name="None" />
+                  )}
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
+    </div>
+  );
+
+  return (
+    <section className="flex h-full flex-col gap-6">
+      <header>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Settings</p>
+        <h1 className="text-2xl font-semibold text-slate-100">Preferences</h1>
+      </header>
+
+      <Tabs
+        activeTabId={selectedTab}
+        onTabChange={handleTabChange}
+        tabs={[
+          {
+            content: generalContent,
+            id: 'general',
+            label: 'General',
+          },
+          {
+            content: instrumentsContent,
+            id: 'instruments',
+            label: 'Instruments',
+          },
+        ]}
+      />
 
       <ConfirmDialog
         isOpen={!!deleteInstrumentId}

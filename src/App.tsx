@@ -40,7 +40,10 @@ function App() {
             <Route index element={<Navigate to="details" replace />} />
             <Route path=":tab" element={<EditSongPage />} />
           </Route>
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/settings">
+            <Route index element={<Navigate to="general" replace />} />
+            <Route path=":tab" element={<SettingsPage />} />
+          </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
