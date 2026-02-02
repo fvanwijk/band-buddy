@@ -28,7 +28,23 @@ export function StoreProvider({ children }: StoreProviderProps) {
       if (Object.keys(store.getTables()).length === 0) {
         const seedSongs = createSongs();
         seedSongs.forEach(({ id, ...song }) => {
-          store.setRow('songs', id, song as Record<string, string | number>);
+          const row: Record<string, unknown> = {
+            ...song,
+          };
+
+          if (song.midiEvents && song.midiEvents.length > 0) {
+            row.midiEvents = JSON.stringify(song.midiEvents);
+          } else {
+            delete row.midiEvents;
+          }
+
+          Object.entries(row).forEach(([key, value]) => {
+            if (value === undefined) {
+              delete row[key];
+            }
+          });
+
+          store.setRow('songs', id, row as Record<string, string | number>);
         });
 
         const seedSetlists = createSetlists();

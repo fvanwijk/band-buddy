@@ -1,6 +1,6 @@
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { Button } from './Button';
@@ -15,7 +15,9 @@ import { useGetInstruments } from '../hooks/useInstruments';
 import type { MidiEvent, Song } from '../types';
 import { calculateMeasures } from '../utils/measures';
 
-type SongFormData = Omit<Song, 'id' | 'midiEvents'> & {
+type SongSubmitData = Omit<Song, 'id'>;
+
+type SongFormData = SongSubmitData & {
   keyNote?: string;
   keyQuality?: string;
 };
@@ -23,24 +25,13 @@ type SongFormData = Omit<Song, 'id' | 'midiEvents'> & {
 type SongFormProps = {
   backPath: string;
   initialData?: Song;
-  onSubmit: (data: {
-    artist: string;
-    bpm?: number;
-    duration?: string;
-    key: string;
-    lyrics?: string;
-    midiEvents?: MidiEvent[];
-    timeSignature: string;
-    title: string;
-    transpose?: number;
-  }) => void;
+  onSubmit: (data: SongSubmitData) => void;
   title: string;
 };
 
 export function SongForm({ backPath, initialData, onSubmit, title }: SongFormProps) {
   const [useFlats, setUseFlats] = useState(false);
   const [calculatedMeasures, setCalculatedMeasures] = useState<number | null>(null);
-  const [midiEvents, setMidiEvents] = useState<MidiEvent[]>(initialData?.midiEvents || []);
 
   const { id, tab } = useParams<{ id?: string; tab?: string }>();
   const navigate = useNavigate();
@@ -52,6 +43,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const existingQuality = existingKey.endsWith('m') ? 'm' : '';
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -64,13 +56,20 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       keyNote: existingNote,
       keyQuality: existingQuality,
       lyrics: initialData?.lyrics || '',
+      midiEvents: initialData?.midiEvents || [],
       timeSignature: initialData?.timeSignature || '4/4',
       title: initialData?.title || '',
     },
   });
 
+  const { append, remove } = useFieldArray({
+    control,
+    name: 'midiEvents',
+  });
+
   const duration = watch('duration');
   const bpm = watch('bpm');
+  const midiEvents = watch('midiEvents') || [];
   const timeSignature = watch('timeSignature');
 
   useEffect(() => {
@@ -135,40 +134,11 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   ];
 
   const handleFormSubmit = (data: SongFormData) => {
-    // Combine note and quality for the key
-    const key = (data.keyNote || existingNote) + (data.keyQuality || '');
-    const finalData: {
-      artist: string;
-      bpm?: number;
-      duration?: string;
-      key: string;
-      lyrics?: string;
-      midiEvents?: MidiEvent[];
-      timeSignature: string;
-      title: string;
-      transpose?: number;
-    } = {
-      artist: data.artist,
-      key,
-      timeSignature: data.timeSignature,
-      title: data.title,
-    };
-    if (data.bpm) {
-      finalData.bpm = data.bpm;
-    }
-    if (data.duration) {
-      finalData.duration = data.duration;
-    }
-    if (data.lyrics) {
-      finalData.lyrics = data.lyrics;
-    }
-    if (midiEvents.length > 0) {
-      finalData.midiEvents = midiEvents;
-    }
-    if (initialData?.transpose !== undefined) {
-      finalData.transpose = initialData.transpose;
-    }
-    onSubmit(finalData);
+    onSubmit({
+      ...data,
+      key: (data.keyNote || existingNote) + (data.keyQuality || ''),
+      transpose: initialData?.transpose,
+    });
   };
 
   const handleAddMidiEvent = (event: Omit<MidiEvent, 'id'>) => {
@@ -176,21 +146,22 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       ...event,
       id: `midi-${Date.now()}`,
     };
-    setMidiEvents([...midiEvents, newEvent]);
+    append(newEvent);
   };
 
   const handleDeleteMidiEvent = (eventId: string) => {
-    setMidiEvents(midiEvents.filter((event) => event.id !== eventId));
+    const index = midiEvents.findIndex((event) => event.id === eventId);
+    if (index >= 0) {
+      remove(index);
+    }
   };
 
   return (
     <Page>
       <PageHeader backPath={backPath} title={title} />
-
       <form
         onSubmit={handleSubmit(handleFormSubmit)}
         className="flex flex-1 flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
-        autoComplete="off"
         noValidate
       >
         <Tabs

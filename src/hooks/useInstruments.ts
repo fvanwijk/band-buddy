@@ -45,25 +45,23 @@ export function useAddInstrument(onSuccess?: () => void) {
   return useAddRowCallback(
     'instruments',
     (data: Omit<Instrument, 'id'>) => {
-      const finalData: Record<string, string> = {
-        midiInId: data.midiInId,
-        midiInName: data.midiInName,
-        name: data.name,
+      const finalData: Record<string, unknown> = {
+        ...data,
       };
-
-      if (data.midiOutId) {
-        finalData.midiOutId = data.midiOutId;
-      }
-
-      if (data.midiOutName) {
-        finalData.midiOutName = data.midiOutName;
-      }
 
       if (data.programNames && Object.keys(data.programNames).length > 0) {
         finalData.programNames = JSON.stringify(data.programNames);
+      } else {
+        delete finalData.programNames;
       }
 
-      return finalData;
+      Object.entries(finalData).forEach(([key, value]) => {
+        if (value === undefined) {
+          delete finalData[key];
+        }
+      });
+
+      return finalData as Record<string, string>;
     },
     [onSuccess],
     undefined,
@@ -91,25 +89,23 @@ export function useUpdateInstrument(id: string | undefined, onSuccess?: () => vo
     'instruments',
     id!,
     (data: Omit<Instrument, 'id'>) => {
-      const finalData: Record<string, string> = {
-        midiInId: data.midiInId,
-        midiInName: data.midiInName,
-        name: data.name,
+      const finalData: Record<string, unknown> = {
+        ...data,
       };
-
-      if (data.midiOutId) {
-        finalData.midiOutId = data.midiOutId;
-      }
-
-      if (data.midiOutName) {
-        finalData.midiOutName = data.midiOutName;
-      }
 
       if (data.programNames && Object.keys(data.programNames).length > 0) {
         finalData.programNames = JSON.stringify(data.programNames);
+      } else {
+        delete finalData.programNames;
       }
 
-      return finalData;
+      Object.entries(finalData).forEach(([key, value]) => {
+        if (value === undefined) {
+          delete finalData[key];
+        }
+      });
+
+      return finalData as Record<string, string>;
     },
     [id, onSuccess],
     undefined,

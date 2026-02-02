@@ -134,16 +134,19 @@ export function useAddSetlist(onSuccess?: () => void) {
   return useAddRowCallback(
     'setlists',
     (data: Omit<Setlist, 'id'>) => {
-      const row: Record<string, string> = {
-        date: data.date,
-        title: data.title,
+      const row: Record<string, unknown> = {
+        ...data,
       };
 
-      if (data.venue) {
-        row.venue = data.venue;
-      }
+      delete row.sets;
 
-      if (!store) return row;
+      Object.entries(row).forEach(([key, value]) => {
+        if (value === undefined) {
+          delete row[key];
+        }
+      });
+
+      if (!store) return row as Record<string, string>;
 
       const setlistId = Date.now().toString();
 
@@ -161,7 +164,7 @@ export function useAddSetlist(onSuccess?: () => void) {
         });
       });
 
-      return row;
+      return row as Record<string, string>;
     },
     [store, onSuccess],
     undefined,
@@ -181,21 +184,25 @@ export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void)
     'setlists',
     id!,
     (data: Omit<Setlist, 'id'>) => {
-      const row: Record<string, string> = {
-        date: data.date,
-        title: data.title,
+      const row: Record<string, unknown> = {
+        ...data,
       };
 
-      if (data.venue) {
-        row.venue = data.venue;
-      }
+      delete row.sets;
 
-      if (!store) return row;
+      Object.entries(row).forEach(([key, value]) => {
+        if (value === undefined) {
+          delete row[key];
+        }
+      });
+
+      if (!store) return row as Record<string, string>;
 
       // Delete existing setlist songs
       const setlistSongsData = store.getTable('setlistSongs') || {};
       Object.entries(setlistSongsData).forEach(([songRowId, songData]) => {
-        if ((songData as any).setlistId === id) {
+        const rowData = songData as { setlistId?: string };
+        if (rowData.setlistId === id) {
           store.delRow('setlistSongs', songRowId);
         }
       });
@@ -214,7 +221,7 @@ export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void)
         });
       });
 
-      return row;
+      return row as Record<string, string>;
     },
     [id, store, onSuccess],
     undefined,
@@ -235,7 +242,8 @@ export function useDeleteSetlist(onSuccess?: () => void) {
       // Delete associated setlist songs
       const setlistSongsData = store.getTable('setlistSongs') || {};
       Object.entries(setlistSongsData).forEach(([songRowId, songData]) => {
-        if ((songData as any).setlistId === id) {
+        const rowData = songData as { setlistId?: string };
+        if (rowData.setlistId === id) {
           store.delRow('setlistSongs', songRowId);
         }
       });

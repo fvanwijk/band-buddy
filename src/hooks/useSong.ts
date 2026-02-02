@@ -69,28 +69,23 @@ export function useAddSong(onSuccess?: () => void) {
   return useAddRowCallback(
     'songs',
     (data: Omit<Song, 'id'>) => {
-      const finalData: Record<string, string | number> = {
-        artist: data.artist,
-        key: data.key,
-        timeSignature: data.timeSignature,
-        title: data.title,
+      const finalData: Record<string, unknown> = {
+        ...data,
       };
-      if (data.bpm) {
-        finalData.bpm = data.bpm;
-      }
-      if (data.duration) {
-        finalData.duration = data.duration;
-      }
-      if (data.lyrics) {
-        finalData.lyrics = data.lyrics;
-      }
+
       if (data.midiEvents && data.midiEvents.length > 0) {
         finalData.midiEvents = JSON.stringify(data.midiEvents);
+      } else {
+        delete finalData.midiEvents;
       }
-      if (data.transpose !== undefined) {
-        finalData.transpose = data.transpose;
-      }
-      return finalData;
+
+      Object.entries(finalData).forEach(([key, value]) => {
+        if (value === undefined) {
+          delete finalData[key];
+        }
+      });
+
+      return finalData as Record<string, string | number>;
     },
     [navigate, onSuccess],
     undefined,
@@ -108,28 +103,23 @@ export function useUpdateSong(id: string | undefined, onSuccess?: () => void) {
     'songs',
     id!,
     (data: Omit<Song, 'id'>) => {
-      const finalData: Record<string, string | number> = {
-        artist: data.artist,
-        key: data.key,
-        timeSignature: data.timeSignature,
-        title: data.title,
+      const finalData: Record<string, unknown> = {
+        ...data,
       };
-      if (data.bpm) {
-        finalData.bpm = data.bpm;
-      }
-      if (data.duration) {
-        finalData.duration = data.duration;
-      }
-      if (data.lyrics) {
-        finalData.lyrics = data.lyrics;
-      }
+
       if (data.midiEvents && data.midiEvents.length > 0) {
         finalData.midiEvents = JSON.stringify(data.midiEvents);
+      } else {
+        delete finalData.midiEvents;
       }
-      if (data.transpose !== undefined) {
-        finalData.transpose = data.transpose;
-      }
-      return finalData;
+
+      Object.entries(finalData).forEach(([key, value]) => {
+        if (value === undefined) {
+          delete finalData[key];
+        }
+      });
+
+      return finalData as Record<string, string | number>;
     },
     [id, onSuccess],
     undefined,

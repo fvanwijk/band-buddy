@@ -2,7 +2,6 @@ import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
-import { BackButton } from './BackButton';
 import { Button } from './Button';
 import { InputField } from './InputField';
 import { Page } from './Page';

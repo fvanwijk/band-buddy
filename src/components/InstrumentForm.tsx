@@ -108,11 +108,8 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
       midiOutId: data.midiOutId || undefined,
       midiOutName,
       name: trimmedName,
+      programNames: data.programNames,
     };
-
-    if (Object.keys(data.programNames).length > 0) {
-      submitData.programNames = data.programNames;
-    }
 
     onSubmit(submitData);
   };
