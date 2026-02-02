@@ -159,32 +159,28 @@ function SongDetailPage() {
         subtitle={currentSong.artist}
       />
 
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-        <Tabs
-          activeTabId={selectedTab}
-          onTabChange={handleTabChange}
-          tabs={[
-            {
-              content: (
-                <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
-              ),
-              id: 'details',
-              label: 'Lyrics',
-            },
-            {
-              content: (
-                <MidiButtonsDisplay
-                  isDisabled={isMidiButtonDisabled}
-                  midiEvents={currentSong.midiEvents}
-                  onTriggerEvent={handleTriggerMidiEvent}
-                />
-              ),
-              id: 'midi',
-              label: 'MIDI buttons',
-            },
-          ]}
-        />
-      </div>
+      <Tabs
+        activeTabId={selectedTab}
+        onTabChange={handleTabChange}
+        tabs={[
+          {
+            content: <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />,
+            id: 'details',
+            label: 'Lyrics',
+          },
+          {
+            content: (
+              <MidiButtonsDisplay
+                isDisabled={isMidiButtonDisabled}
+                midiEvents={currentSong.midiEvents}
+                onTriggerEvent={handleTriggerMidiEvent}
+              />
+            ),
+            id: 'midi',
+            label: 'MIDI buttons',
+          },
+        ]}
+      />
 
       {/* Navigation Footer */}
       <div className="flex gap-3">
