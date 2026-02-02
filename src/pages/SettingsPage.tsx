@@ -1,25 +1,18 @@
 import { IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { Alert } from '../components/Alert';
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { InstrumentDialog } from '../components/InstrumentDialog';
 import { MidiDeviceStatus } from '../components/MidiDeviceStatus';
 import { SelectField } from '../components/SelectField';
 import { Tabs } from '../components/Tabs';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '../config/locales';
 import { THEMES, type ThemeName } from '../config/themes';
-import {
-  useAddInstrument,
-  useDeleteInstrument,
-  useGetInstruments,
-  useUpdateInstrument,
-} from '../hooks/useInstruments';
+import { useDeleteInstrument, useGetInstruments } from '../hooks/useInstruments';
 import { useMidiDevices } from '../hooks/useMidiDevices';
 import { useGetLocale, useGetTheme, useSetLocale, useSetTheme } from '../hooks/useSettings';
-import type { Instrument } from '../types';
 
 // Color preview swatches for each theme
 const themeColors = {
@@ -48,38 +41,10 @@ function SettingsPage() {
   const setTheme = useSetTheme();
   const setLocale = useSetLocale();
   const instruments = useGetInstruments();
-  const addInstrument = useAddInstrument();
   const deleteInstrument = useDeleteInstrument();
   const { error, inputs, isReady, isSupported, outputs } = useMidiDevices();
 
   const [deleteInstrumentId, setDeleteInstrumentId] = useState<string | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingInstrumentId, setEditingInstrumentId] = useState<string | null>(null);
-  const updateInstrument = useUpdateInstrument(editingInstrumentId || undefined);
-
-  // Important: Input and output options are swapped because
-  // the MIDI input of the computer (=webmidi package) corresponds to the output of the instrument and vice versa.
-  const inputOptions = useMemo(
-    () => [
-      { label: 'Select MIDI input', value: '' },
-      ...outputs.map((device) => ({
-        label: device.name,
-        value: device.id,
-      })),
-    ],
-    [outputs],
-  );
-
-  const outputOptions = useMemo(
-    () => [
-      { label: 'None', value: '' },
-      ...inputs.map((device) => ({
-        label: device.name,
-        value: device.id,
-      })),
-    ],
-    [inputs],
-  );
 
   const inputsById = useMemo(
     () => new Map(outputs.map((device) => [device.id, device.name])),
@@ -91,52 +56,12 @@ function SettingsPage() {
     [inputs],
   );
 
-  const editingInstrument = useMemo(
-    () => instruments.find((instrument) => instrument.id === editingInstrumentId),
-    [editingInstrumentId, instruments],
-  );
-
   const deleteInstrumentTarget = useMemo(
     () => instruments.find((instrument) => instrument.id === deleteInstrumentId),
     [deleteInstrumentId, instruments],
   );
 
   const canAddInstrument = isSupported && isReady && inputs.length > 0;
-
-  const handleAddInstrument = (data: { midiInId: string; midiOutId: string; name: string }) => {
-    const trimmedName = data.name.trim();
-    const midiInName = inputsById.get(data.midiInId) || data.midiInId;
-    const midiOutName = data.midiOutId
-      ? outputsById.get(data.midiOutId) || data.midiOutId
-      : undefined;
-
-    const instrumentData: Omit<Instrument, 'id'> = {
-      midiInId: data.midiInId,
-      midiInName,
-      midiOutId: data.midiOutId || undefined,
-      midiOutName,
-      name: trimmedName,
-    };
-
-    if (editingInstrumentId) {
-      updateInstrument(instrumentData);
-    } else {
-      addInstrument(instrumentData);
-    }
-
-    setIsDialogOpen(false);
-    setEditingInstrumentId(null);
-  };
-
-  const handleEditInstrument = (id: string) => {
-    setEditingInstrumentId(id);
-    setIsDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-    setEditingInstrumentId(null);
-  };
 
   const handleCloseDeleteDialog = () => {
     setDeleteInstrumentId(null);
@@ -258,18 +183,26 @@ function SettingsPage() {
             Track connected instruments for program changes and MIDI device routing.
           </p>
         </div>
-        <Button
-          color="primary"
-          disabled={!canAddInstrument}
-          iconStart={<IconPlus className="h-4 w-4" />}
-          onClick={() => {
-            setEditingInstrumentId(null);
-            setIsDialogOpen(true);
-          }}
-          variant="outlined"
-        >
-          Add Instrument
-        </Button>
+        {canAddInstrument ? (
+          <Button
+            as={Link}
+            color="primary"
+            iconStart={<IconPlus className="h-4 w-4" />}
+            to="/settings/instruments/add"
+            variant="outlined"
+          >
+            Add Instrument
+          </Button>
+        ) : (
+          <Button
+            color="primary"
+            disabled
+            iconStart={<IconPlus className="h-4 w-4" />}
+            variant="outlined"
+          >
+            Add Instrument
+          </Button>
+        )}
       </div>
 
       {!isSupported && (
@@ -307,9 +240,10 @@ function SettingsPage() {
                   <p className="text-sm font-semibold text-slate-100">{instrument.name}</p>
                   <div className="flex gap-2">
                     <Button
+                      as={Link}
                       color="primary"
                       icon
-                      onClick={() => handleEditInstrument(instrument.id)}
+                      to={`/settings/instruments/${instrument.id}/edit`}
                       variant="outlined"
                     >
                       <IconPencil className="h-4 w-4" />
@@ -380,14 +314,6 @@ function SettingsPage() {
         onClose={handleCloseDeleteDialog}
         onConfirm={handleConfirmDeleteInstrument}
         title="Delete instrument"
-      />
-      <InstrumentDialog
-        initialInstrument={editingInstrument}
-        inputOptions={inputOptions}
-        isOpen={isDialogOpen}
-        onClose={handleCloseDialog}
-        onSubmit={handleAddInstrument}
-        outputOptions={outputOptions}
       />
     </section>
   );

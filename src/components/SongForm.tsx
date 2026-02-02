@@ -8,6 +8,7 @@ import { Button } from './Button';
 import { InputField } from './InputField';
 import { LyricsTab } from './LyricsTab';
 import { MidiEventsTab } from './MidiEventsTab';
+import { Page } from './Page';
 import { PageHeader } from './PageHeader';
 import { RadioGroup } from './RadioGroup';
 import { Tabs } from './Tabs';
@@ -184,7 +185,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   };
 
   return (
-    <section className="flex h-full flex-col gap-6">
+    <Page>
       <div className="flex items-center gap-3">
         <BackButton to={backPath} />
         <PageHeader title={title} />
@@ -332,6 +333,6 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
           </Button>
         </div>
       </form>
-    </section>
+    </Page>
   );
 }

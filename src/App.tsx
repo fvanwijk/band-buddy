@@ -2,8 +2,10 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import TopNav from './components/TopNav';
 import ActiveSetlistPage from './pages/ActiveSetlistPage';
+import AddInstrumentPage from './pages/AddInstrumentPage';
 import { AddSetlistPage } from './pages/AddSetlistPage';
 import AddSongPage from './pages/AddSongPage';
+import EditInstrumentPage from './pages/EditInstrumentPage';
 import { EditSetlistPage } from './pages/EditSetlistPage';
 import EditSongPage from './pages/EditSongPage';
 import { ManageSetlistsPage } from './pages/ManageSetlistsPage';
@@ -44,6 +46,8 @@ function App() {
             <Route index element={<Navigate to="general" replace />} />
             <Route path=":tab" element={<SettingsPage />} />
           </Route>
+          <Route path="/settings/instruments/add" element={<AddInstrumentPage />} />
+          <Route path="/settings/instruments/:id/edit" element={<EditInstrumentPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
