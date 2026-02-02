@@ -17,7 +17,7 @@ export function useNordProgramOptions(): NordProgramOption[] {
       for (let program = 0; program < 64; program++) {
         const page = Math.floor(program / 8);
         const positionInPage = (program % 8) + 1;
-        const displayValue = page * 10 + positionInPage;
+        const displayValue = (page + 1) * 10 + positionInPage;
         const absoluteProgram = bankStart + program;
         bankOptions.push({
           label: `${bank}-${displayValue} (${absoluteProgram})`,
