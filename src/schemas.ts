@@ -44,14 +44,30 @@ export const songTableSchema = z.object({
 /**
  * Instrument schema (full, with id)
  */
-export const instrumentSchema = z.object({
-  id: z.string(),
-  midiInId: z.string(),
-  midiInName: z.string(),
-  midiOutId: z.string().optional(),
-  midiOutName: z.string().optional(),
-  name: z.string(),
-});
+export const instrumentSchema = z
+  .object({
+    id: z.string(),
+    midiInId: z.string(),
+    midiInName: z.string(),
+    midiOutId: z.string().optional(),
+    midiOutName: z.string().optional(),
+    name: z.string(),
+    programNames: z.string().optional(),
+  })
+  .transform((data) => {
+    const { programNames, ...rest } = data;
+    if (programNames) {
+      try {
+        return {
+          ...rest,
+          programNames: JSON.parse(programNames) as Record<number, string>,
+        };
+      } catch {
+        return rest;
+      }
+    }
+    return rest;
+  });
 
 /**
  * Instrument table schema (without id, for Tinybase table)
@@ -62,6 +78,7 @@ export const instrumentTableSchema = z.object({
   midiOutId: z.string().optional(),
   midiOutName: z.string().optional(),
   name: z.string(),
+  programNames: z.string().optional(),
 });
 
 /**

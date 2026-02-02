@@ -5,7 +5,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { Button } from './Button';
 import { InputField } from './InputField';
 import { SelectField } from './SelectField';
-import { useNordProgramOptions } from '../hooks/useNordProgramOptions';
+import { useProgramOptions } from '../hooks/useProgramOptions';
 import type { Instrument, MidiEvent } from '../types';
 
 type FormData = Omit<MidiEvent, 'id'>;
@@ -40,9 +40,8 @@ export function AddMidiButtonDialog({
   const selectedInstrumentId = useWatch({ control, name: 'instrumentId' });
 
   const selectedInstrument = instruments.find((inst) => inst.id === selectedInstrumentId);
-  const isNordInstrument = selectedInstrument?.name.includes('Nord') ?? false;
-
-  const nordProgramOptions = useNordProgramOptions();
+  const programOptions = useProgramOptions(selectedInstrument);
+  const hasSelectableOptions = programOptions.length > 0;
 
   if (!isOpen) return null;
 
@@ -91,12 +90,12 @@ export function AddMidiButtonDialog({
               required
             />
 
-            {isNordInstrument ? (
+            {hasSelectableOptions ? (
               <SelectField
                 error={errors.programChange}
                 id="midi-programChange"
                 label="Program"
-                options={nordProgramOptions}
+                options={programOptions}
                 register={register('programChange', {
                   required: 'Program is required',
                   valueAsNumber: true,

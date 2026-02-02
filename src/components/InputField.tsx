@@ -1,5 +1,7 @@
 import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
+import { FormLabel } from './FormLabel';
+
 type InputFieldProps = {
   error?: FieldError;
   id: string;
@@ -25,10 +27,9 @@ export function InputField({
 }: InputFieldProps) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-slate-300">
+      <FormLabel className="mb-1.5 block" htmlFor={id} required={required}>
         {label}
-        {required && <span className="ml-1 text-brand-400/70">*</span>}
-      </label>
+      </FormLabel>
       <input
         id={id}
         max={max}

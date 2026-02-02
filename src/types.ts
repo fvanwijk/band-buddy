@@ -25,6 +25,7 @@ export type Instrument = {
   midiOutId?: string;
   midiOutName?: string;
   name: string;
+  programNames?: Record<number, string>;
 };
 
 export type SongReference = {

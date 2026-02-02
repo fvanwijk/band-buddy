@@ -1,12 +1,13 @@
 import { IconDeviceFloppy } from '@tabler/icons-react';
-import { useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useMemo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { Alert } from './Alert';
 import { Button } from './Button';
 import { InputField } from './InputField';
 import { Page } from './Page';
 import { PageHeader } from './PageHeader';
+import { ProgramNamesField } from './ProgramNamesField';
 import { SelectField } from './SelectField';
 import { useMidiDevices } from '../hooks/useMidiDevices';
 import type { Instrument } from '../types';
@@ -15,6 +16,7 @@ type InstrumentFormData = {
   midiInId: string;
   midiOutId: string;
   name: string;
+  programNames: Record<number, string>;
 };
 
 type InstrumentFormProps = {
@@ -26,6 +28,7 @@ type InstrumentFormProps = {
     midiOutId?: string;
     midiOutName?: string;
     name: string;
+    programNames?: Record<number, string>;
   }) => void;
   title: string;
 };
@@ -34,6 +37,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
   const { inputs, isReady, isSupported, outputs } = useMidiDevices();
 
   const {
+    control,
     formState: { errors },
     handleSubmit,
     register,
@@ -43,16 +47,11 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
       midiInId: initialData?.midiInId || '',
       midiOutId: initialData?.midiOutId || '',
       name: initialData?.name || '',
+      programNames: initialData?.programNames || {},
     },
   });
 
-  useEffect(() => {
-    if (initialData) {
-      setValue('midiInId', initialData.midiInId);
-      setValue('midiOutId', initialData.midiOutId || '');
-      setValue('name', initialData.name);
-    }
-  }, [initialData, setValue]);
+  const programNames = useWatch({ control, name: 'programNames' });
 
   // Important: Input and output options are swapped because
   // the MIDI input of the computer (=webmidi package) corresponds to the output of the instrument and vice versa.
@@ -95,13 +94,26 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
       ? outputsById.get(data.midiOutId) || data.midiOutId
       : undefined;
 
-    onSubmit({
+    const submitData: {
+      midiInId: string;
+      midiInName: string;
+      midiOutId?: string;
+      midiOutName?: string;
+      name: string;
+      programNames?: Record<number, string>;
+    } = {
       midiInId: data.midiInId,
       midiInName,
       midiOutId: data.midiOutId || undefined,
       midiOutName,
       name: trimmedName,
-    });
+    };
+
+    if (Object.keys(data.programNames).length > 0) {
+      submitData.programNames = data.programNames;
+    }
+
+    onSubmit(submitData);
   };
 
   const getErrorAlert = () => {
@@ -158,6 +170,11 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
               label="MIDI Out (Optional)"
               options={outputOptions}
               register={register('midiOutId')}
+            />
+
+            <ProgramNamesField
+              onChange={(value) => setValue('programNames', value)}
+              value={programNames}
             />
           </div>
 

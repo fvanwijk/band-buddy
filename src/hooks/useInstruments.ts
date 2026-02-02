@@ -48,6 +48,7 @@ export function useAddInstrument(onSuccess?: () => void) {
       const finalData: Record<string, string> = {
         midiInId: data.midiInId,
         midiInName: data.midiInName,
+        name: data.name,
       };
 
       if (data.midiOutId) {
@@ -58,7 +59,9 @@ export function useAddInstrument(onSuccess?: () => void) {
         finalData.midiOutName = data.midiOutName;
       }
 
-      finalData.name = data.name;
+      if (data.programNames && Object.keys(data.programNames).length > 0) {
+        finalData.programNames = JSON.stringify(data.programNames);
+      }
 
       return finalData;
     },
@@ -91,6 +94,7 @@ export function useUpdateInstrument(id: string | undefined, onSuccess?: () => vo
       const finalData: Record<string, string> = {
         midiInId: data.midiInId,
         midiInName: data.midiInName,
+        name: data.name,
       };
 
       if (data.midiOutId) {
@@ -101,7 +105,9 @@ export function useUpdateInstrument(id: string | undefined, onSuccess?: () => vo
         finalData.midiOutName = data.midiOutName;
       }
 
-      finalData.name = data.name;
+      if (data.programNames && Object.keys(data.programNames).length > 0) {
+        finalData.programNames = JSON.stringify(data.programNames);
+      }
 
       return finalData;
     },

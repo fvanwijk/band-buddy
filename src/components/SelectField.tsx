@@ -1,5 +1,7 @@
 import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
+import { FormLabel } from './FormLabel';
+
 type SelectOption =
   | { label: string; value: string }
   | { label: string; options: Array<{ label: string; value: string }> };
@@ -41,10 +43,9 @@ export function SelectField({
   return (
     <div>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-slate-300" htmlFor={id}>
+        <FormLabel className="mb-1.5 block" htmlFor={id} required={required}>
           {label}
-          {required && <span className="ml-1 text-brand-400/70">*</span>}
-        </label>
+        </FormLabel>
       )}
       <select
         className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
