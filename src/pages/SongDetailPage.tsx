@@ -8,6 +8,7 @@ import { Button } from '../components/Button';
 import { LyricsBlock } from '../components/LyricsBlock';
 import { MidiButtonsDisplay } from '../components/MidiButtonsDisplay';
 import { Page } from '../components/Page';
+import { PageHeader } from '../components/PageHeader';
 import { SongStats } from '../components/SongStats';
 import { Tabs } from '../components/Tabs';
 import { useGetInstruments } from '../hooks/useInstruments';
@@ -151,14 +152,12 @@ function SongDetailPage() {
 
   return (
     <Page>
-      <header className="flex items-start justify-between gap-3 flex-wrap">
-        <BackButton to="/" />
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-slate-100">{currentSong.title}</h1>
-          <p className="text-sm text-slate-400">{currentSong.artist}</p>
-        </div>
-        <SongStats song={currentSong} />
-      </header>
+      <PageHeader
+        action={<SongStats song={currentSong} />}
+        backPath="/"
+        title={currentSong.title}
+        subtitle={currentSong.artist}
+      />
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
         <Tabs

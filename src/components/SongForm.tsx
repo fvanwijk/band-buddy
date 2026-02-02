@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-import { BackButton } from './BackButton';
 import { Button } from './Button';
 import { InputField } from './InputField';
 import { LyricsTab } from './LyricsTab';
@@ -186,10 +185,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
 
   return (
     <Page>
-      <div className="flex items-center gap-3">
-        <BackButton to={backPath} />
-        <PageHeader title={title} />
-      </div>
+      <PageHeader backPath={backPath} title={title} />
 
       <form
         onSubmit={handleSubmit(handleFormSubmit)}

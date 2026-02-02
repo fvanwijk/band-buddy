@@ -1,15 +1,18 @@
 import type { ReactNode } from 'react';
 
+import { BackButton } from './BackButton';
+
 type PageHeaderProps = {
   action?: ReactNode;
+  backPath?: string;
   subtitle?: string;
   title: string;
 };
 
-export function PageHeader({ action, subtitle = 'Library', title }: PageHeaderProps) {
-  return (
-    <header className="flex flex-wrap items-center justify-between gap-3">
-      <div>
+export function PageHeader({ action, backPath, subtitle = 'Library', title }: PageHeaderProps) {
+  const header = (
+    <header className="flex flex-wrap items-center justify-between gap-3 flex-1">
+      <div className="flex-1">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">
           {subtitle}
         </p>
@@ -18,4 +21,15 @@ export function PageHeader({ action, subtitle = 'Library', title }: PageHeaderPr
       {action}
     </header>
   );
+
+  if (backPath) {
+    return (
+      <div className="flex items-center gap-3">
+        <BackButton to={backPath} />
+        {header}
+      </div>
+    );
+  }
+
+  return header;
 }

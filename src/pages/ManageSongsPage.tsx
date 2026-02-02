@@ -6,6 +6,7 @@ import { useTable } from 'tinybase/ui-react';
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { EmptyState } from '../components/EmptyState';
+import { Page } from '../components/Page';
 import { PageHeader } from '../components/PageHeader';
 import { SongCard } from '../components/SongCard';
 import { SortButtonsBar } from '../components/SortButtonsBar';
@@ -43,7 +44,7 @@ function ManageSongsPage() {
   }
 
   return (
-    <section className="flex h-full flex-col gap-6">
+    <Page>
       <PageHeader
         action={
           <Button
@@ -101,7 +102,7 @@ function ManageSongsPage() {
           </div>
         </div>
       )}
-    </section>
+    </Page>
   );
 }
 

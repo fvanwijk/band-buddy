@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { BackButton } from './BackButton';
 import { Button } from './Button';
 import { InputField } from './InputField';
+import { Page } from './Page';
 import { PageHeader } from './PageHeader';
 import { SetlistSetEditor } from './SetlistSetEditor';
 import type { Setlist, SetlistSet } from '../types';
@@ -66,11 +67,8 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
 
   return (
     <FormProvider {...methods}>
-      <section className="flex h-full flex-col gap-6">
-        <div className="flex items-center gap-3">
-          <BackButton to={backPath} />
-          <PageHeader title={title} />
-        </div>
+      <Page>
+        <PageHeader backPath={backPath} title={title} />
 
         <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
@@ -144,7 +142,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
             </div>
           </form>
         </div>
-      </section>
+      </Page>
     </FormProvider>
   );
 }

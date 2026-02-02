@@ -6,6 +6,8 @@ import { Alert } from '../components/Alert';
 import { Button } from '../components/Button';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { MidiDeviceStatus } from '../components/MidiDeviceStatus';
+import { Page } from '../components/Page';
+import { PageHeader } from '../components/PageHeader';
 import { SelectField } from '../components/SelectField';
 import { Tabs } from '../components/Tabs';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '../config/locales';
@@ -283,11 +285,8 @@ function SettingsPage() {
   );
 
   return (
-    <section className="flex h-full flex-col gap-6">
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-300">Settings</p>
-        <h1 className="text-2xl font-semibold text-slate-100">Preferences</h1>
-      </header>
+    <Page>
+      <PageHeader title="Preferences" subtitle="Settings" />
 
       <Tabs
         activeTabId={selectedTab}
@@ -315,7 +314,7 @@ function SettingsPage() {
         onConfirm={handleConfirmDeleteInstrument}
         title="Delete instrument"
       />
-    </section>
+    </Page>
   );
 }
 

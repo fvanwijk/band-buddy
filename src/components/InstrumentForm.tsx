@@ -2,7 +2,6 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { BackButton } from './BackButton';
 import { Button } from './Button';
 import { InputField } from './InputField';
 import { Page } from './Page';
@@ -107,10 +106,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
   if (!isSupported) {
     return (
       <Page>
-        <div className="flex items-center gap-3">
-          <BackButton to={backPath} />
-          <PageHeader subtitle="Settings" title={title} />
-        </div>
+        <PageHeader backPath={backPath} subtitle="Settings" title={title} />
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <p className="text-sm text-red-300">Web MIDI is not supported in this browser.</p>
         </div>
@@ -121,10 +117,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
   if (!isReady) {
     return (
       <Page>
-        <div className="flex items-center gap-3">
-          <BackButton to={backPath} />
-          <PageHeader subtitle="Settings" title={title} />
-        </div>
+        <PageHeader backPath={backPath} subtitle="Settings" title={title} />
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <p className="text-sm text-slate-400">Detecting MIDI devices...</p>
         </div>
@@ -135,10 +128,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
   if (outputs.length === 0) {
     return (
       <Page>
-        <div className="flex items-center gap-3">
-          <BackButton to={backPath} />
-          <PageHeader subtitle="Settings" title={title} />
-        </div>
+        <PageHeader backPath={backPath} subtitle="Settings" title={title} />
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <p className="text-sm text-slate-400">
             No MIDI inputs detected. Connect a device to add instruments.
@@ -150,10 +140,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
 
   return (
     <Page>
-      <div className="flex items-center gap-3">
-        <BackButton to={backPath} />
-        <PageHeader subtitle="Settings" title={title} />
-      </div>
+      <PageHeader backPath={backPath} subtitle="Settings" title={title} />
 
       <form
         className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
