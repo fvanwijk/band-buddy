@@ -86,11 +86,11 @@ export function AddMidiButtonDialog({
               error={errors.programChange}
               id="midi-programChange"
               label="Program Change Number"
-              max="127"
+              max="511"
               min="0"
-              placeholder="0-127"
+              placeholder="0-511"
               register={register('programChange', {
-                max: { message: 'Program change must be at most 127', value: 127 },
+                max: { message: 'Program change must be at most 511', value: 511 },
                 min: { message: 'Program change must be at least 0', value: 0 },
                 required: 'Program change is required',
                 valueAsNumber: true,
