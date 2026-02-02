@@ -2,7 +2,7 @@ import { useSetValueCallback, useValue } from 'tinybase/ui-react';
 
 import type { SupportedLocale } from '../config/locales';
 import { detectLocale } from '../config/locales';
-import { DEFAULT_THEME, applyTheme, type ThemeName } from '../config/themes';
+import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
 import { localeSchema, themeSchema } from '../schemas';
 
 /**

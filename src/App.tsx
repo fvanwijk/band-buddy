@@ -1,4 +1,4 @@
-import { IconMusic, IconVinyl } from '@tabler/icons-react';
+import { IconMusic } from '@tabler/icons-react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import TopNav from './components/TopNav';
