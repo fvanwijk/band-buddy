@@ -9,31 +9,7 @@ type SongStatsProps = {
   song: Song;
 };
 
-const flatNotes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-const sharpNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
 const formatTranspose = (transpose: number) => (transpose > 0 ? `+${transpose}` : `${transpose}`);
-
-const transposeKey = (key: string, transpose: number) => {
-  if (transpose === 0) {
-    return key;
-  }
-
-  const isMinor = key.endsWith('m');
-  const root = isMinor ? key.slice(0, -1) : key;
-  const normalizedRoot = root.replace('♭', 'b').replace('♯', '#');
-  const notes = normalizedRoot.includes('b') ? flatNotes : sharpNotes;
-  const rootIndex = notes.findIndex((note) => note.toLowerCase() === normalizedRoot.toLowerCase());
-
-  if (rootIndex === -1) {
-    return key;
-  }
-
-  const normalizedTranspose = ((transpose % notes.length) + notes.length) % notes.length;
-  const transposedRoot = notes[(rootIndex + normalizedTranspose) % notes.length];
-
-  return `${transposedRoot}${isMinor ? 'm' : ''}`;
-};
 
 export function SongStats({ song }: SongStatsProps) {
   const updateSong = useUpdateSong(song.id);
@@ -41,13 +17,7 @@ export function SongStats({ song }: SongStatsProps) {
 
   const handleTranspose = (delta: number) => {
     updateSong({
-      artist: song.artist,
-      bpm: song.bpm,
-      duration: song.duration,
-      key: song.key,
-      lyrics: song.lyrics,
-      timeSignature: song.timeSignature,
-      title: song.title,
+      ...song,
       transpose: transpose + delta,
     });
   };
@@ -65,7 +35,9 @@ export function SongStats({ song }: SongStatsProps) {
         >
           <IconMinus className="h-4 w-4" />
         </Button>
-        <span className="min-w-8 text-center text-xs text-slate-400">
+        <span
+          className={`min-w-8 text-center text-xs ${transpose !== 0 ? 'text-brand-200 font-semibold' : 'text-slate-400'}`}
+        >
           {formatTranspose(transpose)}
         </span>
         <Button
@@ -79,7 +51,7 @@ export function SongStats({ song }: SongStatsProps) {
           <IconPlus className="h-4 w-4" />
         </Button>
       </div>
-      <SongStat label="Key" value={song.key} valueClassName="font-semibold text-brand-200" />
+      <SongStat label="Key" value={song.key} />
       <SongStat label="Time" value={song.timeSignature} />
       {song.bpm && <SongStat label="BPM" value={song.bpm} />}
       {song.duration && <SongStat label="Duration" value={song.duration} />}
