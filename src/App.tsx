@@ -1,20 +1,20 @@
 import { IconMusic } from '@tabler/icons-react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import TopNav from './components/TopNav';
-import ActiveSetlistPage from './pages/ActiveSetlistPage';
-import AddInstrumentPage from './pages/AddInstrumentPage';
-import { AddSetlistPage } from './pages/AddSetlistPage';
-import AddSongPage from './pages/AddSongPage';
-import EditInstrumentPage from './pages/EditInstrumentPage';
-import { EditSetlistPage } from './pages/EditSetlistPage';
-import EditSongPage from './pages/EditSongPage';
-import { ManageSetlistsPage } from './pages/ManageSetlistsPage';
-import ManageSongsPage from './pages/ManageSongsPage';
-import SettingsPage from './pages/SettingsPage';
-import SongDetailPage from './pages/SongDetailPage';
+import { ActiveSetlistPage } from './active-setlist/ActiveSetlistPage';
+import { SongDetailPage } from './active-setlist/song-detail/SongDetailPage';
+import { AddSetlistPage } from './setlists/form/AddSetlistPage';
+import { EditSetlistPage } from './setlists/form/EditSetlistPage';
+import { ManageSetlistsPage } from './setlists/ManageSetlistsPage';
+import { AddInstrumentPage } from './settings/instruments/form/AddInstrumentPage';
+import { EditInstrumentPage } from './settings/instruments/form/EditInstrumentPage';
+import { SettingsPage } from './settings/SettingsPage';
+import { AddSongPage } from './songs/form/AddSongPage';
+import { EditSongPage } from './songs/form/EditSongPage';
+import { ManageSongsPage } from './songs/ManageSongsPage';
+import { TopNav } from './ui/TopNav';
 
-function App() {
+export function App() {
   return (
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-4 pt-2">
       <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-900 bg-slate-950/80 backdrop-blur py-2">
@@ -59,5 +59,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

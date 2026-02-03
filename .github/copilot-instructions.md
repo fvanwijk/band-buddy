@@ -31,7 +31,7 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 - Use Vitest with @testing-library/react
 - Prefer `renderHook()` for testing hooks
 - Colocate tests next to related code as `src/**/*.test.tsx`
-- Use `@testing-library/jest-dom` matchers (configured in `src/test/setup.ts`)
+- Use `@testing-library/jest-dom` matchers (configured in `./src/test-setup.ts`)
 
 ## Mandatory Sorting Rules
 
