@@ -1,11 +1,12 @@
-import { IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Alert } from './Alert';
 import { Button } from './Button';
 import { ConfirmDialog } from './ConfirmDialog';
-import { MidiDeviceStatus } from './MidiDeviceStatus';
+import { InstrumentCard } from './InstrumentCard';
+import { SettingsCard } from './SettingsCard';
 import { useDeleteInstrument, useGetInstruments } from '../hooks/useInstruments';
 import { useMidiDevices } from '../hooks/useMidiDevices';
 
@@ -40,7 +41,7 @@ export function InstrumentsSettings() {
   const canAddInstrument = isSupported && isReady && inputs.length > 0;
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+    <SettingsCard>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-slate-100">Instruments</h2>
@@ -90,58 +91,15 @@ export function InstrumentsSettings() {
         {instruments.length === 0 ? (
           <p className="text-sm text-slate-400">No instruments added yet.</p>
         ) : (
-          instruments.map((instrument) => {
-            const midiInAvailable = inputsById.has(instrument.midiInId);
-            const midiOutAvailable = instrument.midiOutId
-              ? outputsById.has(instrument.midiOutId)
-              : true;
-
-            return (
-              <div
-                key={instrument.id}
-                className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-4"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-slate-100">{instrument.name}</p>
-                  <div className="flex gap-2">
-                    <Button
-                      as={Link}
-                      color="primary"
-                      icon
-                      to={`/settings/instruments/${instrument.id}/edit`}
-                      variant="outlined"
-                    >
-                      <IconPencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      color="danger"
-                      icon
-                      onClick={() => handleDeleteInstrument(instrument.id)}
-                      variant="outlined"
-                    >
-                      <IconTrash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <MidiDeviceStatus
-                    isAvailable={midiInAvailable}
-                    label="MIDI In"
-                    name={instrument.midiInName}
-                  />
-                  {instrument.midiOutId ? (
-                    <MidiDeviceStatus
-                      isAvailable={midiOutAvailable}
-                      label="MIDI Out"
-                      name={instrument.midiOutName || instrument.midiOutId || 'Unknown'}
-                    />
-                  ) : (
-                    <MidiDeviceStatus isOptional label="MIDI Out" name="None" />
-                  )}
-                </div>
-              </div>
-            );
-          })
+          instruments.map((instrument) => (
+            <InstrumentCard
+              key={instrument.id}
+              inputsById={inputsById}
+              instrument={instrument}
+              outputsById={outputsById}
+              onDeleteClick={handleDeleteInstrument}
+            />
+          ))
         )}
       </div>
 
@@ -159,6 +117,6 @@ export function InstrumentsSettings() {
         }}
         title="Delete instrument"
       />
-    </div>
+    </SettingsCard>
   );
 }
