@@ -46,13 +46,16 @@ export function SongCard({
     >
       <h2 className="text-sm font-semibold text-slate-100 truncate">{title}</h2>
       <p className="text-xs text-slate-500">{artist}</p>
-      <div className="flex shrink-0 items-center gap-1.5">
-        <span className="hidden text-xs text-slate-400 sm:inline">{keyNote}</span>
-        <span className="hidden text-xs text-slate-400 sm:inline">{timeSignature}</span>
+      <div className="flex shrink-0 items-center gap-1 text-xs text-slate-400">
+        <span className="hidden sm:inline">{keyNote}</span>•
+        <span className="hidden sm:inline">{timeSignature}</span>
         {duration && (
-          <span className="text-xs text-slate-400">
-            <FormattedDuration seconds={duration} />
-          </span>
+          <>
+            •
+            <span>
+              <FormattedDuration seconds={duration} />
+            </span>
+          </>
         )}
       </div>
     </Card>

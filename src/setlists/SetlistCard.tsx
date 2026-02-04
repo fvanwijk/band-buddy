@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { formatDate } from '../utils/date';
+import { usePluralize } from '../utils/pluralize';
 
 type SetlistCardProps = {
   date: string;
@@ -26,6 +27,8 @@ export function SetlistCard({
   songsCount,
   title,
 }: SetlistCardProps) {
+  const pluralize = usePluralize();
+
   return (
     <Card
       actions={
@@ -57,12 +60,9 @@ export function SetlistCard({
       }
     >
       <h3 className="font-semibold text-white">{title}</h3>
-      <div className="flex gap-3 text-sm text-slate-400">
-        <span>{formatDate(date)}</span>
-        <span>
-          {setsCount} set{setsCount !== 1 ? 's' : ''}
-        </span>
-        <span>{songsCount} songs</span>
+      <div className="flex gap-2 text-sm text-slate-400">
+        <span>{formatDate(date)}</span>•<span>{pluralize(setsCount, 'set')}</span>•
+        <span>{pluralize(songsCount, 'song')}</span>
       </div>
     </Card>
   );
