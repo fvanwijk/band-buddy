@@ -5,8 +5,7 @@ import { Provider, useCreateStore } from 'tinybase/ui-react';
 import { createAppStore, createStorePersister } from './store';
 import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
-import { createSetlists } from '../mocks/setlists';
-import { createSongs } from '../mocks/songs';
+import { seedStore } from '../mocks/seed';
 import { Logo } from '../ui/Logo';
 
 type StoreProviderProps = {
@@ -26,48 +25,11 @@ export function StoreProvider({ children }: StoreProviderProps) {
       // Load from localStorage
       await persister.load();
 
-      // If store is empty (first load), populate with seed data
-      if (Object.keys(store.getTables()).length === 0) {
-        const seedSongs = createSongs();
-        seedSongs.forEach(({ id, ...song }) => {
-          const row: Record<string, unknown> = {
-            ...song,
-          };
-
-          if (song.midiEvents && song.midiEvents.length > 0) {
-            row.midiEvents = JSON.stringify(song.midiEvents);
-          } else {
-            delete row.midiEvents;
-          }
-
-          Object.entries(row).forEach(([key, value]) => {
-            if (value === undefined) {
-              delete row[key];
-            }
-          });
-
-          store.setRow('songs', id, row as Record<string, string | number>);
-        });
-
-        const seedSetlists = createSetlists();
-        seedSetlists.forEach(({ id, sets, ...metadata }) => {
-          // Add setlist metadata
-          store.setRow('setlists', id, metadata);
-
-          // Add setlist songs
-          sets.forEach((set) => {
-            set.songs.forEach((songRef, index) => {
-              const songRowId = `${id}_${set.setNumber}_${index}`;
-              store.setRow('setlistSongs', songRowId, {
-                isDeleted: songRef.isDeleted || false,
-                setNumber: set.setNumber,
-                setlistId: id,
-                songId: songRef.songId,
-                songIndex: index,
-              });
-            });
-          });
-        });
+      // If store is empty and SEED_DB is enabled, populate with seed data
+      const shouldSeed =
+        import.meta.env.VITE_SEED_DB === 'true' && Object.keys(store.getTables()).length === 0;
+      if (shouldSeed) {
+        seedStore(store);
 
         // Initialize settings with defaults
         store.setValue('locale', detectLocale());
