@@ -69,10 +69,10 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
       <Page>
         <PageHeader backPath={backPath} title={title} />
 
-        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <div>
           <form
             autoComplete="off"
-            className="space-y-4"
+            className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-4"
             noValidate
             onSubmit={handleSubmit(handleFormSubmit)}
           >
