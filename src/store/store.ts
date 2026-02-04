@@ -51,5 +51,5 @@ export function createAppStore(): Store {
  * Create a persister for the given store
  */
 export function createStorePersister(store: Store) {
-  return createLocalPersister(store, 'gig-buddy-store');
+  return createLocalPersister(store, 'band-buddy');
 }
