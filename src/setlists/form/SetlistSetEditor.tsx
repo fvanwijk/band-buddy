@@ -4,7 +4,6 @@ import { useFormContext } from 'react-hook-form';
 
 import type { SetlistFormData } from './SetlistForm';
 import { useGetSongs } from '../../api/useSong';
-import type { Song } from '../../types';
 import { Button } from '../../ui/Button';
 import { SelectField } from '../../ui/form/SelectField';
 
@@ -23,27 +22,17 @@ export function SetlistSetEditor({
 }: SetlistSetEditorProps) {
   const { getValues, register, setValue, watch } = useFormContext<SetlistFormData>();
   const songs = watch(`sets.${index}.songs`);
-  const allSongs = useGetSongs();
+  const allSongs = useGetSongs(true);
   const allSets = watch('sets');
 
-  const songMap = useMemo(() => {
-    const map: Record<string, Song> = {};
-    allSongs.forEach((song) => {
-      map[song.id] = song;
-    });
-    return map;
-  }, [allSongs]);
+  const songMap = useMemo(() => new Map(allSongs.map((song) => [song.id, song])), [allSongs]);
 
   const handleAddSong = () => {
-    const usedSongIds = new Set<string>();
-    allSets.forEach((set) => {
-      set.songs.forEach((songRef) => {
-        usedSongIds.add(songRef.songId);
-      });
-    });
+    const usedSongIds = new Set(
+      allSets.flatMap((set) => set.songs.map((songRef) => songRef.songId)),
+    );
 
-    const availableSongs = allSongs.find((song) => !usedSongIds.has(song.id));
-    const songToAdd = availableSongs || (allSongs.length > 0 ? allSongs[0] : null);
+    const songToAdd = allSongs.find((song) => !usedSongIds.has(song.id)) ?? allSongs[0];
 
     if (songToAdd) {
       setValue(`sets.${index}.songs`, [...songs, { songId: songToAdd.id }]);
@@ -107,16 +96,25 @@ export function SetlistSetEditor({
           <p className="text-sm text-slate-400">No songs in this set</p>
         ) : (
           songs.map((songRef, songIndex) => {
-            const song = songMap[songRef.songId];
-            const isDeleted = songRef.isDeleted || !song;
+            const song = songMap.get(songRef.songId);
+            const isHardDeleted = !song;
+            const isSoftDeleted = song?.isDeleted;
+            const isDeleted = isHardDeleted || isSoftDeleted;
 
             return (
               <div key={songIndex} className="flex items-center gap-2">
                 <span className="w-6 text-sm font-medium text-slate-500">{songIndex + 1}.</span>
 
-                {isDeleted ? (
+                {isHardDeleted ? (
                   <div className="flex-1">
                     <span className="text-sm text-slate-400 line-through">[Deleted Song]</span>
+                  </div>
+                ) : isSoftDeleted ? (
+                  <div className="flex-1">
+                    <span className="text-sm text-slate-400">
+                      {song.artist} - {song.title}
+                      <span className="ml-2 text-xs text-slate-500">(Deleted)</span>
+                    </span>
                   </div>
                 ) : (
                   <div className="flex-1">

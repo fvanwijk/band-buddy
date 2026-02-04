@@ -36,7 +36,6 @@ export function useGetSetlists(): Setlist[] {
           setsMap.set(song.setNumber, []);
         }
         setsMap.get(song.setNumber)!.push({
-          isDeleted: song.isDeleted,
           songId: song.songId,
         });
       });
@@ -97,7 +96,6 @@ export function useGetSetlist(id: string | undefined): Setlist | null {
         setsMap.set(song.setNumber, []);
       }
       setsMap.get(song.setNumber)!.push({
-        isDeleted: song.isDeleted,
         songId: song.songId,
       });
     });
@@ -153,7 +151,6 @@ export function useAddSetlist(onSuccess?: () => void) {
       set.songs.forEach((songRef, index) => {
         const songRowId = `${setlistId}_${set.setNumber}_${index}`;
         store.setRow('setlistSongs', songRowId, {
-          isDeleted: songRef.isDeleted || false,
           setNumber: set.setNumber,
           setlistId,
           songId: songRef.songId,
@@ -206,7 +203,6 @@ export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void)
         set.songs.forEach((songRef, index) => {
           const songRowId = `${id}_${set.setNumber}_${index}`;
           store.setRow('setlistSongs', songRowId, {
-            isDeleted: songRef.isDeleted || false,
             setNumber: set.setNumber,
             setlistId: id!,
             songId: songRef.songId,

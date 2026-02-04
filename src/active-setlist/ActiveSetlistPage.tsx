@@ -6,7 +6,6 @@ import { SetlistHeader } from './SetlistHeader';
 import { SetlistTable } from './SetlistTable';
 import { useGetSetlist } from '../api/useSetlist';
 import { useGetSongs } from '../api/useSong';
-import type { Song } from '../types';
 import { EmptyState } from '../ui/EmptyState';
 
 export function ActiveSetlistPage() {
@@ -35,10 +34,7 @@ export function ActiveSetlistPage() {
   }
 
   // Build songs map for quick lookup
-  const songsMap = new Map<string, Song>();
-  songs.forEach((song) => {
-    songsMap.set(song.id, song);
-  });
+  const songsMap = new Map(songs.map((song) => [song.id, song]));
 
   // Calculate total songs and duration
   const songCount = setlist.sets.reduce((total, s) => total + s.songs.length, 0);

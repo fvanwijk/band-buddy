@@ -35,7 +35,6 @@ export function seedStore(store: Store): void {
       set.songs.forEach((songRef, index) => {
         const songRowId = `${id}_${set.setNumber}_${index}`;
         store.setRow('setlistSongs', songRowId, {
-          isDeleted: songRef.isDeleted || false,
           setNumber: set.setNumber,
           setlistId: id,
           songId: songRef.songId,

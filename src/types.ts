@@ -10,6 +10,7 @@ export type Song = {
   bpm?: number;
   duration?: number;
   id: string;
+  isDeleted?: boolean;
   key: string;
   lyrics?: string;
   midiEvents?: MidiEvent[];
@@ -30,7 +31,6 @@ export type Instrument = {
 
 export type SongReference = {
   songId: string;
-  isDeleted?: boolean;
 };
 
 export type SetlistSet = {

@@ -10,7 +10,6 @@ import { useGetInstruments } from '../../api/useInstruments';
 import { useGetSetlist } from '../../api/useSetlist';
 import { useGetSongs } from '../../api/useSong';
 import { useMidiDevices } from '../../midi/useMidiDevices';
-import type { Song } from '../../types';
 import { BackButton } from '../../ui/BackButton';
 import { Button } from '../../ui/Button';
 import { Page } from '../../ui/Page';
@@ -34,10 +33,7 @@ export function SongDetailPage() {
   const selectedTab = tab && ['details', 'midi'].includes(tab) ? tab : 'details';
 
   // Create songs map
-  const songsMap = new Map<string, Song>();
-  songs.forEach((song) => {
-    songsMap.set(song.id, song);
-  });
+  const songsMap = new Map(songs.map((song) => [song.id, song]));
 
   const instrumentsById = useMemo(
     () => new Map(instruments.map((instrument) => [instrument.id, instrument])),

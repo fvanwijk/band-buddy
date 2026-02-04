@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import {
   useAddRowCallback,
-  useDelRowCallback,
   useRow,
   useSetRowCallback,
+  useStore,
   useTable,
 } from 'tinybase/ui-react';
 
@@ -12,8 +12,9 @@ import type { Song } from '../types';
 
 /**
  * Get all songs from the store
+ * @param includeDeleted - If true, includes soft-deleted songs. Defaults to false.
  */
-export function useGetSongs(): Song[] {
+export function useGetSongs(includeDeleted = false): Song[] {
   const songsData = useTable('songs') || {};
 
   return Object.entries(songsData)
@@ -31,7 +32,7 @@ export function useGetSongs(): Song[] {
       const result = songSchema.safeParse(parsedData);
       return result.success ? result.data : null;
     })
-    .filter((song): song is Song => song !== null)
+    .filter((song): song is Song => song !== null && (includeDeleted || !song.isDeleted))
     .sort((a, b) => a.title.localeCompare(b.title));
 }
 
@@ -131,10 +132,37 @@ export function useUpdateSong(id: string | undefined, onSuccess?: () => void) {
 
 /**
  * Hook to delete a song
+ * If the song is in one or more sets, soft-delete it.
+ * If the song is not in any sets, hard-delete it.
  */
 export function useDeleteSong(onSuccess?: () => void) {
-  return useDelRowCallback('songs', (id: string) => {
+  const store = useStore();
+
+  const handleDelete = (id: string) => {
+    if (!store) {
+      onSuccess?.();
+      return;
+    }
+
+    // Check if song is referenced in any setlistSongs
+    const setlistSongsData = store.getTable('setlistSongs') || {};
+    const isInSets = Object.values(setlistSongsData).some(
+      (songData) => (songData as Record<string, unknown>).songId === id,
+    );
+
+    if (isInSets) {
+      // Soft delete: mark as deleted but don't remove from store
+      const existingRow = store.getRow('songs', id);
+      if (existingRow) {
+        store.setRow('songs', id, { ...existingRow, isDeleted: true });
+      }
+    } else {
+      // Hard delete: remove completely
+      store.delRow('songs', id);
+    }
+
     onSuccess?.();
-    return id;
-  });
+  };
+
+  return handleDelete;
 }

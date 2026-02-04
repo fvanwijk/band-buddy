@@ -18,6 +18,7 @@ export const songSchema = z.object({
   bpm: z.number().optional(),
   duration: z.number().optional(),
   id: z.string(),
+  isDeleted: z.boolean().optional(),
   key: z.string(),
   lyrics: z.string().optional(),
   midiEvents: z.array(midiEventSchema).optional(),
@@ -33,6 +34,7 @@ export const songTableSchema = z.object({
   artist: z.string(),
   bpm: z.number().optional(),
   duration: z.number().optional(),
+  isDeleted: z.boolean().optional(),
   key: z.string(),
   lyrics: z.string().optional(),
   midiEvents: z.string().optional(), // Stored as JSON string
@@ -91,7 +93,6 @@ export const songWithoutIdSchema = songSchema.omit({ id: true });
  */
 export const setlistSongSchema = z.object({
   id: z.string(),
-  isDeleted: z.boolean().default(false),
   setNumber: z.number(),
   setlistId: z.string(),
   songId: z.string(),
@@ -102,7 +103,6 @@ export const setlistSongSchema = z.object({
  * Setlist song table schema (without id, for Tinybase table)
  */
 export const setlistSongTableSchema = z.object({
-  isDeleted: z.boolean().default(false),
   setNumber: z.number(),
   setlistId: z.string(),
   songId: z.string(),

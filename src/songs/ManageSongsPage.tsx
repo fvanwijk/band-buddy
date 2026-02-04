@@ -1,10 +1,9 @@
 import { IconMusic, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useTable } from 'tinybase/ui-react';
 
 import { SongCard } from './SongCard';
-import { useDeleteSong } from '../api/useSong';
+import { useDeleteSong, useGetSongs } from '../api/useSong';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { EmptyState } from '../ui/EmptyState';
@@ -16,8 +15,8 @@ import { useSortState } from '../ui/sorting/useSortState';
 type SortField = 'artist' | 'key' | 'title';
 
 export function ManageSongsPage() {
-  const songs = useTable('songs');
-  let songIds = Object.keys(songs);
+  const allSongs = useGetSongs();
+  let displayedSongs = allSongs;
 
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(null, 'none');
@@ -31,10 +30,7 @@ export function ManageSongsPage() {
 
   // Sort songs
   if (sortDirection !== 'none' && sortBy) {
-    songIds = [...songIds].sort((idA, idB) => {
-      const songA = songs[idA];
-      const songB = songs[idB];
-
+    displayedSongs = [...allSongs].sort((songA, songB) => {
       const valueA = (songA[sortBy] as string).toLowerCase();
       const valueB = (songB[sortBy] as string).toLowerCase();
 
@@ -68,7 +64,7 @@ export function ManageSongsPage() {
         message="Are you sure you want to delete this song? This action cannot be undone."
       />
 
-      {songIds.length === 0 ? (
+      {displayedSongs.length === 0 ? (
         <EmptyState
           description="Add songs to build your repertoire and use them in setlists."
           icon={<IconMusic className="w-12 h-12" />}
@@ -83,22 +79,18 @@ export function ManageSongsPage() {
             sortDirection={sortDirection}
           />
           <div className="grid gap-2">
-            {songIds.map((songId) => {
-              const song = songs[songId];
-
-              return (
-                <SongCard
-                  key={songId}
-                  artist={song.artist as string}
-                  duration={song.duration as number | undefined}
-                  keyNote={song.key as string}
-                  onDelete={() => setDeletingSongId(songId)}
-                  songId={songId}
-                  timeSignature={song.timeSignature as string}
-                  title={song.title as string}
-                />
-              );
-            })}
+            {displayedSongs.map((song) => (
+              <SongCard
+                key={song.id}
+                artist={song.artist}
+                duration={song.duration}
+                keyNote={song.key}
+                onDelete={() => setDeletingSongId(song.id)}
+                songId={song.id}
+                timeSignature={song.timeSignature}
+                title={song.title}
+              />
+            ))}
           </div>
         </div>
       )}
