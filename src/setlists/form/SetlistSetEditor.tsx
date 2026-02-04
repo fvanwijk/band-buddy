@@ -80,12 +80,7 @@ export function SetlistSetEditor({
             const isDeleted = songRef.isDeleted || !song;
 
             return (
-              <div
-                key={songIndex}
-                className={`flex items-center gap-2 rounded border p-2 ${
-                  isDeleted ? 'border-slate-600 bg-slate-800' : 'border-slate-700 bg-slate-950'
-                }`}
-              >
+              <div key={songIndex} className="flex items-center gap-2">
                 <span className="w-6 text-sm font-medium text-slate-500">{songIndex + 1}.</span>
 
                 {isDeleted ? (
