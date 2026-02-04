@@ -3,8 +3,6 @@ type FormattedDurationProps = {
 };
 
 export function FormattedDuration({ seconds }: FormattedDurationProps) {
-  if (seconds <= 0) return <>—</>;
-
   const hours = Math.floor(seconds / 3600);
   const remainingSeconds = seconds % 3600;
   const minutes = Math.floor(remainingSeconds / 60);
