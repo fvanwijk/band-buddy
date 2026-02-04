@@ -21,7 +21,7 @@ export function SetlistSetEditor({
   setNumber,
   showRemove,
 }: SetlistSetEditorProps) {
-  const { register, setValue, watch } = useFormContext<SetlistFormData>();
+  const { getValues, register, setValue, watch } = useFormContext<SetlistFormData>();
   const songs = watch(`sets.${index}.songs`);
   const allSongs = useGetSongs();
   const allSets = watch('sets');
@@ -56,11 +56,32 @@ export function SetlistSetEditor({
   };
 
   const handleMoveSong = (songIndex: number, direction: 'up' | 'down') => {
-    const newIndex = direction === 'up' ? songIndex - 1 : songIndex + 1;
-    if (newIndex >= 0 && newIndex < songs.length) {
-      const updated = [...songs];
-      [updated[songIndex], updated[newIndex]] = [updated[newIndex], updated[songIndex]];
-      setValue(`sets.${index}.songs`, updated);
+    if (direction === 'up') {
+      if (songIndex > 0) {
+        // Move up within the same set
+        const updated = [...songs];
+        [updated[songIndex], updated[songIndex - 1]] = [updated[songIndex - 1], updated[songIndex]];
+        setValue(`sets.${index}.songs`, updated);
+      } else if (index > 0) {
+        // Move to the end of the previous set
+        const prevSetPath = `sets.${index - 1}.songs` as const;
+        const prevSetSongs = getValues(prevSetPath);
+        setValue(prevSetPath, [...prevSetSongs, songs[songIndex]]);
+        handleRemoveSong(songIndex);
+      }
+    } else {
+      if (songIndex < songs.length - 1) {
+        // Move down within the same set
+        const updated = [...songs];
+        [updated[songIndex], updated[songIndex + 1]] = [updated[songIndex + 1], updated[songIndex]];
+        setValue(`sets.${index}.songs`, updated);
+      } else if (index < allSets.length - 1) {
+        // Move to the beginning of the next set
+        const nextSetPath = `sets.${index + 1}.songs` as const;
+        const nextSetSongs = getValues(nextSetPath);
+        setValue(nextSetPath, [songs[songIndex], ...nextSetSongs]);
+        handleRemoveSong(songIndex);
+      }
     }
   };
 
@@ -112,7 +133,7 @@ export function SetlistSetEditor({
                 <div className="flex gap-1">
                   <Button
                     aria-label="Move up"
-                    disabled={songIndex === 0 || isDeleted}
+                    disabled={(songIndex === 0 && index === 0) || isDeleted}
                     icon
                     onClick={() => handleMoveSong(songIndex, 'up')}
                     type="button"
@@ -122,7 +143,9 @@ export function SetlistSetEditor({
                   </Button>
                   <Button
                     aria-label="Move down"
-                    disabled={songIndex === songs.length - 1 || isDeleted}
+                    disabled={
+                      (songIndex === songs.length - 1 && index === allSets.length - 1) || isDeleted
+                    }
                     icon
                     onClick={() => handleMoveSong(songIndex, 'down')}
                     type="button"
