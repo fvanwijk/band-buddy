@@ -40,8 +40,22 @@ export function ActiveSetlistPage() {
     songsMap.set(song.id, song);
   });
 
-  // Calculate total songs
+  // Calculate total songs and duration
   const songCount = setlist.sets.reduce((total, s) => total + s.songs.length, 0);
+  const totalSeconds = setlist.sets.reduce((total, set) => {
+    return (
+      total +
+      set.songs.reduce((setTotal, songRef) => {
+        const song = songsMap.get(songRef.songId);
+        return (
+          setTotal +
+          (song?.duration
+            ? parseInt(song.duration.split(':')[0]) * 60 + parseInt(song.duration.split(':')[1])
+            : 0)
+        );
+      }, 0)
+    );
+  }, 0);
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -49,6 +63,7 @@ export function ActiveSetlistPage() {
         date={setlist.date}
         name={setlist.title}
         songCount={songCount}
+        totalSeconds={totalSeconds}
         venue={setlist.venue}
       />
 

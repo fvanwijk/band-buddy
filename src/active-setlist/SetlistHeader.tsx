@@ -1,13 +1,15 @@
+import { FormattedDuration } from './FormattedDuration';
 import { formatDate } from '../utils/date';
 
 type SetlistHeaderProps = {
-  name: string;
   date: string;
-  venue?: string;
+  name: string;
   songCount: number;
+  totalSeconds?: number;
+  venue?: string;
 };
 
-export function SetlistHeader({ name, date, venue, songCount }: SetlistHeaderProps) {
+export function SetlistHeader({ date, name, songCount, totalSeconds, venue }: SetlistHeaderProps) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex flex-wrap items-center gap-3">
@@ -18,6 +20,12 @@ export function SetlistHeader({ name, date, venue, songCount }: SetlistHeaderPro
         {venue && <span className="rounded-full bg-slate-900/70 px-3 py-1">{venue}</span>}
         <span className="rounded-full bg-brand-400/10 px-3 py-1 text-brand-200">
           {songCount} songs
+          {totalSeconds !== undefined && (
+            <>
+              {' • '}
+              <FormattedDuration seconds={totalSeconds} />
+            </>
+          )}
         </span>
       </div>
     </header>
