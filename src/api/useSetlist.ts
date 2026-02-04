@@ -1,5 +1,4 @@
 import {
-  useAddRowCallback,
   useDelRowCallback,
   useRow,
   useSetRowCallback,
@@ -131,47 +130,42 @@ export function useGetSetlist(id: string | undefined): Setlist | null {
 export function useAddSetlist(onSuccess?: () => void) {
   const store = useStore();
 
-  return useAddRowCallback(
-    'setlists',
-    (data: Omit<Setlist, 'id'>) => {
-      const row: Record<string, unknown> = {
-        ...data,
-      };
+  // Create a wrapper that handles both the setlist and setlistSongs creation
+  const addSetlistWithSongs = (data: Omit<Setlist, 'id'>) => {
+    if (!store) return;
 
-      delete row.sets;
+    const row: Record<string, unknown> = { ...data };
 
-      Object.entries(row).forEach(([key, value]) => {
-        if (value === undefined) {
-          delete row[key];
-        }
-      });
+    delete row.sets;
 
-      if (!store) return row as Record<string, string>;
+    Object.entries(row).forEach(([key, value]) => {
+      if (value === undefined) {
+        delete row[key];
+      }
+    });
 
-      const setlistId = Date.now().toString();
+    // Add the setlist row and get the generated ID
+    const setlistId = store.addRow('setlists', row as Record<string, string>);
+    if (!setlistId) return;
 
-      // Add the songs to setlistSongs table
-      data.sets.forEach((set) => {
-        set.songs.forEach((songRef, index) => {
-          const songRowId = `${setlistId}_${set.setNumber}_${index}`;
-          store.setRow('setlistSongs', songRowId, {
-            isDeleted: songRef.isDeleted || false,
-            setNumber: set.setNumber,
-            setlistId,
-            songId: songRef.songId,
-            songIndex: index,
-          });
+    // Now add the songs with the actual setlist ID
+    data.sets.forEach((set) => {
+      set.songs.forEach((songRef, index) => {
+        const songRowId = `${setlistId}_${set.setNumber}_${index}`;
+        store.setRow('setlistSongs', songRowId, {
+          isDeleted: songRef.isDeleted || false,
+          setNumber: set.setNumber,
+          setlistId,
+          songId: songRef.songId,
+          songIndex: index,
         });
       });
+    });
 
-      return row as Record<string, string>;
-    },
-    [store, onSuccess],
-    undefined,
-    () => {
-      onSuccess?.();
-    },
-  );
+    onSuccess?.();
+  };
+
+  return addSetlistWithSongs;
 }
 
 /**
