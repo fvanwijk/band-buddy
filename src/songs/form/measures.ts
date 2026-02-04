@@ -1,18 +1,16 @@
-import { parseDuration } from '../../utils/duration';
-
 /**
  * Calculate number of measures based on duration, BPM, and time signature
  * Returns null if any required value is missing or invalid
  */
 export function calculateMeasures(
-  duration: string | undefined,
+  duration: number | undefined,
   bpm: number | undefined,
   timeSignature: string | undefined,
 ): number | null {
   if (!duration || !bpm || !timeSignature) return null;
 
-  const totalSeconds = parseDuration(duration);
-  if (totalSeconds === null) return null;
+  const totalSeconds = duration;
+  if (totalSeconds <= 0) return null;
 
   // Extract beats per measure from time signature (e.g., "4/4" -> 4)
   const beatsPerMeasure = parseInt(timeSignature.split('/')[0], 10);

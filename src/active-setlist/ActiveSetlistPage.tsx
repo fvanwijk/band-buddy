@@ -47,12 +47,7 @@ export function ActiveSetlistPage() {
       total +
       set.songs.reduce((setTotal, songRef) => {
         const song = songsMap.get(songRef.songId);
-        return (
-          setTotal +
-          (song?.duration
-            ? parseInt(song.duration.split(':')[0]) * 60 + parseInt(song.duration.split(':')[1])
-            : 0)
-        );
+        return setTotal + (song?.duration || 0);
       }, 0)
     );
   }, 0);

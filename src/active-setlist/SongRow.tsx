@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 
 import { FormattedDuration } from './FormattedDuration';
 import type { Song } from '../types';
-import { parseDuration } from '../utils/duration';
 
 type SongRowProps = {
   index: number;
@@ -11,7 +10,7 @@ type SongRowProps = {
 };
 
 export function SongRow({ index, setlistId, song }: SongRowProps) {
-  const durationSeconds = parseDuration(song.duration);
+  const durationSeconds = song.duration || 0;
 
   return (
     <li>

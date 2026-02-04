@@ -3,7 +3,7 @@ import type { Song } from '../types';
 export const createSong = (overrides: Partial<Song> = {}): Song => ({
   artist: 'Queen',
   bpm: 72,
-  duration: '5:55',
+  duration: 355,
   id: '1',
   key: 'Bb',
   timeSignature: '4/4',
@@ -16,7 +16,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'Earth, Wind & Fire',
     bpm: 126,
-    duration: '3:35',
+    duration: 215,
     id: '2',
     key: 'Ab',
     title: 'September',
@@ -24,7 +24,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'Stevie Wonder',
     bpm: 100,
-    duration: '4:27',
+    duration: 267,
     id: '3',
     key: 'Ebm',
     title: 'Superstition',
@@ -32,7 +32,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'Michael Jackson',
     bpm: 117,
-    duration: '4:54',
+    duration: 294,
     id: '4',
     key: 'F#m',
     title: 'Billie Jean',
@@ -40,7 +40,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'Journey',
     bpm: 119,
-    duration: '4:11',
+    duration: 251,
     id: '5',
     key: 'E',
     title: "Don't Stop Believin'",
@@ -48,7 +48,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'Fleetwood Mac',
     bpm: 120,
-    duration: '4:28',
+    duration: 268,
     id: '6',
     key: 'F',
     title: 'Dreams',
@@ -56,7 +56,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'Aretha Franklin',
     bpm: 115,
-    duration: '2:32',
+    duration: 152,
     id: '7',
     key: 'C',
     title: 'Respect',
@@ -64,7 +64,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'Billy Joel',
     bpm: 90,
-    duration: '5:39',
+    duration: 339,
     id: '8',
     key: 'C',
     timeSignature: '3/4',
@@ -73,7 +73,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'The Beatles',
     bpm: 76,
-    duration: '3:50',
+    duration: 230,
     id: '9',
     key: 'C',
     title: 'Let It Be',
@@ -81,7 +81,7 @@ export const createSongs = (): Song[] => [
   createSong({
     artist: 'Prince',
     bpm: 63,
-    duration: '8:42',
+    duration: 522,
     id: '10',
     title: 'Purple Rain',
   }),

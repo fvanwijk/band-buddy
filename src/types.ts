@@ -8,7 +8,7 @@ export type MidiEvent = {
 export type Song = {
   artist: string;
   bpm?: number;
-  duration?: string;
+  duration?: number;
   id: string;
   key: string;
   lyrics?: string;

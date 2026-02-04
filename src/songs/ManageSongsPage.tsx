@@ -90,7 +90,7 @@ export function ManageSongsPage() {
                 <SongCard
                   key={songId}
                   artist={song.artist as string}
-                  duration={song.duration as string | undefined}
+                  duration={song.duration as number | undefined}
                   keyNote={song.key as string}
                   onDelete={() => setDeletingSongId(songId)}
                   songId={songId}

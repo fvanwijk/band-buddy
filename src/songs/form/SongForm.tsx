@@ -14,10 +14,12 @@ import { RadioGroup } from '../../ui/form/RadioGroup';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
+import { formatDurationToString, parseDuration } from '../../utils/duration';
 
 type SongSubmitData = Omit<Song, 'id'>;
 
 type SongFormData = SongSubmitData & {
+  durationString?: string;
   keyNote?: string;
   keyQuality?: string;
 };
@@ -52,7 +54,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     defaultValues: {
       artist: initialData?.artist || '',
       bpm: initialData?.bpm || undefined,
-      duration: initialData?.duration || '',
+      durationString: initialData?.duration ? formatDurationToString(initialData.duration) : '',
       keyNote: existingNote,
       keyQuality: existingQuality,
       lyrics: initialData?.lyrics || '',
@@ -67,15 +69,16 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     name: 'midiEvents',
   });
 
-  const duration = watch('duration');
+  const durationString = watch('durationString');
+  const durationSeconds = parseDuration(durationString);
   const bpm = watch('bpm');
   const midiEvents = watch('midiEvents') || [];
   const timeSignature = watch('timeSignature');
 
   useEffect(() => {
-    const measures = calculateMeasures(duration, bpm, timeSignature);
+    const measures = calculateMeasures(durationSeconds, bpm, timeSignature);
     setCalculatedMeasures(measures);
-  }, [duration, bpm, timeSignature]);
+  }, [durationSeconds, bpm, timeSignature]);
 
   useEffect(() => {
     // Auto-detect if the existing key uses flats
@@ -134,9 +137,17 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   ];
 
   const handleFormSubmit = (data: SongFormData) => {
+    const durationSeconds = parseDuration(data.durationString);
+
     onSubmit({
-      ...data,
+      artist: data.artist,
+      bpm: data.bpm,
+      duration: durationSeconds || undefined,
       key: (data.keyNote || existingNote) + (data.keyQuality || ''),
+      lyrics: data.lyrics,
+      midiEvents: data.midiEvents,
+      timeSignature: data.timeSignature,
+      title: data.title,
       transpose: initialData?.transpose,
     });
   };
@@ -243,18 +254,18 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                   />
                   <div>
                     <InputField
-                      error={errors.duration}
+                      error={errors.durationString}
                       id="duration"
-                      label="Duration"
+                      label="Duration (mm:ss)"
                       placeholder="Enter duration (mm:ss)"
-                      register={register('duration', {
+                      register={register('durationString', {
                         pattern: {
                           message: 'Duration must be in mm:ss format',
                           value: /^\d{1,3}:[0-5]\d$/,
                         },
                       })}
                     />
-                    {calculatedMeasures !== null && (
+                    {!errors.durationString && calculatedMeasures !== null && (
                       <p className="mt-1 text-xs text-slate-500">
                         ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
                       </p>

@@ -16,7 +16,7 @@ export const midiEventSchema = z.object({
 export const songSchema = z.object({
   artist: z.string(),
   bpm: z.number().optional(),
-  duration: z.string().optional(),
+  duration: z.number().optional(),
   id: z.string(),
   key: z.string(),
   lyrics: z.string().optional(),
@@ -32,7 +32,7 @@ export const songSchema = z.object({
 export const songTableSchema = z.object({
   artist: z.string(),
   bpm: z.number().optional(),
-  duration: z.string().optional(),
+  duration: z.number().optional(),
   key: z.string(),
   lyrics: z.string().optional(),
   midiEvents: z.string().optional(), // Stored as JSON string
