@@ -1,5 +1,9 @@
 # BandBuddy
 
+<div align="center">
+  <img src="public/logo.svg" alt="BandBuddy Logo" width="240" height="64">
+</div>
+
 A musician companion app for managing songs, setlists, and MIDI instruments. Built to help musicians organize their repertoire and control MIDI instruments during live performances.
 
 ## Features

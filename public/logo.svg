@@ -1,0 +1,15 @@
+<svg width="240" height="64" viewBox="0 0 240 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text x="0" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="700" fill="#00d492">Band</text>
+  <text x="108" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="600" fill="#009966">b</text>
+  
+  <g transform="translate(161, 55)">
+    <g stroke="#009966" transform="rotate(180) scale(1.25)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+        <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+        <path d="M9 17v-13h10v13"></path>
+        <path d="M9 8h10"></path>
+    </g>
+  </g>
+  
+  <text x="156" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="600" fill="#009966">ddy</text>
+</svg>
