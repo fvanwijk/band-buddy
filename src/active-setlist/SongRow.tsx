@@ -27,7 +27,7 @@ export function SongRow({ index, setlistId, song }: SongRowProps) {
         <span className="text-right text-sm font-semibold text-slate-100">
           {song.timeSignature}
         </span>
-        <span className="text-right text-sm font-semibold text-brand-200">{song.key}</span>
+        <span className="text-right text-sm font-semibold text-slate-100">{song.key}</span>
         <span className="text-right text-sm text-slate-400">
           <FormattedDuration seconds={durationSeconds} />
         </span>
