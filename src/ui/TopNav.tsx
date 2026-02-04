@@ -60,13 +60,13 @@ export function TopNav() {
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) =>
-              cn([
+              cn(
                 'rounded-full transition',
                 'px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em]',
                 'sm:px-4 sm:py-2 md:gap-2 md:inline-flex md:items-center md:px-3 md:py-2 md:text-xs',
                 'lg:gap-2 lg:inline-flex lg:items-center lg:px-4 lg:py-2 lg:text-xs',
                 isActive ? 'bg-brand-400/15 text-brand-200' : 'text-slate-400 hover:text-slate-200',
-              ])
+              )
             }
             aria-label={item.label}
             title={item.label}

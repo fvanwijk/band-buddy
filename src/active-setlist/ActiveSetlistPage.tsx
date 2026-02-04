@@ -1,4 +1,4 @@
-import { IconPlaylistOff } from '@tabler/icons-react';
+import { IconPlayerPlay } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useValue } from 'tinybase/ui-react';
 
@@ -27,7 +27,7 @@ export function ActiveSetlistPage() {
               to get started with your performance.
             </>
           }
-          icon={<IconPlaylistOff className="w-12 h-12" />}
+          icon={<IconPlayerPlay className="w-12 h-12" />}
           title="No active setlist"
         />
       </div>

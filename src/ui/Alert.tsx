@@ -1,6 +1,8 @@
 import { IconAlertTriangle, IconCircleCheck, IconInfoCircle, IconX } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 
+import { cn } from '../utils/cn';
+
 type AlertSeverity = 'error' | 'info' | 'neutral' | 'success' | 'warning';
 
 type AlertProps = {
@@ -29,12 +31,12 @@ const defaultIcons: Record<AlertSeverity, ReactNode> = {
 export function Alert({ children, hasIcon = true, icon, severity = 'neutral' }: AlertProps) {
   return (
     <div
-      className={[
+      className={cn(
         'flex items-start gap-2 rounded-lg border px-3 py-2 text-xs',
         alertStyles[severity],
-      ].join(' ')}
+      )}
     >
-      {hasIcon && <span className="mt-0.5">{icon || defaultIcons[severity]}</span>}
+      {hasIcon && (icon || defaultIcons[severity])}
       <span>{children}</span>
     </div>
   );

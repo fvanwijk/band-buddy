@@ -89,7 +89,7 @@ export function InstrumentsSettings() {
 
       <div className="mt-6 space-y-3">
         {instruments.length === 0 ? (
-          <p className="text-sm text-slate-400">No instruments added yet.</p>
+          <Alert severity="info">No instruments added yet.</Alert>
         ) : (
           instruments.map((instrument) => (
             <InstrumentCard

@@ -1,8 +1,9 @@
-import { IconZoomOut } from '@tabler/icons-react';
+import { IconBinary } from '@tabler/icons-react';
 
 import type { MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
+import { EmptyStateBlock } from '../../../ui/EmptyStateBlock';
 
 type MidiButtonsDisplayProps = {
   isDisabled?: (event: MidiEvent) => boolean;
@@ -17,10 +18,9 @@ export function MidiButtonsDisplay({
 }: MidiButtonsDisplayProps) {
   if (!midiEvents || midiEvents.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-6 text-center text-sm text-slate-400">
-        <IconZoomOut className="mx-auto mb-2 h-8 w-8 opacity-50" />
+      <EmptyStateBlock icon={<IconBinary className="h-8 w-8" />}>
         No MIDI buttons configured yet.
-      </div>
+      </EmptyStateBlock>
     );
   }
 

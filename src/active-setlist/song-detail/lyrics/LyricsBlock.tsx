@@ -1,6 +1,8 @@
+import { IconMicrophone2Off } from '@tabler/icons-react';
 import { Chord as TonalChord } from 'tonal';
 
 import { Chord } from './Chord';
+import { EmptyStateBlock } from '../../../ui/EmptyStateBlock';
 
 type LyricsBlockProps = {
   lyrics?: string;
@@ -26,32 +28,32 @@ export function LyricsBlock({ lyrics, transpose = 0 }: LyricsBlockProps) {
     return hasUppercaseRoot && normalized.length > 0 && !TonalChord.get(normalized).empty;
   };
 
-  return (
+  return lyrics ? (
     <div className="flex flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-      {lyrics ? (
-        <pre className="whitespace-pre-wrap font-mono text-sm text-slate-200 leading-relaxed">
-          {lyrics.split(/(\s+)/).map((token, index) => {
-            if (!token.trim()) {
-              return token;
-            }
+      <pre className="whitespace-pre-wrap font-mono text-sm text-slate-200 leading-relaxed">
+        {lyrics.split(/(\s+)/).map((token, index) => {
+          if (!token.trim()) {
+            return token;
+          }
 
-            if (!isChordToken(token)) {
-              return token;
-            }
+          if (!isChordToken(token)) {
+            return token;
+          }
 
-            const { core, leading, trailing } = splitToken(token);
-            return (
-              <span key={`chord-${index}`}>
-                {leading}
-                <Chord transpose={transpose}>{core}</Chord>
-                {trailing}
-              </span>
-            );
-          })}
-        </pre>
-      ) : (
-        <p className="text-slate-400">No lyrics added yet</p>
-      )}
+          const { core, leading, trailing } = splitToken(token);
+          return (
+            <span key={`chord-${index}`}>
+              {leading}
+              <Chord transpose={transpose}>{core}</Chord>
+              {trailing}
+            </span>
+          );
+        })}
+      </pre>
     </div>
+  ) : (
+    <EmptyStateBlock icon={<IconMicrophone2Off className="h-8 w-8" />}>
+      No lyrics added yet
+    </EmptyStateBlock>
   );
 }
