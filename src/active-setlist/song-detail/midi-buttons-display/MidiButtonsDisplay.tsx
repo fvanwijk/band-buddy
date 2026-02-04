@@ -41,7 +41,7 @@ export function MidiButtonsDisplay({
             disabled={isDisabled?.(event)}
             onClick={() => onTriggerEvent?.(event)}
             className="h-24 rounded-lg text-xl!"
-            variant="filled"
+            variant="outlined"
           >
             {event.label}
           </Button>
