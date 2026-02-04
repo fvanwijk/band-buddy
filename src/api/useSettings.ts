@@ -45,6 +45,14 @@ export function useSetTheme() {
 }
 
 /**
+ * Hook to get the active setlist ID
+ */
+export function useGetActiveSetlist(): string | undefined {
+  const activeSetlistId = useValue('activeSetlistId');
+  return typeof activeSetlistId === 'string' ? activeSetlistId : undefined;
+}
+
+/**
  * Hook to activate a setlist
  */
 export function useActivateSetlist(onSuccess?: () => void) {
