@@ -93,6 +93,8 @@ export function useAddSong(onSuccess?: () => void) {
     () => {
       onSuccess?.();
     },
+    undefined,
+    false, // Do not reuse row ids
   );
 }
 
@@ -152,10 +154,7 @@ export function useDeleteSong(onSuccess?: () => void) {
 
     if (isInSets) {
       // Soft delete: mark as deleted but don't remove from store
-      const existingRow = store.getRow('songs', id);
-      if (existingRow) {
-        store.setRow('songs', id, { ...existingRow, isDeleted: true });
-      }
+      store.setPartialRow('songs', id, { isDeleted: true });
     } else {
       // Hard delete: remove completely
       store.delRow('songs', id);

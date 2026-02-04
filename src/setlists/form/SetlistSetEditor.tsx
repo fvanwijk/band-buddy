@@ -111,7 +111,7 @@ export function SetlistSetEditor({
                   </div>
                 ) : isSoftDeleted ? (
                   <div className="flex-1">
-                    <span className="text-sm text-slate-400">
+                    <span className="text-sm text-slate-400 line-through">
                       {song.artist} - {song.title}
                       <span className="ml-2 text-xs text-slate-500">(Deleted)</span>
                     </span>
