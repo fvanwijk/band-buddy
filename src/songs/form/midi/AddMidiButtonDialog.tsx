@@ -64,7 +64,7 @@ export function AddMidiButtonDialog({
     <Dialog onClose={onClose} open={isOpen}>
       <DialogTitle>Add MIDI Button</DialogTitle>
 
-      <form onSubmit={handleFormSubmit} autoComplete="off" noValidate>
+      <form autoComplete="off" noValidate onSubmit={handleFormSubmit}>
         <div className="space-y-4">
           <InputField
             error={errors.label}

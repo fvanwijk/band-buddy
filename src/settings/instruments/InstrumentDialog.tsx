@@ -74,7 +74,12 @@ export function InstrumentDialog({
           {isEditing ? 'Edit Instrument' : 'Add Instrument'}
         </h2>
 
-        <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
+        <form
+          autoComplete="off"
+          className="space-y-4"
+          noValidate
+          onSubmit={handleSubmit(handleFormSubmit)}
+        >
           <InputField
             error={errors.name}
             id="instrument-name"

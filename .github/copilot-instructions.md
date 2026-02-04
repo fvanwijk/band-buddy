@@ -491,7 +491,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
   return (
     <Page>
       <PageHeader backPath={backPath} subtitle="Settings" title={title} />
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form  autoComplete="off" noValidate onSubmit={handleSubmit(onSubmit)}>
         {/* Form fields */}
       </form>
     </Page>

@@ -70,7 +70,12 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
         <PageHeader backPath={backPath} title={title} />
 
         <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <form className="space-y-4" onSubmit={handleSubmit(handleFormSubmit)}>
+          <form
+            autoComplete="off"
+            className="space-y-4"
+            noValidate
+            onSubmit={handleSubmit(handleFormSubmit)}
+          >
             <InputField
               error={errors.title}
               id="title"

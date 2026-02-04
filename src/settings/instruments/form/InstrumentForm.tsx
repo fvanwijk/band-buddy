@@ -141,6 +141,8 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">{errorAlert}</div>
       ) : (
         <form
+          autoComplete="off"
+          noValidate
           className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
           onSubmit={handleSubmit(handleFormSubmit)}
         >
