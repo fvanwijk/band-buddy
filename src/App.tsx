@@ -1,8 +1,9 @@
-import { IconMusic } from '@tabler/icons-react';
+import { useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { ActiveSetlistPage } from './active-setlist/ActiveSetlistPage';
 import { SongDetailPage } from './active-setlist/song-detail/SongDetailPage';
+import { useHasSeenWelcome, useSetHasSeenWelcome } from './api/useSettings';
 import { AddSetlistPage } from './setlists/form/AddSetlistPage';
 import { EditSetlistPage } from './setlists/form/EditSetlistPage';
 import { ManageSetlistsPage } from './setlists/ManageSetlistsPage';
@@ -12,19 +13,24 @@ import { SettingsPage } from './settings/SettingsPage';
 import { AddSongPage } from './songs/form/AddSongPage';
 import { EditSongPage } from './songs/form/EditSongPage';
 import { ManageSongsPage } from './songs/ManageSongsPage';
+import { Logo } from './ui/Logo';
 import { TopNav } from './ui/TopNav';
+import { WelcomeModal } from './ui/WelcomeModal';
 
 export function App() {
+  const hasSeenWelcome = useHasSeenWelcome();
+  const setHasSeenWelcome = useSetHasSeenWelcome();
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(!hasSeenWelcome);
+
+  const handleCloseWelcome = () => {
+    setIsWelcomeOpen(false);
+    setHasSeenWelcome(true);
+  };
+
   return (
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-4 pt-2">
       <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-900 bg-slate-950/80 backdrop-blur py-2">
-        <span className="text-brand-400 font-bold text-md sm:text-2xl">
-          Band
-          <span className="font-semibold text-brand-600">
-            b<IconMusic className="inline h-4 w-4 rotate-180 -mx-0.5" />
-            ddy
-          </span>
-        </span>
+        <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
         <TopNav />
       </header>
 
@@ -56,6 +62,8 @@ export function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+
+      <WelcomeModal isOpen={isWelcomeOpen} onClose={handleCloseWelcome} />
     </div>
   );
 }

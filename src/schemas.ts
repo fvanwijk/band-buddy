@@ -166,3 +166,4 @@ export const setlistWithoutIdSchema = setlistSchema.omit({ id: true });
 export const localeSchema = z.string().default('en-US');
 export const themeSchema = z.string().default('emerald');
 export const activeSetlistIdSchema = z.string();
+export const hasSeenWelcomeSchema = z.boolean().default(false);

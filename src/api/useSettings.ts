@@ -3,7 +3,7 @@ import { useSetValueCallback, useValue } from 'tinybase/ui-react';
 import type { SupportedLocale } from '../config/locales';
 import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
-import { localeSchema, themeSchema } from '../schemas';
+import { hasSeenWelcomeSchema, localeSchema, themeSchema } from '../schemas';
 
 /**
  * Hook to get the current locale
@@ -56,4 +56,20 @@ export function useActivateSetlist(onSuccess?: () => void) {
     },
     [onSuccess],
   );
+}
+
+/**
+ * Hook to get whether the user has seen the welcome modal
+ */
+export function useHasSeenWelcome(): boolean {
+  const hasSeenWelcome = useValue('hasSeenWelcome');
+  const result = hasSeenWelcomeSchema.safeParse(hasSeenWelcome);
+  return result.success ? result.data : false;
+}
+
+/**
+ * Hook to set whether the user has seen the welcome modal
+ */
+export function useSetHasSeenWelcome() {
+  return useSetValueCallback('hasSeenWelcome', (value: boolean) => value, []);
 }

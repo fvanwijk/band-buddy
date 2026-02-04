@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Provider, useCreateStore } from 'tinybase/ui-react';
 
@@ -7,6 +7,7 @@ import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
 import { createSetlists } from '../mocks/setlists';
 import { createSongs } from '../mocks/songs';
+import { Logo } from '../ui/Logo';
 
 type StoreProviderProps = {
   children: ReactNode;
@@ -14,6 +15,7 @@ type StoreProviderProps = {
 
 export function StoreProvider({ children }: StoreProviderProps) {
   const store = useCreateStore(createAppStore);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (!store) return;
@@ -82,10 +84,24 @@ export function StoreProvider({ children }: StoreProviderProps) {
 
       // Start auto-save
       await persister.startAutoSave();
+
+      // Mark as initialized
+      setIsInitialized(true);
     }
 
     init();
   }, [store]);
+
+  if (!isInitialized) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <div className="text-center">
+          <Logo className="mb-4 text-4xl" />
+          <div className="text-sm text-slate-400">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return <Provider store={store}>{children}</Provider>;
 }
