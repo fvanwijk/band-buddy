@@ -1,10 +1,12 @@
 import { IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { AddMidiButtonDialog } from './AddMidiButtonDialog';
 import { MidiButtonCard } from './MidiButtonCard';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
+import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 
 type MidiButtonsTabProps = {
@@ -31,6 +33,18 @@ export function MidiButtonsTab({
 
   return (
     <div className="space-y-6">
+      {instruments.length === 0 && (
+        <Alert severity="info">
+          <p>
+            Configure MIDI instruments in{' '}
+            <Link className="underline hover:text-sky-300" to="/settings/instruments">
+              Settings → Instruments
+            </Link>{' '}
+            to create MIDI buttons.
+          </p>
+        </Alert>
+      )}
+
       <AddMidiButtonDialog
         instruments={instruments}
         isOpen={isDialogOpen}

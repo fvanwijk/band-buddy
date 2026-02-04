@@ -4,6 +4,7 @@ import { FormLabel } from './FormLabel';
 
 type InputFieldProps = {
   error?: FieldError;
+  helperText?: string;
   id: string;
   label: string;
   max?: string;
@@ -16,6 +17,7 @@ type InputFieldProps = {
 
 export function InputField({
   error,
+  helperText,
   id,
   label,
   max,
@@ -39,7 +41,11 @@ export function InputField({
         {...register}
         className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
       />
-      {error && <p className="mt-1 text-xs text-red-400">{error.message}</p>}
+      {error ? (
+        <p className="mt-1 text-xs text-red-400">{error.message}</p>
+      ) : helperText ? (
+        <p className="mt-1 text-xs text-slate-400">{helperText}</p>
+      ) : null}
     </div>
   );
 }

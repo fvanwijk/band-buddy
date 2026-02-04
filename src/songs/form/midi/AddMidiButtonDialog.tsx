@@ -1,5 +1,6 @@
 import { IconPlus } from '@tabler/icons-react';
 import { useForm, useWatch } from 'react-hook-form';
+import { Link } from 'react-router';
 
 import { useProgramOptions } from './useProgramOptions';
 import type { Instrument, MidiEvent } from '../../../types';
@@ -77,6 +78,16 @@ export function AddMidiButtonDialog({
 
           <SelectField
             error={errors.instrumentId}
+            helperText={
+              instruments.length === 0 ? (
+                <>
+                  Add the first instrument in{' '}
+                  <Link className="link" to="/settings/instruments">
+                    Settings → Instruments
+                  </Link>
+                </>
+              ) : undefined
+            }
             id="midi-instrument"
             label="Instrument"
             options={instrumentOptions}

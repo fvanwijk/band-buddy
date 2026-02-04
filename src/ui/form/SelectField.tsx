@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
 import { FormLabel } from './FormLabel';
@@ -8,6 +9,7 @@ type SelectOption =
 
 type SelectFieldProps = {
   error?: FieldError;
+  helperText?: ReactNode;
   id?: string;
   label?: string;
   onChange?: (value: string) => void;
@@ -19,6 +21,7 @@ type SelectFieldProps = {
 
 export function SelectField({
   error,
+  helperText,
   id,
   label,
   onChange,
@@ -71,7 +74,11 @@ export function SelectField({
           );
         })}
       </select>
-      {error && <p className="mt-1 text-xs text-red-400">{error.message}</p>}
+      {error ? (
+        <p className="mt-1 text-xs text-red-400">{error.message}</p>
+      ) : helperText ? (
+        <p className="mt-1 text-xs text-slate-400">{helperText}</p>
+      ) : null}
     </div>
   );
 }
