@@ -40,7 +40,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
 
   const instruments = useGetInstruments();
 
-  const existingKey = initialData?.key || 'C';
+  const existingKey = initialData?.key || '';
   const existingNote = existingKey.replace(/m$/, '');
   const existingQuality = existingKey.endsWith('m') ? 'm' : '';
 
@@ -55,11 +55,11 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       artist: initialData?.artist || '',
       bpm: initialData?.bpm || undefined,
       durationString: initialData?.duration ? formatDurationToString(initialData.duration) : '',
-      keyNote: existingNote,
-      keyQuality: existingQuality,
+      keyNote: existingNote || undefined,
+      keyQuality: existingQuality || undefined,
       lyrics: initialData?.lyrics || '',
       midiEvents: initialData?.midiEvents || [],
-      timeSignature: initialData?.timeSignature || '4/4',
+      timeSignature: initialData?.timeSignature,
       title: initialData?.title || '',
     },
   });
@@ -230,6 +230,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                     options={qualityOptions}
                     error={errors.keyQuality}
                     register={register('keyQuality')}
+                    required
                   />
                   <RadioGroup
                     label="Time Signature"
