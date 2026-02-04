@@ -185,7 +185,7 @@ export function SongDetailPage() {
       {/* Navigation Footer */}
       <div className="flex gap-3">
         <Button
-          className="flex-1"
+          className="flex-1 h-16"
           color="primary"
           disabled={!previousSongId}
           iconStart={<IconArrowLeft className="h-4 w-4" />}
@@ -195,7 +195,7 @@ export function SongDetailPage() {
           Previous
         </Button>
         <Button
-          className="flex-1"
+          className="flex-1 h-16"
           color="primary"
           disabled={!nextSongId}
           iconEnd={<IconArrowRight className="h-4 w-4" />}
