@@ -2,8 +2,9 @@ import { IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-r
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import type { SetlistFormData } from './SetlistForm';
 import { useGetSongs } from '../../api/useSong';
-import type { Song, SongReference } from '../../types';
+import type { Song } from '../../types';
 import { Button } from '../../ui/Button';
 import { SelectField } from '../../ui/form/SelectField';
 
@@ -20,9 +21,10 @@ export function SetlistSetEditor({
   setNumber,
   showRemove,
 }: SetlistSetEditorProps) {
-  const { register, setValue, watch } = useFormContext();
-  const songs = watch(`sets.${index}.songs`) as SongReference[];
+  const { register, setValue, watch } = useFormContext<SetlistFormData>();
+  const songs = watch(`sets.${index}.songs`);
   const allSongs = useGetSongs();
+  const allSets = watch('sets');
 
   const songMap = useMemo(() => {
     const map: Record<string, Song> = {};
@@ -33,10 +35,18 @@ export function SetlistSetEditor({
   }, [allSongs]);
 
   const handleAddSong = () => {
-    const availableSongs = allSongs.filter((song) => !songs.some((s) => s.songId === song.id));
+    const usedSongIds = new Set<string>();
+    allSets.forEach((set) => {
+      set.songs.forEach((songRef) => {
+        usedSongIds.add(songRef.songId);
+      });
+    });
 
-    if (availableSongs.length > 0) {
-      setValue(`sets.${index}.songs`, [...songs, { songId: availableSongs[0].id }]);
+    const availableSongs = allSongs.find((song) => !usedSongIds.has(song.id));
+    const songToAdd = availableSongs || (allSongs.length > 0 ? allSongs[0] : null);
+
+    if (songToAdd) {
+      setValue(`sets.${index}.songs`, [...songs, { songId: songToAdd.id }]);
     }
   };
 

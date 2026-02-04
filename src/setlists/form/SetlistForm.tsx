@@ -9,19 +9,19 @@ import { InputField } from '../../ui/form/InputField';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 
-type FormData = Omit<Setlist, 'id' | 'sets'> & {
+export type SetlistFormData = Omit<Setlist, 'id' | 'sets'> & {
   sets: SetlistSet[];
 };
 
 type SetlistFormProps = {
   backPath: string;
   initialData?: Setlist;
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: SetlistFormData) => void;
   title: string;
 };
 
 export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistFormProps) {
-  const methods = useForm<FormData>({
+  const methods = useForm<SetlistFormData>({
     defaultValues: {
       date: initialData?.date || new Date().toISOString().split('T')[0],
       sets: initialData?.sets || [{ setNumber: 1, songs: [] }],
@@ -55,7 +55,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
     }
   };
 
-  const handleFormSubmit = (data: FormData) => {
+  const handleFormSubmit = (data: SetlistFormData) => {
     // Ensure sets are in order
     const orderedSets = [...data.sets].sort((a, b) => a.setNumber - b.setNumber);
     onSubmit({
