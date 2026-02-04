@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { DataSettings } from './data/DataSettings';
 import { GeneralSettings } from './general/GeneralSettings';
 import { InstrumentsSettings } from './instruments/InstrumentsSettings';
 import { Page } from '../ui/Page';
@@ -13,7 +14,7 @@ export function SettingsPage() {
   const navigate = useNavigate();
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
 
-  const selectedTab = tab && ['general', 'instruments'].includes(tab) ? tab : 'general';
+  const selectedTab = tab && ['general', 'instruments', 'data'].includes(tab) ? tab : 'general';
 
   const handleTabChange = (tabId: string) => {
     navigate(`/settings/${tabId}`);
@@ -44,6 +45,11 @@ export function SettingsPage() {
             content: <InstrumentsSettings />,
             id: 'instruments',
             label: 'Instruments',
+          },
+          {
+            content: <DataSettings />,
+            id: 'data',
+            label: 'Data',
           },
         ]}
       />
