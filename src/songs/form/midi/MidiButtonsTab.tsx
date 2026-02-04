@@ -7,19 +7,19 @@ import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 
-type MidiEventsTabProps = {
+type MidiButtonsTabProps = {
   instruments: Instrument[];
   midiEvents?: MidiEvent[];
   onAddEvent?: (event: Omit<MidiEvent, 'id'>) => void;
   onDeleteEvent?: (eventId: string) => void;
 };
 
-export function MidiEventsTab({
+export function MidiButtonsTab({
   instruments,
   midiEvents,
   onAddEvent,
   onDeleteEvent,
-}: MidiEventsTabProps) {
+}: MidiButtonsTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { isReady, outputs } = useMidiDevices();
 
@@ -38,7 +38,7 @@ export function MidiEventsTab({
         onClose={() => setIsDialogOpen(false)}
       />
 
-      {/* Events List */}
+      {/* Buttons List */}
       <div>
         <p className="text-xs text-slate-500 mb-3">
           Create buttons that send MIDI program changes to your instruments. During a performance,

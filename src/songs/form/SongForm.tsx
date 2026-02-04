@@ -5,7 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { LyricsTab } from './lyrics/LyricsTab';
 import { calculateMeasures } from './measures';
-import { MidiEventsTab } from './midi/MidiEventsTab';
+import { MidiButtonsTab } from './midi/MidiButtonsTab';
 import { useGetInstruments } from '../../api/useInstruments';
 import type { MidiEvent, Song } from '../../types';
 import { Button } from '../../ui/Button';
@@ -284,7 +284,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
             },
             {
               content: (
-                <MidiEventsTab
+                <MidiButtonsTab
                   instruments={instruments}
                   midiEvents={midiEvents}
                   onAddEvent={handleAddMidiEvent}
