@@ -72,7 +72,7 @@ export function InstrumentsSettings() {
       </div>
 
       {!isSupported && (
-        <p className="mt-4 text-sm text-red-300">Web MIDI is not supported in this browser.</p>
+        <p className="mt-4 text-sm text-red-300">Web MIDI is not supported on this device.</p>
       )}
       {isSupported && !isReady && (
         <p className="mt-4 text-sm text-slate-400">Detecting MIDI devices...</p>

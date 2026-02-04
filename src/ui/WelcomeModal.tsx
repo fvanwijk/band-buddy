@@ -61,7 +61,7 @@ export function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
 
         <p className="pt-2">
           Start by adding some songs to your library or creating your first setlist. All your data
-          is saved locally in your browser.
+          is saved locally on this device.
         </p>
       </div>
 

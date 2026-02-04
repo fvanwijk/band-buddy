@@ -98,13 +98,13 @@ export function DataSettings() {
           <div className="space-y-2">
             <h2 className="text-lg font-semibold text-slate-100">Back up your data</h2>
             <p className="text-sm text-slate-400">
-              BandBuddy stores everything locally in your browser. If you clear your browser cache
-              or site data, you will lose your songs, setlists, and settings. Exporting a backup is
-              recommended before you clear data or switch devices, and you can also share exported
-              files with band members to sync your data.
+              BandBuddy stores everything locally on this device. If you clear app or site data, you
+              will lose your songs, setlists, and settings. Exporting a backup is recommended before
+              you clear data or switch devices, and you can also share exported files with band
+              members to sync your data.
             </p>
             <p className="text-sm text-slate-400">
-              Importing a backup replaces your current data in this browser.
+              Importing a backup replaces your current data on this device.
             </p>
           </div>
 

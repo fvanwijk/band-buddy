@@ -116,7 +116,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
 
   const getErrorAlert = () => {
     if (!isSupported) {
-      return <Alert severity="error">Web MIDI is not supported in this browser.</Alert>;
+      return <Alert severity="error">Web MIDI is not supported on this device.</Alert>;
     }
     if (!isReady) {
       return <Alert severity="info">Detecting MIDI devices...</Alert>;
