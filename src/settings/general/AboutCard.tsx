@@ -14,6 +14,7 @@ export function AboutCard({ onShowWelcome }: AboutCardProps) {
       <p className="mt-2 text-sm text-slate-400">
         BandBuddy is your companion for managing band repertoire and live performances.
       </p>
+      <p className="mt-2 text-sm text-slate-400">Created by Frank van Wijk.</p>
 
       <div className="mt-4">
         <Button
