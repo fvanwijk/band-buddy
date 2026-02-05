@@ -1,8 +1,9 @@
-import { IconPlayerPlay, IconTrash } from '@tabler/icons-react';
+import { IconPlayerPlay } from '@tabler/icons-react';
 import { WebMidi } from 'webmidi';
 
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
+import { DeleteButton } from '../../../ui/DeleteButton';
 
 type MidiButtonCardProps = {
   event: MidiEvent;
@@ -43,15 +44,7 @@ export function MidiButtonCard({ event, instrument, isAvailable, onDelete }: Mid
         >
           <IconPlayerPlay className="h-4 w-4" />
         </Button>
-        <Button
-          color="danger"
-          icon
-          onClick={() => onDelete(event.id)}
-          variant="outlined"
-          title="Delete"
-        >
-          <IconTrash className="h-4 w-4" />
-        </Button>
+        <DeleteButton onClick={() => onDelete(event.id)} title="Delete MIDI button" />
       </div>
     </div>
   );

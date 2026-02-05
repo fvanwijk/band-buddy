@@ -1,8 +1,9 @@
-import { IconPencil, IconPlayerPlay, IconTrash } from '@tabler/icons-react';
+import { IconPencil, IconPlayerPlay } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { DeleteButton } from '../ui/DeleteButton';
 import { formatDate } from '../utils/date';
 import { usePluralize } from '../utils/pluralize';
 
@@ -42,19 +43,10 @@ export function SetlistCard({
           >
             <IconPlayerPlay className="h-4 w-4" />
           </Button>
-          <Button
-            as={Link}
-            color="primary"
-            icon
-            title="Edit"
-            to={`/setlists/edit/${id}`}
-            variant="outlined"
-          >
+          <Button as={Link} icon title="Edit" to={`/setlists/edit/${id}`} variant="outlined">
             <IconPencil className="h-4 w-4" />
           </Button>
-          <Button color="danger" onClick={onDelete} icon title="Delete" variant="outlined">
-            <IconTrash className="h-4 w-4" />
-          </Button>
+          <DeleteButton onClick={onDelete} title="Delete setlist" />
         </>
       }
     >

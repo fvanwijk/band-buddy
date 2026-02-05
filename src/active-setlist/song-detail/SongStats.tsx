@@ -27,10 +27,10 @@ export function SongStats({ song }: SongStatsProps) {
     <div className="flex gap-4 text-right text-sm">
       <div className="bg-slate-900 rounded-full p-1 flex items-center gap-2">
         <Button
-          aria-label="Transpose down"
           className="h-7 w-7 text-xs"
           icon
           onClick={() => handleTranspose(-1)}
+          title="Transpose down"
           type="button"
           variant="ghost"
         >
@@ -45,10 +45,10 @@ export function SongStats({ song }: SongStatsProps) {
           {formatTranspose(transpose)}
         </span>
         <Button
-          aria-label="Transpose up"
           className="h-7 w-7 text-xs"
           icon
           onClick={() => handleTranspose(1)}
+          title="Transpose up"
           type="button"
           variant="ghost"
         >

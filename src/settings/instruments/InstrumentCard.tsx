@@ -1,9 +1,10 @@
-import { IconPencil, IconTrash } from '@tabler/icons-react';
+import { IconPencil } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 import { MidiDeviceStatus } from './MidiDeviceStatus';
 import type { Instrument } from '../../types';
 import { Button } from '../../ui/Button';
+import { DeleteButton } from '../../ui/DeleteButton';
 
 type InstrumentCardProps = {
   inputsById: Map<string, string>;
@@ -35,14 +36,7 @@ export function InstrumentCard({
           >
             <IconPencil className="h-4 w-4" />
           </Button>
-          <Button
-            color="danger"
-            icon
-            onClick={() => onDeleteClick(instrument.id)}
-            variant="outlined"
-          >
-            <IconTrash className="h-4 w-4" />
-          </Button>
+          <DeleteButton onClick={() => onDeleteClick(instrument.id)} title="Delete instrument" />
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

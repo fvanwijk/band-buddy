@@ -5,6 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import type { SetlistFormData } from './SetlistForm';
 import { useGetSongs } from '../../api/useSong';
 import { Button } from '../../ui/Button';
+import { DeleteButton } from '../../ui/DeleteButton';
 import { SelectField } from '../../ui/form/SelectField';
 
 type SetlistSetEditorProps = {
@@ -130,37 +131,28 @@ export function SetlistSetEditor({
 
                 <div className="flex gap-1">
                   <Button
-                    aria-label="Move up"
                     disabled={(songIndex === 0 && index === 0) || isDeleted}
                     icon
                     onClick={() => handleMoveSong(songIndex, 'up')}
+                    title="Move up"
                     type="button"
                     variant="ghost"
                   >
                     <IconArrowUp className="h-4 w-4" />
                   </Button>
                   <Button
-                    aria-label="Move down"
                     disabled={
                       (songIndex === songs.length - 1 && index === allSets.length - 1) || isDeleted
                     }
                     icon
                     onClick={() => handleMoveSong(songIndex, 'down')}
+                    title="Move down"
                     type="button"
                     variant="ghost"
                   >
                     <IconArrowDown className="h-4 w-4" />
                   </Button>
-                  <Button
-                    aria-label="Remove song"
-                    color="danger"
-                    icon
-                    onClick={() => handleRemoveSong(songIndex)}
-                    type="button"
-                    variant="outlined"
-                  >
-                    <IconTrash className="h-4 w-4" />
-                  </Button>
+                  <DeleteButton onClick={() => handleRemoveSong(songIndex)} title="Delete song" />
                 </div>
               </div>
             );

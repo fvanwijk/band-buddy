@@ -1,9 +1,10 @@
-import { IconPencil, IconTrash } from '@tabler/icons-react';
+import { IconPencil } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 import { FormattedDuration } from '../active-setlist/FormattedDuration';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { DeleteButton } from '../ui/DeleteButton';
 
 type SongCardProps = {
   artist: string;
@@ -28,19 +29,10 @@ export function SongCard({
     <Card
       actions={
         <>
-          <Button
-            as={Link}
-            color="primary"
-            icon
-            to={`/songs/edit/${songId}`}
-            title="Edit"
-            variant="outlined"
-          >
+          <Button as={Link} icon to={`/songs/edit/${songId}`} title="Edit" variant="outlined">
             <IconPencil className="h-4 w-4" />
           </Button>
-          <Button color="danger" icon onClick={onDelete} title="Delete" variant="outlined">
-            <IconTrash className="h-4 w-4" />
-          </Button>
+          <DeleteButton onClick={onDelete} />
         </>
       }
     >
