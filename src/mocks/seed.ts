@@ -1,11 +1,17 @@
 import type { Store } from 'tinybase';
 
+import { createInstrument } from './instruments';
 import { createSetlists } from './setlists';
 import { createSongs } from './songs';
 
 export function seedStore(store: Store): void {
-  const seedSongs = createSongs();
-  seedSongs.forEach(({ id, ...song }) => {
+  seedSongs(store);
+  seedSetlists(store);
+  seedInstruments(store);
+}
+
+export const seedSongs = (store: Store): void => {
+  createSongs().forEach(({ id, ...song }) => {
     const row: Record<string, unknown> = {
       ...song,
     };
@@ -24,9 +30,10 @@ export function seedStore(store: Store): void {
 
     store.setRow('songs', id, row as Record<string, string | number>);
   });
+};
 
-  const seedSetlists = createSetlists();
-  seedSetlists.forEach(({ id, sets, ...metadata }) => {
+const seedSetlists = (store: Store): void => {
+  createSetlists().forEach(({ id, sets, ...metadata }) => {
     // Add setlist metadata
     store.setRow('setlists', id, metadata);
 
@@ -43,4 +50,17 @@ export function seedStore(store: Store): void {
       });
     });
   });
-}
+};
+
+const seedInstruments = (store: Store): void => {
+  const { id, ...instrument } = createInstrument();
+  const row: Record<string, unknown> = {
+    ...instrument,
+  };
+  Object.entries(row).forEach(([key, value]) => {
+    if (value === undefined) {
+      delete row[key];
+    }
+  });
+  store.setRow('instruments', id, row as Record<string, string | number>);
+};

@@ -43,7 +43,13 @@ export function MidiButtonCard({ event, instrument, isAvailable, onDelete }: Mid
         >
           <IconPlayerPlay className="h-4 w-4" />
         </Button>
-        <Button color="danger" icon onClick={() => onDelete(event.id)} variant="outlined">
+        <Button
+          color="danger"
+          icon
+          onClick={() => onDelete(event.id)}
+          variant="outlined"
+          title="Delete"
+        >
           <IconTrash className="h-4 w-4" />
         </Button>
       </div>

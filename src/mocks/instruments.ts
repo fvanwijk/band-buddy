@@ -4,9 +4,9 @@ export const createInstrument = (overrides: Partial<Instrument> = {}): Instrumen
   id: '1',
   midiInId: 'midi-in',
   midiInName: 'MIDI In',
-  midiOutId: undefined,
-  midiOutName: undefined,
-  name: 'Yamaha',
+  midiOutId: 'midi-out',
+  midiOutName: 'MIDI Out',
+  name: 'Nord Stage 4',
   programNames: undefined,
   ...overrides,
 });

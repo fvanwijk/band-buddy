@@ -1,4 +1,26 @@
-import type { Song } from '../types';
+import type { MidiEvent, Song } from '../types';
+
+export const createMidiEvent = (overrides: Partial<MidiEvent> = {}): MidiEvent => ({
+  id: '1',
+  instrumentId: '1',
+  label: 'Piano',
+  programChange: 1,
+  ...overrides,
+});
+
+export const createMidiEvents = (): MidiEvent[] => [
+  createMidiEvent(),
+  createMidiEvent({
+    id: '2',
+    label: 'EP',
+    programChange: 5,
+  }),
+  createMidiEvent({
+    id: '3',
+    label: 'Organ',
+    programChange: 12,
+  }),
+];
 
 export const createSong = (overrides: Partial<Song> = {}): Song => ({
   artist: 'Queen',
@@ -6,6 +28,8 @@ export const createSong = (overrides: Partial<Song> = {}): Song => ({
   duration: 355,
   id: '1',
   key: 'Bb',
+  lyrics: createLyrics(),
+  midiEvents: createMidiEvents(),
   timeSignature: '4/4',
   title: 'Bohemian Rhapsody',
   ...overrides,
