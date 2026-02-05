@@ -1,10 +1,7 @@
-import { IconPencil } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
-
 import { MidiDeviceStatus } from './MidiDeviceStatus';
 import type { Instrument } from '../../types';
-import { Button } from '../../ui/Button';
 import { DeleteButton } from '../../ui/DeleteButton';
+import { EditButton } from '../../ui/EditButton';
 
 type InstrumentCardProps = {
   inputsById: Map<string, string>;
@@ -27,15 +24,7 @@ export function InstrumentCard({
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-slate-100">{instrument.name}</p>
         <div className="flex gap-2">
-          <Button
-            as={Link}
-            color="primary"
-            icon
-            to={`/settings/instruments/${instrument.id}/edit`}
-            variant="outlined"
-          >
-            <IconPencil className="h-4 w-4" />
-          </Button>
+          <EditButton title="Edit instrument" to={`/settings/instruments/${instrument.id}/edit`} />
           <DeleteButton onClick={() => onDeleteClick(instrument.id)} title="Delete instrument" />
         </div>
       </div>
