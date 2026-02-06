@@ -108,6 +108,9 @@ export function SongDetailPage() {
   const nextSongId =
     currentSongIndex < allSongs.length - 1 ? allSongs[currentSongIndex + 1].songId : null;
 
+  const previousSong = previousSongId ? songsMap.get(previousSongId) : null;
+  const nextSong = nextSongId ? songsMap.get(nextSongId) : null;
+
   const handlePrevious = () => {
     if (previousSongId) {
       navigate(`/setlist/${setlistId}/song/${previousSongId}/${selectedTab}`);
@@ -181,27 +184,29 @@ export function SongDetailPage() {
           ]}
         />
         <nav className="fixed w-full left-0 bottom-0 z-10 bg-slate-950 ">
-          <div className="mx-auto max-w-5xl flex gap-3 border-t border-slate-800 py-4">
-            <Button
-              className="flex-1 h-16"
-              color="primary"
-              disabled={!previousSongId}
-              iconStart={<IconArrowLeft className="h-4 w-4" />}
-              onClick={handlePrevious}
-              variant="outlined"
-            >
-              Previous
-            </Button>
-            <Button
-              className="flex-1 h-16"
-              color="primary"
-              disabled={!nextSongId}
-              iconEnd={<IconArrowRight className="h-4 w-4" />}
-              onClick={handleNext}
-              variant="outlined"
-            >
-              Next
-            </Button>
+          <div className="mx-auto max-w-5xl grid grid-cols-2 gap-3 border-t border-slate-800 py-4">
+            {previousSongId && (
+              <Button
+                className="flex-1 h-16"
+                color="primary"
+                iconStart={<IconArrowLeft className="h-4 w-4" />}
+                onClick={handlePrevious}
+                variant="outlined"
+              >
+                {previousSong?.title || 'Previous'}
+              </Button>
+            )}
+            {nextSongId && (
+              <Button
+                className="flex-1 h-16 col-start-2"
+                color="primary"
+                iconEnd={<IconArrowRight className="h-4 w-4" />}
+                onClick={handleNext}
+                variant="outlined"
+              >
+                {nextSong?.title || 'Next'}
+              </Button>
+            )}
           </div>
         </nav>
       </Page>
