@@ -1,6 +1,6 @@
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { useCallback, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WebMidi } from 'webmidi';
 
 import { LyricsBlock } from './lyrics/LyricsBlock';
@@ -111,18 +111,6 @@ export function SongDetailPage() {
   const previousSong = previousSongId ? songsMap.get(previousSongId) : null;
   const nextSong = nextSongId ? songsMap.get(nextSongId) : null;
 
-  const handlePrevious = () => {
-    if (previousSongId) {
-      navigate(`/setlist/${setlistId}/song/${previousSongId}/${selectedTab}`);
-    }
-  };
-
-  const handleNext = () => {
-    if (nextSongId) {
-      navigate(`/setlist/${setlistId}/song/${nextSongId}/${selectedTab}`);
-    }
-  };
-
   const handleTabChange = (tabId: string) => {
     navigate(`/setlist/${setlistId}/song/${songId}/${tabId}`);
   };
@@ -151,7 +139,7 @@ export function SongDetailPage() {
 
   return (
     <>
-      <Page className="pb-[97px]">
+      <Page className="pb-24.25">
         <PageHeader
           action={<SongStats song={currentSong} />}
           backPath="/"
@@ -187,10 +175,11 @@ export function SongDetailPage() {
           <div className="mx-auto max-w-5xl grid grid-cols-2 gap-3 border-t border-slate-800 py-4">
             {previousSongId && (
               <Button
+                as={Link}
                 className="flex-1 h-16"
                 color="primary"
                 iconStart={<IconArrowLeft className="h-4 w-4" />}
-                onClick={handlePrevious}
+                to={`/setlist/${setlistId}/song/${previousSongId}/${selectedTab}`}
                 variant="outlined"
               >
                 {previousSong?.title || 'Previous'}
@@ -198,10 +187,11 @@ export function SongDetailPage() {
             )}
             {nextSongId && (
               <Button
+                as={Link}
                 className="flex-1 h-16 col-start-2"
                 color="primary"
                 iconEnd={<IconArrowRight className="h-4 w-4" />}
-                onClick={handleNext}
+                to={`/setlist/${setlistId}/song/${nextSongId}/${selectedTab}`}
                 variant="outlined"
               >
                 {nextSong?.title || 'Next'}
