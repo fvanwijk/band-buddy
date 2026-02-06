@@ -8,6 +8,7 @@ import { calculateMeasures } from './measures';
 import { MidiButtonsTab } from './midi/MidiButtonsTab';
 import { useGetInstruments } from '../../api/useInstruments';
 import type { MidiEvent, Song } from '../../types';
+import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { InputField } from '../../ui/form/InputField';
 import { RadioGroup } from '../../ui/form/RadioGroup';
@@ -72,8 +73,13 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const durationString = watch('durationString');
   const durationSeconds = parseDuration(durationString);
   const bpm = watch('bpm');
+  const lyrics = watch('lyrics');
   const midiEvents = watch('midiEvents') || [];
   const timeSignature = watch('timeSignature');
+
+  const hasDrawings = initialData?.canvasPaths && initialData.canvasPaths.length > 0;
+  const lyricsChanged = lyrics !== (initialData?.lyrics || '');
+  const showDrawingWarning = hasDrawings && lyricsChanged;
 
   useEffect(() => {
     const measures = calculateMeasures(durationSeconds, bpm, timeSignature);
@@ -297,6 +303,13 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
             },
           ]}
         />
+
+        {showDrawingWarning && (
+          <Alert severity="warning">
+            Lyrics have changed. Your drawings may no longer align correctly with the lyrics during
+            performance.
+          </Alert>
+        )}
 
         <div className="flex gap-3 pt-4">
           <Button as={Link} className="flex-1" to={backPath} type="button" variant="outlined">
