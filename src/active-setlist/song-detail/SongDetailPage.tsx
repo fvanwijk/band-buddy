@@ -147,60 +147,64 @@ export function SongDetailPage() {
   };
 
   return (
-    <Page>
-      <PageHeader
-        action={<SongStats song={currentSong} />}
-        backPath="/"
-        title={currentSong.title}
-        subtitle={currentSong.artist}
-      />
+    <>
+      <Page className="pb-[97px]">
+        <PageHeader
+          action={<SongStats song={currentSong} />}
+          backPath="/"
+          title={currentSong.title}
+          subtitle={currentSong.artist}
+        />
 
-      <Tabs
-        activeTabId={selectedTab}
-        onTabChange={handleTabChange}
-        tabs={[
-          {
-            content: <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />,
-            id: 'details',
-            label: 'Lyrics',
-          },
-          {
-            content: (
-              <MidiButtonsDisplay
-                isDisabled={isMidiButtonDisabled}
-                midiEvents={currentSong.midiEvents}
-                onTriggerEvent={handleTriggerMidiEvent}
-              />
-            ),
-            id: 'midi',
-            label: 'MIDI buttons',
-          },
-        ]}
-      />
-
-      {/* Navigation Footer */}
-      <div className="flex gap-3">
-        <Button
-          className="flex-1 h-16"
-          color="primary"
-          disabled={!previousSongId}
-          iconStart={<IconArrowLeft className="h-4 w-4" />}
-          onClick={handlePrevious}
-          variant="outlined"
-        >
-          Previous
-        </Button>
-        <Button
-          className="flex-1 h-16"
-          color="primary"
-          disabled={!nextSongId}
-          iconEnd={<IconArrowRight className="h-4 w-4" />}
-          onClick={handleNext}
-          variant="outlined"
-        >
-          Next
-        </Button>
-      </div>
-    </Page>
+        <Tabs
+          activeTabId={selectedTab}
+          onTabChange={handleTabChange}
+          tabs={[
+            {
+              content: (
+                <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
+              ),
+              id: 'details',
+              label: 'Lyrics',
+            },
+            {
+              content: (
+                <MidiButtonsDisplay
+                  isDisabled={isMidiButtonDisabled}
+                  midiEvents={currentSong.midiEvents}
+                  onTriggerEvent={handleTriggerMidiEvent}
+                />
+              ),
+              id: 'midi',
+              label: 'MIDI buttons',
+            },
+          ]}
+        />
+        <nav className="fixed w-full left-0 bottom-0 z-10 bg-slate-950 ">
+          <div className="mx-auto max-w-5xl flex gap-3 border-t border-slate-800 py-4">
+            <Button
+              className="flex-1 h-16"
+              color="primary"
+              disabled={!previousSongId}
+              iconStart={<IconArrowLeft className="h-4 w-4" />}
+              onClick={handlePrevious}
+              variant="outlined"
+            >
+              Previous
+            </Button>
+            <Button
+              className="flex-1 h-16"
+              color="primary"
+              disabled={!nextSongId}
+              iconEnd={<IconArrowRight className="h-4 w-4" />}
+              onClick={handleNext}
+              variant="outlined"
+            >
+              Next
+            </Button>
+          </div>
+        </nav>
+      </Page>
+    </>
   );
 }
