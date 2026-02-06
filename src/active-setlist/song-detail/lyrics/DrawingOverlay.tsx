@@ -14,15 +14,20 @@ type DrawingMode = 'idle' | 'pen' | 'eraser';
 
 const defaultColor = '#ef4444';
 
-export function DrawingOverlay({ children, storageKey, toolbarContainer }: DrawingOverlayProps) {
+export function DrawingOverlay({ children, storageKey }: DrawingOverlayProps) {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
+  const isInitializingRef = useRef(true);
   const [mode, setMode] = useState<DrawingMode>('idle');
   const [selectedColor, setSelectedColor] = useState(defaultColor);
 
   useEffect(() => {
+    isInitializingRef.current = true;
     const storedPaths = localStorage.getItem(storageKey);
     if (!storedPaths) {
-      return;
+      const raf = requestAnimationFrame(() => {
+        isInitializingRef.current = false;
+      });
+      return () => cancelAnimationFrame(raf);
     }
 
     try {
@@ -33,10 +38,18 @@ export function DrawingOverlay({ children, storageKey, toolbarContainer }: Drawi
     } catch {
       localStorage.removeItem(storageKey);
     }
+
+    const raf = requestAnimationFrame(() => {
+      isInitializingRef.current = false;
+    });
+    return () => cancelAnimationFrame(raf);
   }, [storageKey]);
 
   const handlePathsChange = useCallback(
     (paths: CanvasPath[]) => {
+      if (isInitializingRef.current) {
+        return;
+      }
       localStorage.setItem(storageKey, JSON.stringify(paths));
     },
     [storageKey],
