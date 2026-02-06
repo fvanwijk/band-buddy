@@ -1,4 +1,4 @@
-import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
+import { IconArrowLeft, IconArrowRight, IconMicrophone2Off } from '@tabler/icons-react';
 import { useCallback, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WebMidi } from 'webmidi';
@@ -13,6 +13,7 @@ import { useGetSongs } from '../../api/useSong';
 import { useMidiDevices } from '../../midi/useMidiDevices';
 import { BackButton } from '../../ui/BackButton';
 import { Button } from '../../ui/Button';
+import { EmptyStateBlock } from '../../ui/EmptyStateBlock';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
@@ -153,11 +154,16 @@ export function SongDetailPage() {
           onTabChange={handleTabChange}
           tabs={[
             {
-              content: (
-                <DrawingOverlay songId={songId}>
-                  <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
-                </DrawingOverlay>
-              ),
+              content:
+                currentSong.lyrics && currentSong.lyrics.trim().length > 0 ? (
+                  <DrawingOverlay songId={songId}>
+                    <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
+                  </DrawingOverlay>
+                ) : (
+                  <EmptyStateBlock icon={<IconMicrophone2Off className="h-8 w-8" />}>
+                    No lyrics added yet
+                  </EmptyStateBlock>
+                ),
               id: 'details',
               label: 'Lyrics',
             },

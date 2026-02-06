@@ -58,7 +58,7 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
   };
 
   return (
-    <section className="relative flex flex-col">
+    <section className="relative flex flex-1 flex-col min-h-0">
       <DrawingToolbar
         mode={mode}
         onClear={handleClear}
@@ -67,7 +67,7 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
         selectedColor={selectedColor}
       />
 
-      <div className="relative">
+      <div className="flex flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-y-auto min-h-0">
         {children}
         <div
           className={cn(
