@@ -1,5 +1,6 @@
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { IconEraser, IconPointer, IconScribble, IconTrash } from '@tabler/icons-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Button } from '../../../ui/Button';
 import { cn } from '../../../utils/cn';
@@ -37,37 +38,10 @@ export function DrawingToolbar({
   onModeChange,
   selectedColor,
 }: DrawingToolbarProps) {
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const selectedOption = useMemo(
     () => colorOptions.find((option) => option.value === selectedColor),
     [selectedColor],
   );
-
-  useEffect(() => {
-    if (!isDropdownOpen) {
-      return;
-    }
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!dropdownRef.current) {
-        return;
-      }
-
-      if (!dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    window.addEventListener('mousedown', handleClickOutside);
-    return () => window.removeEventListener('mousedown', handleClickOutside);
-  }, [isDropdownOpen]);
-
-  const handleColorSelect = (color: string) => {
-    onColorSelect(color);
-    setIsDropdownOpen(false);
-  };
 
   return (
     // 52px + 2rem negative margin
@@ -103,12 +77,12 @@ export function DrawingToolbar({
         </Button>
       </div>
 
-      <div className="relative" ref={dropdownRef}>
-        <Button
+      <Menu as="div" className="relative">
+        <MenuButton
+          as={Button}
           className="p-1!"
           color="default"
           icon
-          onClick={() => setIsDropdownOpen((prev) => !prev)}
           title={selectedOption?.label || 'Color'}
           variant="outlined"
         >
@@ -116,35 +90,39 @@ export function DrawingToolbar({
             className="h-6 w-6 rounded-full border border-slate-700"
             style={{ backgroundColor: selectedColor }}
           />
-        </Button>
-        {isDropdownOpen && (
-          <div className="absolute right-0 top-12 z-30 w-48 rounded-xl border border-slate-800 bg-slate-950 p-2 shadow-lg">
-            <p className="px-2 pb-2 text-xs uppercase tracking-wide text-slate-400">
-              {selectedOption?.label || 'Color'}
-            </p>
-            <div className="grid grid-cols-4 gap-2">
-              {colorOptions.map((option) => (
-                <Button
-                  color="default"
-                  icon
-                  key={option.value}
-                  onClick={() => handleColorSelect(option.value)}
-                  title={option.label}
-                  variant="ghost"
-                >
-                  <span
-                    className={cn(
-                      'h-5 w-5 rounded-full border border-slate-700',
-                      selectedColor === option.value && 'ring-2 ring-brand-400',
-                    )}
-                    style={{ backgroundColor: option.value }}
-                  />
-                </Button>
-              ))}
-            </div>
+        </MenuButton>
+        <MenuItems className="absolute right-0 top-12 z-30 w-48 rounded-xl border border-slate-800 bg-slate-950 p-2 shadow-lg">
+          <p className="px-2 pb-2 text-xs uppercase tracking-wide text-slate-400">
+            {selectedOption?.label || 'Color'}
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {colorOptions.map((option) => (
+              <div>
+                <MenuItem key={option.value}>
+                  {({ focus }) => (
+                    <button
+                      className={cn('rounded-full p-2 transition-colors', focus && 'bg-slate-800')}
+                      onClick={() => onColorSelect(option.value)}
+                      title={option.label}
+                      type="button"
+                    >
+                      <span
+                        className={cn(
+                          'block h-5 w-5 rounded-full border transition-all',
+                          selectedColor === option.value
+                            ? 'border-brand-400 ring-2 ring-brand-400'
+                            : 'border-slate-700',
+                        )}
+                        style={{ backgroundColor: option.value }}
+                      />
+                    </button>
+                  )}
+                </MenuItem>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </MenuItems>
+      </Menu>
 
       <Button color="default" icon onClick={onClear} title="Clear" variant="outlined">
         <IconTrash className="h-4 w-4" />

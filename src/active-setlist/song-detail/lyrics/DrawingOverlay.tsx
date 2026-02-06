@@ -71,7 +71,7 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
         {children}
         <div
           className={cn(
-            'absolute inset-0 z-10',
+            'absolute inset-0',
             mode !== 'idle' ? 'pointer-events-auto touch-none' : 'pointer-events-none',
           )}
         >
