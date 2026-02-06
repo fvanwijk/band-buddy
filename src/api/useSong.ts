@@ -1,4 +1,6 @@
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { CanvasPath } from 'react-sketch-canvas';
 import {
   useAddRowCallback,
   useRow,
@@ -29,6 +31,14 @@ export function useGetSongs(includeDeleted = false): Song[] {
           parsedData.midiEvents = undefined;
         }
       }
+      // Parse canvasPaths if stored as JSON string
+      if (typeof songData.canvasPaths === 'string') {
+        try {
+          parsedData.canvasPaths = JSON.parse(songData.canvasPaths);
+        } catch {
+          parsedData.canvasPaths = undefined;
+        }
+      }
       const result = songSchema.safeParse(parsedData);
       return result.success ? result.data : null;
     })
@@ -54,6 +64,14 @@ export function useGetSong(id: string | undefined): Song | null {
       parsedData.midiEvents = JSON.parse(songData.midiEvents);
     } catch {
       parsedData.midiEvents = undefined;
+    }
+  }
+  // Parse canvasPaths if stored as JSON string
+  if (typeof songData.canvasPaths === 'string') {
+    try {
+      parsedData.canvasPaths = JSON.parse(songData.canvasPaths);
+    } catch {
+      parsedData.canvasPaths = undefined;
     }
   }
 
@@ -164,4 +182,49 @@ export function useDeleteSong(onSuccess?: () => void) {
   };
 
   return handleDelete;
+}
+
+/**
+ * Hook to get canvas paths for a song
+ */
+export function useGetSongCanvasPaths(songId: string | undefined): CanvasPath[] {
+  const songRow = useRow('songs', songId || '');
+
+  if (!songId || !songRow) {
+    return [];
+  }
+  const songData = songRow as Record<string, unknown>;
+  if (!songData.canvasPaths || typeof songData.canvasPaths !== 'string') {
+    return [];
+  }
+
+  try {
+    return JSON.parse(songData.canvasPaths) as CanvasPath[];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Hook to set canvas paths for a song
+ */
+export function useSetSongCanvasPaths(songId: string | undefined) {
+  const store = useStore();
+
+  return useCallback(
+    (paths: CanvasPath[]) => {
+      if (!songId || !store) {
+        return;
+      }
+
+      if (paths.length === 0) {
+        store.setPartialRow('songs', songId, { canvasPaths: '' });
+      } else {
+        store.setPartialRow('songs', songId, {
+          canvasPaths: JSON.stringify(paths),
+        });
+      }
+    },
+    [songId, store],
+  );
 }

@@ -154,7 +154,7 @@ export function SongDetailPage() {
           tabs={[
             {
               content: (
-                <DrawingOverlay storageKey={`song-drawing:${setlistId ?? 'setlist'}:${songId}`}>
+                <DrawingOverlay songId={songId}>
                   <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
                 </DrawingOverlay>
               ),

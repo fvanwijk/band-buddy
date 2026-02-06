@@ -16,6 +16,7 @@ export const midiEventSchema = z.object({
 export const songSchema = z.object({
   artist: z.string(),
   bpm: z.number().optional(),
+  canvasPaths: z.array(z.unknown()).optional(),
   duration: z.number().optional(),
   id: z.string(),
   isDeleted: z.boolean().optional(),
@@ -33,6 +34,7 @@ export const songSchema = z.object({
 export const songTableSchema = z.object({
   artist: z.string(),
   bpm: z.number().optional(),
+  canvasPaths: z.string().optional(), // Stored as JSON string
   duration: z.number().optional(),
   isDeleted: z.boolean().optional(),
   key: z.string(),

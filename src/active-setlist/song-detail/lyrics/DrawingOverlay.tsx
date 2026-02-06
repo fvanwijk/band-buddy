@@ -2,57 +2,39 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { type CanvasPath, ReactSketchCanvas, type ReactSketchCanvasRef } from 'react-sketch-canvas';
 
 import { DrawingToolbar } from './DrawingToolbar';
+import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
 import { cn } from '../../../utils/cn';
 
 type DrawingOverlayProps = {
   children: ReactNode;
-  storageKey: string;
-  toolbarContainer?: HTMLElement | null;
+  songId: string;
 };
 
 type DrawingMode = 'idle' | 'pen' | 'eraser';
 
 const defaultColor = '#ef4444';
 
-export function DrawingOverlay({ children, storageKey }: DrawingOverlayProps) {
+export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
-  const isInitializingRef = useRef(true);
   const [mode, setMode] = useState<DrawingMode>('idle');
   const [selectedColor, setSelectedColor] = useState(defaultColor);
 
+  const storedCanvasPaths = useGetSongCanvasPaths(songId);
+  const setCanvasPaths = useSetSongCanvasPaths(songId);
+
   useEffect(() => {
-    isInitializingRef.current = true;
-    const storedPaths = localStorage.getItem(storageKey);
-    if (!storedPaths) {
-      const raf = requestAnimationFrame(() => {
-        isInitializingRef.current = false;
-      });
-      return () => cancelAnimationFrame(raf);
+    if (storedCanvasPaths.length > 0) {
+      canvasRef.current?.clearCanvas();
+      canvasRef.current?.loadPaths(storedCanvasPaths);
     }
-
-    try {
-      const parsedPaths = JSON.parse(storedPaths) as CanvasPath[];
-      if (parsedPaths.length) {
-        canvasRef.current?.loadPaths(parsedPaths);
-      }
-    } catch {
-      localStorage.removeItem(storageKey);
-    }
-
-    const raf = requestAnimationFrame(() => {
-      isInitializingRef.current = false;
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [storageKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [songId]);
 
   const handlePathsChange = useCallback(
     (paths: CanvasPath[]) => {
-      if (isInitializingRef.current) {
-        return;
-      }
-      localStorage.setItem(storageKey, JSON.stringify(paths));
+      setCanvasPaths(paths);
     },
-    [storageKey],
+    [setCanvasPaths],
   );
 
   const handleModeChange = (newMode: DrawingMode) => {
@@ -66,7 +48,7 @@ export function DrawingOverlay({ children, storageKey }: DrawingOverlayProps) {
 
   const handleClear = () => {
     canvasRef.current?.clearCanvas();
-    localStorage.removeItem(storageKey);
+    setCanvasPaths([]);
   };
 
   const handleColorSelect = (color: string) => {

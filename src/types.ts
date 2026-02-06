@@ -8,6 +8,7 @@ export type MidiEvent = {
 export type Song = {
   artist: string;
   bpm?: number;
+  canvasPaths?: unknown[];
   duration?: number;
   id: string;
   isDeleted?: boolean;
