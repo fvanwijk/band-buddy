@@ -70,8 +70,8 @@ export function DrawingToolbar({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      {/* Drawing tools */}
+    // 52px + 2rem negative margin
+    <div className="sticky top-14 z-10 flex items-center gap-2 mb-2 sm:mb-8 sm:-mt-21 pr-2 self-end">
       <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 p-2">
         <Button
           color={mode === 'idle' ? 'primary' : 'default'}
@@ -118,7 +118,7 @@ export function DrawingToolbar({
           />
         </Button>
         {isDropdownOpen && (
-          <div className="absolute left-0 top-12 z-30 w-48 rounded-xl border border-slate-800 bg-slate-950 p-2 shadow-lg">
+          <div className="absolute right-0 top-12 z-30 w-48 rounded-xl border border-slate-800 bg-slate-950 p-2 shadow-lg">
             <p className="px-2 pb-2 text-xs uppercase tracking-wide text-slate-400">
               {selectedOption?.label || 'Color'}
             </p>

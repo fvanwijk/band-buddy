@@ -63,7 +63,7 @@ export function DrawingOverlay({ children, storageKey, toolbarContainer }: Drawi
   };
 
   return (
-    <section className="relative">
+    <section className="relative flex flex-col">
       <DrawingToolbar
         mode={mode}
         onClear={handleClear}
@@ -88,6 +88,7 @@ export function DrawingOverlay({ children, storageKey, toolbarContainer }: Drawi
             onChange={handlePathsChange}
             strokeColor={selectedColor}
             strokeWidth={4}
+            style={{ border: 'none' }}
           />
         </div>
       </div>
