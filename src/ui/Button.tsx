@@ -4,7 +4,7 @@ import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 import { cn } from '../utils/cn';
 
 const buttonVariants = cva(
-  'flex rounded-full items-center justify-center rounded font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50',
+  'flex rounded-full items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50',
   {
     compoundVariants: [
       // Filled variants
@@ -58,9 +58,16 @@ const buttonVariants = cva(
         color: 'danger',
         variant: 'outlined',
       },
+      // Gap for non-icon buttons with iconStart or iconEnd
+      {
+        className: 'gap-2',
+        hasIcons: true,
+        icon: false,
+      },
     ],
     defaultVariants: {
       color: 'default',
+      hasIcons: false,
       icon: false,
       size: 'default',
       variant: 'filled',
@@ -71,9 +78,13 @@ const buttonVariants = cva(
         default: '',
         primary: '',
       },
+      hasIcons: {
+        false: '',
+        true: '',
+      },
       icon: {
         false: '',
-        true: 'pl-2! pr-2!',
+        true: 'p-2!',
       },
       size: {
         default: 'px-3 py-1 text-sm',
@@ -110,17 +121,20 @@ export function Button<C extends ElementType = 'button'>({
   ...props
 }: ButtonProps<C>) {
   const Component = as || 'button';
-  const hasIcons = iconStart || iconEnd;
+  const hasIcons = !!(iconStart || iconEnd);
 
   return (
     <Component
-      className={buttonVariants({
-        className: cn(hasIcons && 'gap-2', className),
-        color,
-        icon,
-        size,
-        variant,
-      })}
+      className={cn(
+        buttonVariants({
+          color,
+          hasIcons,
+          icon,
+          size,
+          variant,
+        }),
+        className,
+      )}
       {...props}
     >
       {iconStart}

@@ -29,7 +29,7 @@ export function App() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-4 pt-2">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-900 bg-slate-950/80 backdrop-blur py-2">
+      <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-900 bg-slate-950/80 backdrop-blur py-2">
         <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
         <TopNav />
       </header>

@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WebMidi } from 'webmidi';
 
+import { DrawingOverlay } from './lyrics/DrawingOverlay';
 import { LyricsBlock } from './lyrics/LyricsBlock';
 import { MidiButtonsDisplay } from './midi-buttons-display/MidiButtonsDisplay';
 import { SongStats } from './SongStats';
@@ -153,7 +154,9 @@ export function SongDetailPage() {
           tabs={[
             {
               content: (
-                <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
+                <DrawingOverlay storageKey={`song-drawing:${setlistId ?? 'setlist'}:${songId}`}>
+                  <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
+                </DrawingOverlay>
               ),
               id: 'details',
               label: 'Lyrics',
