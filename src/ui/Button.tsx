@@ -25,7 +25,8 @@ const buttonVariants = cva(
       },
       // Ghost variants
       {
-        className: 'text-slate-300 hover:text-slate-100 disabled:hover:text-slate-300',
+        className:
+          'text-slate-300 hover:bg-slate-300/10 hover:text-slate-100 disabled:hover:text-slate-300',
         color: 'default',
         variant: 'ghost',
       },
