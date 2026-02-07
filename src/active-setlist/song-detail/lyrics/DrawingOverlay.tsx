@@ -2,6 +2,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { type CanvasPath, ReactSketchCanvas, type ReactSketchCanvasRef } from 'react-sketch-canvas';
 
 import { DrawingToolbar } from './DrawingToolbar';
+import { useScrollableDimensions } from './useScrollableDimensions';
 import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
 import { cn } from '../../../utils/cn';
 
@@ -22,6 +23,9 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
   const storedCanvasPaths = useGetSongCanvasPaths(songId);
   const setCanvasPaths = useSetSongCanvasPaths(songId);
 
+  const { containerRef, overlayRef, dimensions } = useScrollableDimensions();
+
+  // Initially load stored canvas paths when songId changes (not while we are drawing)
   useEffect(() => {
     if (storedCanvasPaths.length > 0) {
       canvasRef.current?.clearCanvas();
@@ -30,6 +34,7 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [songId]);
 
+  // Save immediately while drawing
   const handlePathsChange = useCallback(
     (paths: CanvasPath[]) => {
       setCanvasPaths(paths);
@@ -67,24 +72,31 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
         selectedColor={selectedColor}
       />
 
-      <div className="flex flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-y-auto min-h-0">
+      <div
+        className="flex flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-auto min-h-0"
+        ref={containerRef}
+      >
         {children}
         <div
-          className={cn(
-            'absolute inset-0',
-            mode !== 'idle' ? 'pointer-events-auto touch-none' : 'pointer-events-none',
-          )}
+          ref={overlayRef}
+          style={{
+            height: `${dimensions.height}px`,
+            width: `${dimensions.width}px`,
+          }}
+          className={cn('absolute inset-0', mode === 'idle' && 'pointer-events-none')}
         >
-          <ReactSketchCanvas
-            ref={canvasRef}
-            className="h-full w-full"
-            canvasColor="transparent"
-            eraserWidth={20}
-            onChange={handlePathsChange}
-            strokeColor={selectedColor}
-            strokeWidth={4}
-            style={{ border: 'none' }}
-          />
+          <div className="w-full h-full">
+            <ReactSketchCanvas
+              ref={canvasRef}
+              canvasColor="transparent"
+              eraserWidth={20}
+              onChange={handlePathsChange}
+              readOnly={mode === 'idle'}
+              strokeColor={selectedColor}
+              strokeWidth={4}
+              style={{ border: 'none' }}
+            />
+          </div>
         </div>
       </div>
     </section>
