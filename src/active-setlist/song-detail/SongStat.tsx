@@ -1,6 +1,8 @@
+import type { ReactNode } from 'react';
+
 type SongStatProps = {
   label: string;
-  value: string | number;
+  value: ReactNode;
 };
 
 export function SongStat({ label, value }: SongStatProps) {

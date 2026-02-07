@@ -6,6 +6,7 @@ import { WebMidi } from 'webmidi';
 import { DrawingOverlay } from './lyrics/DrawingOverlay';
 import { LyricsBlock } from './lyrics/LyricsBlock';
 import { MidiButtonsDisplay } from './midi-buttons-display/MidiButtonsDisplay';
+import { SettingsPanel } from './SettingsPanel';
 import { SongStats } from './SongStats';
 import { useGetInstruments } from '../../api/useInstruments';
 import { useGetSetlist } from '../../api/useSetlist';
@@ -17,7 +18,6 @@ import { EmptyStateBlock } from '../../ui/EmptyStateBlock';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
-
 export function SongDetailPage() {
   const { setlistId, songId, tab } = useParams<{
     setlistId: string;
@@ -139,11 +139,18 @@ export function SongDetailPage() {
     }
   };
 
+  const transposeControl = (
+    <div className="flex items-center gap-4">
+      <SongStats song={currentSong} />
+      <SettingsPanel song={currentSong} />
+    </div>
+  );
+
   return (
     <>
       <Page className="pb-24.25">
         <PageHeader
-          action={<SongStats song={currentSong} />}
+          action={transposeControl}
           backPath="/"
           title={currentSong.title}
           subtitle={currentSong.artist}
