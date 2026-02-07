@@ -10,12 +10,14 @@ import { Card } from '../../ui/Card';
 import { cn } from '../../utils/cn';
 
 type SettingsPanelProps = {
+  onZoomChange: (zoom: number) => void;
   song: Song;
+  zoom: number;
 };
 
 const formatTranspose = (transpose: number) => (transpose > 0 ? `+${transpose}` : `${transpose}`);
 
-export function SettingsPanel({ song }: SettingsPanelProps) {
+export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) {
   const updateSong = useUpdateSong(song.id);
   const transpose = song.transpose ?? 0;
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
@@ -30,6 +32,10 @@ export function SettingsPanel({ song }: SettingsPanelProps) {
       ...song,
       transpose: transpose + delta,
     });
+  };
+
+  const handleZoomChange = (value: number) => {
+    onZoomChange(value);
   };
 
   return (
@@ -82,6 +88,25 @@ export function SettingsPanel({ song }: SettingsPanelProps) {
             >
               <IconPlus className="h-4 w-4" />
             </Button>
+          </div>
+          <div className="mt-4 border-t border-slate-700 pt-4">
+            <p className="pb-2 text-xs uppercase tracking-wide text-slate-400">Zoom</p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400">0.75×</span>
+              <input
+                type="range"
+                min="0.75"
+                max="2"
+                step="0.05"
+                value={zoom}
+                onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
+                className="flex-1 accent-brand-400"
+              />
+              <span className="text-xs text-slate-400">2×</span>
+            </div>
+            <p className="mt-1 text-center text-xs font-semibold text-brand-200">
+              {zoom.toFixed(2)}×
+            </p>
           </div>
         </Card>
       </PopoverPanel>

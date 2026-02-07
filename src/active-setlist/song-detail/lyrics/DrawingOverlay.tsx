@@ -11,6 +11,7 @@ import { cn } from '../../../utils/cn';
 type DrawingOverlayProps = {
   children: ReactNode;
   songId: string;
+  zoom?: number;
 };
 
 type DrawingMode = 'idle' | 'pen' | 'eraser';
@@ -19,7 +20,7 @@ const defaultColor = '#ef4444';
 const PEN_RADIUS = 4;
 const ERASER_RADIUS = 10;
 
-export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
+export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayProps) {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
   const [mode, setMode] = useState<DrawingMode>('idle');
   const [selectedColor, setSelectedColor] = useState(defaultColor);
@@ -33,6 +34,7 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
     overlayRef,
     PEN_RADIUS,
     ERASER_RADIUS,
+    zoom,
   );
 
   // Initially load stored canvas paths when songId changes (not while we are drawing)
@@ -86,15 +88,25 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
         className="flex flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-auto min-h-0"
         ref={containerRef}
       >
-        {children}
+        <div
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: 'top left',
+          }}
+        >
+          {children}
+        </div>
         <div
           ref={overlayRef}
           className={cn('absolute inset-0', mode === 'idle' && 'pointer-events-none')}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           style={{
-            cursor: mode !== 'idle' ? 'none' : 'default',
+            // For debugging
+            //cursor: mode !== 'idle' ? 'none' : 'default',
             height: `${dimensions.height}px`,
+            transform: `scale(${zoom})`,
+            transformOrigin: 'top left',
             width: `${dimensions.width}px`,
           }}
         >

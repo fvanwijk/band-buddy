@@ -1,5 +1,5 @@
 import { IconArrowLeft, IconArrowRight, IconMicrophone2Off } from '@tabler/icons-react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WebMidi } from 'webmidi';
 
@@ -29,6 +29,8 @@ export function SongDetailPage() {
   const instruments = useGetInstruments();
   const songs = useGetSongs();
   const { isReady, isSupported } = useMidiDevices();
+
+  const [zoom, setZoom] = useState(1);
 
   // Default to 'details' tab if not specified
   const selectedTab = tab && ['details', 'midi'].includes(tab) ? tab : 'details';
@@ -122,7 +124,7 @@ export function SongDetailPage() {
   const transposeControl = (
     <div className="flex items-center gap-4">
       <SongStats song={currentSong} />
-      <SettingsPanel song={currentSong} />
+      <SettingsPanel onZoomChange={setZoom} song={currentSong} zoom={zoom} />
     </div>
   );
 
@@ -143,7 +145,7 @@ export function SongDetailPage() {
             {
               content:
                 currentSong.lyrics && currentSong.lyrics.trim().length > 0 ? (
-                  <DrawingOverlay songId={songId}>
+                  <DrawingOverlay songId={songId} zoom={zoom}>
                     <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
                   </DrawingOverlay>
                 ) : (

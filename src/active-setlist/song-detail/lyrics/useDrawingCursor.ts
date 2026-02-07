@@ -7,6 +7,7 @@ export function useDrawingCursor(
   overlayRef: RefObject<HTMLElement | null>,
   penRadius: number,
   eraserRadius: number,
+  zoom: number,
 ) {
   const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
 
@@ -14,8 +15,8 @@ export function useDrawingCursor(
     if (mode !== 'idle' && overlayRef.current) {
       const rect = overlayRef.current.getBoundingClientRect();
       setCursorPosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: (e.clientX - rect.left) / zoom,
+        y: (e.clientY - rect.top) / zoom,
       });
     }
   };
