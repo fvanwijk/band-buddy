@@ -24,6 +24,7 @@ export function SetlistSetEditor({
   const { getValues, register, setValue, watch } = useFormContext<SetlistFormData>();
   const songs = watch(`sets.${index}.songs`);
   const allSongs = useGetSongs(true);
+  const addableSongs = allSongs.filter((song) => !song.isDeleted);
   const allSets = watch('sets');
 
   const songMap = useMemo(() => new Map(allSongs.map((song) => [song.id, song])), [allSongs]);
@@ -33,8 +34,7 @@ export function SetlistSetEditor({
       allSets.flatMap((set) => set.songs.map((songRef) => songRef.songId)),
     );
 
-    const songToAdd = allSongs.find((song) => !usedSongIds.has(song.id)) ?? allSongs[0];
-
+    const songToAdd = addableSongs.find((song) => !usedSongIds.has(song.id)) ?? addableSongs[0];
     if (songToAdd) {
       setValue(`sets.${index}.songs`, [...songs, { songId: songToAdd.id }]);
     }
@@ -163,6 +163,7 @@ export function SetlistSetEditor({
       <Button
         className="w-full border-dashed"
         color="primary"
+        disabled={!addableSongs.length}
         iconStart={<IconPlus className="h-4 w-4" />}
         onClick={handleAddSong}
         type="button"

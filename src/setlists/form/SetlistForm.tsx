@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { SetlistSetEditor } from './SetlistSetEditor';
 import type { Setlist, SetlistSet } from '../../types';
+import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { InputField } from '../../ui/form/InputField';
 import { Page } from '../../ui/Page';
@@ -118,6 +119,14 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
                   </Button>
                 )}
               </div>
+
+              <Alert severity="info">
+                You don't have songs in your library.{' '}
+                <Link className="link" to="/songs/add">
+                  Add some songs
+                </Link>{' '}
+                to be added to a set.
+              </Alert>
 
               {fields.map((field, index) => (
                 <SetlistSetEditor
