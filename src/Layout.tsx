@@ -17,17 +17,20 @@ export function Layout() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-4 pt-2">
-      <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-900 bg-slate-950/80 backdrop-blur py-2">
-        <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
-        <TopNav />
-      </header>
+    <>
+      <div className="sticky top-0 z-30 mx-auto max-w-5xl bg-slate-950/80 backdrop-blur-xs ">
+        <header className=" flex items-center justify-between gap-3 border-b border-slate-900 py-2">
+          <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
+          <TopNav />
+        </header>
+      </div>
+      <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-4 pt-2">
+        <main className="min-h-0 flex-1 pt-1.5">
+          <Outlet />
+        </main>
 
-      <main className="min-h-0 flex-1 pt-1.5">
-        <Outlet />
-      </main>
-
-      <WelcomeModal isOpen={isWelcomeOpen} onClose={handleCloseWelcome} />
-    </div>
+        <WelcomeModal isOpen={isWelcomeOpen} onClose={handleCloseWelcome} />
+      </div>
+    </>
   );
 }
