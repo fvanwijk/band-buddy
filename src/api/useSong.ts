@@ -119,19 +119,26 @@ export function useAddSong(onSuccess?: () => void) {
 /**
  * Hook to update an existing song
  */
-export function useUpdateSong(id: string | undefined, onSuccess?: () => void) {
+export function useUpdateSong(id: string, onSuccess?: () => void) {
   return useSetRowCallback(
     'songs',
-    id!,
+    id,
     (data: Omit<Song, 'id'>) => {
       const finalData: Record<string, unknown> = {
         ...data,
       };
+      console.log(data);
 
       if (data.midiEvents && data.midiEvents.length > 0) {
         finalData.midiEvents = JSON.stringify(data.midiEvents);
       } else {
         delete finalData.midiEvents;
+      }
+
+      if (data.canvasPaths && data.canvasPaths.length > 0) {
+        finalData.canvasPaths = JSON.stringify(data.canvasPaths);
+      } else if (data.canvasPaths !== undefined) {
+        delete finalData.canvasPaths;
       }
 
       Object.entries(finalData).forEach(([key, value]) => {

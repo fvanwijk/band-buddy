@@ -148,6 +148,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     onSubmit({
       artist: data.artist,
       bpm: data.bpm,
+      canvasPaths: initialData?.canvasPaths || [],
       duration: durationSeconds || undefined,
       key: (data.keyNote || existingNote) + (data.keyQuality || ''),
       lyrics: data.lyrics,
