@@ -5,6 +5,7 @@ import { useUpdateSong } from '../../api/useSong';
 import type { Song } from '../../types';
 import { Button } from '../../ui/Button';
 import { cn } from '../../utils/cn';
+import { formatDuration } from '../../utils/duration';
 
 type SongStatsProps = {
   song: Song;
@@ -58,7 +59,7 @@ export function SongStats({ song }: SongStatsProps) {
       <SongStat label="Key" value={song.key} />
       <SongStat label="Time" value={song.timeSignature} />
       {song.bpm && <SongStat label="BPM" value={song.bpm} />}
-      {song.duration && <SongStat label="Duration" value={song.duration} />}
+      {song.duration && <SongStat label="Duration" value={formatDuration(song.duration)} />}
     </div>
   );
 }
