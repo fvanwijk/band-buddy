@@ -19,7 +19,7 @@ export function Layout() {
   return (
     <>
       <div className="sticky top-0 z-30 mx-auto max-w-5xl bg-slate-950/80 backdrop-blur-xs">
-        <header className="flex items-center justify-between gap-3 border-b border-slate-900 py-2">
+        <header className="flex items-center justify-between gap-3 border-b border-slate-900 px-4 py-2">
           <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
           <TopNav />
         </header>
