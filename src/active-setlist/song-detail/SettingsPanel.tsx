@@ -1,8 +1,10 @@
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import { IconAdjustments, IconMinus, IconPlus, IconRefresh } from '@tabler/icons-react';
+import { IconAdjustments, IconMinus, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePopper } from 'react-popper';
 
+import { ResetButton } from './ResetButton';
+import { SettingHeading } from './SettingHeading';
 import { useUpdateSong } from '../../api/useSong';
 import type { Song } from '../../types';
 import { Button } from '../../ui/Button';
@@ -58,7 +60,15 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
         className="shadow-lg z-20"
       >
         <Card>
-          <p className="pb-2 text-xs uppercase tracking-wide text-slate-400">Transpose</p>
+          <SettingHeading
+            resetButton={
+              transpose !== 0 && (
+                <ResetButton onClick={() => handleTranspose(-transpose)} title="Reset transpose" />
+              )
+            }
+          >
+            Transpose
+          </SettingHeading>
           <div className="flex items-center gap-2">
             <Button
               className="h-7 w-7 text-xs"
@@ -90,21 +100,15 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
             </Button>
           </div>
           <div className="mt-4 border-t border-slate-800 pt-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs uppercase tracking-wide text-slate-400">Zoom</p>
-              {zoom !== 1 && (
-                <Button
-                  className="h-6 w-6 p-1! -my-1 text-xs"
-                  icon
-                  onClick={() => handleZoomChange(1)}
-                  title="Reset zoom to 1×"
-                  type="button"
-                  variant="ghost"
-                >
-                  <IconRefresh className="h-3 w-3" />
-                </Button>
-              )}
-            </div>
+            <SettingHeading
+              resetButton={
+                zoom !== 1 && (
+                  <ResetButton onClick={() => handleZoomChange(1)} title="Reset zoom to 1×" />
+                )
+              }
+            >
+              Zoom
+            </SettingHeading>
             <div className="relative flex items-center gap-2">
               <span className="text-xs text-slate-400">0.75×</span>
               <div className="relative flex-1">
