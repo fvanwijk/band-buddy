@@ -14,6 +14,7 @@ import { InputField } from '../../ui/form/InputField';
 import { RadioGroup } from '../../ui/form/RadioGroup';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
+import { Switch } from '../../ui/Switch';
 import { Tabs } from '../../ui/Tabs';
 import { formatDurationToString, parseDuration } from '../../utils/duration';
 
@@ -214,19 +215,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                     required
                   >
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setUseFlats(!useFlats)}
-                        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
-                          useFlats ? 'bg-brand-400/30' : 'bg-slate-700'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-slate-100 transition-transform ${
-                            useFlats ? 'translate-x-7' : 'translate-x-1'
-                          }`}
-                        />
-                      </button>
+                      <Switch checked={useFlats} onCheckedChange={setUseFlats} />
                       <span className="text-xs font-medium text-slate-400">
                         {useFlats ? '♭' : '♯'}
                       </span>
