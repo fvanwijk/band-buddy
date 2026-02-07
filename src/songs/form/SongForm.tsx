@@ -1,5 +1,6 @@
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
+import type { FieldErrors } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
@@ -82,17 +83,21 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const lyricsChanged = lyrics !== (initialData?.lyrics || '');
   const showDrawingWarning = hasDrawings && lyricsChanged;
 
+  // Define which fields belong to which tab
+  const detailsFields: (keyof SongFormData)[] = [
+    'artist',
+    'bpm',
+    'durationString',
+    'keyNote',
+    'keyQuality',
+    'timeSignature',
+    'title',
+  ];
+  const lyricsFields: (keyof SongFormData)[] = ['lyrics'];
+
   // Check which tabs have errors
-  const hasDetailsErrors = !!(
-    errors.artist ||
-    errors.title ||
-    errors.keyNote ||
-    errors.keyQuality ||
-    errors.timeSignature ||
-    errors.bpm ||
-    errors.durationString
-  );
-  const hasLyricsErrors = !!errors.lyrics;
+  const hasDetailsErrors = detailsFields.some((field) => !!errors[field]);
+  const hasLyricsErrors = lyricsFields.some((field) => !!errors[field]);
 
   useEffect(() => {
     const measures = calculateMeasures(durationSeconds, bpm, timeSignature);
@@ -111,6 +116,19 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
 
   const handleTabChange = (tabId: string) => {
     navigate(`${songFormBasePath}/${tabId}`);
+  };
+
+  const handleFormError = (formErrors: FieldErrors<SongFormData>) => {
+    // Check which tabs have errors using the fresh errors object
+    const hasDetailsErrors = detailsFields.some((field) => !!formErrors[field]);
+    const hasLyricsErrors = lyricsFields.some((field) => !!formErrors[field]);
+
+    // Navigate to the first tab with errors
+    if (hasDetailsErrors) {
+      handleTabChange('details');
+    } else if (hasLyricsErrors) {
+      handleTabChange('lyrics');
+    }
   };
 
   const noteOptions = useFlats
@@ -194,7 +212,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
         autoComplete="off"
         className="flex flex-1 flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
         noValidate
-        onSubmit={handleSubmit(handleFormSubmit)}
+        onSubmit={handleSubmit(handleFormSubmit, handleFormError)}
       >
         <Tabs
           activeTabId={selectedTab}
