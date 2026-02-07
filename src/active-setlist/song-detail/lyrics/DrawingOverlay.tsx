@@ -2,7 +2,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { type CanvasPath, ReactSketchCanvas, type ReactSketchCanvasRef } from 'react-sketch-canvas';
 
 import { DrawingCursor } from './DrawingCursor';
-import { DrawingToolbar } from './DrawingToolbar';
+import { DrawingToolbar, colorOptions } from './DrawingToolbar';
 import { useDrawingCursor } from './useDrawingCursor';
 import { useScrollableDimensions } from './useScrollableDimensions';
 import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
@@ -16,7 +16,7 @@ type DrawingOverlayProps = {
 
 type DrawingMode = 'idle' | 'pen' | 'eraser';
 
-const defaultColor = '#ef4444';
+const defaultColor = colorOptions[0].value;
 const PEN_RADIUS = 4;
 const ERASER_RADIUS = 10;
 
@@ -34,24 +34,39 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
     overlayRef,
     PEN_RADIUS,
     ERASER_RADIUS,
-    zoom,
   );
 
   // Initially load stored canvas paths when songId changes (not while we are drawing)
   useEffect(() => {
     if (storedCanvasPaths.length > 0) {
       canvasRef.current?.clearCanvas();
-      canvasRef.current?.loadPaths(storedCanvasPaths);
+      // Scale paths for display based on zoom level
+      const scaledPaths = storedCanvasPaths.map((path) => ({
+        ...path,
+        paths: path.paths?.map((point: { x: number; y: number }) => ({
+          x: point.x * zoom,
+          y: point.y * zoom,
+        })),
+      }));
+      canvasRef.current?.loadPaths(scaledPaths);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [songId]);
+  }, [songId, zoom]);
 
   // Save immediately while drawing
   const handlePathsChange = useCallback(
     (paths: CanvasPath[]) => {
-      setCanvasPaths(paths);
+      // Scale paths back to 1:1 for storage
+      const unscaledPaths = paths.map((path) => ({
+        ...path,
+        paths: path.paths?.map((point: { x: number; y: number }) => ({
+          x: point.x / zoom,
+          y: point.y / zoom,
+        })),
+      }));
+      setCanvasPaths(unscaledPaths);
     },
-    [setCanvasPaths],
+    [setCanvasPaths, zoom],
   );
 
   const handleModeChange = (newMode: DrawingMode) => {
@@ -85,10 +100,11 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
       />
 
       <div
-        className="flex flex-1 flex-col rounded-2xl border border-slate-800 bg-slate-900/60 relative overflow-auto min-h-0"
+        className="flex flex-1 flex-col rounded-2xl border border-slate-800  relative overflow-auto min-h-0"
         ref={containerRef}
       >
         <div
+          className="bg-slate-900/60"
           style={{
             transform: `scale(${zoom})`,
             transformOrigin: 'top left',
@@ -102,23 +118,20 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           style={{
-            // For debugging
-            //cursor: mode !== 'idle' ? 'none' : 'default',
-            height: `${dimensions.height}px`,
-            transform: `scale(${zoom})`,
-            transformOrigin: 'top left',
-            width: `${dimensions.width}px`,
+            cursor: mode !== 'idle' ? 'none' : 'default',
+            height: `${dimensions.height * zoom}px`,
+            width: `${dimensions.width * zoom}px`,
           }}
         >
           <div className="w-full h-full">
             <ReactSketchCanvas
               ref={canvasRef}
               canvasColor="transparent"
-              eraserWidth={ERASER_RADIUS * 2}
+              eraserWidth={ERASER_RADIUS * 2 * zoom}
               onChange={handlePathsChange}
               readOnly={mode === 'idle'}
               strokeColor={selectedColor}
-              strokeWidth={PEN_RADIUS}
+              strokeWidth={PEN_RADIUS * zoom}
               style={{ border: 'none' }}
             />
           </div>
@@ -127,7 +140,7 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
               color={selectedColor}
               mode={mode}
               position={cursorPosition}
-              radius={cursorRadius}
+              radius={cursorRadius * zoom}
             />
           )}
         </div>

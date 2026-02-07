@@ -36,6 +36,7 @@ export default tseslint.config([
           'newlines-between': 'always',
         },
       ],
+      'react-refresh/only-export-components': ['off'],
       'sort-imports': ['error', { ignoreDeclarationSort: true }],
       'sort-keys-fix/sort-keys-fix': 'warn',
       'unused-imports/no-unused-imports': 'warn',

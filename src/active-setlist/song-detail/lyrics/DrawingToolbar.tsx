@@ -20,7 +20,7 @@ type DrawingToolbarProps = {
   selectedColor: string;
 };
 
-const colorOptions: ColorOption[] = [
+export const colorOptions: ColorOption[] = [
   { label: 'Red', value: '#ef4444' },
   { label: 'Orange', value: '#f97316' },
   { label: 'Yellow', value: '#facc15' },
