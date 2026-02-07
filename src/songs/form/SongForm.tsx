@@ -225,7 +225,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                     label="Key (Quality)"
                     options={qualityOptions}
                     error={errors.keyQuality}
-                    register={register('keyQuality')}
+                    register={register('keyQuality', {
+                      required: 'Key quality is required',
+                    })}
                     required
                   />
                   <RadioGroup
