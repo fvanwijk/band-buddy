@@ -12,7 +12,6 @@ import { useGetInstruments } from '../../api/useInstruments';
 import { useGetSetlist } from '../../api/useSetlist';
 import { useGetSongs } from '../../api/useSong';
 import { useMidiDevices } from '../../midi/useMidiDevices';
-import { BackButton } from '../../ui/BackButton';
 import { Button } from '../../ui/Button';
 import { EmptyStateBlock } from '../../ui/EmptyStateBlock';
 import { Page } from '../../ui/Page';
@@ -26,7 +25,7 @@ export function SongDetailPage() {
   }>();
   const navigate = useNavigate();
 
-  const setlist = useGetSetlist(setlistId);
+  const setlist = useGetSetlist(setlistId!);
   const instruments = useGetInstruments();
   const songs = useGetSongs();
   const { isReady, isSupported } = useMidiDevices();
@@ -64,51 +63,32 @@ export function SongDetailPage() {
   );
 
   if (!setlist || !songId) {
-    return (
-      <Page>
-        <BackButton to="/" />
-        <div className="flex h-full items-center justify-center">
-          <p className="text-slate-400">Song not found</p>
-        </div>
-      </Page>
-    );
+    throw new Error('Song not found');
   }
 
   // Flatten all sets into a single list of songs for easier navigation
-  const allSongs = setlist.sets.flatMap((set) =>
+  const songFromSetlist = setlist.sets.flatMap((set) =>
     set.songs.map((songRef) => ({ setNumber: set.setNumber, songId: songRef.songId })),
   );
 
   // Find current song index
-  const currentSongIndex = allSongs.findIndex((s) => s.songId === songId);
+  const currentSongIndex = songFromSetlist.findIndex((s) => s.songId === songId);
 
   if (currentSongIndex === -1) {
-    return (
-      <Page>
-        <BackButton to="/" />
-        <div className="flex h-full items-center justify-center">
-          <p className="text-slate-400">Song not found</p>
-        </div>
-      </Page>
-    );
+    throw new Error('Song not found');
   }
 
   const currentSong = songsMap.get(songId);
   if (!currentSong) {
-    return (
-      <Page>
-        <BackButton to="/" />
-        <div className="flex h-full items-center justify-center">
-          <p className="text-slate-400">Song not found</p>
-        </div>
-      </Page>
-    );
+    throw new Error('Song not found');
   }
 
   // Get previous and next song IDs
-  const previousSongId = currentSongIndex > 0 ? allSongs[currentSongIndex - 1].songId : null;
+  const previousSongId = currentSongIndex > 0 ? songFromSetlist[currentSongIndex - 1].songId : null;
   const nextSongId =
-    currentSongIndex < allSongs.length - 1 ? allSongs[currentSongIndex + 1].songId : null;
+    currentSongIndex < songFromSetlist.length - 1
+      ? songFromSetlist[currentSongIndex + 1].songId
+      : null;
 
   const previousSong = previousSongId ? songsMap.get(previousSongId) : null;
   const nextSong = nextSongId ? songsMap.get(nextSongId) : null;

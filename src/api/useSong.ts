@@ -49,10 +49,10 @@ export function useGetSongs(includeDeleted = false): Song[] {
 /**
  * Get a single song by ID
  */
-export function useGetSong(id: string | undefined): Song | null {
+export function useGetSong(id: string | undefined, includeDeleted = false): Song | null {
   const songRow = useRow('songs', id || '');
 
-  if (!id || !songRow) {
+  if (!id || !songRow || (songRow.isDeleted && !includeDeleted)) {
     return null;
   }
 

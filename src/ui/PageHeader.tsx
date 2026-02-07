@@ -9,7 +9,7 @@ type PageHeaderProps = {
   title: string;
 };
 
-export function PageHeader({ action, backPath, subtitle = 'Library', title }: PageHeaderProps) {
+export function PageHeader({ action, backPath, subtitle, title }: PageHeaderProps) {
   const header = (
     <header className="flex flex-wrap items-center justify-between gap-3 flex-1">
       <div className="flex-1">

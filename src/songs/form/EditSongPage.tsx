@@ -1,8 +1,7 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { SongForm } from './SongForm';
 import { useGetSong, useUpdateSong } from '../../api/useSong';
-import { Button } from '../../ui/Button';
 
 export function EditSongPage() {
   const backPath = '/songs';
@@ -10,16 +9,9 @@ export function EditSongPage() {
   const navigate = useNavigate();
   const song = useGetSong(id);
   const updateSong = useUpdateSong(id!, () => navigate(backPath));
-
+  console.log(song);
   if (!id || !song) {
-    return (
-      <section className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-xl text-slate-100">Song not found</p>
-        <Button as={Link} color="primary" to={backPath}>
-          Back to Songs
-        </Button>
-      </section>
-    );
+    throw new Error('Song not found');
   }
 
   return (
