@@ -1,23 +1,20 @@
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import { IconAdjustments, IconMinus, IconPlus } from '@tabler/icons-react';
+import { IconAdjustments } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePopper } from 'react-popper';
 
-import { ResetButton } from './ResetButton';
-import { SettingHeading } from './SettingHeading';
+import { TransposePanel } from './TransposePanel';
+import { ZoomPanel } from './ZoomPanel';
 import { useUpdateSong } from '../../api/useSong';
 import type { Song } from '../../types';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
-import { cn } from '../../utils/cn';
 
 type SettingsPanelProps = {
   onZoomChange: (zoom: number) => void;
   song: Song;
   zoom: number;
 };
-
-const formatTranspose = (transpose: number) => (transpose > 0 ? `+${transpose}` : `${transpose}`);
 
 export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) {
   const updateSong = useUpdateSong(song.id);
@@ -34,10 +31,6 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
       ...song,
       transpose: transpose + delta,
     });
-  };
-
-  const handleZoomChange = (value: number) => {
-    onZoomChange(value);
   };
 
   return (
@@ -60,81 +53,9 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
         className="shadow-lg z-20"
       >
         <Card>
-          <SettingHeading
-            resetButton={
-              transpose !== 0 && (
-                <ResetButton onClick={() => handleTranspose(-transpose)} title="Reset transpose" />
-              )
-            }
-          >
-            Transpose
-          </SettingHeading>
-          <div className="flex items-center gap-2">
-            <Button
-              className="h-7 w-7 text-xs"
-              icon
-              onClick={() => handleTranspose(-1)}
-              title="Transpose down"
-              type="button"
-              variant="ghost"
-            >
-              <IconMinus className="h-4 w-4" />
-            </Button>
-            <span
-              className={cn(
-                'min-w-8 text-center text-xs',
-                transpose !== 0 ? 'text-brand-200 font-semibold' : 'text-slate-400',
-              )}
-            >
-              {formatTranspose(transpose)}
-            </span>
-            <Button
-              className="h-7 w-7 text-xs"
-              icon
-              onClick={() => handleTranspose(1)}
-              title="Transpose up"
-              type="button"
-              variant="ghost"
-            >
-              <IconPlus className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="mt-4 border-t border-slate-800 pt-4">
-            <SettingHeading
-              resetButton={
-                zoom !== 1 && (
-                  <ResetButton onClick={() => handleZoomChange(1)} title="Reset zoom to 1×" />
-                )
-              }
-            >
-              Zoom
-            </SettingHeading>
-            <div className="relative flex items-center gap-2">
-              <span className="text-xs text-slate-400">0.75×</span>
-              <div className="relative flex-1">
-                <input
-                  type="range"
-                  min="0.75"
-                  max="2"
-                  step="0.05"
-                  value={zoom}
-                  onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
-                  className="w-full accent-brand-500"
-                />
-                <div
-                  className="absolute top-1/2 h-2 w-0.5 bg-slate-500 pointer-events-none"
-                  style={{
-                    left: `${((1 - 0.75) / (2 - 0.75)) * 100}%`,
-                    transform: 'translate(calc(-50% + 5px), 8px)',
-                  }}
-                />
-              </div>
-              <span className="text-xs text-slate-400">2×</span>
-            </div>
-            <p className="mt-1 text-center text-xs font-semibold text-brand-200">
-              {zoom.toFixed(2)}×
-            </p>
-          </div>
+          <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />
+          <div className="my-4 h-px bg-slate-800" />
+          <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />
         </Card>
       </PopoverPanel>
     </Popover>
