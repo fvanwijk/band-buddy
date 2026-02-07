@@ -39,8 +39,8 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
         ) : (
           <>
             {/* Column Headers */}
-            <div className="grid gap-4 border-b border-slate-700 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 sm:grid-cols-[0.5fr_3fr_1fr_1fr_1fr] bg-slate-900/30">
-              <span className="text-right">No.</span>
+            <div className="hidden sm:grid gap-4 border-b border-slate-700 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 grid-cols-[25px_6fr_2fr_2fr_2fr] bg-slate-900/30">
+              <span className="text-right"></span>
               <span>Song</span>
               <span className="text-right">Time</span>
               <span className="text-right">Key</span>
