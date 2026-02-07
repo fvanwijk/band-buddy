@@ -1,6 +1,6 @@
 import { IconPlayerPlay } from '@tabler/icons-react';
-import { WebMidi } from 'webmidi';
 
+import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { DeleteButton } from '../../../ui/DeleteButton';
@@ -13,7 +13,11 @@ type MidiButtonCardProps = {
 };
 
 export function MidiButtonCard({ event, instrument, isAvailable, onDelete }: MidiButtonCardProps) {
-  const output = instrument?.midiInId ? WebMidi.getOutputById(instrument.midiInId) : undefined;
+  const { outputs } = useMidiDevices();
+
+  const output = instrument?.midiInId
+    ? outputs.find((o) => o.id === instrument.midiInId)
+    : undefined;
 
   const handleTestEvent = (event: MidiEvent) => {
     output?.sendProgramChange(event.programChange);

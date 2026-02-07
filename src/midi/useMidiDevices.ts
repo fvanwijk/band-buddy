@@ -1,22 +1,17 @@
 import { useEffect, useState } from 'react';
-import { WebMidi } from 'webmidi';
-
-type MidiDevice = {
-  id: string;
-  name: string;
-};
+import { Input, Output, WebMidi } from 'webmidi';
 
 type MidiDevicesState = {
   error: string | null;
-  inputs: MidiDevice[];
+  inputs: Input[];
   isReady: boolean;
   isSupported: boolean;
-  outputs: MidiDevice[];
+  outputs: Output[];
 };
 
 export function useMidiDevices(): MidiDevicesState {
-  const [inputs, setInputs] = useState<MidiDevice[]>([]);
-  const [outputs, setOutputs] = useState<MidiDevice[]>([]);
+  const [inputs, setInputs] = useState<Input[]>([]);
+  const [outputs, setOutputs] = useState<Output[]>([]);
   const [isSupported, setIsSupported] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,18 +24,8 @@ export function useMidiDevices(): MidiDevicesState {
         await WebMidi.enable({ sysex: true });
         if (!isMounted) return;
 
-        const nextInputs = WebMidi.inputs.map((input) => ({
-          id: input.id,
-          name: input.name,
-        }));
-
-        const nextOutputs = WebMidi.outputs.map((output) => ({
-          id: output.id,
-          name: output.name,
-        }));
-
-        setInputs(nextInputs);
-        setOutputs(nextOutputs);
+        setInputs(WebMidi.inputs);
+        setOutputs(WebMidi.outputs);
         setIsSupported(true);
         setIsReady(true);
         setError(null);
@@ -48,35 +33,15 @@ export function useMidiDevices(): MidiDevicesState {
         WebMidi.addListener('connected', () => {
           if (!isMounted) return;
 
-          setInputs(
-            WebMidi.inputs.map((input) => ({
-              id: input.id,
-              name: input.name,
-            })),
-          );
-          setOutputs(
-            WebMidi.outputs.map((output) => ({
-              id: output.id,
-              name: output.name,
-            })),
-          );
+          setInputs(WebMidi.inputs);
+          setOutputs(WebMidi.outputs);
         });
 
         WebMidi.addListener('disconnected', () => {
           if (!isMounted) return;
 
-          setInputs(
-            WebMidi.inputs.map((input) => ({
-              id: input.id,
-              name: input.name,
-            })),
-          );
-          setOutputs(
-            WebMidi.outputs.map((output) => ({
-              id: output.id,
-              name: output.name,
-            })),
-          );
+          setInputs(WebMidi.inputs);
+          setOutputs(WebMidi.outputs);
         });
       } catch (err) {
         if (!isMounted) return;

@@ -28,7 +28,7 @@ export function SongDetailPage() {
   const setlist = useGetSetlist(setlistId!);
   const instruments = useGetInstruments();
   const songs = useGetSongs();
-  const { isReady, isSupported } = useMidiDevices();
+  const { isReady, isSupported, outputs } = useMidiDevices();
 
   const [zoom, setZoom] = useState(1);
 
@@ -45,23 +45,19 @@ export function SongDetailPage() {
 
   const isMidiButtonDisabled = useCallback(
     (event: { instrumentId: string }) => {
-      if (!isSupported || !isReady) {
-        return true;
-      }
-
       const instrument = instrumentsById.get(event.instrumentId);
       if (!instrument) {
         console.warn('Instrument not found for MIDI button');
         return true;
       }
 
-      const output = WebMidi.getOutputById(instrument.midiInId);
+      const output = outputs.find((o) => o.id === instrument.midiInId);
       if (!output) {
         console.warn('The MIDI input that is configured for the instrument is not available');
       }
       return !output;
     },
-    [isReady, isSupported, instrumentsById],
+    [instrumentsById, outputs],
   );
 
   if (!setlist || !songId) {
