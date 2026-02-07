@@ -1,5 +1,5 @@
 import { IconX } from '@tabler/icons-react';
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 type DialogProps = {
@@ -10,6 +10,19 @@ type DialogProps = {
 };
 
 export function Dialog({ children, onClose, open, portal = true }: DialogProps) {
+  useEffect(() => {
+    if (!open || !onClose) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, open]);
+
   if (!open) return null;
 
   const dialog = (
