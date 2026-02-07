@@ -1,7 +1,9 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { type CanvasPath, ReactSketchCanvas, type ReactSketchCanvasRef } from 'react-sketch-canvas';
 
+import { DrawingCursor } from './DrawingCursor';
 import { DrawingToolbar } from './DrawingToolbar';
+import { useDrawingCursor } from './useDrawingCursor';
 import { useScrollableDimensions } from './useScrollableDimensions';
 import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
 import { cn } from '../../../utils/cn';
@@ -14,6 +16,8 @@ type DrawingOverlayProps = {
 type DrawingMode = 'idle' | 'pen' | 'eraser';
 
 const defaultColor = '#ef4444';
+const PEN_RADIUS = 4;
+const ERASER_RADIUS = 10;
 
 export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
@@ -24,6 +28,12 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
   const setCanvasPaths = useSetSongCanvasPaths(songId);
 
   const { containerRef, overlayRef, dimensions } = useScrollableDimensions();
+  const { cursorPosition, cursorRadius, handleMouseLeave, handleMouseMove } = useDrawingCursor(
+    mode,
+    overlayRef,
+    PEN_RADIUS,
+    ERASER_RADIUS,
+  );
 
   // Initially load stored canvas paths when songId changes (not while we are drawing)
   useEffect(() => {
@@ -79,24 +89,35 @@ export function DrawingOverlay({ children, songId }: DrawingOverlayProps) {
         {children}
         <div
           ref={overlayRef}
+          className={cn('absolute inset-0', mode === 'idle' && 'pointer-events-none')}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
           style={{
+            cursor: mode !== 'idle' ? 'none' : 'default',
             height: `${dimensions.height}px`,
             width: `${dimensions.width}px`,
           }}
-          className={cn('absolute inset-0', mode === 'idle' && 'pointer-events-none')}
         >
           <div className="w-full h-full">
             <ReactSketchCanvas
               ref={canvasRef}
               canvasColor="transparent"
-              eraserWidth={20}
+              eraserWidth={ERASER_RADIUS * 2}
               onChange={handlePathsChange}
               readOnly={mode === 'idle'}
               strokeColor={selectedColor}
-              strokeWidth={4}
+              strokeWidth={PEN_RADIUS}
               style={{ border: 'none' }}
             />
           </div>
+          {cursorPosition && mode !== 'idle' && (
+            <DrawingCursor
+              color={selectedColor}
+              mode={mode}
+              position={cursorPosition}
+              radius={cursorRadius}
+            />
+          )}
         </div>
       </div>
     </section>
