@@ -28,6 +28,7 @@ export function ConfirmDialog({ isOpen, message, onClose, onConfirm, title }: Co
           Cancel
         </Button>
         <Button
+          autoFocus
           color="danger"
           className="flex-1"
           iconStart={<IconTrash className="h-4 w-4" />}
