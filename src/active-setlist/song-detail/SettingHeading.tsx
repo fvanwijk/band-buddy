@@ -7,8 +7,8 @@ type SettingHeadingProps = {
 
 export function SettingHeading({ children, resetButton }: SettingHeadingProps) {
   return (
-    <div className="flex items-center justify-between mb-2 h-4">
-      <p className="text-xs uppercase tracking-wide text-slate-400">{children}</p>
+    <div className="mb-2 flex h-4 items-center justify-between">
+      <p className="text-xs tracking-wide text-slate-400 uppercase">{children}</p>
       {resetButton}
     </div>
   );

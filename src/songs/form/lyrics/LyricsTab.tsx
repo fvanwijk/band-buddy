@@ -16,7 +16,7 @@ export function LyricsTab({ error, register }: LyricsTabProps) {
           id="lyrics"
           rows={12}
           {...register}
-          className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 font-mono text-sm text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
+          className="focus:border-brand-400 focus:ring-brand-400/20 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 font-mono text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:outline-none"
           placeholder="Enter chords and lyrics..."
         />
         <p className="mt-1 text-xs text-slate-500">

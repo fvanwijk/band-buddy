@@ -18,7 +18,7 @@ export function SetlistHeader({ date, name, songCount, totalSeconds, venue }: Se
       <div className="flex flex-wrap gap-2 text-xs text-slate-300">
         <span className="rounded-full bg-slate-900/70 px-3 py-1">{formatDate(date)}</span>
         {venue && <span className="rounded-full bg-slate-900/70 px-3 py-1">{venue}</span>}
-        <span className="rounded-full bg-brand-400/10 px-3 py-1 text-brand-200">
+        <span className="bg-brand-400/10 text-brand-200 rounded-full px-3 py-1">
           {songCount} songs
           {totalSeconds !== undefined && (
             <>

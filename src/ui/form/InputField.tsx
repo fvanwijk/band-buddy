@@ -39,7 +39,7 @@ export function InputField({
         placeholder={placeholder}
         type={type}
         {...register}
-        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
+        className="focus:border-brand-400 focus:ring-brand-400/20 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 placeholder-slate-500 focus:ring-2 focus:outline-none"
       />
       {error ? (
         <p className="mt-1 text-xs text-red-400">{error.message}</p>

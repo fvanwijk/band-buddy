@@ -29,7 +29,7 @@ export function RadioGroup({
       <div className="mb-2 flex items-center justify-between">
         <label className="text-sm font-medium text-slate-300">
           {label}
-          {required && <span className="ml-1 text-brand-400/70">*</span>}
+          {required && <span className="text-brand-400/70 ml-1">*</span>}
         </label>
         {children}
       </div>
@@ -37,13 +37,13 @@ export function RadioGroup({
         {options.map((option) => (
           <label
             key={option.value}
-            className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-300 hover:border-brand-400/50 has-checked:border-brand-400 has-checked:bg-brand-400/10 has-checked:text-brand-200"
+            className="hover:border-brand-400/50 has-checked:border-brand-400 has-checked:bg-brand-400/10 has-checked:text-brand-200 flex cursor-pointer items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-300"
           >
             <input
               type="radio"
               value={option.value}
               {...register}
-              className="h-4 w-4 text-brand-400 focus:ring-2 focus:ring-brand-400/20"
+              className="text-brand-400 focus:ring-brand-400/20 h-4 w-4 focus:ring-2"
             />
             <span>{option.label}</span>
           </label>

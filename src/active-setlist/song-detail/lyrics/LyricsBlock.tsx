@@ -28,7 +28,7 @@ export function LyricsBlock({ lyrics, transpose = 0 }: LyricsBlockProps) {
 
   return (
     <div className="flex flex-1 flex-col p-6">
-      <pre className="whitespace-pre font-mono text-sm text-slate-200 leading-relaxed">
+      <pre className="font-mono text-sm leading-relaxed whitespace-pre text-slate-200">
         {lyrics?.split(/(\s+)/).map((token, index) => {
           if (!token.trim()) {
             return token;

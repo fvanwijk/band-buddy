@@ -90,7 +90,7 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
   };
 
   return (
-    <section className="relative flex flex-1 flex-col min-h-0">
+    <section className="relative flex min-h-0 flex-1 flex-col">
       <DrawingToolbar
         mode={mode}
         onClear={handleClear}
@@ -100,7 +100,7 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
       />
 
       <div
-        className="flex flex-1 flex-col rounded-2xl border border-slate-800  relative overflow-auto min-h-0"
+        className="relative flex min-h-0 flex-1 flex-col overflow-auto rounded-2xl border border-slate-800"
         ref={containerRef}
       >
         <div
@@ -123,7 +123,7 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
             width: `${dimensions.width * zoom}px`,
           }}
         >
-          <div className="w-full h-full">
+          <div className="h-full w-full">
             <ReactSketchCanvas
               ref={canvasRef}
               canvasColor="transparent"

@@ -112,7 +112,7 @@ export function InstrumentDialog({
             <Button
               className="flex-1"
               color="primary"
-              iconStart={<IconDeviceFloppy className="w-4 h-4" />}
+              iconStart={<IconDeviceFloppy className="h-4 w-4" />}
               type="submit"
               variant="filled"
             >

@@ -86,7 +86,7 @@ export function ManageSetlistsPage() {
       {displaySetlists.length === 0 ? (
         <EmptyState
           description="Create your first setlist to get started!"
-          icon={<IconPlaylist className="w-12 h-12" />}
+          icon={<IconPlaylist className="h-12 w-12" />}
           title="No setlists yet"
         />
       ) : (

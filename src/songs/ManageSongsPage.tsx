@@ -67,7 +67,7 @@ export function ManageSongsPage() {
       {displayedSongs.length === 0 ? (
         <EmptyState
           description="Add songs to build your repertoire and use them in setlists."
-          icon={<IconMusic className="w-12 h-12" />}
+          icon={<IconMusic className="h-12 w-12" />}
           title="No songs in your library"
         />
       ) : (

@@ -24,9 +24,9 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
   return (
     <div>
       {/* Set Card */}
-      <div className="rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl shadow-black/40 overflow-hidden">
+      <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl shadow-black/40">
         {/* Set Header */}
-        <div className="flex items-center justify-between border-b border-slate-700 bg-slate-800/50 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
+        <div className="text-brand-300 flex items-center justify-between border-b border-slate-700 bg-slate-800/50 px-6 py-3 text-xs font-semibold tracking-[0.2em] uppercase">
           <span>Set {setIndex + 1}</span>
           <span className="text-slate-400">
             <FormattedDuration seconds={setSeconds} />
@@ -39,7 +39,7 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
         ) : (
           <>
             {/* Column Headers */}
-            <div className="hidden sm:grid gap-4 border-b border-slate-700 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 grid-cols-[25px_6fr_2fr_2fr_2fr] bg-slate-900/30">
+            <div className="hidden grid-cols-[25px_6fr_2fr_2fr_2fr] gap-4 border-b border-slate-700 bg-slate-900/30 px-6 py-3 text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase sm:grid">
               <span className="text-right"></span>
               <span>Song</span>
               <span className="text-right">Time</span>
@@ -70,7 +70,7 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
       {setIndex < sets.length - 1 && (
         <div className="flex items-center justify-center gap-4 py-4">
           <div className="h-px flex-1 bg-slate-700" />
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          <span className="text-xs font-semibold tracking-[0.2em] text-slate-500 uppercase">
             Break
           </span>
           <div className="h-px flex-1 bg-slate-700" />

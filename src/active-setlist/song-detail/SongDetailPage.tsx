@@ -169,12 +169,12 @@ export function SongDetailPage() {
             },
           ]}
         />
-        <nav className="fixed w-full left-0 bottom-0 z-10 bg-slate-950 ">
-          <div className="mx-auto max-w-5xl grid grid-cols-2 gap-3 border-t border-slate-800 p-4">
+        <nav className="fixed bottom-0 left-0 z-10 w-full bg-slate-950">
+          <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 border-t border-slate-800 p-4">
             {previousSongId && (
               <Button
                 as={Link}
-                className="flex-1 h-16"
+                className="h-16 flex-1"
                 color="primary"
                 iconStart={<IconArrowLeft className="h-4 w-4" />}
                 to={`/setlist/${setlistId}/song/${previousSongId}/${selectedTab}`}
@@ -186,7 +186,7 @@ export function SongDetailPage() {
             {nextSongId && (
               <Button
                 as={Link}
-                className="flex-1 h-16 col-start-2"
+                className="col-start-2 h-16 flex-1"
                 color="primary"
                 iconEnd={<IconArrowRight className="h-4 w-4" />}
                 to={`/setlist/${setlistId}/song/${nextSongId}/${selectedTab}`}

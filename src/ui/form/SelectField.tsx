@@ -51,7 +51,7 @@ export function SelectField({
         </FormLabel>
       )}
       <select
-        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/20"
+        className="focus:border-brand-400 focus:ring-brand-400/20 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:ring-2 focus:outline-none"
         id={id}
         {...selectProps}
       >

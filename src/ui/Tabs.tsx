@@ -45,7 +45,7 @@ export function Tabs({ activeTabId, onTabChange, tabs }: TabsProps) {
               [
                 'rounded-t-lg border-b-2 px-4 py-2 text-sm font-semibold transition',
                 selected
-                  ? 'border-brand-400 bg-slate-900/80 text-brand-100'
+                  ? 'border-brand-400 text-brand-100 bg-slate-900/80'
                   : 'border-transparent text-slate-400 hover:text-slate-200',
               ].join(' ')
             }

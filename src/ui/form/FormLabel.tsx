@@ -13,7 +13,7 @@ export function FormLabel({ children, className, htmlFor, required = false }: Fo
   return (
     <label className={cn('text-sm font-medium text-slate-300', className)} htmlFor={htmlFor}>
       {children}
-      {required && <span className="ml-1 text-brand-400/70">*</span>}
+      {required && <span className="text-brand-400/70 ml-1">*</span>}
     </label>
   );
 }

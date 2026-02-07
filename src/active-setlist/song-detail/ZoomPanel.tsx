@@ -26,10 +26,10 @@ export function ZoomPanel({ onZoomChange, zoom }: ZoomPanelProps) {
             step="0.05"
             value={zoom}
             onChange={(e) => onZoomChange(parseFloat(e.target.value))}
-            className="w-full accent-brand-500"
+            className="accent-brand-500 w-full"
           />
           <div
-            className="absolute top-1/2 h-2 w-0.5 bg-slate-500 pointer-events-none"
+            className="pointer-events-none absolute top-1/2 h-2 w-0.5 bg-slate-500"
             style={{
               left: `${((1 - 0.75) / (2 - 0.75)) * 100}%`,
               transform: 'translate(calc(-50% + 5px), 8px)',
@@ -38,7 +38,7 @@ export function ZoomPanel({ onZoomChange, zoom }: ZoomPanelProps) {
         </div>
         <span className="text-xs text-slate-400">2×</span>
       </div>
-      <p className="mt-1 text-center text-xs font-semibold text-brand-200">{zoom.toFixed(2)}×</p>
+      <p className="text-brand-200 mt-1 text-center text-xs font-semibold">{zoom.toFixed(2)}×</p>
     </>
   );
 }

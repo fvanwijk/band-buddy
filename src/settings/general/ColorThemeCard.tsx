@@ -43,10 +43,10 @@ export function ColorThemeCard() {
               key={themeName}
               onClick={() => setTheme(themeName)}
               className={[
-                'group relative overflow-hidden rounded-xl border text-left transition block! p-3!',
+                'group relative block! overflow-hidden rounded-xl border p-3! text-left transition',
                 isActive
-                  ? 'border-brand-400 bg-brand-400/10 '
-                  : 'border-slate-700 bg-slate-800/50  hover:border-slate-600',
+                  ? 'border-brand-400 bg-brand-400/10'
+                  : 'border-slate-700 bg-slate-800/50 hover:border-slate-600',
               ].join(' ')}
               variant="ghost"
             >
@@ -59,9 +59,9 @@ export function ColorThemeCard() {
                 </div>
 
                 {isActive && (
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-400/20">
+                  <div className="bg-brand-400/20 flex h-5 w-5 items-center justify-center rounded-full">
                     <svg
-                      className="h-3 w-3 text-brand-300"
+                      className="text-brand-300 h-3 w-3"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

@@ -27,7 +27,7 @@ export function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
 
         <div className="space-y-3">
           <div className="flex gap-3">
-            <IconMusic className="mt-0.5 h-5 w-5 shrink-0 text-brand-400" />
+            <IconMusic className="text-brand-400 mt-0.5 h-5 w-5 shrink-0" />
             <div>
               <p className="font-semibold text-slate-100">Build Your Song Library</p>
               <p className="text-slate-400">
@@ -38,7 +38,7 @@ export function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
           </div>
 
           <div className="flex gap-3">
-            <IconPlaylist className="mt-0.5 h-5 w-5 flex-shrink-0 text-brand-400" />
+            <IconPlaylist className="text-brand-400 mt-0.5 h-5 w-5 flex-shrink-0" />
             <div>
               <p className="font-semibold text-slate-100">Create Setlists</p>
               <p className="text-slate-400">
@@ -49,7 +49,7 @@ export function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
           </div>
 
           <div className="flex gap-3">
-            <IconSettings className="mt-0.5 h-5 w-5 flex-shrink-0 text-brand-400" />
+            <IconSettings className="text-brand-400 mt-0.5 h-5 w-5 flex-shrink-0" />
             <div>
               <p className="font-semibold text-slate-100">Configure Your Instruments</p>
               <p className="text-slate-400">

@@ -45,7 +45,7 @@ export function DrawingToolbar({
 
   return (
     // 52px + 2rem negative margin
-    <div className="sticky top-14 z-10 flex items-center gap-2 mb-2 sm:mb-8 sm:-mt-21 pr-2 self-end">
+    <div className="sticky top-14 z-10 mb-2 flex items-center gap-2 self-end pr-2 sm:-mt-21 sm:mb-8">
       <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 p-2">
         <Button
           color={mode === 'idle' ? 'primary' : 'default'}
@@ -91,8 +91,8 @@ export function DrawingToolbar({
             style={{ backgroundColor: selectedColor }}
           />
         </MenuButton>
-        <MenuItems className="absolute right-0 top-12 z-30 w-48 rounded-xl border border-slate-800 bg-slate-950 p-2 shadow-lg">
-          <p className="px-2 pb-2 text-xs uppercase tracking-wide text-slate-400">
+        <MenuItems className="absolute top-12 right-0 z-30 w-48 rounded-xl border border-slate-800 bg-slate-950 p-2 shadow-lg">
+          <p className="px-2 pb-2 text-xs tracking-wide text-slate-400 uppercase">
             {selectedOption?.label || 'Color'}
           </p>
           <div className="grid grid-cols-4 gap-2">
@@ -110,7 +110,7 @@ export function DrawingToolbar({
                         className={cn(
                           'block h-5 w-5 rounded-full border transition-all',
                           selectedColor === option.value
-                            ? 'border-brand-400 ring-2 ring-brand-400'
+                            ? 'border-brand-400 ring-brand-400 ring-2'
                             : 'border-slate-700',
                         )}
                         style={{ backgroundColor: option.value }}

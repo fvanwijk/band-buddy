@@ -50,7 +50,7 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
         ref={setPopperElement}
         style={styles.popper}
         {...attributes.popper}
-        className="shadow-lg z-20"
+        className="z-20 shadow-lg"
       >
         <Card>
           <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />

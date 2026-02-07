@@ -15,7 +15,7 @@ export function SongRow({ index, setlistId, song }: SongRowProps) {
   return (
     <li>
       <Link
-        className="grid cursor-pointer gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 grid-cols-[25px_4fr_75px] sm:grid-cols-[25px_6fr_2fr_2fr_2fr]"
+        className="grid cursor-pointer grid-cols-[25px_4fr_75px] gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[25px_6fr_2fr_2fr_2fr]"
         to={setlistId ? `/setlist/${setlistId}/song/${song.id}` : '#'}
       >
         <span className="text-right text-slate-500">{index}</span>
@@ -23,20 +23,20 @@ export function SongRow({ index, setlistId, song }: SongRowProps) {
           <span className="text-base font-semibold text-slate-100">{song.title}</span>
           <span className="text-xs text-slate-400">{song.artist}</span>
         </span>
-        <span className="hidden sm:block text-right text-sm font-semibold text-slate-100">
+        <span className="hidden text-right text-sm font-semibold text-slate-100 sm:block">
           {song.timeSignature}
         </span>
-        <span className="hidden sm:block text-right text-sm font-semibold text-slate-100">
+        <span className="hidden text-right text-sm font-semibold text-slate-100 sm:block">
           {song.key}
         </span>
-        <span className="hidden sm:block text-right text-sm text-slate-400">
+        <span className="hidden text-right text-sm text-slate-400 sm:block">
           <FormattedDuration seconds={durationSeconds} />
         </span>
-        <span className="sm:hidden flex flex-col gap-0.5 text-right">
+        <span className="flex flex-col gap-0.5 text-right sm:hidden">
           <span>
             {song.timeSignature} • {song.key}
           </span>
-          <span className="text-slate-400 text-xs">
+          <span className="text-xs text-slate-400">
             {durationSeconds && <FormattedDuration seconds={durationSeconds} />}
           </span>
         </span>

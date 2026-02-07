@@ -26,7 +26,7 @@ export function ActiveSetlistPage() {
               to get started with your performance.
             </>
           }
-          icon={<IconPlayerPlay className="w-12 h-12" />}
+          icon={<IconPlayerPlay className="h-12 w-12" />}
           title="No active setlist"
         />
       </div>

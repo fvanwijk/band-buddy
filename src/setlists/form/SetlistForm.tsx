@@ -72,7 +72,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
         <div>
           <form
             autoComplete="off"
-            className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-4"
+            className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
             noValidate
             onSubmit={handleSubmit(handleFormSubmit)}
           >

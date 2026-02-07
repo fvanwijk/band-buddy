@@ -33,7 +33,7 @@ export function Dialog({ children, onClose, open, portal = true }: DialogProps) 
         {onClose && (
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 rounded-lg p-1 text-slate-400 transition hover:bg-slate-800 hover:text-slate-100"
+            className="absolute top-4 right-4 rounded-lg p-1 text-slate-400 transition hover:bg-slate-800 hover:text-slate-100"
             type="button"
           >
             <IconX className="h-5 w-5" />

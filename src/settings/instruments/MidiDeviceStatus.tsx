@@ -25,7 +25,7 @@ export function MidiDeviceStatus({
           {name}
         </p>
         {!isAvailable && !isOptional && (
-          <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-red-300">
+          <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold tracking-[0.2em] text-red-300 uppercase">
             Unavailable
           </span>
         )}

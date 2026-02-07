@@ -20,5 +20,5 @@ export function Chord({ children, transpose = 0 }: ChordProps) {
   const normalized = normalizeChord(children);
   const transposed = transposeChord(normalized, transpose);
 
-  return <strong className="font-semibold text-brand-300">{transposed}</strong>;
+  return <strong className="text-brand-300 font-semibold">{transposed}</strong>;
 }

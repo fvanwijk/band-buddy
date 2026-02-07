@@ -6,8 +6,8 @@ export type LayoutProps = PropsWithChildren;
 
 export function EmptyLayout({ children }: LayoutProps) {
   return (
-    <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pb-4 pt-2">
-      <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-900 bg-slate-950/80 backdrop-blur py-2">
+    <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pt-2 pb-4">
+      <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-900 bg-slate-950/80 py-2 backdrop-blur">
         <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
       </header>
 
