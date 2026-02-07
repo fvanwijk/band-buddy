@@ -33,7 +33,7 @@ export function ColorThemeCard() {
         Choose your preferred color scheme. Based on triadic color harmony.
       </p>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <div className="mt-6 grid grid-cols-3 gap-3">
         {Object.entries(THEMES).map(([key, theme]) => {
           const themeName = key as ThemeName;
           const isActive = currentTheme === themeName;
@@ -77,11 +77,11 @@ export function ColorThemeCard() {
                 )}
               </div>
 
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex h-20 flex-col gap-2 sm:h-8 sm:flex-row">
                 {(['200', '400', '600'] as const).map((shade) => (
                   <div
                     key={shade}
-                    className="h-8 flex-1 rounded"
+                    className="flex-1 rounded"
                     style={{
                       backgroundColor: themeColors[themeName][shade],
                     }}
