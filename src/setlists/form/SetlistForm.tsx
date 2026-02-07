@@ -45,9 +45,8 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
 
   const handleAddSet = () => {
     const newSetNumber = Math.max(...fields.map((s) => s.setNumber), 0) + 1;
-    if (newSetNumber <= 3) {
-      append({ setNumber: newSetNumber, songs: [] });
-    }
+
+    append({ setNumber: newSetNumber, songs: [] });
   };
 
   const handleRemoveSet = (index: number) => {

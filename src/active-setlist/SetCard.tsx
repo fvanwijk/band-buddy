@@ -27,7 +27,7 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
       <div className="rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl shadow-black/40 overflow-hidden">
         {/* Set Header */}
         <div className="flex items-center justify-between border-b border-slate-700 bg-slate-800/50 px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
-          <span>Set {set.setNumber}</span>
+          <span>Set {setIndex + 1}</span>
           <span className="text-slate-400">
             <FormattedDuration seconds={setSeconds} />
           </span>

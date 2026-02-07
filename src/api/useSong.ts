@@ -127,7 +127,6 @@ export function useUpdateSong(id: string, onSuccess?: () => void) {
       const finalData: Record<string, unknown> = {
         ...data,
       };
-      console.log(data);
 
       if (data.midiEvents && data.midiEvents.length > 0) {
         finalData.midiEvents = JSON.stringify(data.midiEvents);

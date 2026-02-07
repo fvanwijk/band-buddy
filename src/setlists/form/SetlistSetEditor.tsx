@@ -78,7 +78,7 @@ export function SetlistSetEditor({
   return (
     <div className="space-y-2 rounded border border-slate-700 bg-slate-900 p-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-semibold text-white">Set {setNumber}</h4>
+        <h4 className="font-semibold text-white">Set {index + 1}</h4>
         {showRemove && (
           <Button
             color="danger"

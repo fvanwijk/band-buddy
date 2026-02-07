@@ -9,7 +9,7 @@ export function EditSongPage() {
   const navigate = useNavigate();
   const song = useGetSong(id);
   const updateSong = useUpdateSong(id!, () => navigate(backPath));
-  console.log(song);
+
   if (!id || !song) {
     throw new Error('Song not found');
   }
