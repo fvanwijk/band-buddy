@@ -82,6 +82,18 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const lyricsChanged = lyrics !== (initialData?.lyrics || '');
   const showDrawingWarning = hasDrawings && lyricsChanged;
 
+  // Check which tabs have errors
+  const hasDetailsErrors = !!(
+    errors.artist ||
+    errors.title ||
+    errors.keyNote ||
+    errors.keyQuality ||
+    errors.timeSignature ||
+    errors.bpm ||
+    errors.durationString
+  );
+  const hasLyricsErrors = !!errors.lyrics;
+
   useEffect(() => {
     const measures = calculateMeasures(durationSeconds, bpm, timeSignature);
     setCalculatedMeasures(measures);
@@ -273,11 +285,13 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                   </div>
                 </div>
               ),
+              hasError: hasDetailsErrors,
               id: 'details',
               label: 'Song details',
             },
             {
               content: <LyricsTab error={errors.lyrics} register={register('lyrics')} />,
+              hasError: hasLyricsErrors,
               id: 'lyrics',
               label: 'Lyrics',
             },

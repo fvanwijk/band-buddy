@@ -1,9 +1,11 @@
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { IconAlertCircle } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 type TabItem = {
   content: ReactNode;
+  hasError?: boolean;
   id: string;
   label: string;
 };
@@ -43,7 +45,7 @@ export function Tabs({ activeTabId, onTabChange, tabs }: TabsProps) {
             key={tab.id}
             className={({ selected }: { selected: boolean }) =>
               [
-                'rounded-t-lg border-b-2 px-4 py-2 text-sm font-semibold transition',
+                'flex items-center rounded-t-lg border-b-2 px-4 py-2 text-sm font-semibold transition',
                 selected
                   ? 'border-brand-400 text-brand-100 bg-slate-900/80'
                   : 'border-transparent text-slate-400 hover:text-slate-200',
@@ -51,6 +53,7 @@ export function Tabs({ activeTabId, onTabChange, tabs }: TabsProps) {
             }
           >
             {tab.label}
+            {tab.hasError && <IconAlertCircle className="ml-1 inline-block h-4 w-4 text-red-400" />}
           </Tab>
         ))}
       </TabList>
