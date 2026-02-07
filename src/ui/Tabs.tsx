@@ -58,8 +58,13 @@ export function Tabs({ activeTabId, onTabChange, tabs }: TabsProps) {
         ))}
       </TabList>
       <TabPanels className="pt-6">
-        {tabs.map((tab) => (
-          <TabPanel key={tab.id} className="focus:outline-none">
+        {tabs.map((tab, index) => (
+          <TabPanel
+            key={tab.id}
+            className="focus:outline-none"
+            unmount={false}
+            style={{ display: selectedIndex === index ? 'block' : 'none' }}
+          >
             {tab.content}
           </TabPanel>
         ))}
