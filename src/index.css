@@ -49,3 +49,18 @@
 .link {
   @apply text-brand-300 hover:text-brand-200 decoration-brand-300/50 hover:decoration-brand-200 underline transition-colors;
 }
+
+@keyframes metronome-pulse {
+  0% {
+    border-color: oklch(0.985 0 0);
+    box-shadow: 0 0 0 1px oklch(0.985 0 0);
+  }
+  100% {
+    border-color: unset;
+    box-shadow: 0 0 0 1px transparent;
+  }
+}
+
+.metronome-pulse {
+  animation: metronome-pulse 1s infinite;
+}

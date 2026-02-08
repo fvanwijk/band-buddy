@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Sampler } from 'smplr';
 
 import { useGetMetronomeVolume } from '../api/useSettings';
@@ -11,17 +11,8 @@ type UseMetronomeProps = {
   timeSignature: string;
 };
 
-type UseMetronomeReturn = {
-  isOnBeat: boolean;
-};
-
-export function useMetronome({
-  bpm,
-  isRunning,
-  timeSignature,
-}: UseMetronomeProps): UseMetronomeReturn {
+export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProps) {
   const volume = useGetMetronomeVolume();
-  const [isOnBeat, setIsOnBeat] = useState(false);
   const samplerRef = useRef<Sampler | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const beatCountRef = useRef(0);
@@ -29,7 +20,6 @@ export function useMetronome({
   const isArmedRef = useRef(false);
   const nextBeatTimeRef = useRef(0);
   const schedulerIdRef = useRef<number | null>(null);
-  const lastBeatRef = useRef(-1);
   const prevIsRunningRef = useRef(false);
 
   // Parse time signature to get beats per measure
@@ -104,13 +94,6 @@ export function useMetronome({
       const now = Date.now();
 
       while (nextBeatTimeRef.current - now < scheduleAhead) {
-        // Visual feedback - always show on every beat
-        if (lastBeatRef.current !== beatCountRef.current) {
-          lastBeatRef.current = beatCountRef.current;
-          setIsOnBeat(true);
-          setTimeout(() => setIsOnBeat(false), 100);
-        }
-
         // Audio - only play if running
         if (isRunning) {
           let isDownbeat = false;
@@ -153,6 +136,4 @@ export function useMetronome({
     document.addEventListener('click', resumeAudioContext);
     return () => document.removeEventListener('click', resumeAudioContext);
   }, []);
-
-  return { isOnBeat };
 }

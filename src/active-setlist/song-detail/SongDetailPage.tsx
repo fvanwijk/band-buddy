@@ -2,8 +2,8 @@ import {
   IconArrowLeft,
   IconArrowRight,
   IconMicrophone2Off,
-  IconPlayerPlay,
-  IconPlayerStop,
+  IconPlayerPlayFilled,
+  IconPlayerStopFilled,
 } from '@tabler/icons-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -89,11 +89,13 @@ export function SongDetailPage() {
   }
 
   // Initialize metronome
-  const { isOnBeat } = useMetronome({
+  useMetronome({
     bpm: currentSong.bpm || 120,
     isRunning: isMetronomeRunning,
     timeSignature: currentSong.timeSignature || '4/4',
   });
+
+  const beatDurationSeconds = 60 / (currentSong.bpm || 120);
 
   // Get previous and next song IDs
   const previousSongId = currentSongIndex > 0 ? songFromSetlist[currentSongIndex - 1].songId : null;
@@ -134,17 +136,18 @@ export function SongDetailPage() {
   const transposeControl = (
     <div className="flex items-center gap-4">
       <Button
-        color={isOnBeat ? 'primary' : 'default'}
+        className="metronome-pulse"
         icon
         onClick={() => setIsMetronomeRunning((prev) => !prev)}
+        style={{ animationDuration: `${beatDurationSeconds}s` }}
         title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
         type="button"
         variant="outlined"
       >
         {isMetronomeRunning ? (
-          <IconPlayerStop className="h-4 w-4" />
+          <IconPlayerStopFilled className="h-4 w-4" />
         ) : (
-          <IconPlayerPlay className="h-4 w-4" />
+          <IconPlayerPlayFilled className="h-4 w-4" />
         )}
       </Button>
       <SongStats song={currentSong} />
