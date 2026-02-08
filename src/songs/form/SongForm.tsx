@@ -56,7 +56,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       bpm: initialData?.bpm || undefined,
       durationString: initialData?.duration ? formatDurationToString(initialData.duration) : '',
       keyNote: existingNote || undefined,
-      keyQuality: existingQuality || undefined,
+      keyQuality: existingQuality || existingNote ? '' : undefined,
       lyrics: initialData?.lyrics || '',
       midiEvents: initialData?.midiEvents || [],
       timeSignature: initialData?.timeSignature,
