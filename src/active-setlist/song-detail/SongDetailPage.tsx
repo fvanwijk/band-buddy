@@ -133,7 +133,7 @@ export function SongDetailPage() {
     }
   };
 
-  const transposeControl = (
+  const toolbar = (
     <div className="flex items-center gap-4">
       <Button
         className="metronome-pulse"
@@ -159,7 +159,7 @@ export function SongDetailPage() {
     <>
       <Page className="pb-24.25">
         <PageHeader
-          action={transposeControl}
+          action={toolbar}
           backPath="/"
           title={currentSong.title}
           subtitle={currentSong.artist}

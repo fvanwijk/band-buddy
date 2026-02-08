@@ -11,6 +11,7 @@ import {
   metronomeVolumeSchema,
   setlistMetadataTableSchema,
   setlistSongTableSchema,
+  showDrawingToolsSchema,
   songTableSchema,
   themeSchema,
 } from '../schemas';
@@ -43,6 +44,7 @@ export function createAppStore(): Store {
     hasSeenWelcome: hasSeenWelcomeSchema,
     locale: localeSchema,
     metronomeVolume: metronomeVolumeSchema,
+    showDrawingTools: showDrawingToolsSchema,
     theme: themeSchema,
   });
 

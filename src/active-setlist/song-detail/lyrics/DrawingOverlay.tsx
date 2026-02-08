@@ -5,6 +5,7 @@ import { DrawingCursor } from './DrawingCursor';
 import { DrawingToolbar, colorOptions } from './DrawingToolbar';
 import { useDrawingCursor } from './useDrawingCursor';
 import { useScrollableDimensions } from './useScrollableDimensions';
+import { useGetShowDrawingTools } from '../../../api/useSettings';
 import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
 import { cn } from '../../../utils/cn';
 
@@ -22,6 +23,7 @@ const ERASER_RADIUS = 10;
 
 export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayProps) {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
+  const showDrawingTools = useGetShowDrawingTools();
   const [mode, setMode] = useState<DrawingMode>('idle');
   const [selectedColor, setSelectedColor] = useState(defaultColor);
 
@@ -91,13 +93,15 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
 
   return (
     <section className="relative flex min-h-0 flex-1 flex-col">
-      <DrawingToolbar
-        mode={mode}
-        onClear={handleClear}
-        onColorSelect={handleColorSelect}
-        onModeChange={handleModeChange}
-        selectedColor={selectedColor}
-      />
+      {showDrawingTools && (
+        <DrawingToolbar
+          mode={mode}
+          onClear={handleClear}
+          onColorSelect={handleColorSelect}
+          onModeChange={handleModeChange}
+          selectedColor={selectedColor}
+        />
+      )}
 
       <div
         className="relative flex min-h-0 flex-1 flex-col overflow-auto rounded-2xl border border-slate-800"

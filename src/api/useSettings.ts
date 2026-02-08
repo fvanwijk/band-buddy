@@ -3,7 +3,13 @@ import { useSetValueCallback, useValue } from 'tinybase/ui-react';
 import type { SupportedLocale } from '../config/locales';
 import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
-import { hasSeenWelcomeSchema, localeSchema, metronomeVolumeSchema, themeSchema } from '../schemas';
+import {
+  hasSeenWelcomeSchema,
+  localeSchema,
+  metronomeVolumeSchema,
+  showDrawingToolsSchema,
+  themeSchema,
+} from '../schemas';
 
 /**
  * Hook to get the current locale
@@ -96,4 +102,19 @@ export function useGetMetronomeVolume(): number {
  */
 export function useSetMetronomeVolume() {
   return useSetValueCallback('metronomeVolume', (volume: number) => volume, []);
+}
+/**
+ * Hook to get whether drawing tools are shown
+ */
+export function useGetShowDrawingTools(): boolean {
+  const show = useValue('showDrawingTools');
+  const result = showDrawingToolsSchema.safeParse(show);
+  return result.success ? result.data : true;
+}
+
+/**
+ * Hook to set whether drawing tools are shown
+ */
+export function useSetShowDrawingTools() {
+  return useSetValueCallback('showDrawingTools', (show: boolean) => show, []);
 }
