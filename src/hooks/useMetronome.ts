@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Sampler } from 'smplr';
 
 import { useGetMetronomeVolume } from '../api/useSettings';
@@ -11,16 +11,42 @@ type UseMetronomeProps = {
   timeSignature: string;
 };
 
-export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProps) {
+type UseMetronomeReturn = {
+  isOnBeat: boolean;
+};
+
+export function useMetronome({
+  bpm,
+  isRunning,
+  timeSignature,
+}: UseMetronomeProps): UseMetronomeReturn {
   const volume = useGetMetronomeVolume();
+  const [isOnBeat, setIsOnBeat] = useState(false);
   const samplerRef = useRef<Sampler | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const beatCountRef = useRef(0);
+  const audioBeatIndexRef = useRef(0);
+  const isArmedRef = useRef(false);
   const nextBeatTimeRef = useRef(0);
   const schedulerIdRef = useRef<number | null>(null);
+  const lastBeatRef = useRef(-1);
+  const prevIsRunningRef = useRef(false);
 
   // Parse time signature to get beats per measure
   const [beatsPerMeasure] = timeSignature.split('/').map(Number);
+
+  // Track when isRunning changes
+  useEffect(() => {
+    if (isRunning && !prevIsRunningRef.current) {
+      // Play pressed - arm the next beat as downbeat
+      isArmedRef.current = true;
+      audioBeatIndexRef.current = 0;
+    }
+    if (!isRunning && prevIsRunningRef.current) {
+      isArmedRef.current = false;
+    }
+    prevIsRunningRef.current = isRunning;
+  }, [isRunning, beatsPerMeasure]);
 
   // Initialize Sampler with custom WAV samples
   useEffect(() => {
@@ -64,31 +90,42 @@ export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProp
     });
   }, []);
 
-  // Metronome scheduler
+  // Continuous scheduler - always running
   useEffect(() => {
-    if (!isRunning || !audioContextRef.current) {
-      if (schedulerIdRef.current !== null) {
-        cancelAnimationFrame(schedulerIdRef.current);
-        schedulerIdRef.current = null;
-      }
-      return;
-    }
-
     const beatDuration = (60 / bpm) * 1000; // Beat duration in ms
     const scheduleAhead = 100; // Schedule 100ms ahead
+
+    // Initialize on first run
+    if (nextBeatTimeRef.current === 0) {
+      nextBeatTimeRef.current = Date.now();
+    }
 
     const scheduler = () => {
       const now = Date.now();
 
-      if (nextBeatTimeRef.current === 0) {
-        nextBeatTimeRef.current = now;
-      }
-
       while (nextBeatTimeRef.current - now < scheduleAhead) {
-        const isDownbeat = beatCountRef.current % beatsPerMeasure === 0;
-        playBeat(isDownbeat);
+        // Visual feedback - always show on every beat
+        if (lastBeatRef.current !== beatCountRef.current) {
+          lastBeatRef.current = beatCountRef.current;
+          setIsOnBeat(true);
+          setTimeout(() => setIsOnBeat(false), 100);
+        }
 
-        beatCountRef.current = (beatCountRef.current + 1) % beatsPerMeasure;
+        // Audio - only play if running
+        if (isRunning) {
+          let isDownbeat = false;
+          if (isArmedRef.current) {
+            isDownbeat = true;
+            isArmedRef.current = false;
+            audioBeatIndexRef.current = 1;
+          } else {
+            isDownbeat = audioBeatIndexRef.current % beatsPerMeasure === 0;
+            audioBeatIndexRef.current += 1;
+          }
+          playBeat(isDownbeat);
+        }
+
+        beatCountRef.current += 1;
         nextBeatTimeRef.current += beatDuration;
       }
 
@@ -103,7 +140,7 @@ export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProp
         schedulerIdRef.current = null;
       }
     };
-  }, [isRunning, bpm, beatsPerMeasure, playBeat]);
+  }, [bpm, isRunning, beatsPerMeasure, playBeat]);
 
   // Resume audio context on interaction
   useEffect(() => {
@@ -116,4 +153,6 @@ export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProp
     document.addEventListener('click', resumeAudioContext);
     return () => document.removeEventListener('click', resumeAudioContext);
   }, []);
+
+  return { isOnBeat };
 }

@@ -89,7 +89,7 @@ export function SongDetailPage() {
   }
 
   // Initialize metronome
-  useMetronome({
+  const { isOnBeat } = useMetronome({
     bpm: currentSong.bpm || 120,
     isRunning: isMetronomeRunning,
     timeSignature: currentSong.timeSignature || '4/4',
@@ -134,6 +134,7 @@ export function SongDetailPage() {
   const transposeControl = (
     <div className="flex items-center gap-4">
       <Button
+        color={isOnBeat ? 'primary' : 'default'}
         icon
         onClick={() => setIsMetronomeRunning((prev) => !prev)}
         title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
