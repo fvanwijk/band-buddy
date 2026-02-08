@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Soundfont2Sampler } from 'smplr';
-import { SoundFont2 } from 'soundfont2';
+import { Sampler } from 'smplr';
 
 import { useGetMetronomeVolume } from '../api/useSettings';
+import hiSample from '../assets/hi.wav';
+import loSample from '../assets/lo.wav';
 
 type UseMetronomeProps = {
   bpm: number;
@@ -12,39 +13,29 @@ type UseMetronomeProps = {
 
 export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProps) {
   const volume = useGetMetronomeVolume();
-  const samplerRef = useRef<Soundfont2Sampler | null>(null);
+  const samplerRef = useRef<Sampler | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const beatCountRef = useRef(0);
   const nextBeatTimeRef = useRef(0);
   const schedulerIdRef = useRef<number | null>(null);
-  const isLoadedRef = useRef(false);
 
   // Parse time signature to get beats per measure
   const [beatsPerMeasure] = timeSignature.split('/').map(Number);
 
-  // Initialize Soundfont2Sampler with custom metronome.sf2
+  // Initialize Sampler with custom WAV samples
   useEffect(() => {
-    const initSampler = async () => {
+    const initSampler = () => {
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       }
 
       if (!samplerRef.current && audioContextRef.current) {
-        samplerRef.current = new Soundfont2Sampler(audioContextRef.current, {
-          createSoundfont: (data) => new SoundFont2(data),
-          url: '/src/assets/metronome.sf2',
+        samplerRef.current = new Sampler(audioContextRef.current, {
+          buffers: {
+            hi: hiSample,
+            lo: loSample,
+          },
         });
-
-        try {
-          await samplerRef.current.load;
-          // Load the first instrument available in the soundfont
-          if (samplerRef.current.instrumentNames.length > 0) {
-            samplerRef.current.loadInstrument(samplerRef.current.instrumentNames[0]);
-            isLoadedRef.current = true;
-          }
-        } catch (err) {
-          console.error('Failed to load metronome soundfont:', err);
-        }
       }
     };
 
@@ -55,23 +46,23 @@ export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProp
     };
   }, []);
 
-  const playBeat = useCallback(
-    (isDownbeat: boolean) => {
-      if (!samplerRef.current || !isLoadedRef.current || !audioContextRef.current) return;
+  useEffect(() => {
+    if (samplerRef.current) {
+      samplerRef.current.output.setVolume(Math.round((volume / 100) * 127));
+    }
+  }, [volume]);
 
-      // Play different notes for downbeat vs other beats
-      // Downbeat: F5 (higher velocity), other beats: E5 (lower velocity)
-      const note = isDownbeat ? 'F5' : 'E5';
-      const velocity = isDownbeat ? 127 : 80;
+  const playBeat = useCallback((isDownbeat: boolean) => {
+    if (!samplerRef.current || !audioContextRef.current) return;
 
-      samplerRef.current.start({
-        duration: 1,
-        note,
-        velocity: velocity * (volume / 100), // Scale velocity by volume setting
-      });
-    },
-    [volume],
-  );
+    const note = isDownbeat ? 'hi' : 'lo';
+    const velocity = isDownbeat ? 127 : 90;
+
+    samplerRef.current.start({
+      note,
+      velocity,
+    });
+  }, []);
 
   // Metronome scheduler
   useEffect(() => {
