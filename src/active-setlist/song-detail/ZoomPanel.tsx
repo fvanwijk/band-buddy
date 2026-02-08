@@ -1,5 +1,6 @@
 import { ResetButton } from './ResetButton';
 import { SettingHeading } from './SettingHeading';
+import { Slider } from '../../ui/Slider';
 
 type ZoomPanelProps = {
   onZoomChange: (zoom: number) => void;
@@ -8,7 +9,7 @@ type ZoomPanelProps = {
 
 export function ZoomPanel({ onZoomChange, zoom }: ZoomPanelProps) {
   return (
-    <>
+    <div className="bg-slate-800/20 p-3">
       <SettingHeading
         resetButton={
           zoom !== 1 && <ResetButton onClick={() => onZoomChange(1)} title="Reset zoom to 1×" />
@@ -16,29 +17,18 @@ export function ZoomPanel({ onZoomChange, zoom }: ZoomPanelProps) {
       >
         Zoom
       </SettingHeading>
-      <div className="relative flex items-center gap-2">
-        <span className="text-xs text-slate-400">0.75×</span>
-        <div className="relative flex-1">
-          <input
-            type="range"
-            min="0.75"
-            max="2"
-            step="0.05"
-            value={zoom}
-            onChange={(e) => onZoomChange(parseFloat(e.target.value))}
-            className="accent-brand-500 w-full"
-          />
-          <div
-            className="pointer-events-none absolute top-1/2 h-2 w-0.5 bg-slate-500"
-            style={{
-              left: `${((1 - 0.75) / (2 - 0.75)) * 100}%`,
-              transform: 'translate(calc(-50% + 5px), 8px)',
-            }}
-          />
-        </div>
-        <span className="text-xs text-slate-400">2×</span>
-      </div>
+      <Slider
+        ariaLabel="Zoom"
+        defaultValue={1}
+        max={2}
+        maxLabel="2×"
+        min={0.75}
+        minLabel="0.75×"
+        onChange={(e) => onZoomChange(parseFloat(e.target.value))}
+        step={0.05}
+        value={zoom}
+      />
       <p className="text-brand-200 mt-1 text-center text-xs font-semibold">{zoom.toFixed(2)}×</p>
-    </>
+    </div>
   );
 }

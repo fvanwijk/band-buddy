@@ -1,5 +1,6 @@
 import { SettingHeading } from './SettingHeading';
 import { useGetMetronomeVolume, useSetMetronomeVolume } from '../../api/useSettings';
+import { Slider } from '../../ui/Slider';
 
 export function MetronomeVolumePanel() {
   const volume = useGetMetronomeVolume();
@@ -10,20 +11,18 @@ export function MetronomeVolumePanel() {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 bg-slate-800/20 p-3">
       <SettingHeading>Metronome volume</SettingHeading>
       <div className="space-y-2">
-        <input
-          aria-label="Metronome volume"
-          className="accent-brand-400 h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-800"
-          max="100"
-          min="0"
+        <Slider
+          ariaLabel="Metronome volume"
+          max={100}
+          min={0}
           onChange={handleVolumeChange}
-          step="1"
-          type="range"
+          step={1}
           value={volume}
         />
-        <p className="text-center text-sm text-slate-400">{Math.round(volume)}%</p>
+        <p className="text-brand-200 text-center text-xs font-semibold">{Math.round(volume)}%</p>
       </div>
     </div>
   );

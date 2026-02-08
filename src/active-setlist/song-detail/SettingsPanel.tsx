@@ -53,16 +53,10 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
         {...attributes.popper}
         className="z-20 shadow-lg"
       >
-        <Card>
+        <Card className="p-1" contentClassName="w-56 space-y-1">
           <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />
-          <div className="my-4 h-px bg-slate-800" />
           <MetronomeVolumePanel />
-          {song.lyrics && (
-            <>
-              <div className="my-4 h-px bg-slate-800" />
-              <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />
-            </>
-          )}
+          {song.lyrics && <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />}
         </Card>
       </PopoverPanel>
     </Popover>
