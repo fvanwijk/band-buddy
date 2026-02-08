@@ -7,7 +7,6 @@ import {
 } from '@tabler/icons-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { WebMidi } from 'webmidi';
 
 import { DrawingOverlay } from './lyrics/DrawingOverlay';
 import { LyricsBlock } from './lyrics/LyricsBlock';
@@ -17,6 +16,7 @@ import { SongStats } from './SongStats';
 import { useGetInstruments } from '../../api/useInstruments';
 import { useGetSetlist } from '../../api/useSetlist';
 import { useGetSongs } from '../../api/useSong';
+import { useMetronome } from '../../hooks/useMetronome';
 import { useMidiDevices } from '../../midi/useMidiDevices';
 import { Button } from '../../ui/Button';
 import { EmptyStateBlock } from '../../ui/EmptyStateBlock';
@@ -88,6 +88,13 @@ export function SongDetailPage() {
     throw new Error('Song not found');
   }
 
+  // Initialize metronome
+  useMetronome({
+    bpm: currentSong.bpm || 120,
+    isRunning: isMetronomeRunning,
+    timeSignature: currentSong.timeSignature || '4/4',
+  });
+
   // Get previous and next song IDs
   const previousSongId = currentSongIndex > 0 ? songFromSetlist[currentSongIndex - 1].songId : null;
   const nextSongId =
@@ -118,7 +125,7 @@ export function SongDetailPage() {
       return;
     }
 
-    const output = WebMidi.getOutputById(selectedDevice);
+    const output = outputs.find((o) => o.id === selectedDevice);
     if (output) {
       output.sendProgramChange(event.programChange);
     }
