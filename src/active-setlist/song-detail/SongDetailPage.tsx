@@ -1,4 +1,10 @@
-import { IconArrowLeft, IconArrowRight, IconMicrophone2Off } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconMicrophone2Off,
+  IconPlayerPlay,
+  IconPlayerStop,
+} from '@tabler/icons-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WebMidi } from 'webmidi';
@@ -31,6 +37,7 @@ export function SongDetailPage() {
   const { isReady, isSupported, outputs } = useMidiDevices();
 
   const [zoom, setZoom] = useState(1);
+  const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
 
   // Default to 'details' tab if not specified
   const selectedTab = tab && ['details', 'midi'].includes(tab) ? tab : 'details';
@@ -119,6 +126,19 @@ export function SongDetailPage() {
 
   const transposeControl = (
     <div className="flex items-center gap-4">
+      <Button
+        icon
+        onClick={() => setIsMetronomeRunning((prev) => !prev)}
+        title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
+        type="button"
+        variant="outlined"
+      >
+        {isMetronomeRunning ? (
+          <IconPlayerStop className="h-4 w-4" />
+        ) : (
+          <IconPlayerPlay className="h-4 w-4" />
+        )}
+      </Button>
       <SongStats song={currentSong} />
       <SettingsPanel onZoomChange={setZoom} song={currentSong} zoom={zoom} />
     </div>
