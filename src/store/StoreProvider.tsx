@@ -34,6 +34,12 @@ export function StoreProvider({ children }: StoreProviderProps) {
         // Initialize settings with defaults
         store.setValue('locale', detectLocale());
         store.setValue('theme', DEFAULT_THEME);
+        store.setValue('metronomeVolume', 50);
+      } else {
+        // Ensure metronomeVolume is set even if not seeding
+        if (store.getValue('metronomeVolume') === undefined) {
+          store.setValue('metronomeVolume', 50);
+        }
       }
 
       // Apply theme from store

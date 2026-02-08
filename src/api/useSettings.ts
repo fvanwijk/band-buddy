@@ -3,7 +3,7 @@ import { useSetValueCallback, useValue } from 'tinybase/ui-react';
 import type { SupportedLocale } from '../config/locales';
 import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
-import { hasSeenWelcomeSchema, localeSchema, themeSchema } from '../schemas';
+import { hasSeenWelcomeSchema, localeSchema, metronomeVolumeSchema, themeSchema } from '../schemas';
 
 /**
  * Hook to get the current locale
@@ -80,4 +80,20 @@ export function useHasSeenWelcome(): boolean {
  */
 export function useSetHasSeenWelcome() {
   return useSetValueCallback('hasSeenWelcome', (value: boolean) => value, []);
+}
+
+/**
+ * Hook to get the metronome volume (0-100)
+ */
+export function useGetMetronomeVolume(): number {
+  const volume = useValue('metronomeVolume');
+  const result = metronomeVolumeSchema.safeParse(volume);
+  return result.success ? result.data : 50;
+}
+
+/**
+ * Hook to set the metronome volume
+ */
+export function useSetMetronomeVolume() {
+  return useSetValueCallback('metronomeVolume', (volume: number) => volume, []);
 }

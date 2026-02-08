@@ -3,6 +3,7 @@ import { IconAdjustments } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePopper } from 'react-popper';
 
+import { MetronomeVolumePanel } from './MetronomeVolumePanel';
 import { TransposePanel } from './TransposePanel';
 import { ZoomPanel } from './ZoomPanel';
 import { useUpdateSong } from '../../api/useSong';
@@ -54,6 +55,8 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
       >
         <Card>
           <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />
+          <div className="my-4 h-px bg-slate-800" />
+          <MetronomeVolumePanel />
           {song.lyrics && (
             <>
               <div className="my-4 h-px bg-slate-800" />

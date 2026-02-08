@@ -8,6 +8,7 @@ import {
   hasSeenWelcomeSchema,
   instrumentTableSchema,
   localeSchema,
+  metronomeVolumeSchema,
   setlistMetadataTableSchema,
   setlistSongTableSchema,
   songTableSchema,
@@ -41,6 +42,7 @@ export function createAppStore(): Store {
     activeSetlistId: activeSetlistIdSchema,
     hasSeenWelcome: hasSeenWelcomeSchema,
     locale: localeSchema,
+    metronomeVolume: metronomeVolumeSchema,
     theme: themeSchema,
   });
 
