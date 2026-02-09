@@ -1,11 +1,12 @@
 import { IconBrandSpotify } from '@tabler/icons-react';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import type { Row } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
 
-import { useImportSpotifyPlaylist } from '../api/useImportSpotifyPlaylist';
 import { useAddSetlist } from '../api/useSetlist';
+import { useSpotify } from '../contexts/SpotifyContext';
 import type { Setlist, Song } from '../types';
 import { Button } from '../ui/Button';
 import { Dialog } from '../ui/Dialog';
@@ -24,8 +25,17 @@ type ImportSpotifyDialogProps = {
 export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProps) {
   const navigate = useNavigate();
   const store = useStore();
-  const { isPending, mutate, error, reset: resetMutation } = useImportSpotifyPlaylist();
+  const { sdk } = useSpotify();
   const addSetlist = useAddSetlist();
+
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: async (playlistId: string) => {
+      if (!sdk) {
+        throw new Error('Spotify SDK not available');
+      }
+      return await sdk.playlists.getPlaylist(playlistId);
+    },
+  });
 
   const {
     handleSubmit,
@@ -39,26 +49,19 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
   });
 
   const extractPlaylistId = (input: string): string | null => {
-    // Remove whitespace
     const trimmed = input.trim();
-
-    // Try to extract from URL
     const urlMatch = trimmed.match(/playlist\/([a-zA-Z0-9]+)/);
     if (urlMatch) {
       return urlMatch[1];
     }
-
-    // Check if it's already just an ID (alphanumeric, typically 22 chars)
     if (/^[a-zA-Z0-9]{22}$/.test(trimmed)) {
       return trimmed;
     }
-
     return null;
   };
 
   const handleImport = (data: FormData) => {
     const playlistId = extractPlaylistId(data.playlistUrl);
-
     if (!playlistId) {
       return;
     }
@@ -66,11 +69,8 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
     mutate(playlistId, {
       onSuccess: (playlist) => {
         if (!store) return;
-
-        // Log the songs
         console.log('Fetched Spotify playlist:', playlist.name);
 
-        // Get existing songs to check for duplicates
         const songsTable = store.getTable('songs') || {};
         const existingSongs = new Set(
           Object.entries(songsTable).map(([, songRow]) => {
@@ -79,7 +79,6 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
           }),
         );
 
-        // Create songs from Spotify tracks
         const songIds: string[] = [];
 
         playlist.tracks.items.forEach((item) => {
@@ -87,14 +86,12 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
           if (track) {
             const artist = track.artists.map((a) => a.name).join(', ');
             const title = track.name;
-
-            // Check if song already exists
             const songKey = `${title}|${artist}`;
+
             if (existingSongs.has(songKey)) {
               return;
             }
 
-            // Create song object
             const songData: Omit<Song, 'id'> = {
               artist,
               key: '',
@@ -102,17 +99,14 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
               title,
             };
 
-            // Add song directly to store and capture the ID
             const songId = store.addRow('songs', songData as unknown as Row);
             if (songId) {
               songIds.push(songId);
-              // Add to existing songs map to avoid duplicates within this import
               existingSongs.add(songKey);
             }
           }
         });
 
-        // Create setlist with all imported songs
         if (songIds.length > 0) {
           const today = new Date().toISOString().split('T')[0];
           const setlistData: Omit<Setlist, 'id'> = {
@@ -129,7 +123,6 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
           addSetlist(setlistData);
         }
 
-        // Success - close dialog and navigate to setlists
         reset();
         onClose();
         navigate('/setlists');
@@ -139,7 +132,6 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
 
   const handleClose = () => {
     reset();
-    resetMutation();
     onClose();
   };
 

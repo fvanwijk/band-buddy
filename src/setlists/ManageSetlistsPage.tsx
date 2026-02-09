@@ -7,6 +7,7 @@ import { ImportSpotifyDialog } from './ImportSpotifyDialog';
 import { SetlistCard } from './SetlistCard';
 import { useDeleteSetlist, useGetSetlists } from '../api/useSetlist';
 import { useActivateSetlist } from '../api/useSettings';
+import { useSpotify } from '../contexts/SpotifyContext';
 import { useSortedArray } from '../hooks/useSortedArray';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
@@ -28,6 +29,7 @@ export function ManageSetlistsPage() {
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>('date', 'desc');
   const activateSetlist = useActivateSetlist(() => navigate('/'));
   const deleteSetlist = useDeleteSetlist(() => setDeletingSetlistId(null));
+  const { isAuthenticated: isSpotifyAuthenticated } = useSpotify();
 
   const handleActivate = (id: string) => {
     activateSetlist(id);
@@ -48,7 +50,7 @@ export function ManageSetlistsPage() {
       <PageHeader
         action={
           <div className="flex gap-2">
-            {import.meta.env.VITE_SPOTIFY_API_TOKEN && (
+            {isSpotifyAuthenticated && (
               <Button
                 iconStart={<IconBrandSpotify className="h-4 w-4" />}
                 onClick={() => setIsImportDialogOpen(true)}
