@@ -135,21 +135,23 @@ export function SongDetailPage() {
 
   const toolbar = (
     <div className="flex items-center gap-4">
-      <Button
-        className="metronome-pulse"
-        icon
-        onClick={() => setIsMetronomeRunning((prev) => !prev)}
-        style={{ animationDuration: `${beatDurationSeconds}s` }}
-        title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
-        type="button"
-        variant="outlined"
-      >
-        {isMetronomeRunning ? (
-          <IconPlayerStopFilled className="h-4 w-4" />
-        ) : (
-          <IconPlayerPlayFilled className="h-4 w-4" />
-        )}
-      </Button>
+      {currentSong.bpm && (
+        <Button
+          className="metronome-pulse"
+          icon
+          onClick={() => setIsMetronomeRunning((prev) => !prev)}
+          style={{ animationDuration: `${beatDurationSeconds}s` }}
+          title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
+          type="button"
+          variant="outlined"
+        >
+          {isMetronomeRunning ? (
+            <IconPlayerStopFilled className="h-4 w-4" />
+          ) : (
+            <IconPlayerPlayFilled className="h-4 w-4" />
+          )}
+        </Button>
+      )}
       <SongStats song={currentSong} />
       <SettingsPanel onZoomChange={setZoom} song={currentSong} zoom={zoom} />
     </div>

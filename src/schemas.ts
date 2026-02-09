@@ -20,10 +20,11 @@ export const songSchema = z.object({
   duration: z.number().optional(),
   id: z.string(),
   isDeleted: z.boolean().optional(),
-  key: z.string(),
+  key: z.string().optional(),
   lyrics: z.string().optional(),
   midiEvents: z.array(midiEventSchema).optional(),
-  timeSignature: z.string(),
+  spotifyId: z.string().optional(),
+  timeSignature: z.string().optional(),
   title: z.string(),
   transpose: z.number().optional(),
 });
@@ -37,10 +38,11 @@ export const songTableSchema = z.object({
   canvasPaths: z.string().optional(), // Stored as JSON string
   duration: z.number().optional(),
   isDeleted: z.boolean().optional(),
-  key: z.string(),
+  key: z.string().optional(),
   lyrics: z.string().optional(),
   midiEvents: z.string().optional(), // Stored as JSON string
-  timeSignature: z.string(),
+  spotifyId: z.string().optional(),
+  timeSignature: z.string().optional(),
   title: z.string(),
   transpose: z.number().optional(),
 });

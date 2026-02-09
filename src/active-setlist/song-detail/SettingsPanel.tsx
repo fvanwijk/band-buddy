@@ -38,6 +38,8 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
     });
   };
 
+  const hasSettings = song.key || song.lyrics || song.bpm;
+
   return (
     <Popover>
       <PopoverButton
@@ -58,16 +60,33 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
         className="z-20 shadow-lg"
       >
         <Card className="p-1" contentClassName="w-56 space-y-1">
-          <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />
-          <MetronomeVolumePanel />
-          {song.lyrics && <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />}
-          <div className="space-y-3 bg-slate-800/20 p-3">
-            <Checkbox
-              checked={showDrawingTools}
-              label="Show drawing tools"
-              onChange={(e) => setShowDrawingTools(e.target.checked)}
-            />
-          </div>
+          {hasSettings ? (
+            <>
+              {song.key && (
+                <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />
+              )}
+              {song.bpm && <MetronomeVolumePanel />}
+              {song.lyrics && (
+                <>
+                  <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />
+                  <div className="space-y-3 bg-slate-800/20 p-3">
+                    <Checkbox
+                      checked={showDrawingTools}
+                      label="Show drawing tools"
+                      onChange={(e) => setShowDrawingTools(e.target.checked)}
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="p-3 text-xs">
+              <p className="mb-1 text-slate-200">No settings available for this song.</p>
+              <p className="text-slate-400">
+                Add more information such as lyrics, key or BPM to enable settings.
+              </p>
+            </div>
+          )}
         </Card>
       </PopoverPanel>
     </Popover>

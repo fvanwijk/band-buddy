@@ -12,10 +12,11 @@ export type Song = {
   duration?: number;
   id: string;
   isDeleted?: boolean;
-  key: string;
+  key?: string;
   lyrics?: string;
   midiEvents?: MidiEvent[];
-  timeSignature: string;
+  spotifyId?: string;
+  timeSignature?: string;
   title: string;
   transpose?: number;
 };

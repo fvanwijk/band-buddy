@@ -43,6 +43,7 @@ export function useProcessSpotifyPlaylist() {
         const songData: Omit<Song, 'id'> = {
           artist,
           key: '',
+          spotifyId: track.id,
           timeSignature: '',
           title,
         };
