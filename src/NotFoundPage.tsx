@@ -14,7 +14,7 @@ export function NotFoundPage() {
   return (
     <EmptyLayout>
       <Page>
-        <PageHeader backPath="/" title="Error" subtitle={subtitle ?? 'Oops'} />
+        <PageHeader backPath="/play" title="Error" subtitle={subtitle ?? 'Oops'} />
         <EmptyState
           description="The page you are looking for does not exist."
           title={title}

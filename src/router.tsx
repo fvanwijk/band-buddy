@@ -18,8 +18,12 @@ export const router = createBrowserRouter([
   {
     children: [
       {
-        element: <ActiveSetlistPage />,
+        element: <Navigate to="/play" />,
         path: '/',
+      },
+      {
+        element: <ActiveSetlistPage />,
+        path: '/play',
       },
       {
         children: [

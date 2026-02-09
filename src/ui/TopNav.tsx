@@ -22,7 +22,7 @@ const navItems: NavItem[] = [
     icon: <IconPlayerPlayFilled className="h-4 w-4" />,
     label: 'Active setlist',
     shortLabel: 'Active',
-    to: '/',
+    to: '/play',
   },
   {
     icon: <IconPlaylist className="h-4 w-4" />,
@@ -52,13 +52,17 @@ export function TopNav() {
     <nav className="flex flex-wrap items-center gap-2">
       {navItems.map((item) => {
         const icon =
-          item.to === '/' && !hasActiveSetlist ? <IconPlayerPlay className="h-4 w-4" /> : item.icon;
+          item.to === '/play' && !hasActiveSetlist ? (
+            <IconPlayerPlay className="h-4 w-4" />
+          ) : (
+            item.icon
+          );
 
         return (
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
+            end={item.to === '/play'}
             className={({ isActive }) =>
               cn(
                 'rounded-full transition',

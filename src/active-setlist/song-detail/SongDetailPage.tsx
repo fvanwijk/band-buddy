@@ -163,7 +163,7 @@ export function SongDetailPage() {
       <Page className="pb-24.25">
         <PageHeader
           action={toolbar}
-          backPath="/"
+          backPath="/play"
           title={
             <div className="flex items-center gap-2">
               {currentSong.title}{' '}
