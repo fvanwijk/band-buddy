@@ -3,12 +3,10 @@ import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { parse } from 'spotify-uri';
-import type { Row } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
 
-import { useAddSetlist } from '../api/useSetlist';
+import { useProcessSpotifyPlaylist } from './importSpotifyPlaylist';
 import { useSpotify } from '../contexts/SpotifyContext';
-import type { Setlist, Song } from '../types';
 import { Alert } from '../ui/Alert';
 import { Button } from '../ui/Button';
 import { Dialog } from '../ui/Dialog';
@@ -28,7 +26,7 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
   const navigate = useNavigate();
   const store = useStore();
   const { sdk } = useSpotify();
-  const addSetlist = useAddSetlist();
+  const processSpotifyPlaylist = useProcessSpotifyPlaylist();
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: async (playlistId: string) => {
@@ -72,57 +70,7 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
 
     mutate(playlistId, {
       onSuccess: (playlist) => {
-        const songsTable = store.getTable('songs') || {};
-        const existingSongs = new Set(
-          Object.entries(songsTable).map(([, songRow]) => {
-            const song = songRow as Record<string, unknown>;
-            return `${song.title}|${song.artist}`;
-          }),
-        );
-
-        const songIds: string[] = [];
-
-        playlist.tracks.items.forEach((item) => {
-          const track = item.track;
-          if (track) {
-            const artist = track.artists.map((a) => a.name).join(', ');
-            const title = track.name;
-            const songKey = `${title}|${artist}`;
-
-            if (existingSongs.has(songKey)) {
-              return;
-            }
-
-            const songData: Omit<Song, 'id'> = {
-              artist,
-              key: '',
-              timeSignature: '',
-              title,
-            };
-
-            const songId = store.addRow('songs', songData as unknown as Row);
-            if (songId) {
-              songIds.push(songId);
-              existingSongs.add(songKey);
-            }
-          }
-        });
-
-        if (songIds.length > 0) {
-          const today = new Date().toISOString().split('T')[0];
-          const setlistData: Omit<Setlist, 'id'> = {
-            date: today,
-            sets: [
-              {
-                setNumber: 1,
-                songs: songIds.map((songId) => ({ songId })),
-              },
-            ],
-            title: playlist.name,
-          };
-
-          addSetlist(setlistData);
-        }
+        processSpotifyPlaylist(playlist);
 
         reset();
         onClose();
