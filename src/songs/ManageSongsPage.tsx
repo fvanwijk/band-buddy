@@ -11,16 +11,17 @@ import { Page } from '../ui/Page';
 import { PageHeader } from '../ui/PageHeader';
 import { SortButtonsBar } from '../ui/sorting/SortButtonsBar';
 import { useSortState } from '../ui/sorting/useSortState';
+import { usePluralize } from '../utils/pluralize';
 
 type SortField = 'artist' | 'key' | 'title';
 
 export function ManageSongsPage() {
   const allSongs = useGetSongs();
-  let displayedSongs = allSongs;
 
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(null, 'none');
   const deleteSong = useDeleteSong(() => setDeletingSongId(null));
+  const pluralize = usePluralize();
 
   const handleDeleteSong = () => {
     if (deletingSongId) {
@@ -29,15 +30,16 @@ export function ManageSongsPage() {
   };
 
   // Sort songs
-  if (sortDirection !== 'none' && sortBy) {
-    displayedSongs = [...allSongs].sort((songA, songB) => {
-      const valueA = (songA[sortBy] as string).toLowerCase();
-      const valueB = (songB[sortBy] as string).toLowerCase();
+  const displayedSongs =
+    sortDirection !== 'none' && sortBy
+      ? allSongs.toSorted((songA, songB) => {
+          const valueA = (songA[sortBy] as string).toLowerCase();
+          const valueB = (songB[sortBy] as string).toLowerCase();
 
-      const comparison = valueA.localeCompare(valueB);
-      return sortDirection === 'asc' ? comparison : -comparison;
-    });
-  }
+          const comparison = valueA.localeCompare(valueB);
+          return sortDirection === 'asc' ? comparison : -comparison;
+        })
+      : allSongs;
 
   return (
     <Page>
@@ -72,12 +74,17 @@ export function ManageSongsPage() {
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <SortButtonsBar
-            fields={['title', 'artist', 'key'] as const}
-            isActive={isActive}
-            onSort={handleSort}
-            sortDirection={sortDirection}
-          />
+          <div className="flex items-end justify-between">
+            <SortButtonsBar
+              fields={['title', 'artist', 'key'] as const}
+              isActive={isActive}
+              onSort={handleSort}
+              sortDirection={sortDirection}
+            />
+            <span className="text-sm text-slate-100">
+              {pluralize(displayedSongs.length, 'song')}
+            </span>
+          </div>
           <div className="grid gap-2">
             {displayedSongs.map((song) => (
               <SongCard
