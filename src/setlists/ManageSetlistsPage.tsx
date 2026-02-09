@@ -7,6 +7,7 @@ import { ImportSpotifyDialog } from './ImportSpotifyDialog';
 import { SetlistCard } from './SetlistCard';
 import { useDeleteSetlist, useGetSetlists } from '../api/useSetlist';
 import { useActivateSetlist } from '../api/useSettings';
+import { useSortedArray } from '../hooks/useSortedArray';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { EmptyState } from '../ui/EmptyState';
@@ -14,6 +15,7 @@ import { Page } from '../ui/Page';
 import { PageHeader } from '../ui/PageHeader';
 import { SortButtonsBar } from '../ui/sorting/SortButtonsBar';
 import { useSortState } from '../ui/sorting/useSortState';
+import { pluralize } from '../utils/pluralize';
 
 type SortField = 'date' | 'title';
 
@@ -37,28 +39,9 @@ export function ManageSetlistsPage() {
     }
   };
 
-  const getSortedSetlists = () => {
-    if (!sortBy || sortDirection === 'none') {
-      return setlists;
-    }
-
-    const sorted = [...setlists];
-    sorted.sort((a, b) => {
-      let comparison = 0;
-
-      if (sortBy === 'title') {
-        comparison = a.title.localeCompare(b.title);
-      } else if (sortBy === 'date') {
-        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
-      }
-
-      return sortDirection === 'asc' ? comparison : -comparison;
-    });
-
-    return sorted;
-  };
-
-  const displaySetlists = getSortedSetlists();
+  const displaySetlists = useSortedArray(setlists, sortBy, sortDirection, (setlist, field) =>
+    field === 'date' ? new Date(setlist.date).getTime() : setlist[field],
+  );
 
   return (
     <Page>
@@ -109,12 +92,17 @@ export function ManageSetlistsPage() {
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <SortButtonsBar
-            fields={['date', 'title'] as const}
-            isActive={isActive}
-            onSort={handleSort}
-            sortDirection={sortDirection}
-          />
+          <div className="flex items-end justify-between">
+            <SortButtonsBar
+              fields={['date', 'title'] as const}
+              isActive={isActive}
+              onSort={handleSort}
+              sortDirection={sortDirection}
+            />
+            <span className="text-sm text-slate-100">
+              {pluralize(displaySetlists.length, 'setlist')}
+            </span>
+          </div>
 
           <div className="grid gap-2">
             {displaySetlists.map((setlist) => (

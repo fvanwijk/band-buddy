@@ -5,7 +5,7 @@ import { Card } from '../ui/Card';
 import { DeleteButton } from '../ui/DeleteButton';
 import { EditButton } from '../ui/EditButton';
 import { formatDate } from '../utils/date';
-import { usePluralize } from '../utils/pluralize';
+import { pluralize } from '../utils/pluralize';
 
 type SetlistCardProps = {
   date: string;
@@ -28,8 +28,6 @@ export function SetlistCard({
   songsCount,
   title,
 }: SetlistCardProps) {
-  const pluralize = usePluralize();
-
   return (
     <Card
       actions={

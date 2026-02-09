@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { SongCard } from './SongCard';
 import { useDeleteSong, useGetSongs } from '../api/useSong';
+import { useSortedArray } from '../hooks/useSortedArray';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { EmptyState } from '../ui/EmptyState';
@@ -11,7 +12,7 @@ import { Page } from '../ui/Page';
 import { PageHeader } from '../ui/PageHeader';
 import { SortButtonsBar } from '../ui/sorting/SortButtonsBar';
 import { useSortState } from '../ui/sorting/useSortState';
-import { usePluralize } from '../utils/pluralize';
+import { pluralize } from '../utils/pluralize';
 
 type SortField = 'artist' | 'key' | 'title';
 
@@ -21,7 +22,6 @@ export function ManageSongsPage() {
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(null, 'none');
   const deleteSong = useDeleteSong(() => setDeletingSongId(null));
-  const pluralize = usePluralize();
 
   const handleDeleteSong = () => {
     if (deletingSongId) {
@@ -30,16 +30,7 @@ export function ManageSongsPage() {
   };
 
   // Sort songs
-  const displayedSongs =
-    sortDirection !== 'none' && sortBy
-      ? allSongs.toSorted((songA, songB) => {
-          const valueA = (songA[sortBy] as string).toLowerCase();
-          const valueB = (songB[sortBy] as string).toLowerCase();
-
-          const comparison = valueA.localeCompare(valueB);
-          return sortDirection === 'asc' ? comparison : -comparison;
-        })
-      : allSongs;
+  const displayedSongs = useSortedArray(allSongs, sortBy, sortDirection);
 
   return (
     <Page>
