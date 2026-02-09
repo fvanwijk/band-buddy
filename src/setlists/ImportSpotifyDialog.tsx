@@ -1,13 +1,15 @@
-import { IconBrandSpotify } from '@tabler/icons-react';
+import { IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { parse } from 'spotify-uri';
 import type { Row } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
 
 import { useAddSetlist } from '../api/useSetlist';
 import { useSpotify } from '../contexts/SpotifyContext';
 import type { Setlist, Song } from '../types';
+import { Alert } from '../ui/Alert';
 import { Button } from '../ui/Button';
 import { Dialog } from '../ui/Dialog';
 import { DialogTitle } from '../ui/DialogTitle';
@@ -48,29 +50,28 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
     },
   });
 
+  const validatePlaylistId = (input: string): boolean | string => {
+    return extractPlaylistId(input) ? true : 'Invalid Spotify playlist URL or ID';
+  };
+
   const extractPlaylistId = (input: string): string | null => {
     const trimmed = input.trim();
-    const urlMatch = trimmed.match(/playlist\/([a-zA-Z0-9]+)/);
-    if (urlMatch) {
-      return urlMatch[1];
+    try {
+      const parsed = parse(trimmed);
+      return parsed?.type === 'playlist' ? parsed.id : null;
+    } catch {
+      return /^[a-zA-Z0-9]{22}$/.test(trimmed) ? trimmed : null;
     }
-    if (/^[a-zA-Z0-9]{22}$/.test(trimmed)) {
-      return trimmed;
-    }
-    return null;
   };
 
   const handleImport = (data: FormData) => {
     const playlistId = extractPlaylistId(data.playlistUrl);
-    if (!playlistId) {
+    if (!playlistId || !store) {
       return;
     }
 
     mutate(playlistId, {
       onSuccess: (playlist) => {
-        if (!store) return;
-        console.log('Fetched Spotify playlist:', playlist.name);
-
         const songsTable = store.getTable('songs') || {};
         const existingSongs = new Set(
           Object.entries(songsTable).map(([, songRow]) => {
@@ -147,14 +148,15 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
             id="playlist-url"
             label="Playlist URL or ID"
             placeholder="https://open.spotify.com/playlist/... or just the ID"
-            register={register('playlistUrl', { required: 'Playlist URL or ID is required' })}
+            register={register('playlistUrl', {
+              required: 'Playlist URL or ID is required',
+              validate: validatePlaylistId,
+            })}
             required
           />
 
           {error && (
-            <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
-              {error.message}
-            </div>
+            <Alert severity="error">{error instanceof Response ? 'Oeps' : error.message}</Alert>
           )}
 
           <div className="flex justify-end gap-2 pt-2">
@@ -164,7 +166,7 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
             <Button
               color="primary"
               disabled={isPending}
-              iconStart={<IconBrandSpotify className="h-4 w-4" />}
+              iconStart={<IconUpload className="h-4 w-4" />}
               type="submit"
               variant="filled"
             >
