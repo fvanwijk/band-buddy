@@ -1,8 +1,9 @@
-import { IconPlaylist, IconPlus } from '@tabler/icons-react';
+import { IconBrandSpotify, IconPlaylist, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useValue } from 'tinybase/ui-react';
 
+import { ImportSpotifyDialog } from './ImportSpotifyDialog';
 import { SetlistCard } from './SetlistCard';
 import { useDeleteSetlist, useGetSetlists } from '../api/useSetlist';
 import { useActivateSetlist } from '../api/useSettings';
@@ -21,6 +22,7 @@ export function ManageSetlistsPage() {
   const setlists = useGetSetlists();
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;
   const [deletingSetlistId, setDeletingSetlistId] = useState<string | null>(null);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>('date', 'desc');
   const activateSetlist = useActivateSetlist(() => navigate('/'));
   const deleteSetlist = useDeleteSetlist(() => setDeletingSetlistId(null));
@@ -62,17 +64,33 @@ export function ManageSetlistsPage() {
     <Page>
       <PageHeader
         action={
-          <Button
-            as={Link}
-            iconStart={<IconPlus className="h-4 w-4" />}
-            color="primary"
-            to="/setlists/add"
-            variant="outlined"
-          >
-            New setlist
-          </Button>
+          <div className="flex gap-2">
+            {import.meta.env.VITE_SPOTIFY_API_TOKEN && (
+              <Button
+                iconStart={<IconBrandSpotify className="h-4 w-4" />}
+                onClick={() => setIsImportDialogOpen(true)}
+                variant="outlined"
+              >
+                Import from Spotify
+              </Button>
+            )}
+            <Button
+              as={Link}
+              iconStart={<IconPlus className="h-4 w-4" />}
+              color="primary"
+              to="/setlists/add"
+              variant="outlined"
+            >
+              New setlist
+            </Button>
+          </div>
         }
         title="Setlists"
+      />
+
+      <ImportSpotifyDialog
+        isOpen={isImportDialogOpen}
+        onClose={() => setIsImportDialogOpen(false)}
       />
 
       <ConfirmDialog

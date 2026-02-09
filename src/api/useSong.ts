@@ -82,7 +82,7 @@ export function useGetSong(id: string | undefined, includeDeleted = false): Song
 /**
  * Hook to add a new song
  */
-export function useAddSong(onSuccess?: () => void) {
+export function useAddSong(onSuccess?: (id: string) => void) {
   const navigate = useNavigate();
 
   return useAddRowCallback(
@@ -108,8 +108,8 @@ export function useAddSong(onSuccess?: () => void) {
     },
     [navigate, onSuccess],
     undefined,
-    () => {
-      onSuccess?.();
+    (id) => {
+      onSuccess?.(id as string);
     },
     undefined,
     false, // Do not reuse row ids
