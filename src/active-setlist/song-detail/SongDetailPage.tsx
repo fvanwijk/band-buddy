@@ -1,6 +1,7 @@
 import {
   IconArrowLeft,
   IconArrowRight,
+  IconBrandSpotify,
   IconMicrophone2Off,
   IconPlayerPlayFilled,
   IconPlayerStopFilled,
@@ -163,7 +164,17 @@ export function SongDetailPage() {
         <PageHeader
           action={toolbar}
           backPath="/"
-          title={currentSong.title}
+          title={
+            <div className="flex items-center gap-2">
+              {currentSong.title}{' '}
+              {currentSong.spotifyId && (
+                <IconBrandSpotify
+                  className="inline h-5 w-5 stroke-slate-300"
+                  title="Imported from Spotify. Expect more features soon."
+                />
+              )}
+            </div>
+          }
           subtitle={currentSong.artist}
         />
 

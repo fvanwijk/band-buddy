@@ -132,6 +132,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       key: (data.keyNote || existingNote) + (data.keyQuality || ''),
       lyrics: data.lyrics,
       midiEvents: data.midiEvents,
+      spotifyId: initialData?.spotifyId,
       timeSignature: data.timeSignature,
       title: data.title,
       transpose: initialData?.transpose,

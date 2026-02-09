@@ -5,8 +5,8 @@ import { BackButton } from './BackButton';
 type PageHeaderProps = {
   action?: ReactNode;
   backPath?: string;
-  subtitle?: string;
-  title: string;
+  subtitle?: ReactNode;
+  title: ReactNode;
 };
 
 export function PageHeader({ action, backPath, subtitle, title }: PageHeaderProps) {
