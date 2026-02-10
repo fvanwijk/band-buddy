@@ -24,6 +24,7 @@ export const songSchema = z.object({
   lyrics: z.string().optional(),
   midiEvents: z.array(midiEventSchema).optional(),
   notes: z.string().optional(),
+  sheetMusicFilename: z.string().optional(),
   spotifyId: z.string().optional(),
   timeSignature: z.string().optional(),
   title: z.string(),
@@ -43,6 +44,7 @@ export const songTableSchema = z.object({
   lyrics: z.string().optional(),
   midiEvents: z.string().optional(), // Stored as JSON string
   notes: z.string().optional(),
+  sheetMusicFilename: z.string().optional(),
   spotifyId: z.string().optional(),
   timeSignature: z.string().optional(),
   title: z.string(),

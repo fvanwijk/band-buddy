@@ -129,7 +129,6 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
                   key={field.id}
                   index={index}
                   onRemove={() => handleRemoveSet(index)}
-                  setNumber={field.setNumber}
                   showRemove={fields.length > 1}
                 />
               ))}

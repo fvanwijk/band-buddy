@@ -14,6 +14,7 @@ import { DrawingOverlay } from './lyrics/DrawingOverlay';
 import { LyricsBlock } from './lyrics/LyricsBlock';
 import { MidiButtonsDisplay } from './midi-buttons-display/MidiButtonsDisplay';
 import { SettingsPanel } from './SettingsPanel';
+import { SheetMusicTab } from './SheetMusicTab';
 import { SongStats } from './SongStats';
 import { useGetInstruments } from '../../api/useInstruments';
 import { useGetSetlist } from '../../api/useSetlist';
@@ -44,7 +45,8 @@ export function SongDetailPage() {
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
 
   // Default to 'details' tab if not specified
-  const selectedTab = tab && ['details', 'notes', 'midi'].includes(tab) ? tab : 'details';
+  const selectedTab =
+    tab && ['details', 'notes', 'sheet-music', 'midi'].includes(tab) ? tab : 'details';
 
   // Create songs map
   const songsMap = new Map(songs.map((song) => [song.id, song]));
@@ -214,6 +216,16 @@ export function SongDetailPage() {
               ),
               id: 'notes',
               label: 'Notes',
+            },
+            {
+              content: (
+                <SheetMusicTab
+                  sheetMusicFilename={currentSong.sheetMusicFilename}
+                  songId={songId}
+                />
+              ),
+              id: 'sheet-music',
+              label: 'Sheet Music',
             },
             {
               content: (

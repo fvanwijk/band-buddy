@@ -8,6 +8,7 @@ import { DetailsTab } from './DetailsTab';
 import { LyricsTab } from './lyrics/LyricsTab';
 import { calculateMeasures } from './measures';
 import { MidiButtonsTab } from './midi/MidiButtonsTab';
+import { SheetMusicFormTab } from './sheet-music/SheetMusicFormTab';
 import { useGetInstruments } from '../../api/useInstruments';
 import type { MidiEvent, Song } from '../../types';
 import { Alert } from '../../ui/Alert';
@@ -23,12 +24,14 @@ export type SongFormData = SongSubmitData & {
   durationString?: string;
   keyNote?: string;
   keyQuality?: string;
+  sheetMusicFiles?: FileList;
+  sheetMusicFilename?: string;
 };
 
 type SongFormProps = {
   backPath: string;
   initialData?: Song;
-  onSubmit: (data: SongSubmitData) => void;
+  onSubmit: (data: SongSubmitData, sheetMusicFile?: File) => void;
   title: string;
 };
 
@@ -49,6 +52,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
     watch,
   } = useForm<SongFormData>({
     defaultValues: {
@@ -59,6 +63,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       keyQuality: existingQuality || existingNote ? '' : undefined,
       lyrics: initialData?.lyrics || '',
       midiEvents: initialData?.midiEvents || [],
+      sheetMusicFilename: initialData?.sheetMusicFilename,
       timeSignature: initialData?.timeSignature,
       title: initialData?.title || '',
     },
@@ -74,6 +79,8 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const bpm = watch('bpm');
   const lyrics = watch('lyrics');
   const midiEvents = watch('midiEvents') || [];
+  const sheetMusicFiles = watch('sheetMusicFiles');
+  const sheetMusicFilename = watch('sheetMusicFilename');
   const timeSignature = watch('timeSignature');
 
   const hasDrawings = initialData?.canvasPaths && initialData.canvasPaths.length > 0;
@@ -101,7 +108,8 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     setCalculatedMeasures(measures);
   }, [durationSeconds, bpm, timeSignature]);
 
-  const selectedTab = tab && ['details', 'lyrics', 'midi'].includes(tab) ? tab : 'details';
+  const selectedTab =
+    tab && ['details', 'lyrics', 'sheet-music', 'midi'].includes(tab) ? tab : 'details';
   const songFormBasePath = id ? `/songs/edit/${id}` : '/songs/add';
 
   const handleTabChange = (tabId: string) => {
@@ -124,19 +132,23 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const handleFormSubmit = (data: SongFormData) => {
     const durationSeconds = parseDuration(data.durationString);
 
-    onSubmit({
-      artist: data.artist,
-      bpm: data.bpm,
-      canvasPaths: initialData?.canvasPaths || [],
-      duration: durationSeconds || undefined,
-      key: (data.keyNote || existingNote) + (data.keyQuality || ''),
-      lyrics: data.lyrics,
-      midiEvents: data.midiEvents,
-      spotifyId: initialData?.spotifyId,
-      timeSignature: data.timeSignature,
-      title: data.title,
-      transpose: initialData?.transpose,
-    });
+    onSubmit(
+      {
+        artist: data.artist,
+        bpm: data.bpm,
+        canvasPaths: initialData?.canvasPaths || [],
+        duration: durationSeconds || undefined,
+        key: (data.keyNote || existingNote) + (data.keyQuality || ''),
+        lyrics: data.lyrics,
+        midiEvents: data.midiEvents,
+        sheetMusicFilename: data.sheetMusicFilename,
+        spotifyId: initialData?.spotifyId,
+        timeSignature: data.timeSignature,
+        title: data.title,
+        transpose: initialData?.transpose,
+      },
+      data.sheetMusicFiles?.[0],
+    );
   };
 
   const handleAddMidiEvent = (event: Omit<MidiEvent, 'id'>) => {
@@ -185,6 +197,28 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               hasError: hasLyricsErrors,
               id: 'lyrics',
               label: 'Lyrics',
+            },
+            {
+              content: (
+                <SheetMusicFormTab
+                  error={errors.sheetMusicFiles}
+                  register={register('sheetMusicFiles', {
+                    validate: {
+                      fileType: (files) => {
+                        console.log(files, 'validating');
+                        if (!files || files.length === 0) return true;
+                        const file = files[0];
+                        return file.type === 'application/pdf' || 'Please select a PDF file';
+                      },
+                    },
+                  })}
+                  setValue={setValue}
+                  sheetMusicFiles={sheetMusicFiles}
+                  sheetMusicFilename={sheetMusicFilename}
+                />
+              ),
+              id: 'sheet-music',
+              label: 'Sheet Music',
             },
             {
               content: (

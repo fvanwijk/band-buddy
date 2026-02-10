@@ -27,7 +27,7 @@ export function ManageSetlistsPage() {
   const [deletingSetlistId, setDeletingSetlistId] = useState<string | null>(null);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>('date', 'desc');
-  const activateSetlist = useActivateSetlist(() => navigate('/'));
+  const activateSetlist = useActivateSetlist(() => navigate('/play'));
   const deleteSetlist = useDeleteSetlist(() => setDeletingSetlistId(null));
   const { isAuthenticated: isSpotifyAuthenticated } = useSpotify();
 

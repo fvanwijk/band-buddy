@@ -104,9 +104,7 @@ export function DetailsTab({
         error={errors.timeSignature}
         label="Time Signature"
         options={timeSignatureOptions}
-        register={register('timeSignature', {
-          required: 'Time signature is required',
-        })}
+        register={register('timeSignature')}
       />
       <InputField
         error={errors.bpm}

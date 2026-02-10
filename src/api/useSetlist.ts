@@ -68,7 +68,7 @@ export function useGetSetlists(): Setlist[] {
 /**
  * Get a single setlist by ID
  */
-export function useGetSetlist(id: string, includeDeleted = false): Setlist | null {
+export function useGetSetlist(id?: string, includeDeleted = false): Setlist | null {
   const setlistRow = useRow('setlists', id || '');
   const setlistSongsData = useTable('setlistSongs') || {};
 
