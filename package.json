@@ -1,5 +1,10 @@
 {
   "name": "band-buddy",
+  "author": "Frank van Wijk <info@frankvanwijk.nl>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fvanwijk/band-buddy.git"
+  },
   "private": true,
   "version": "0.0.0",
   "type": "module",

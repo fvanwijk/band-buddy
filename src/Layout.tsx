@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 import { useHasSeenWelcome, useSetHasSeenWelcome } from './api/useSettings';
 import { Logo } from './ui/Logo';
@@ -20,7 +20,9 @@ export function Layout() {
     <>
       <div className="sticky top-0 z-30 mx-auto max-w-5xl bg-slate-950/80 backdrop-blur-xs">
         <header className="flex items-center justify-between gap-3 border-b border-slate-900 px-4 py-2">
-          <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
+          <Link to="/">
+            <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
+          </Link>
           <TopNav />
         </header>
       </div>

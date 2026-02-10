@@ -2,6 +2,7 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 
 import { ActiveSetlistPage } from './active-setlist/ActiveSetlistPage';
 import { SongDetailPage } from './active-setlist/song-detail/SongDetailPage';
+import { Home } from './home/Home';
 import { Layout } from './Layout';
 import { NotFoundPage } from './NotFoundPage';
 import { AddSetlistPage } from './setlists/form/AddSetlistPage';
@@ -16,11 +17,11 @@ import { ManageSongsPage } from './songs/ManageSongsPage';
 
 export const router = createBrowserRouter([
   {
+    element: <Home />,
+    index: true,
+  },
+  {
     children: [
-      {
-        element: <Navigate to="/play" />,
-        path: '/',
-      },
       {
         element: <ActiveSetlistPage />,
         path: '/play',
