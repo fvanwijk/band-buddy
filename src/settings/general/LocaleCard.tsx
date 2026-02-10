@@ -16,14 +16,13 @@ export function LocaleCard() {
 
       <div className="mt-6">
         <SelectField
-          id="locale-select"
           label="Locale"
           options={SUPPORTED_LOCALES.map(({ locale, name }) => ({
             label: name,
             value: locale,
           }))}
+          onChange={(event) => setLocale(event.target.value as SupportedLocale)}
           value={currentLocale}
-          onChange={(locale) => setLocale(locale as SupportedLocale)}
         />
       </div>
     </SettingsCard>

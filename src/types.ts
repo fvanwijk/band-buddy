@@ -15,6 +15,7 @@ export type Song = {
   key?: string;
   lyrics?: string;
   midiEvents?: MidiEvent[];
+  notes?: string;
   spotifyId?: string;
   timeSignature?: string;
   title: string;

@@ -69,10 +69,9 @@ export function AddMidiButtonDialog({
         <div className="space-y-4">
           <InputField
             error={errors.label}
-            id="midi-label"
             label="Button label"
             placeholder="e.g., Verse, Chorus, Bridge"
-            register={register('label', { required: 'Label is required' })}
+            {...register('label', { required: 'Label is required' })}
             required
           />
 
@@ -88,20 +87,18 @@ export function AddMidiButtonDialog({
                 </>
               ) : undefined
             }
-            id="midi-instrument"
             label="Instrument"
             options={instrumentOptions}
-            register={register('instrumentId', { required: 'Instrument is required' })}
+            {...register('instrumentId', { required: 'Instrument is required' })}
             required
           />
 
           {hasSelectableOptions ? (
             <SelectField
               error={errors.programChange}
-              id="midi-programChange"
               label="Program"
               options={programOptions}
-              register={register('programChange', {
+              {...register('programChange', {
                 required: 'Program is required',
                 valueAsNumber: true,
               })}
@@ -110,12 +107,11 @@ export function AddMidiButtonDialog({
           ) : (
             <InputField
               error={errors.programChange}
-              id="midi-programChange"
               label="Program Change Number"
               max="511"
               min="0"
               placeholder="0-511"
-              register={register('programChange', {
+              {...register('programChange', {
                 max: { message: 'Program change must be at most 511', value: 511 },
                 min: { message: 'Program change must be at least 0', value: 0 },
                 required: 'Program change is required',

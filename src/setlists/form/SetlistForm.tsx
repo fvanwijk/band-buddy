@@ -78,28 +78,25 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
           >
             <InputField
               error={errors.title}
-              id="title"
               label="Setlist Title"
               placeholder="Enter setlist title"
-              register={register('title', { required: 'Setlist title is required' })}
+              {...register('title', { required: 'Setlist title is required' })}
               required
             />
 
             <InputField
               error={errors.date}
-              id="date"
               label="Performance Date"
-              register={register('date', { required: 'Date is required' })}
+              {...register('date', { required: 'Date is required' })}
               required
               type="date"
             />
 
             <InputField
               error={errors.venue}
-              id="venue"
               label="Venue"
               placeholder="Enter venue"
-              register={register('venue')}
+              {...register('venue')}
             />
 
             <div className="space-y-4">

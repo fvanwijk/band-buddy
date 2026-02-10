@@ -67,18 +67,16 @@ export function DetailsTab({
     <div className="space-y-4">
       <InputField
         error={errors.artist}
-        id="artist"
         label="Artist"
         placeholder="Enter artist name"
-        register={register('artist', { required: 'Artist is required' })}
+        {...register('artist', { required: 'Artist is required' })}
         required
       />
       <InputField
         error={errors.title}
-        id="title"
         label="Title"
         placeholder="Enter song title"
-        register={register('title', { required: 'Title is required' })}
+        {...register('title', { required: 'Title is required' })}
         required
       />
       <RadioGroup
@@ -112,12 +110,11 @@ export function DetailsTab({
       />
       <InputField
         error={errors.bpm}
-        id="bpm"
         label="BPM"
         max="200"
         min="0"
         placeholder="Enter BPM (0-200)"
-        register={register('bpm', {
+        {...register('bpm', {
           max: { message: 'BPM must be at most 200', value: 200 },
           min: { message: 'BPM must be at least 0', value: 0 },
           valueAsNumber: true,
@@ -127,10 +124,9 @@ export function DetailsTab({
       <div>
         <InputField
           error={errors.durationString}
-          id="duration"
           label="Duration (mm:ss)"
           placeholder="Enter duration (mm:ss)"
-          register={register('durationString', {
+          {...register('durationString', {
             pattern: {
               message: 'Duration must be in mm:ss format',
               value: /^\d{1,3}:[0-5]\d$/,

@@ -1,7 +1,9 @@
-import type { ReactNode } from 'react';
-import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
+import { useId } from 'react';
+import type { ReactNode, SelectHTMLAttributes } from 'react';
+import type { FieldError } from 'react-hook-form';
 
 import { FormLabel } from './FormLabel';
+import { cn } from '../../utils/cn';
 
 type SelectOption =
   | { label: string; value: string }
@@ -10,51 +12,32 @@ type SelectOption =
 type SelectFieldProps = {
   error?: FieldError;
   helperText?: ReactNode;
-  id?: string;
   label?: string;
-  onChange?: (value: string) => void;
   options: SelectOption[];
-  register?: UseFormRegisterReturn;
-  required?: boolean;
-  value?: string;
-};
+} & Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'>;
 
 export function SelectField({
   error,
   helperText,
-  id,
   label,
-  onChange,
   options,
-  register,
-  required = false,
-  value,
+  ...selectProps
 }: SelectFieldProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (onChange) {
-      onChange(e.target.value);
-    }
-  };
-
-  const selectProps = register
-    ? { ...register }
-    : {
-        onChange: handleChange,
-        value,
-      };
+  const generatedId = useId();
+  const selectId = selectProps.id ?? generatedId;
+  const selectClass = cn(
+    'focus:border-brand-400 focus:ring-brand-400/20 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:ring-2 focus:outline-none',
+    selectProps.className,
+  );
 
   return (
     <div>
       {label && (
-        <FormLabel className="mb-1.5 block" htmlFor={id} required={required}>
+        <FormLabel className="mb-1.5 block" htmlFor={selectId} required={selectProps.required}>
           {label}
         </FormLabel>
       )}
-      <select
-        className="focus:border-brand-400 focus:ring-brand-400/20 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:ring-2 focus:outline-none"
-        id={id}
-        {...selectProps}
-      >
+      <select {...selectProps} className={selectClass} id={selectId}>
         {options.map((option) => {
           if ('value' in option) {
             return (

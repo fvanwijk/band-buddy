@@ -93,10 +93,9 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
           <InputField
             error={errors.playlistUrl}
             helperText="Paste a Spotify playlist share link or playlist ID"
-            id="playlist-url"
             label="Playlist URL or ID"
             placeholder="https://open.spotify.com/playlist/... or just the ID"
-            register={register('playlistUrl', {
+            {...register('playlistUrl', {
               required: 'Playlist URL or ID is required',
               validate: validatePlaylistId,
             })}

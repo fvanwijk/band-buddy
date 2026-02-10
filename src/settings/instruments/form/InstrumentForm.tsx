@@ -149,27 +149,24 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
           <div className="space-y-4">
             <InputField
               error={errors.name}
-              id="instrument-name"
               label="Instrument Name"
               placeholder="Enter instrument name"
-              register={register('name', { required: 'Instrument name is required' })}
+              {...register('name', { required: 'Instrument name is required' })}
               required
             />
 
             <SelectField
               error={errors.midiInId}
-              id="midi-in"
               label="MIDI In"
               options={inputOptions}
-              register={register('midiInId', { required: 'MIDI in is required' })}
+              {...register('midiInId', { required: 'MIDI in is required' })}
               required
             />
 
             <SelectField
-              id="midi-out"
               label="MIDI Out (Optional)"
               options={outputOptions}
-              register={register('midiOutId')}
+              {...register('midiOutId')}
             />
 
             <ProgramNamesField

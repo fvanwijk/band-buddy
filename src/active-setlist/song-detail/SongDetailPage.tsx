@@ -8,6 +8,7 @@ import {
 } from '@tabler/icons-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useStore } from 'tinybase/ui-react';
 
 import { DrawingOverlay } from './lyrics/DrawingOverlay';
 import { LyricsBlock } from './lyrics/LyricsBlock';
@@ -21,6 +22,7 @@ import { useMetronome } from '../../hooks/useMetronome';
 import { useMidiDevices } from '../../midi/useMidiDevices';
 import { Button } from '../../ui/Button';
 import { EmptyStateBlock } from '../../ui/EmptyStateBlock';
+import { InputField } from '../../ui/form/InputField';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
@@ -31,6 +33,7 @@ export function SongDetailPage() {
     tab: string;
   }>();
   const navigate = useNavigate();
+  const store = useStore();
 
   const setlist = useGetSetlist(setlistId!);
   const instruments = useGetInstruments();
@@ -41,7 +44,7 @@ export function SongDetailPage() {
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
 
   // Default to 'details' tab if not specified
-  const selectedTab = tab && ['details', 'midi'].includes(tab) ? tab : 'details';
+  const selectedTab = tab && ['details', 'notes', 'midi'].includes(tab) ? tab : 'details';
 
   // Create songs map
   const songsMap = new Map(songs.map((song) => [song.id, song]));
@@ -195,6 +198,22 @@ export function SongDetailPage() {
                 ),
               id: 'details',
               label: 'Lyrics',
+            },
+            {
+              content: (
+                <InputField
+                  className="text-sm"
+                  label="Notes"
+                  onChange={(event) => {
+                    store?.setPartialRow('songs', songId, { notes: event.target.value });
+                  }}
+                  placeholder="Add notes, chord changes, or reminders..."
+                  rows={12}
+                  value={currentSong.notes || ''}
+                />
+              ),
+              id: 'notes',
+              label: 'Notes',
             },
             {
               content: (

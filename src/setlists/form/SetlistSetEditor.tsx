@@ -11,16 +11,10 @@ import { SelectField } from '../../ui/form/SelectField';
 type SetlistSetEditorProps = {
   index: number;
   onRemove: () => void;
-  setNumber: number;
   showRemove: boolean;
 };
 
-export function SetlistSetEditor({
-  index,
-  onRemove,
-  setNumber,
-  showRemove,
-}: SetlistSetEditorProps) {
+export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEditorProps) {
   const { getValues, register, setValue, watch } = useFormContext<SetlistFormData>();
   const songs = watch(`sets.${index}.songs`);
   const allSongs = useGetSongs(true);
@@ -124,7 +118,7 @@ export function SetlistSetEditor({
                         label: `${s.artist} - ${s.title}`,
                         value: s.id,
                       }))}
-                      register={register(`sets.${index}.songs.${songIndex}.songId`)}
+                      {...register(`sets.${index}.songs.${songIndex}.songId`)}
                     />
                   </div>
                 )}
