@@ -6,10 +6,10 @@ import { EditButton } from '../ui/EditButton';
 type SongCardProps = {
   artist: string;
   duration?: number;
-  keyNote: string;
+  keyNote?: string;
   onDelete: () => void;
   songId: string;
-  timeSignature: string;
+  timeSignature?: string;
   title: string;
 };
 
