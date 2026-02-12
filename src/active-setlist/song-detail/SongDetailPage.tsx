@@ -174,7 +174,7 @@ export function SongDetailPage() {
               {currentSong.title}{' '}
               {currentSong.spotifyId && (
                 <IconBrandSpotify
-                  className="inline h-5 w-5 stroke-slate-300"
+                  className="inline h-5 w-5 shrink-0 stroke-slate-300"
                   title="Imported from Spotify. Expect more features soon."
                 />
               )}
