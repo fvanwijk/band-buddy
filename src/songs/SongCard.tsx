@@ -1,4 +1,4 @@
-import { FormattedDuration } from '../active-setlist/FormattedDuration';
+import { SongMetadata } from './SongMetadata';
 import { Card } from '../ui/Card';
 import { DeleteButton } from '../ui/DeleteButton';
 import { EditButton } from '../ui/EditButton';
@@ -33,22 +33,7 @@ export function SongCard({
     >
       <h2 className="truncate text-sm font-semibold text-slate-100">{title}</h2>
       <p className="text-xs text-slate-500">{artist}</p>
-      <div className="flex shrink-0 items-center gap-1 text-xs text-slate-400">
-        {keyNote && (
-          <>
-            <span className="hidden sm:inline">{keyNote}</span>•
-          </>
-        )}
-        {timeSignature && <span className="hidden sm:inline">{timeSignature}</span>}
-        {duration && (
-          <>
-            •
-            <span>
-              <FormattedDuration seconds={duration} />
-            </span>
-          </>
-        )}
-      </div>
+      <SongMetadata duration={duration} keyNote={keyNote} timeSignature={timeSignature} />
     </Card>
   );
 }
