@@ -71,8 +71,9 @@ export function useGetSetlists(): Setlist[] {
 export function useGetSetlist(id?: string, includeDeleted = false): Setlist | null {
   const setlistRow = useRow('setlists', id || '');
   const setlistSongsData = useTable('setlistSongs') || {};
+  const songsData = useTable('songs') || {};
 
-  if (!id || !setlistRow || (setlistRow.isDeleted && !includeDeleted)) {
+  if (!id || !setlistRow) {
     return null;
   }
 
@@ -85,7 +86,13 @@ export function useGetSetlist(id?: string, includeDeleted = false): Setlist | nu
       const songResult = setlistSongSchema.safeParse({ ...songData, id: songRowId });
       return songResult.success ? songResult.data : null;
     })
-    .filter((song): song is NonNullable<typeof song> => song !== null && song.setlistId === id);
+    .filter((song): song is NonNullable<typeof song> => song !== null && song.setlistId === id)
+    // Filter out soft-deleted songs unless includeDeleted is true
+    .filter((song) => {
+      if (includeDeleted) return true;
+      const songRow = songsData[song.songId] as Record<string, unknown> | undefined;
+      return !songRow?.isDeleted;
+    });
 
   // Group by set number
   const setsMap = new Map<number, SongReference[]>();

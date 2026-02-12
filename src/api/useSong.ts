@@ -40,7 +40,11 @@ export function useGetSongs(includeDeleted = false): Song[] {
         }
       }
       const result = songSchema.safeParse(parsedData);
-      return result.success ? result.data : null;
+      if (!result.success) {
+        console.log(result.error, parsedData);
+        return null;
+      }
+      return result.data;
     })
     .filter((song): song is Song => song !== null && (includeDeleted || !song.isDeleted))
     .sort((a, b) => a.title.localeCompare(b.title));
@@ -76,7 +80,11 @@ export function useGetSong(id: string | undefined, includeDeleted = false): Song
   }
 
   const result = songSchema.safeParse(parsedData);
-  return result.success ? result.data : null;
+  if (!result.success) {
+    console.log(result.error, parsedData);
+    return null;
+  }
+  return result.data;
 }
 
 /**
