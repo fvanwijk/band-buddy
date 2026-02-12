@@ -32,7 +32,7 @@ export function SongCard({
       }
     >
       <h2 className="truncate text-sm font-semibold text-slate-100">{title}</h2>
-      <p className="text-xs text-slate-500">{artist}</p>
+      <p className="truncate text-xs text-slate-500">{artist}</p>
       <SongMetadata duration={duration} keyNote={keyNote} timeSignature={timeSignature} />
     </Card>
   );

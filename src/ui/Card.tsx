@@ -13,7 +13,7 @@ export function Card({ actions, children, className, contentClassName }: CardPro
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-3 rounded border border-slate-700 bg-slate-900 p-4 shadow-sm transition-shadow hover:shadow-md',
+        'flex items-center justify-between gap-3 overflow-hidden rounded border border-slate-700 bg-slate-900 p-4 shadow-sm transition-shadow hover:shadow-md',
         className,
       )}
     >
