@@ -10,8 +10,6 @@ type SongRowProps = {
 };
 
 export function SongRow({ index, setlistId, song }: SongRowProps) {
-  const durationSeconds = song.duration || 0;
-
   return (
     <li>
       <Link
@@ -30,14 +28,12 @@ export function SongRow({ index, setlistId, song }: SongRowProps) {
           {song.key}
         </span>
         <span className="hidden text-right text-sm text-slate-400 sm:block">
-          <FormattedDuration seconds={durationSeconds} />
+          {song.duration === undefined ? null : <FormattedDuration seconds={song.duration} />}
         </span>
         <span className="flex flex-col gap-0.5 text-right sm:hidden">
-          <span>
-            {song.timeSignature} • {song.key}
-          </span>
+          <span>{[song.timeSignature, song.key].filter(Boolean).join(' • ')}</span>
           <span className="text-xs text-slate-400">
-            {durationSeconds && <FormattedDuration seconds={durationSeconds} />}
+            {song.duration === undefined ? null : <FormattedDuration seconds={song.duration} />}
           </span>
         </span>
       </Link>
