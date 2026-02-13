@@ -1,8 +1,8 @@
 import { IconFileMusic } from '@tabler/icons-react';
 
-import { useObjectUrl } from '../../hooks/useObjectUrl';
 import { useSheetMusic } from '../../hooks/useSheetMusic';
 import { EmptyStateBlock } from '../../ui/EmptyStateBlock';
+import { PdfViewer } from '../../ui/PdfViewer';
 
 type SheetMusicTabProps = {
   sheetMusicFilename?: string;
@@ -11,7 +11,6 @@ type SheetMusicTabProps = {
 
 export function SheetMusicTab({ sheetMusicFilename, songId }: SheetMusicTabProps) {
   const { data: file, isLoading } = useSheetMusic(songId, !!sheetMusicFilename);
-  const pdfUrl = useObjectUrl(file);
 
   if (isLoading) {
     return (
@@ -21,7 +20,7 @@ export function SheetMusicTab({ sheetMusicFilename, songId }: SheetMusicTabProps
     );
   }
 
-  if (!sheetMusicFilename || !pdfUrl) {
+  if (!sheetMusicFilename || !file) {
     return (
       <EmptyStateBlock icon={<IconFileMusic className="h-8 w-8" />}>
         No sheet music added yet
@@ -29,15 +28,5 @@ export function SheetMusicTab({ sheetMusicFilename, songId }: SheetMusicTabProps
     );
   }
 
-  return (
-    <div className="flex flex-col gap-4">
-      <p className="text-sm text-slate-300">{sheetMusicFilename}</p>
-
-      <iframe
-        className="h-screen w-full rounded-lg border border-slate-800"
-        src={pdfUrl}
-        title="Sheet Music"
-      />
-    </div>
-  );
+  return <PdfViewer file={file} height="h-screen" />;
 }

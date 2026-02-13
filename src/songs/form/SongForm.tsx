@@ -10,6 +10,7 @@ import { calculateMeasures } from './measures';
 import { MidiButtonsTab } from './midi/MidiButtonsTab';
 import { SheetMusicFormTab } from './sheet-music/SheetMusicFormTab';
 import { useGetInstruments } from '../../api/useInstruments';
+import { useSheetMusic } from '../../hooks/useSheetMusic';
 import type { MidiEvent, Song } from '../../types';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
@@ -86,6 +87,25 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const hasDrawings = initialData?.canvasPaths && initialData.canvasPaths.length > 0;
   const lyricsChanged = lyrics !== (initialData?.lyrics || '');
   const showDrawingWarning = hasDrawings && lyricsChanged;
+
+  // Fetch existing sheet music when editing
+  const { data: existingSheetMusic } = useSheetMusic(
+    id,
+    !!id && !!sheetMusicFilename && (!sheetMusicFiles || sheetMusicFiles.length === 0),
+  );
+
+  // Set sheet music file in form state when fetched
+  useEffect(() => {
+    if (
+      existingSheetMusic &&
+      sheetMusicFilename &&
+      (!sheetMusicFiles || sheetMusicFiles.length === 0)
+    ) {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(existingSheetMusic);
+      setValue('sheetMusicFiles', dataTransfer.files);
+    }
+  }, [existingSheetMusic, sheetMusicFiles, sheetMusicFilename, setValue]);
 
   // Define which fields belong to which tab
   const detailsFields: (keyof SongFormData)[] = [
@@ -205,7 +225,6 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                   register={register('sheetMusicFiles', {
                     validate: {
                       fileType: (files) => {
-                        console.log(files, 'validating');
                         if (!files || files.length === 0) return true;
                         const file = files[0];
                         return file.type === 'application/pdf' || 'Please select a PDF file';

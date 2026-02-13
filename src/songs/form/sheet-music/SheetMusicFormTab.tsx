@@ -1,9 +1,9 @@
 import { IconFileMusic, IconFileTypePdf, IconTrash, IconUpload } from '@tabler/icons-react';
 import type { FieldError, UseFormRegisterReturn, UseFormSetValue } from 'react-hook-form';
 
-import { useObjectUrl } from '../../../hooks/useObjectUrl';
 import { Button } from '../../../ui/Button';
 import { EmptyStateBlock } from '../../../ui/EmptyStateBlock';
+import { PdfViewer } from '../../../ui/PdfViewer';
 import type { SongFormData } from '../SongForm';
 
 type SheetMusicFormTabProps = {
@@ -24,7 +24,6 @@ export function SheetMusicFormTab({
   const file = sheetMusicFiles?.[0];
   const displayFilename = file?.name || sheetMusicFilename;
   const fileSizeKB = file ? Math.round(file.size / 1024) : null;
-  const pdfUrl = useObjectUrl(file);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     await register.onChange(event);
@@ -97,13 +96,9 @@ export function SheetMusicFormTab({
         </div>
       </div>
 
-      {pdfUrl && (
+      {file && (
         <div className="mt-4">
-          <iframe
-            className="h-[600px] w-full rounded border border-slate-700"
-            src={pdfUrl}
-            title="Sheet Music Preview"
-          />
+          <PdfViewer file={file} height="h-[600px]" />
         </div>
       )}
     </div>
