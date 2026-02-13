@@ -26,7 +26,7 @@ export function Layout() {
           <TopNav />
         </header>
       </div>
-      <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-4 pt-2 pb-4">
+      <div className="mx-auto flex max-w-5xl flex-col px-4 pt-2 pb-4">
         <main className="min-h-0 flex-1 pt-1.5">
           <Outlet />
         </main>
