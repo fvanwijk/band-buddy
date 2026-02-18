@@ -28,5 +28,5 @@ export function SheetMusicTab({ sheetMusicFilename, songId }: SheetMusicTabProps
     );
   }
 
-  return <PdfViewer file={file} height="h-screen" />;
+  return <PdfViewer file={file} className="w-full" />;
 }

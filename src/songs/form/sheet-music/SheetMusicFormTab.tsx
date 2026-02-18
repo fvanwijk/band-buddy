@@ -98,7 +98,7 @@ export function SheetMusicFormTab({
 
       {file && (
         <div className="mt-4">
-          <PdfViewer file={file} height="h-[600px]" />
+          <PdfViewer file={file} />
         </div>
       )}
     </div>

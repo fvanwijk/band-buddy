@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import { cn } from '../utils/cn';
 
 // Set up worker from local package
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -12,32 +13,47 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 type PdfViewerProps = {
   file: File | Blob | string | null;
-  height?: string;
+  className?: string;
 };
 
-export function PdfViewer({ file, height = 'h-[600px]' }: PdfViewerProps) {
+export function PdfViewer({ file, className }: PdfViewerProps) {
   const [numPages, setNumPages] = useState(0);
-
-  if (!file) return null;
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.clientWidth;
+        // Scale based on container width (assuming base width of 612px)
+        const newScale = Math.max(0.5, Math.min(2, width / 612));
+        setScale(newScale);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  if (!file) return null;
+
   return (
-    <div className={`${height} overflow-y-auto rounded-lg border border-slate-800 bg-slate-950`}>
+    <div ref={containerRef} className={cn('flex justify-center overflow-y-auto', className)}>
       <Document
         file={file}
         onLoadSuccess={handleDocumentLoadSuccess}
         onLoadError={(error) => console.error('PDF load error:', error)}
+        scale={scale}
       >
         {Array.from({ length: numPages }, (_, i) => (
-          <div key={i + 1} className="flex justify-center bg-slate-950 py-2">
-            <Page
-              pageNumber={i + 1}
-              width={Math.min(window.innerWidth - 32, 800)}
-              renderTextLayer={false}
-            />
+          <div key={i + 1} className="py-2">
+            <Page pageNumber={i + 1} renderTextLayer={false} />
           </div>
         ))}
       </Document>
