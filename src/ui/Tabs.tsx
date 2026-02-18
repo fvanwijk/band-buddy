@@ -14,9 +14,10 @@ type TabsProps = {
   activeTabId?: string;
   onTabChange?: (tabId: string) => void;
   tabs: TabItem[];
+  unmount?: boolean;
 };
 
-export function Tabs({ activeTabId, onTabChange, tabs }: TabsProps) {
+export function Tabs({ activeTabId, onTabChange, tabs, unmount = true }: TabsProps) {
   const [uncontrolledIndex, setUncontrolledIndex] = useState(0);
 
   // Determine if this is controlled or uncontrolled
@@ -62,7 +63,7 @@ export function Tabs({ activeTabId, onTabChange, tabs }: TabsProps) {
           <TabPanel
             key={tab.id}
             className="focus:outline-none"
-            unmount={false}
+            unmount={unmount}
             style={{ display: selectedIndex === index ? 'block' : 'none' }}
           >
             {tab.content}
