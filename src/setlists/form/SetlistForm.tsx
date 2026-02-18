@@ -3,6 +3,7 @@ import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 import { SetlistSetEditor } from './SetlistSetEditor';
+import { useGetSongs } from '../../api/useSong';
 import type { Setlist, SetlistSet } from '../../types';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
@@ -22,6 +23,7 @@ type SetlistFormProps = {
 };
 
 export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistFormProps) {
+  const songs = useGetSongs();
   const methods = useForm<SetlistFormData>({
     defaultValues: {
       date: initialData?.date || new Date().toISOString().split('T')[0],
@@ -102,27 +104,28 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-semibold text-slate-100">Sets</h3>
-                {fields.length < 3 && (
-                  <Button
-                    className="text-xs"
-                    color="primary"
-                    iconStart={<IconPlus className="h-4 w-4" />}
-                    onClick={handleAddSet}
-                    type="button"
-                    variant="ghost"
-                  >
-                    Add set
-                  </Button>
-                )}
+
+                <Button
+                  className="text-xs"
+                  color="primary"
+                  iconStart={<IconPlus className="h-4 w-4" />}
+                  onClick={handleAddSet}
+                  type="button"
+                  variant="ghost"
+                >
+                  Add set
+                </Button>
               </div>
 
-              <Alert severity="info">
-                You don't have songs in your library.{' '}
-                <Link className="link" to="/songs/add">
-                  Add some songs
-                </Link>{' '}
-                to be added to a set.
-              </Alert>
+              {songs.length === 0 && (
+                <Alert severity="info">
+                  You don't have songs in your library.{' '}
+                  <Link className="link" to="/songs/add">
+                    Add some songs
+                  </Link>{' '}
+                  to be added to a set.
+                </Alert>
+              )}
 
               {fields.map((field, index) => (
                 <SetlistSetEditor
