@@ -23,22 +23,18 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
 
   return (
     <div>
-      {/* Set Card */}
       <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl shadow-black/40">
-        {/* Set Header */}
         <div className="text-brand-300 flex items-center justify-between border-b border-slate-700 bg-slate-800/50 px-6 py-3 text-xs font-semibold tracking-[0.2em] uppercase">
-          <span>Set {setIndex + 1}</span>
+          <span>{set.name || `Set ${setIndex + 1}`}</span>
           <span className="text-slate-400">
             <FormattedDuration seconds={setSeconds} />
           </span>
         </div>
 
-        {/* Songs in Set */}
         {set.songs.length === 0 ? (
           <div className="px-6 py-8 text-center text-slate-400">No songs in this set</div>
         ) : (
           <>
-            {/* Column Headers */}
             <div className="hidden grid-cols-[25px_6fr_2fr_2fr_2fr] gap-4 border-b border-slate-700 bg-slate-900/30 px-6 py-3 text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase sm:grid">
               <span className="text-right"></span>
               <span>Song</span>
@@ -47,7 +43,6 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
               <span className="text-right">Duration</span>
             </div>
 
-            {/* Songs */}
             <ul className="divide-y divide-slate-800">
               {set.songs.map((songRef, index) => {
                 const song = songsMap.get(songRef.songId);
@@ -66,7 +61,6 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
         )}
       </div>
 
-      {/* Break Between Sets */}
       {setIndex < sets.length - 1 && (
         <div className="flex items-center justify-center gap-4 py-4">
           <div className="h-px flex-1 bg-slate-700" />

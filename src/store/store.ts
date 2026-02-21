@@ -10,6 +10,7 @@ import {
   localeSchema,
   metronomeVolumeSchema,
   setlistMetadataTableSchema,
+  setlistSetTableSchema,
   setlistSongTableSchema,
   showDrawingToolsSchema,
   songTableSchema,
@@ -34,6 +35,7 @@ export function createAppStore(): Store {
 
   const tablesSchema = schematizer.toTablesSchema({
     instruments: instrumentTableSchema,
+    setlistSets: setlistSetTableSchema,
     setlistSongs: setlistSongTableSchema,
     setlists: setlistMetadataTableSchema,
     songs: songTableSchema,

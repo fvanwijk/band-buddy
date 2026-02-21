@@ -77,10 +77,18 @@ export function SongDetailPage() {
     throw new Error('Song not found');
   }
 
-  // Flatten all sets into a single list of songs for easier navigation
-  const songFromSetlist = setlist.sets.flatMap((set) =>
-    set.songs.map((songRef) => ({ setNumber: set.setNumber, songId: songRef.songId })),
-  );
+  // Flatten all sets into a single list of songs for easier navigation, ordered by setIndex and songIndex
+  const songFromSetlist = setlist.sets
+    .toSorted((a, b) => a.setIndex - b.setIndex)
+    .flatMap((set) =>
+      set.songs
+        .toSorted((a, b) => a.songIndex - b.songIndex)
+        .map((songRef) => ({
+          setId: set.id,
+          songId: songRef.songId,
+          songIndex: songRef.songIndex,
+        })),
+    );
 
   // Find current song index
   const currentSongIndex = songFromSetlist.findIndex((s) => s.songId === songId);

@@ -1,24 +1,19 @@
 import { z } from 'zod';
 
-/**
- * MIDI event schema
- */
-export const midiEventSchema = z.object({
-  id: z.string(),
+// --- MIDI Event Schemas ---
+export const midiEventBaseSchema = z.object({
   instrumentId: z.string(),
   label: z.string(),
   programChange: z.number(),
 });
+export const midiEventSchema = midiEventBaseSchema.extend({ id: z.string() });
 
-/**
- * Song schema (full, with id)
- */
-export const songSchema = z.object({
+// --- Song Schemas ---
+export const songBaseSchema = z.object({
   artist: z.string(),
   bpm: z.number().optional(),
   canvasPaths: z.array(z.unknown()).optional(),
   duration: z.number().optional(),
-  id: z.string(),
   isDeleted: z.boolean().optional(),
   key: z.string().optional(),
   lyrics: z.string().optional(),
@@ -30,40 +25,24 @@ export const songSchema = z.object({
   title: z.string(),
   transpose: z.number().optional(),
 });
-
-/**
- * Song table schema (without id, for Tinybase table)
- */
-export const songTableSchema = z.object({
-  artist: z.string(),
-  bpm: z.number().optional(),
+export const songSchema = songBaseSchema.extend({ id: z.string() });
+export const songTableSchema = songBaseSchema.extend({
   canvasPaths: z.string().optional(), // Stored as JSON string
-  duration: z.number().optional(),
-  isDeleted: z.boolean().optional(),
-  key: z.string().optional(),
-  lyrics: z.string().optional(),
   midiEvents: z.string().optional(), // Stored as JSON string
-  notes: z.string().optional(),
-  sheetMusicFilename: z.string().optional(),
-  spotifyId: z.string().optional(),
-  timeSignature: z.string().optional(),
-  title: z.string(),
-  transpose: z.number().optional(),
 });
+export const songWithoutIdSchema = songBaseSchema;
 
-/**
- * Instrument schema (full, with id)
- */
-export const instrumentSchema = z
-  .object({
-    id: z.string(),
-    midiInId: z.string(),
-    midiInName: z.string(),
-    midiOutId: z.string().optional(),
-    midiOutName: z.string().optional(),
-    name: z.string(),
-    programNames: z.string().optional(),
-  })
+// --- Instrument Schemas ---
+export const instrumentBaseSchema = z.object({
+  midiInId: z.string(),
+  midiInName: z.string(),
+  midiOutId: z.string().optional(),
+  midiOutName: z.string().optional(),
+  name: z.string(),
+  programNames: z.string().optional(),
+});
+export const instrumentSchema = instrumentBaseSchema
+  .extend({ id: z.string() })
   .transform((data) => {
     const { programNames, ...rest } = data;
     if (programNames) {
@@ -78,99 +57,63 @@ export const instrumentSchema = z
     }
     return rest;
   });
+export const instrumentTableSchema = instrumentBaseSchema;
 
-/**
- * Instrument table schema (without id, for Tinybase table)
- */
-export const instrumentTableSchema = z.object({
-  midiInId: z.string(),
-  midiInName: z.string(),
-  midiOutId: z.string().optional(),
-  midiOutName: z.string().optional(),
-  name: z.string(),
-  programNames: z.string().optional(),
-});
-
-/**
- * Song without ID (for creating/updating)
- */
-export const songWithoutIdSchema = songSchema.omit({ id: true });
-
-/**
- * Setlist song schema (full, with id)
- */
-export const setlistSongSchema = z.object({
-  id: z.string(),
-  setNumber: z.number(),
+// --- Setlist Set Schemas ---
+export const setlistSetBaseSchema = z.object({
+  name: z.string().optional(),
+  setIndex: z.number(),
   setlistId: z.string(),
+});
+export const setlistSetTableSchema = setlistSetBaseSchema;
+export const setlistSetSchema = setlistSetBaseSchema.extend({ id: z.string() });
+
+// --- Setlist Song Schemas ---
+export const setlistSongBaseSchema = z.object({
+  setId: z.string(),
   songId: z.string(),
   songIndex: z.number(),
 });
+export const setlistSongSchema = setlistSongBaseSchema.extend({ id: z.string() });
+export const setlistSongTableSchema = setlistSongBaseSchema;
 
-/**
- * Setlist song table schema (without id, for Tinybase table)
- */
-export const setlistSongTableSchema = z.object({
-  setNumber: z.number(),
-  setlistId: z.string(),
-  songId: z.string(),
-  songIndex: z.number(),
-});
-
-/**
- * Setlist metadata schema (full, with id)
- */
-export const setlistMetadataSchema = z.object({
-  date: z.string(),
-  id: z.string(),
-  title: z.string(),
-  venue: z.string().optional(),
-});
-
-/**
- * Setlist metadata table schema (without id, for Tinybase table)
- */
-export const setlistMetadataTableSchema = z.object({
+// --- Setlist Metadata Schemas ---
+export const setlistMetadataBaseSchema = z.object({
   date: z.string(),
   title: z.string(),
   venue: z.string().optional(),
 });
+export const setlistMetadataSchema = setlistMetadataBaseSchema.extend({ id: z.string() });
+export const setlistMetadataTableSchema = setlistMetadataBaseSchema;
 
-/**
- * Song reference schema (for UI)
- */
+// --- Song Reference (UI) ---
 export const songReferenceSchema = z.object({
   isDeleted: z.boolean().optional(),
+  setId: z.string(),
   songId: z.string(),
+  songIndex: z.number(),
 });
 
-/**
- * Setlist set schema (for UI)
- */
-export const setlistSetSchema = z.object({
-  setNumber: z.number(),
+// --- Setlist Set (UI, with songs) ---
+export const setlistSetUiSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  setIndex: z.number(),
+  setlistId: z.string(),
   songs: z.array(songReferenceSchema),
 });
 
-/**
- * Complete setlist schema (for UI)
- */
-export const setlistSchema = z.object({
+// --- Complete Setlist (UI) ---
+export const setlistBaseSchema = z.object({
   date: z.string(),
-  id: z.string(),
-  sets: z.array(setlistSetSchema),
+  sets: z.array(setlistSetUiSchema),
   title: z.string(),
   venue: z.string().optional(),
 });
+export const setlistSchema = setlistBaseSchema.extend({ id: z.string() });
+export const setlistWithoutIdSchema = setlistBaseSchema;
 
-/**
- * Setlist without ID (for creating/updating)
- */
-export const setlistWithoutIdSchema = setlistSchema.omit({ id: true });
-
-/**
- * Settings values
- */
+// --- Settings values ---
 export const localeSchema = z.string().default('en-US');
 export const themeSchema = z.string().default('emerald');
 export const activeSetlistIdSchema = z.string();

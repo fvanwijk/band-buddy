@@ -1,11 +1,12 @@
 import { IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import type { SetlistFormData } from './SetlistForm';
 import { useGetSongs } from '../../api/useSong';
 import { Button } from '../../ui/Button';
 import { DeleteButton } from '../../ui/DeleteButton';
+import { InputField } from '../../ui/form/InputField';
 import { SelectField } from '../../ui/form/SelectField';
 
 type SetlistSetEditorProps = {
@@ -16,6 +17,8 @@ type SetlistSetEditorProps = {
 
 export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEditorProps) {
   const { getValues, register, setValue, watch } = useFormContext<SetlistFormData>();
+  const setName = watch(`sets.${index}.name`);
+  const [editing, setEditing] = useState(false);
   const songs = watch(`sets.${index}.songs`);
   const allSongs = useGetSongs(true);
   const addableSongs = allSongs.filter((song) => !song.isDeleted);
@@ -30,7 +33,15 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
 
     const songToAdd = addableSongs.find((song) => !usedSongIds.has(song.id)) ?? addableSongs[0];
     if (songToAdd) {
-      setValue(`sets.${index}.songs`, [...songs, { songId: songToAdd.id }]);
+      const setId = allSets[index]?.id || '';
+      setValue(`sets.${index}.songs`, [
+        ...songs,
+        {
+          setId,
+          songId: songToAdd.id,
+          songIndex: songs.length,
+        },
+      ]);
     }
   };
 
@@ -72,7 +83,40 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
   return (
     <div className="space-y-2 rounded border border-slate-700 bg-slate-900 p-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-semibold text-white">Set {index + 1}</h4>
+        <div className="flex items-center gap-2">
+          {editing ? (
+            <InputField
+              {...register(`sets.${index}.name`, {
+                onBlur: () => setEditing(false),
+              })}
+              autoFocus
+              hideLabel
+              label="Set name"
+              id={`set-name-${index}`}
+              className="ml-0"
+              placeholder={`Set ${index + 1} name (optional)`}
+              size="small"
+              type="text"
+            />
+          ) : (
+            <h4
+              className="decoration-brand-400 h-7.5 cursor-pointer font-semibold text-white underline decoration-dashed underline-offset-4"
+              tabIndex={0}
+              onClick={() => {
+                setEditing(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setEditing(true);
+                }
+              }}
+              aria-label="Edit set name"
+              role="button"
+            >
+              {setName?.trim() ? setName : `Set ${index + 1}`}
+            </h4>
+          )}
+        </div>
         {showRemove && (
           <Button
             color="danger"

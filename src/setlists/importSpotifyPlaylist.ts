@@ -65,8 +65,15 @@ export function useProcessSpotifyPlaylist() {
       date: today,
       sets: [
         {
-          setNumber: 1,
-          songs: songIds.map((songId) => ({ songId })),
+          id: 'spotify-set',
+          name: '',
+          setIndex: 0,
+          setlistId: '', // Will be set after creation
+          songs: songIds.map((songId, songIndex) => ({
+            setId: 'spotify-set',
+            songId,
+            songIndex,
+          })),
         },
       ],
       title: playlist.name,

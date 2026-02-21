@@ -1,6 +1,8 @@
 import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
+import { nanoid } from 'nanoid';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import { useStore } from 'tinybase/ui-react';
 
 import { SetlistSetEditor } from './SetlistSetEditor';
 import { useGetSongs } from '../../api/useSong';
@@ -27,7 +29,27 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
   const methods = useForm<SetlistFormData>({
     defaultValues: {
       date: initialData?.date || new Date().toISOString().split('T')[0],
-      sets: initialData?.sets || [{ setNumber: 1, songs: [] }],
+      sets: initialData?.sets?.map((set, idx) => ({
+        id: set.id || nanoid(),
+        name: typeof set.name === 'string' ? set.name : '',
+        setIndex: typeof set.setIndex === 'number' ? set.setIndex : idx,
+        setlistId: set.setlistId || initialData?.id || '',
+        songs:
+          set.songs?.map((song, songIndex) => ({
+            setId: set.id || nanoid(),
+            songId: song.songId,
+            songIndex: typeof song.songIndex === 'number' ? song.songIndex : songIndex,
+            isDeleted: song.isDeleted,
+          })) || [],
+      })) || [
+        {
+          id: nanoid(),
+          name: '',
+          setIndex: 0,
+          setlistId: initialData?.id || '',
+          songs: [],
+        },
+      ],
       title: initialData?.title || '',
       venue: initialData?.venue || '',
     },
@@ -46,9 +68,16 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
   });
 
   const handleAddSet = () => {
-    const newSetNumber = Math.max(...fields.map((s) => s.setNumber), 0) + 1;
-
-    append({ setNumber: newSetNumber, songs: [] });
+    const newSetIndex =
+      Math.max(...fields.map((s) => (typeof s.setIndex === 'number' ? s.setIndex : 0)), 0) + 1;
+    const setlistId = initialData?.id || nanoid();
+    append({
+      id: nanoid(),
+      name: '',
+      setIndex: newSetIndex,
+      setlistId,
+      songs: [],
+    });
   };
 
   const handleRemoveSet = (index: number) => {
@@ -57,12 +86,44 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
     }
   };
 
+  const store = useStore();
+
   const handleFormSubmit = (data: SetlistFormData) => {
-    // Ensure sets are in order
-    const orderedSets = [...data.sets].sort((a, b) => a.setNumber - b.setNumber);
+    // Generate set IDs and store sets in Tinybase
+    const setlistId = initialData?.id || nanoid();
+    const setsWithIds = data.sets.map((set, idx) => {
+      const setId = set.id || nanoid();
+      const setName = typeof set.name === 'string' ? set.name : '';
+      const setIndex = typeof set.setIndex === 'number' ? set.setIndex : idx;
+      if (store) {
+        store.setRow('setlistSets', setId, {
+          id: setId,
+          name: setName,
+          setIndex,
+          setlistId,
+        });
+      }
+      return {
+        id: setId,
+        name: setName,
+        setIndex,
+        setlistId,
+        songs: (set.songs || [])
+          .filter((song) => typeof song.songId === 'string')
+          .map((song, songIndex) => ({
+            setId,
+            songId: song.songId,
+            songIndex: typeof song.songIndex === 'number' ? song.songIndex : songIndex,
+            isDeleted: song.isDeleted,
+          })),
+      };
+    });
+
     onSubmit({
-      ...data,
-      sets: orderedSets,
+      date: data.date,
+      sets: setsWithIds,
+      title: data.title,
+      venue: data.venue,
     });
   };
 

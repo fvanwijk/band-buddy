@@ -1,51 +1,20 @@
-export type MidiEvent = {
-  id: string;
-  instrumentId: string;
-  label: string;
-  programChange: number;
-};
+import { z } from 'zod';
 
-export type Song = {
-  artist: string;
-  bpm?: number;
-  canvasPaths?: unknown[];
-  duration?: number;
-  id: string;
-  isDeleted?: boolean;
-  key?: string;
-  lyrics?: string;
-  midiEvents?: MidiEvent[];
-  notes?: string;
-  sheetMusicFilename?: string;
-  spotifyId?: string;
-  timeSignature?: string;
-  title: string;
-  transpose?: number;
-};
+import {
+  instrumentSchema,
+  midiEventSchema,
+  setlistSchema,
+  setlistSetUiSchema,
+  songReferenceSchema,
+  songSchema,
+} from './schemas';
 
-export type Instrument = {
-  id: string;
-  midiInId: string;
-  midiInName: string;
-  midiOutId?: string;
-  midiOutName?: string;
-  name: string;
+// UI Instrument type: programNames is Record<number, string> when present
+export type Instrument = Omit<z.infer<typeof instrumentSchema>, 'programNames'> & {
   programNames?: Record<number, string>;
 };
-
-export type SongReference = {
-  songId: string;
-};
-
-export type SetlistSet = {
-  setNumber: number;
-  songs: SongReference[];
-};
-
-export type Setlist = {
-  date: string;
-  id: string;
-  sets: SetlistSet[];
-  title: string;
-  venue?: string;
-};
+export type MidiEvent = z.infer<typeof midiEventSchema>;
+export type Song = z.infer<typeof songSchema>;
+export type SongReference = z.infer<typeof songReferenceSchema>;
+export type SetlistSet = z.infer<typeof setlistSetUiSchema>;
+export type Setlist = z.infer<typeof setlistSchema>;

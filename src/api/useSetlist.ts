@@ -6,14 +6,15 @@ import {
   useTable,
 } from 'tinybase/ui-react';
 
-import { setlistMetadataSchema, setlistSongSchema } from '../schemas';
-import type { Setlist, SetlistSet, SongReference } from '../types';
+import { setlistMetadataSchema } from '../schemas';
+import type { Setlist, SetlistSet } from '../types';
 
 /**
  * Get all setlists from the store
  */
 export function useGetSetlists(): Setlist[] {
   const setlistsData = useTable('setlists') || {};
+  const setlistSetsData = useTable('setlistSets') || {};
   const setlistSongsData = useTable('setlistSongs') || {};
 
   return Object.entries(setlistsData)
@@ -21,48 +22,51 @@ export function useGetSetlists(): Setlist[] {
       const result = setlistMetadataSchema.safeParse({ ...data, id });
       if (!result.success) return null;
 
-      // Get all songs for this setlist, grouped by set number
-      const setlistSongs = Object.entries(setlistSongsData)
-        .map(([songRowId, songData]) => {
-          const songResult = setlistSongSchema.safeParse({ ...songData, id: songRowId });
-          return songResult.success ? songResult.data : null;
+      // Get sets for this setlist
+      const sets = Object.entries(setlistSetsData)
+        .filter(([, setData]) => typeof setData === 'object' && setData.setlistId === id)
+        .map(([setRowId, setData]) => {
+          const setIndex = typeof setData.setIndex === 'number' ? setData.setIndex : 0;
+          const songs = Object.values(setlistSongsData)
+            .filter(
+              (songData) =>
+                typeof songData === 'object' &&
+                songData.setId === setRowId &&
+                typeof songData.songId === 'string',
+            )
+            .toSorted((a, b) => {
+              const ai = typeof a.songIndex === 'number' ? a.songIndex : 0;
+              const bi = typeof b.songIndex === 'number' ? b.songIndex : 0;
+              return ai - bi;
+            })
+            .map((songData) => ({
+              isDeleted: typeof songData.isDeleted === 'boolean' ? songData.isDeleted : false,
+              setId: setRowId,
+              songId: String(songData.songId),
+              songIndex: typeof songData.songIndex === 'number' ? songData.songIndex : 0,
+            }));
+          return {
+            id: setRowId,
+            name: typeof setData.name === 'string' ? setData.name : '',
+            setIndex,
+            setlistId: id,
+            songs,
+          };
         })
-        .filter((song): song is NonNullable<typeof song> => song !== null && song.setlistId === id);
+        .toSorted((a, b) => a.setIndex - b.setIndex);
 
-      // Group by set number
-      const setsMap = new Map<number, SongReference[]>();
-      setlistSongs.forEach((song) => {
-        if (!setsMap.has(song.setNumber)) {
-          setsMap.set(song.setNumber, []);
-        }
-        setsMap.get(song.setNumber)!.push({
-          songId: song.songId,
-        });
-      });
-
-      // Convert to sorted array of sets
-      const sets: SetlistSet[] = Array.from(setsMap.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([setNumber, songs]) => ({
-          setNumber,
-          songs,
-        }));
-
-      const setlist: Setlist = {
+      const setlist = {
         date: result.data.date,
         id: result.data.id,
         sets,
         title: result.data.title,
+        venue: result.data.venue,
       };
-
-      if (result.data.venue) {
-        setlist.venue = result.data.venue;
-      }
 
       return setlist;
     })
-    .filter((setlist): setlist is Setlist => setlist !== null)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .filter((setlist) => setlist !== null)
+    .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 /**
@@ -70,6 +74,7 @@ export function useGetSetlists(): Setlist[] {
  */
 export function useGetSetlist(id?: string, includeDeleted = false): Setlist | null {
   const setlistRow = useRow('setlists', id || '');
+  const setlistSetsData = useTable('setlistSets') || {};
   const setlistSongsData = useTable('setlistSongs') || {};
   const songsData = useTable('songs') || {};
 
@@ -80,40 +85,47 @@ export function useGetSetlist(id?: string, includeDeleted = false): Setlist | nu
   const result = setlistMetadataSchema.safeParse({ ...setlistRow, id });
   if (!result.success) return null;
 
-  // Get all songs for this setlist
-  const setlistSongs = Object.entries(setlistSongsData)
-    .map(([songRowId, songData]) => {
-      const songResult = setlistSongSchema.safeParse({ ...songData, id: songRowId });
-      return songResult.success ? songResult.data : null;
+  // Get sets for this setlist
+  const sets: SetlistSet[] = Object.entries(setlistSetsData)
+    .filter(([, setData]) => typeof setData === 'object' && setData.setlistId === id)
+    .map(([setRowId, setData]) => {
+      const setIndex = typeof setData.setIndex === 'number' ? setData.setIndex : 0;
+
+      const songs = Object.values(setlistSongsData)
+        .filter(
+          (songData) =>
+            typeof songData === 'object' &&
+            songData.setId === setRowId &&
+            typeof songData.songId === 'string',
+        )
+        .filter((songData) => {
+          if (includeDeleted) return true;
+          if (typeof songData.songId !== 'string') return false;
+          const songRow = songsData[songData.songId] as Record<string, unknown> | undefined;
+          return !songRow?.isDeleted;
+        })
+        .toSorted((a, b) => {
+          const ai = typeof a.songIndex === 'number' ? a.songIndex : 0;
+          const bi = typeof b.songIndex === 'number' ? b.songIndex : 0;
+          return ai - bi;
+        })
+        .map((songData) => {
+          return typeof songData.songId === 'string'
+            ? { setId: songData.setId, songId: songData.songId, songIndex: songData.songIndex }
+            : null;
+        })
+        .filter(
+          (song): song is { setId: string; songId: string; songIndex: number } => song !== null,
+        );
+      return {
+        id: setRowId,
+        name: typeof setData.name === 'string' ? setData.name : '',
+        setIndex,
+        setlistId: id,
+        songs,
+      };
     })
-    .filter((song): song is NonNullable<typeof song> => song !== null && song.setlistId === id)
-    // Filter out soft-deleted songs unless includeDeleted is true
-    .filter((song) => {
-      if (includeDeleted) return true;
-      const songRow = songsData[song.songId] as Record<string, unknown> | undefined;
-      return !songRow?.isDeleted;
-    });
-
-  // Group by set number
-  const setsMap = new Map<number, SongReference[]>();
-  setlistSongs
-    .sort((a, b) => a.songIndex - b.songIndex)
-    .forEach((song) => {
-      if (!setsMap.has(song.setNumber)) {
-        setsMap.set(song.setNumber, []);
-      }
-      setsMap.get(song.setNumber)!.push({
-        songId: song.songId,
-      });
-    });
-
-  // Convert to sorted array of sets
-  const sets: SetlistSet[] = Array.from(setsMap.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([setNumber, songs]) => ({
-      setNumber,
-      songs,
-    }));
+    .sort((a, b) => a.setIndex - b.setIndex);
 
   const setlist: Setlist = {
     date: result.data.date,
@@ -140,9 +152,7 @@ export function useAddSetlist(onSuccess?: () => void) {
     if (!store) return;
 
     const row: Record<string, unknown> = { ...data };
-
     delete row.sets;
-
     Object.entries(row).forEach(([key, value]) => {
       if (value === undefined) {
         delete row[key];
@@ -153,16 +163,23 @@ export function useAddSetlist(onSuccess?: () => void) {
     const setlistId = store.addRow('setlists', row as Record<string, string>);
     if (!setlistId) return;
 
-    // Now add the songs with the actual setlist ID
-    data.sets.forEach((set) => {
-      set.songs.forEach((songRef, index) => {
-        const songRowId = `${setlistId}_${set.setNumber}_${index}`;
-        store.setRow('setlistSongs', songRowId, {
-          setNumber: set.setNumber,
-          setlistId,
+    // Store sets in setlistSets table and let Tinybase generate setIds
+    data.sets.forEach((set, setIndex) => {
+      const setRow = {
+        name: set.name || '',
+        setIndex,
+        setlistId,
+      };
+      const setId = store.addRow('setlistSets', setRow);
+      if (!setId) return;
+      // Store songs referencing setId, let Tinybase generate song ids
+      set.songs.forEach((songRef, songIndex) => {
+        const songRow = {
+          setId,
           songId: songRef.songId,
-          songIndex: index,
-        });
+          songIndex,
+        };
+        store.addRow('setlistSongs', songRow);
       });
     });
 
@@ -196,7 +213,7 @@ export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void)
 
       if (!store) return row as Record<string, string>;
 
-      // Delete existing setlist songs
+      // Delete existing setlist songs and sets
       const setlistSongsData = store.getTable('setlistSongs') || {};
       Object.entries(setlistSongsData).forEach(([songRowId, songData]) => {
         const rowData = songData as { setlistId?: string };
@@ -204,17 +221,30 @@ export function useUpdateSetlist(id: string | undefined, onSuccess?: () => void)
           store.delRow('setlistSongs', songRowId);
         }
       });
+      const setlistSetsData = store.getTable('setlistSets') || {};
+      Object.entries(setlistSetsData).forEach(([setRowId, setData]) => {
+        const rowData = setData as { setlistId?: string };
+        if (rowData.setlistId === id) {
+          store.delRow('setlistSets', setRowId);
+        }
+      });
 
-      // Add updated songs
-      data.sets.forEach((set) => {
-        set.songs.forEach((songRef, index) => {
-          const songRowId = `${id}_${set.setNumber}_${index}`;
-          store.setRow('setlistSongs', songRowId, {
-            setNumber: set.setNumber,
-            setlistId: id!,
+      // Add updated sets and songs, let Tinybase generate ids
+      data.sets.forEach((set, setIndex) => {
+        const setRow = {
+          name: set.name || '',
+          setIndex,
+          setlistId: id!,
+        };
+        const setId = store.addRow('setlistSets', setRow);
+        if (!setId) return;
+        set.songs.forEach((songRef, songIndex) => {
+          const songRow = {
+            setId,
             songId: songRef.songId,
-            songIndex: index,
-          });
+            songIndex,
+          };
+          store.addRow('setlistSongs', songRow);
         });
       });
 

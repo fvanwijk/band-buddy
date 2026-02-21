@@ -24,7 +24,7 @@ export function SetlistTable({ setlistId, sets, songsMap }: SetlistTableProps) {
         )}
         {sets.map((set, setIndex) => (
           <SetCard
-            key={set.setNumber}
+            key={set.id}
             set={set}
             setIndex={setIndex}
             setlistId={setlistId}

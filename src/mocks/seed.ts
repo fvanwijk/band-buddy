@@ -37,15 +37,20 @@ const seedSetlists = (store: Store): void => {
     // Add setlist metadata
     store.setRow('setlists', id, metadata);
 
-    // Add setlist songs
+    // Add setlist sets and songs
     sets.forEach((set) => {
-      set.songs.forEach((songRef, index) => {
-        const songRowId = `${id}_${set.setNumber}_${index}`;
+      store.setRow('setlistSets', set.id, {
+        id: set.id,
+        name: set.name || '',
+        setIndex: set.setIndex,
+        setlistId: id,
+      });
+      set.songs.forEach((songRef, songIndex) => {
+        const songRowId = `${id}_${set.id}_${songIndex}`;
         store.setRow('setlistSongs', songRowId, {
-          setNumber: set.setNumber,
-          setlistId: id,
+          setId: set.id,
           songId: songRef.songId,
-          songIndex: index,
+          songIndex,
         });
       });
     });
