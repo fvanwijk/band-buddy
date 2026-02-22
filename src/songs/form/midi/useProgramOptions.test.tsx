@@ -10,7 +10,7 @@ type FlatOption = { label: string; value: string };
 
 describe('useProgramOptions', () => {
   it('returns empty options for non-Nord instruments without program names', () => {
-    const instrument = createInstrument();
+    const instrument = createInstrument({ name: 'Roland Juno' });
 
     const { result } = renderHook(() => useProgramOptions(instrument));
 
