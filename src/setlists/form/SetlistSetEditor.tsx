@@ -124,7 +124,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
             type="button"
             variant="ghost"
           >
-            Remove Set
+            Remove set
           </Button>
         )}
       </div>
@@ -206,7 +206,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
         type="button"
         variant="outlined"
       >
-        Add Song to Set
+        Add song to set
       </Button>
     </div>
   );

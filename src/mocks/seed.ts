@@ -14,10 +14,12 @@ export function seedStore(store: Store): void {
   seedInstruments(store);
 }
 
-export const seedSongs = (store: Store): void => {
-  createSongsTable().forEach((song) => {
-    store.addRow('songs', song);
-  });
+export const seedSongs = async (store: Store): Promise<void> => {
+  await Promise.all(
+    createSongsTable().map((song, i) => {
+      return store.setRow('songs', i.toString(), song);
+    }),
+  );
 };
 
 export const seedSetlistSongs = (store: Store): void => {

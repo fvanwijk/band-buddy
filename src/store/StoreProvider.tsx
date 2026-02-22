@@ -27,7 +27,9 @@ export function StoreProvider({ children }: StoreProviderProps) {
 
       // If store is empty and SEED_DB is enabled, populate with seed data
       const shouldSeed =
-        import.meta.env.VITE_SEED_DB === 'true' && Object.keys(store.getTables()).length === 0;
+        import.meta.env.VITE_SEED_DB === 'true' &&
+        import.meta.env.MODE !== 'test' &&
+        Object.keys(store.getTables()).length === 0;
       if (shouldSeed) {
         seedStore(store);
 

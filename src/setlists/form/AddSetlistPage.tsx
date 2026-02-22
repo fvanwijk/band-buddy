@@ -8,5 +8,5 @@ export function AddSetlistPage() {
   const navigate = useNavigate();
   const addSetlist = useAddSetlist(() => navigate(backPath));
 
-  return <SetlistForm backPath={backPath} onSubmit={addSetlist} title="Add New Setlist" />;
+  return <SetlistForm backPath={backPath} onSubmit={addSetlist} title="Add new setlist" />;
 }

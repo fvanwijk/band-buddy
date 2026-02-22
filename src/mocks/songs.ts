@@ -111,6 +111,17 @@ export const createSongs = (): Song[] => [
   }),
 ];
 
+export const createSongTable = (overrides: Partial<SongTable> = {}): SongTable => {
+  const song = createSong();
+  const { id, canvasPaths, midiEvents, ...table } = song;
+  return {
+    ...table,
+    canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
+    midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
+    ...overrides,
+  };
+};
+
 export const createSongsTable = (): SongTable[] =>
   createSongs().map((song) => {
     const { id, canvasPaths, midiEvents, ...table } = song;

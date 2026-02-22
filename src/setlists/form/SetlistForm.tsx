@@ -1,5 +1,4 @@
 import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
-import { nanoid } from 'nanoid';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
@@ -16,7 +15,7 @@ export type SetlistFormData = SetlistTable & {
   sets: (SetlistSetTable & { songs: SetlistSongTable[] })[];
 };
 
-type SetlistFormProps = {
+export type SetlistFormProps = {
   backPath: string;
   initialData?: SetlistWithSets;
   onSubmit: (data: SetlistFormData) => void;
@@ -46,11 +45,11 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
   const handleAddSet = () => {
     const newSetIndex =
       Math.max(...fields.map((s) => (typeof s.setIndex === 'number' ? s.setIndex : 0)), 0) + 1;
-    const setlistId = initialData?.id || nanoid();
+
     append({
       name: '',
       setIndex: newSetIndex,
-      setlistId,
+      setlistId: initialData?.id || '',
       songs: [],
     });
   };
@@ -79,7 +78,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
           >
             <InputField
               error={errors.title}
-              label="Setlist Title"
+              label="Setlist title"
               placeholder="Enter setlist title"
               {...register('title', { required: 'Setlist title is required' })}
               required
@@ -87,7 +86,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
 
             <InputField
               error={errors.date}
-              label="Performance Date"
+              label="Performance date"
               {...register('date', { required: 'Date is required' })}
               required
               type="date"
@@ -147,7 +146,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
                 type="submit"
                 variant="filled"
               >
-                {initialData ? 'Save Changes' : 'Create Setlist'}
+                {initialData ? 'Save changes' : 'Create setlist'}
               </Button>
             </div>
           </form>
