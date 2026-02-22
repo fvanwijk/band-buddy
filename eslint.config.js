@@ -28,6 +28,14 @@ export default tseslint.config([
       'unused-imports': unusedImportsPlugin,
     },
     rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
       'import/order': [
         'error',
         {

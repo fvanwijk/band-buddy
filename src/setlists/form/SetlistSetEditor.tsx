@@ -33,11 +33,10 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
 
     const songToAdd = addableSongs.find((song) => !usedSongIds.has(song.id)) ?? addableSongs[0];
     if (songToAdd) {
-      const setId = allSets[index]?.id || '';
       setValue(`sets.${index}.songs`, [
         ...songs,
         {
-          setId,
+          setId: '', // This will be set properly in the onSubmit handler of the form
           songId: songToAdd.id,
           songIndex: songs.length,
         },

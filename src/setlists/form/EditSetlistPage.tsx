@@ -6,7 +6,7 @@ import { useGetSetlist, useUpdateSetlist } from '../../api/useSetlist';
 export function EditSetlistPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const setlist = useGetSetlist(id!);
+  const setlist = useGetSetlist(id!, true);
   const updateSetlist = useUpdateSetlist(id, () => navigate('/setlists'));
 
   if (!setlist) {

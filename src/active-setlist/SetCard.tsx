@@ -1,24 +1,23 @@
 import { FormattedDuration } from './FormattedDuration';
 import { SongRow } from './SongRow';
-import type { SetlistSet, Song } from '../types';
+import type { SetlistSetWithSongs } from '../types';
 import { parseDuration } from '../utils/duration';
 
 type SetCardProps = {
-  set: SetlistSet;
+  set: SetlistSetWithSongs;
   setIndex: number;
   setlistId?: string;
-  sets: SetlistSet[];
-  songsMap: Map<string, Song>;
+  sets: SetlistSetWithSongs[];
 };
 
-export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardProps) {
+export function SetCard({ set, setIndex, setlistId, sets }: SetCardProps) {
   // Calculate cumulative song count before this set
   const songsBefore = sets.slice(0, setIndex).reduce((total, s) => total + s.songs.length, 0);
 
   // Calculate set duration
   const setSeconds = set.songs.reduce((total, songRef) => {
-    const song = songsMap.get(songRef.songId);
-    return total + parseDuration(song?.duration);
+    const duration = 'duration' in songRef ? songRef.duration : undefined;
+    return total + parseDuration(duration);
   }, 0);
 
   return (
@@ -44,12 +43,13 @@ export function SetCard({ set, setIndex, setlistId, sets, songsMap }: SetCardPro
             </div>
 
             <ul className="divide-y divide-slate-800">
-              {set.songs.map((songRef, index) => {
-                const song = songsMap.get(songRef.songId);
-                if (!song) return null;
+              {set.songs.map((song, index) => {
+                // TODO: isSong(song)
+                if (!('duration' in song)) return null;
+
                 return (
                   <SongRow
-                    key={songRef.songId}
+                    key={song.songId}
                     index={songsBefore + index + 1}
                     setlistId={setlistId}
                     song={song}

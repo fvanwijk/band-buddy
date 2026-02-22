@@ -1,15 +1,14 @@
 import { Link } from 'react-router-dom';
 
 import { SetCard } from './SetCard';
-import type { SetlistSet, Song } from '../types';
+import type { SetlistSetWithSongs } from '../types';
 
 type SetlistTableProps = {
   setlistId?: string;
-  sets: SetlistSet[];
-  songsMap: Map<string, Song>;
+  sets: SetlistSetWithSongs[];
 };
 
-export function SetlistTable({ setlistId, sets, songsMap }: SetlistTableProps) {
+export function SetlistTable({ setlistId, sets }: SetlistTableProps) {
   return (
     <section className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="flex-1 overflow-y-auto">
@@ -23,14 +22,7 @@ export function SetlistTable({ setlistId, sets, songsMap }: SetlistTableProps) {
           </p>
         )}
         {sets.map((set, setIndex) => (
-          <SetCard
-            key={set.id}
-            set={set}
-            setIndex={setIndex}
-            setlistId={setlistId}
-            sets={sets}
-            songsMap={songsMap}
-          />
+          <SetCard key={set.id} set={set} setIndex={setIndex} setlistId={setlistId} sets={sets} />
         ))}
       </div>
     </section>

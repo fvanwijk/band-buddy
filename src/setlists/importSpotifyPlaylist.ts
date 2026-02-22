@@ -3,7 +3,7 @@ import type { Row } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
 
 import { useAddSetlist } from '../api/useSetlist';
-import type { Setlist, Song } from '../types';
+import type { SetlistSetTable, SetlistSongTable, SetlistTable, Song } from '../types';
 
 /**
  * Hook to process a Spotify playlist and prepare songs and setlist data for import.
@@ -61,11 +61,12 @@ export function useProcessSpotifyPlaylist() {
     }
 
     const today = new Date().toISOString().split('T')[0];
-    const setlistData: Omit<Setlist, 'id'> = {
+    const setlistData: SetlistTable & {
+      sets: (SetlistSetTable & { songs: SetlistSongTable[] })[];
+    } = {
       date: today,
       sets: [
         {
-          id: 'spotify-set',
           name: '',
           setIndex: 0,
           setlistId: '', // Will be set after creation

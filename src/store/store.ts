@@ -9,9 +9,9 @@ import {
   instrumentTableSchema,
   localeSchema,
   metronomeVolumeSchema,
-  setlistMetadataTableSchema,
   setlistSetTableSchema,
   setlistSongTableSchema,
+  setlistTableSchema,
   showDrawingToolsSchema,
   songTableSchema,
   themeSchema,
@@ -22,8 +22,10 @@ import {
  *
  * Tables:
  * - songs: Individual songs with their properties
- * - setlists: Setlist metadata (title, date)
  * - setlistSongs: Join table connecting setlists to songs with set/order info
+ * - setlistSets: Sets within a setlist with order info and optional name
+ * - setlists: Setlist metadata (title, date)
+ * - instruments: List of instruments with their MIDI program numbers
  *
  * Values:
  * - activeSetlistId: ID of the currently active setlist
@@ -37,7 +39,7 @@ export function createAppStore(): Store {
     instruments: instrumentTableSchema,
     setlistSets: setlistSetTableSchema,
     setlistSongs: setlistSongTableSchema,
-    setlists: setlistMetadataTableSchema,
+    setlists: setlistTableSchema,
     songs: songTableSchema,
   });
 

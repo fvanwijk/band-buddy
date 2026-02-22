@@ -1,4 +1,4 @@
-import type { MidiEvent, Song } from '../types';
+import type { MidiEvent, Song, SongTable } from '../types';
 
 export const createMidiEvent = (overrides: Partial<MidiEvent> = {}): MidiEvent => ({
   id: '1',
@@ -26,7 +26,7 @@ export const createSong = (overrides: Partial<Song> = {}): Song => ({
   artist: 'Queen',
   bpm: 72,
   duration: 355,
-  id: '1',
+  id: '0',
   key: 'Bb',
   lyrics: createLyrics(),
   midiEvents: createMidiEvents(),
@@ -41,7 +41,7 @@ export const createSongs = (): Song[] => [
     artist: 'Earth, Wind & Fire',
     bpm: 126,
     duration: 215,
-    id: '2',
+    id: '1',
     key: 'Ab',
     title: 'September',
   }),
@@ -49,7 +49,7 @@ export const createSongs = (): Song[] => [
     artist: 'Stevie Wonder',
     bpm: 100,
     duration: 267,
-    id: '3',
+    id: '2',
     key: 'Ebm',
     title: 'Superstition',
   }),
@@ -57,7 +57,7 @@ export const createSongs = (): Song[] => [
     artist: 'Michael Jackson',
     bpm: 117,
     duration: 294,
-    id: '4',
+    id: '3',
     key: 'F#m',
     title: 'Billie Jean',
   }),
@@ -65,7 +65,7 @@ export const createSongs = (): Song[] => [
     artist: 'Journey',
     bpm: 119,
     duration: 251,
-    id: '5',
+    id: '4',
     key: 'E',
     title: "Don't Stop Believin'",
   }),
@@ -73,7 +73,7 @@ export const createSongs = (): Song[] => [
     artist: 'Fleetwood Mac',
     bpm: 120,
     duration: 268,
-    id: '6',
+    id: '5',
     key: 'F',
     title: 'Dreams',
   }),
@@ -81,7 +81,7 @@ export const createSongs = (): Song[] => [
     artist: 'Aretha Franklin',
     bpm: 115,
     duration: 152,
-    id: '7',
+    id: '6',
     key: 'C',
     title: 'Respect',
   }),
@@ -89,7 +89,7 @@ export const createSongs = (): Song[] => [
     artist: 'Billy Joel',
     bpm: 90,
     duration: 339,
-    id: '8',
+    id: '7',
     key: 'C',
     timeSignature: '3/4',
     title: 'Piano Man',
@@ -98,7 +98,7 @@ export const createSongs = (): Song[] => [
     artist: 'The Beatles',
     bpm: 76,
     duration: 230,
-    id: '9',
+    id: '8',
     key: 'C',
     title: 'Let It Be',
   }),
@@ -106,10 +106,20 @@ export const createSongs = (): Song[] => [
     artist: 'Prince',
     bpm: 63,
     duration: 522,
-    id: '10',
+    id: '9',
     title: 'Purple Rain',
   }),
 ];
+
+export const createSongsTable = (): SongTable[] =>
+  createSongs().map((song) => {
+    const { id, canvasPaths, midiEvents, ...table } = song;
+    return {
+      ...table,
+      canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
+      midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
+    };
+  });
 
 export const createLyrics = (): string => `[Verse 1]
  

@@ -2,24 +2,23 @@ import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
 import { nanoid } from 'nanoid';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { useStore } from 'tinybase/ui-react';
 
 import { SetlistSetEditor } from './SetlistSetEditor';
 import { useGetSongs } from '../../api/useSong';
-import type { Setlist, SetlistSet } from '../../types';
+import type { SetlistSetTable, SetlistSongTable, SetlistTable, SetlistWithSets } from '../../types';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { InputField } from '../../ui/form/InputField';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 
-export type SetlistFormData = Omit<Setlist, 'id' | 'sets'> & {
-  sets: SetlistSet[];
+export type SetlistFormData = SetlistTable & {
+  sets: (SetlistSetTable & { songs: SetlistSongTable[] })[];
 };
 
 type SetlistFormProps = {
   backPath: string;
-  initialData?: Setlist;
+  initialData?: SetlistWithSets;
   onSubmit: (data: SetlistFormData) => void;
   title: string;
 };
@@ -27,31 +26,8 @@ type SetlistFormProps = {
 export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistFormProps) {
   const songs = useGetSongs();
   const methods = useForm<SetlistFormData>({
-    defaultValues: {
-      date: initialData?.date || new Date().toISOString().split('T')[0],
-      sets: initialData?.sets?.map((set, idx) => ({
-        id: set.id || nanoid(),
-        name: typeof set.name === 'string' ? set.name : '',
-        setIndex: typeof set.setIndex === 'number' ? set.setIndex : idx,
-        setlistId: set.setlistId || initialData?.id || '',
-        songs:
-          set.songs?.map((song, songIndex) => ({
-            setId: set.id || nanoid(),
-            songId: song.songId,
-            songIndex: typeof song.songIndex === 'number' ? song.songIndex : songIndex,
-            isDeleted: song.isDeleted,
-          })) || [],
-      })) || [
-        {
-          id: nanoid(),
-          name: '',
-          setIndex: 0,
-          setlistId: initialData?.id || '',
-          songs: [],
-        },
-      ],
-      title: initialData?.title || '',
-      venue: initialData?.venue || '',
+    defaultValues: initialData ?? {
+      date: new Date().toISOString().split('T')[0],
     },
   });
 
@@ -72,7 +48,6 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
       Math.max(...fields.map((s) => (typeof s.setIndex === 'number' ? s.setIndex : 0)), 0) + 1;
     const setlistId = initialData?.id || nanoid();
     append({
-      id: nanoid(),
       name: '',
       setIndex: newSetIndex,
       setlistId,
@@ -86,45 +61,8 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
     }
   };
 
-  const store = useStore();
-
   const handleFormSubmit = (data: SetlistFormData) => {
-    // Generate set IDs and store sets in Tinybase
-    const setlistId = initialData?.id || nanoid();
-    const setsWithIds = data.sets.map((set, idx) => {
-      const setId = set.id || nanoid();
-      const setName = typeof set.name === 'string' ? set.name : '';
-      const setIndex = typeof set.setIndex === 'number' ? set.setIndex : idx;
-      if (store) {
-        store.setRow('setlistSets', setId, {
-          id: setId,
-          name: setName,
-          setIndex,
-          setlistId,
-        });
-      }
-      return {
-        id: setId,
-        name: setName,
-        setIndex,
-        setlistId,
-        songs: (set.songs || [])
-          .filter((song) => typeof song.songId === 'string')
-          .map((song, songIndex) => ({
-            setId,
-            songId: song.songId,
-            songIndex: typeof song.songIndex === 'number' ? song.songIndex : songIndex,
-            isDeleted: song.isDeleted,
-          })),
-      };
-    });
-
-    onSubmit({
-      date: data.date,
-      sets: setsWithIds,
-      title: data.title,
-      venue: data.venue,
-    });
+    onSubmit(data);
   };
 
   return (

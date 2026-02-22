@@ -5,13 +5,11 @@ import { useValue } from 'tinybase/ui-react';
 import { SetlistHeader } from './SetlistHeader';
 import { SetlistTable } from './SetlistTable';
 import { useGetSetlist } from '../api/useSetlist';
-import { useGetSongs } from '../api/useSong';
 import { EmptyState } from '../ui/EmptyState';
 
 export function ActiveSetlistPage() {
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;
   const setlist = useGetSetlist(activeSetlistId);
-  const songs = useGetSongs();
 
   if (!activeSetlistId || !setlist) {
     return (
@@ -33,18 +31,15 @@ export function ActiveSetlistPage() {
     );
   }
 
-  // Build songs map for quick lookup
-  const songsMap = new Map(songs.map((song) => [song.id, song]));
-
   // Calculate total songs and duration
   const songCount = setlist.sets.reduce((total, s) => total + s.songs.length, 0);
   const totalSeconds = setlist.sets.reduce((total, set) => {
     return (
       total +
-      set.songs.reduce((setTotal, songRef) => {
-        const song = songsMap.get(songRef.songId);
-        return setTotal + (song?.duration || 0);
-      }, 0)
+      set.songs.reduce(
+        (setTotal, songRef) => setTotal + ('duration' in songRef ? (songRef.duration ?? 0) : 0),
+        0,
+      )
     );
   }, 0);
 
@@ -58,7 +53,7 @@ export function ActiveSetlistPage() {
         venue={setlist.venue}
       />
 
-      <SetlistTable setlistId={activeSetlistId} sets={setlist.sets} songsMap={songsMap} />
+      <SetlistTable setlistId={activeSetlistId} sets={setlist.sets} />
     </div>
   );
 }

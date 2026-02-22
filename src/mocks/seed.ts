@@ -1,71 +1,44 @@
 import type { Store } from 'tinybase';
 
-import { createInstrument } from './instruments';
-import { createSetlists } from './setlists';
-import { createSongs } from './songs';
+import { createInstrumentTable } from './instruments';
+import { createSetlistsTable } from './setlists';
+import { createSetlistSetsTable } from './setlistSets';
+import { createSetlistSongsTable } from './setlistSongs';
+import { createSongsTable } from './songs';
 
 export function seedStore(store: Store): void {
   seedSongs(store);
+  seedSetlistSongs(store);
+  seedSetlistSets(store);
   seedSetlists(store);
   seedInstruments(store);
 }
 
 export const seedSongs = (store: Store): void => {
-  createSongs().forEach(({ id, ...song }) => {
-    const row: Record<string, unknown> = {
-      ...song,
-    };
-
-    if (song.midiEvents && song.midiEvents.length > 0) {
-      row.midiEvents = JSON.stringify(song.midiEvents);
-    } else {
-      delete row.midiEvents;
-    }
-
-    Object.entries(row).forEach(([key, value]) => {
-      if (value === undefined) {
-        delete row[key];
-      }
-    });
-
-    store.setRow('songs', id, row as Record<string, string | number>);
+  createSongsTable().forEach((song) => {
+    store.addRow('songs', song);
   });
 };
 
-const seedSetlists = (store: Store): void => {
-  createSetlists().forEach(({ id, sets, ...metadata }) => {
-    // Add setlist metadata
-    store.setRow('setlists', id, metadata);
-
-    // Add setlist sets and songs
-    sets.forEach((set) => {
-      store.setRow('setlistSets', set.id, {
-        id: set.id,
-        name: set.name || '',
-        setIndex: set.setIndex,
-        setlistId: id,
-      });
-      set.songs.forEach((songRef, songIndex) => {
-        const songRowId = `${id}_${set.id}_${songIndex}`;
-        store.setRow('setlistSongs', songRowId, {
-          setId: set.id,
-          songId: songRef.songId,
-          songIndex,
-        });
-      });
-    });
+export const seedSetlistSongs = (store: Store): void => {
+  createSetlistSongsTable().forEach((song) => {
+    store.addRow('setlistSongs', song);
   });
 };
 
-const seedInstruments = (store: Store): void => {
-  const { id, ...instrument } = createInstrument();
-  const row: Record<string, unknown> = {
-    ...instrument,
-  };
-  Object.entries(row).forEach(([key, value]) => {
-    if (value === undefined) {
-      delete row[key];
-    }
+export const seedSetlistSets = (store: Store): void => {
+  createSetlistSetsTable().forEach((set) => {
+    store.addRow('setlistSets', set);
   });
-  store.setRow('instruments', id, row as Record<string, string | number>);
+};
+
+export const seedSetlists = (store: Store): void => {
+  createSetlistsTable().forEach((setlist) => {
+    store.addRow('setlists', setlist);
+  });
+};
+
+export const seedInstruments = (store: Store): void => {
+  const instrument = createInstrumentTable();
+  store.addRow('instruments', instrument);
 };
