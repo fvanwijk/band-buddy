@@ -45,8 +45,15 @@ export default defineConfig({
     host: '127.0.0.1',
   },
   test: {
+    coverage: {
+      enabled: true,
+      include: ['src/**/*.{js,ts,tsx}'],
+      provider: 'v8',
+      reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
+    },
     environment: 'jsdom',
     globals: true,
+    mockReset: true,
     setupFiles: './src/test-setup.ts',
     ui: true,
   },
