@@ -81,19 +81,19 @@ export function DetailsTab({
       />
       <RadioGroup
         error={errors.keyNote}
-        label="Key (Note)"
+        label="Key (note)"
         options={noteOptions}
         register={register('keyNote', { required: 'Key note is required' })}
         required
       >
         <div className="flex items-center gap-2">
-          <Switch checked={useFlats} onCheckedChange={setUseFlats} />
-          <span className="text-xs font-medium text-slate-400">{useFlats ? '♭' : '♯'}</span>
+          <Switch checked={useFlats} label={useFlats ? '♭' : '♯'} onCheckedChange={setUseFlats} />
+          {/* <span className="text-xs font-medium text-slate-400">{useFlats ? '♭' : '♯'}</span> */}
         </div>
       </RadioGroup>
       <RadioGroup
         error={errors.keyQuality}
-        label="Key (Quality)"
+        label="Key (quality)"
         options={qualityOptions}
         register={register('keyQuality', {
           required: 'Key quality is required',
@@ -102,7 +102,7 @@ export function DetailsTab({
       />
       <RadioGroup
         error={errors.timeSignature}
-        label="Time Signature"
+        label="Time signature"
         options={timeSignatureOptions}
         register={register('timeSignature')}
       />

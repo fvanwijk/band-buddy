@@ -39,8 +39,5 @@ export const createSetlistSetTable = (
 };
 
 export const createSetlistSetsTable = (): SetlistSetTable[] => {
-  return createSetlistSets().map((set) => {
-    const { id, ...table } = set;
-    return table;
-  });
+  return createSetlistSets().map(({ id, ...table }) => table);
 };

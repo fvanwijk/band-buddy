@@ -60,11 +60,12 @@ export function MidiButtonsTab({
         </p>
 
         <div className="mb-3 flex items-center gap-4">
-          <h3 className="text-sm font-semibold text-slate-200">MIDI Buttons </h3>
+          <h3 className="text-sm font-semibold text-slate-200">MIDI Buttons</h3>
           <Button
             color="primary"
             icon
             onClick={() => setIsDialogOpen(true)}
+            title="Add MIDI button"
             type="button"
             variant="outlined"
           >

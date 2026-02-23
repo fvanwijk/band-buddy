@@ -45,7 +45,7 @@ export function SetCard({ set, setIndex, setlistId, sets }: SetCardProps) {
             <ul className="divide-y divide-slate-800">
               {set.songs.map((song, index) => {
                 // TODO: isSong(song)
-                if (!('duration' in song)) return null;
+                if (!('artist' in song)) return null;
 
                 return (
                   <SongRow

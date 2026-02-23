@@ -29,9 +29,9 @@ export type SongFormData = SongSubmitData & {
   sheetMusicFilename?: string;
 };
 
-type SongFormProps = {
+export type SongFormProps = {
   backPath: string;
-  initialData?: Song;
+  initialData?: Omit<Song, 'id'>;
   onSubmit: (data: SongSubmitData, sheetMusicFile?: File) => void;
   title: string;
 };
@@ -57,16 +57,10 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     watch,
   } = useForm<SongFormData>({
     defaultValues: {
-      artist: initialData?.artist || '',
-      bpm: initialData?.bpm || undefined,
+      ...initialData,
       durationString: initialData?.duration ? formatDurationToString(initialData.duration) : '',
       keyNote: existingNote || undefined,
       keyQuality: existingQuality || existingNote ? '' : undefined,
-      lyrics: initialData?.lyrics || '',
-      midiEvents: initialData?.midiEvents || [],
-      sheetMusicFilename: initialData?.sheetMusicFilename,
-      timeSignature: initialData?.timeSignature,
-      title: initialData?.title || '',
     },
   });
 
@@ -149,25 +143,26 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     }
   };
 
-  const handleFormSubmit = (data: SongFormData) => {
-    const durationSeconds = parseDuration(data.durationString);
+  const handleFormSubmit = ({
+    durationString,
+    keyQuality,
+    keyNote,
+    sheetMusicFiles,
+    ...data
+  }: SongFormData) => {
+    const durationSeconds = parseDuration(durationString);
 
     onSubmit(
       {
-        artist: data.artist,
-        bpm: data.bpm,
+        ...data,
         canvasPaths: initialData?.canvasPaths || [],
         duration: durationSeconds || undefined,
-        key: (data.keyNote || existingNote) + (data.keyQuality || ''),
-        lyrics: data.lyrics,
-        midiEvents: data.midiEvents,
-        sheetMusicFilename: data.sheetMusicFilename,
+        key: (keyNote || existingNote) + (keyQuality || ''),
+        notes: initialData?.notes,
         spotifyId: initialData?.spotifyId,
-        timeSignature: data.timeSignature,
-        title: data.title,
         transpose: initialData?.transpose,
       },
-      data.sheetMusicFiles?.[0],
+      sheetMusicFiles?.[0],
     );
   };
 
@@ -272,7 +267,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
             type="submit"
             variant="filled"
           >
-            {initialData ? 'Save Changes' : 'Add song'}
+            {initialData ? 'Save changes' : 'Create song'}
           </Button>
         </div>
       </form>

@@ -27,10 +27,10 @@ export function RadioGroup({
   return (
     <div className={className}>
       <div className="mb-2 flex items-center justify-between">
-        <label className="text-sm font-medium text-slate-300">
+        <div className="text-sm font-medium text-slate-300">
           {label}
           {required && <span className="text-brand-400/70 ml-1">*</span>}
-        </label>
+        </div>
         {children}
       </div>
       <div className="flex flex-wrap gap-2">

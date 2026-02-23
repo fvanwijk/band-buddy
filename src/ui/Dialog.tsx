@@ -26,7 +26,7 @@ export function Dialog({ children, onClose, open, portal = true }: DialogProps) 
   if (!open) return null;
 
   const dialog = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="presentation">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
       <div className="relative z-10 w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">

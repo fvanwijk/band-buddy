@@ -28,7 +28,4 @@ export const createSetlistTable = (overrides: Partial<SetlistTable> = {}): Setli
 };
 
 export const createSetlistsTable = (): SetlistTable[] =>
-  createSetlists().map((setlist) => {
-    const { id, ...table } = setlist;
-    return table;
-  });
+  createSetlists().map(({ id, ...table }) => table);

@@ -10,7 +10,7 @@ export function LyricsTab({ error, register }: LyricsTabProps) {
     <div className="space-y-4">
       <div>
         <label htmlFor="lyrics" className="mb-1.5 block text-sm font-medium text-slate-300">
-          Chords & Lyrics
+          Chords & lyrics
         </label>
         <textarea
           id="lyrics"

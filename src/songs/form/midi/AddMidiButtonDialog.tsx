@@ -1,6 +1,6 @@
 import { IconPlus } from '@tabler/icons-react';
 import { useForm, useWatch } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 import { useProgramOptions } from './useProgramOptions';
 import type { Instrument, MidiEvent } from '../../../types';
@@ -27,16 +27,18 @@ export function AddMidiButtonDialog({
 }: AddMidiButtonDialogProps) {
   const {
     control,
+    formState: { errors },
     handleSubmit,
     register,
     reset,
-    formState: { errors },
+    watch,
   } = useForm<FormData>({
     defaultValues: {
       instrumentId: instruments[0]?.id || '',
       label: '',
       programChange: 0,
     },
+    mode: 'all',
   });
 
   const selectedInstrumentId = useWatch({ control, name: 'instrumentId' });
@@ -46,13 +48,14 @@ export function AddMidiButtonDialog({
   const hasSelectableOptions = programOptions.length > 0;
 
   const handleAdd = (data: FormData) => {
+    console.log('onAdd data', data);
     onAdd(data);
     reset();
     onClose();
   };
 
   const handleFormSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.stopPropagation(); // Prevent outer form from submitting
+    e.stopPropagation(); // Prevent outer form from also submitting
     handleSubmit(handleAdd)(e);
   };
 
@@ -64,6 +67,7 @@ export function AddMidiButtonDialog({
   return (
     <Dialog onClose={onClose} open={isOpen}>
       <DialogTitle>Add MIDI Button</DialogTitle>
+      {JSON.stringify(watch())}
 
       <form autoComplete="off" noValidate onSubmit={handleFormSubmit}>
         <div className="space-y-4">
@@ -107,7 +111,7 @@ export function AddMidiButtonDialog({
           ) : (
             <InputField
               error={errors.programChange}
-              label="Program Change Number"
+              label="Program Change number"
               max="511"
               min="0"
               placeholder="0-511"

@@ -50,9 +50,5 @@ export const createSetlistSongTable = (
   return table;
 };
 
-export const createSetlistSongsTable = (): SetlistSongTable[] => {
-  return createSetlistSongs().map((song) => {
-    const { id, ...table } = song;
-    return table;
-  });
-};
+export const createSetlistSongsTable = (): SetlistSongTable[] =>
+  createSetlistSongs().map(({ id, ...table }) => table);

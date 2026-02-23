@@ -40,6 +40,6 @@ export function EditSongPage() {
   };
 
   return (
-    <SongForm backPath={backPath} initialData={song} onSubmit={handleSubmit} title="Edit Song" />
+    <SongForm backPath={backPath} initialData={song} onSubmit={handleSubmit} title="Edit song" />
   );
 }

@@ -24,5 +24,5 @@ export function AddSongPage() {
     addSong(data);
   };
 
-  return <SongForm backPath={backPath} onSubmit={handleSubmit} title="Add New Song" />;
+  return <SongForm backPath={backPath} onSubmit={handleSubmit} title="Add new song" />;
 }

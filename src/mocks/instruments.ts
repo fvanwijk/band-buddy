@@ -11,9 +11,16 @@ export const createInstrument = (overrides: Partial<Instrument> = {}): Instrumen
   ...overrides,
 });
 
+export const createInstruments = () => [
+  createInstrument(),
+  createInstrument({ id: '1', name: 'Yamaha Montage' }),
+];
+
 export const createInstrumentTable = (
   overrides: Partial<InstrumentTable> = {},
 ): InstrumentTable => {
   const { id, programNames, ...table } = createInstrument(overrides);
   return { ...table, programNames: programNames ? JSON.stringify(programNames) : undefined };
 };
+
+export const createInstrumentsTable = () => createInstruments().map(({ id, ...table }) => table);

@@ -25,13 +25,18 @@ export const createMidiEvents = (): MidiEvent[] => [
 export const createSong = (overrides: Partial<Song> = {}): Song => ({
   artist: 'Queen',
   bpm: 72,
+  canvasPaths: [],
   duration: 355,
   id: '0',
   key: 'Bb',
   lyrics: createLyrics(),
   midiEvents: createMidiEvents(),
+  notes: 'Do not play too fast',
+  sheetMusicFilename: 'bohemian_rhapsody.pdf',
+  spotifyId: 'abc123',
   timeSignature: '4/4',
   title: 'Bohemian Rhapsody',
+  transpose: 0,
   ...overrides,
 });
 
@@ -112,8 +117,7 @@ export const createSongs = (): Song[] => [
 ];
 
 export const createSongTable = (overrides: Partial<SongTable> = {}): SongTable => {
-  const song = createSong();
-  const { id, canvasPaths, midiEvents, ...table } = song;
+  const { id, canvasPaths, midiEvents, ...table } = createSong();
   return {
     ...table,
     canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
@@ -123,14 +127,11 @@ export const createSongTable = (overrides: Partial<SongTable> = {}): SongTable =
 };
 
 export const createSongsTable = (): SongTable[] =>
-  createSongs().map((song) => {
-    const { id, canvasPaths, midiEvents, ...table } = song;
-    return {
-      ...table,
-      canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
-      midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
-    };
-  });
+  createSongs().map(({ id, canvasPaths, midiEvents, ...table }) => ({
+    ...table,
+    canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
+    midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
+  }));
 
 export const createLyrics = (): string => `[Verse 1]
  
