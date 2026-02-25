@@ -83,7 +83,7 @@ export function ManageSetlistsPage() {
         message="Are you sure you want to delete this setlist? This action cannot be undone."
         onClose={() => setDeletingSetlistId(null)}
         onConfirm={handleDeleteSetlist}
-        title="Delete Setlist"
+        title="Delete setlist"
       />
 
       {displaySetlists.length === 0 ? (
