@@ -1,9 +1,7 @@
-import type { ReactNode } from 'react';
+import type { HTMLAttributes } from 'react';
 
-type DialogTitleProps = {
-  children: ReactNode;
-};
+type DialogTitleProps = HTMLAttributes<HTMLHeadingElement>;
 
-export function DialogTitle({ children }: DialogTitleProps) {
-  return <h2 className="mb-4 text-xl font-semibold text-slate-100">{children}</h2>;
+export function DialogTitle(props: DialogTitleProps) {
+  return <h2 className="mb-4 text-xl font-semibold text-slate-100" {...props} />;
 }

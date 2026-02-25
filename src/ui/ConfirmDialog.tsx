@@ -2,7 +2,6 @@ import { IconTrash } from '@tabler/icons-react';
 
 import { Button } from './Button';
 import { Dialog } from './Dialog';
-import { DialogTitle } from './DialogTitle';
 
 type ConfirmDialogProps = {
   isOpen: boolean;
@@ -19,8 +18,7 @@ export function ConfirmDialog({ isOpen, message, onClose, onConfirm, title }: Co
   };
 
   return (
-    <Dialog onClose={onClose} open={isOpen}>
-      <DialogTitle>{title}</DialogTitle>
+    <Dialog onClose={onClose} open={isOpen} title={title}>
       <p className="mb-6 text-sm text-slate-400">{message}</p>
 
       <div className="flex gap-3">

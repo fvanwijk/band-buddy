@@ -1,7 +1,9 @@
+import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { type PropsWithChildren } from 'react';
 import { createRoutesStub } from 'react-router-dom';
 
+import { SpotifyContext, type SpotifyContextType } from './contexts/SpotifyContext';
 import { createAppStore, createStorePersister } from './store/store';
 
 export const queryClient = new QueryClient({
@@ -30,6 +32,23 @@ export const MockRouteProvider = ({ children }: PropsWithChildren) => {
 
   return <RoutesStub initialEntries={['/']} />;
 };
+
+export const MockSpotifyProvider = ({
+  children,
+  ...props
+}: PropsWithChildren<Partial<SpotifyContextType>>) => (
+  <SpotifyContext
+    value={{
+      isAuthenticated: true,
+      isLoading: false,
+      logout: () => {},
+      sdk: { playlists: { getPlaylist: async () => ({}) } } as unknown as SpotifyApi,
+      ...props,
+    }}
+  >
+    {children}
+  </SpotifyContext>
+);
 
 export const getMockStore = () => {
   const store = createAppStore();

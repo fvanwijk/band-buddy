@@ -1,7 +1,6 @@
 import { IconUpload } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import { parse } from 'spotify-uri';
 import { useStore } from 'tinybase/ui-react';
 
@@ -10,7 +9,6 @@ import { useSpotify } from '../contexts/SpotifyContext';
 import { Alert } from '../ui/Alert';
 import { Button } from '../ui/Button';
 import { Dialog } from '../ui/Dialog';
-import { DialogTitle } from '../ui/DialogTitle';
 import { InputField } from '../ui/form/InputField';
 
 type FormData = {
@@ -23,7 +21,6 @@ type ImportSpotifyDialogProps = {
 };
 
 export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProps) {
-  const navigate = useNavigate();
   const store = useStore();
   const { sdk } = useSpotify();
   const processSpotifyPlaylist = useProcessSpotifyPlaylist();
@@ -48,9 +45,8 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
     },
   });
 
-  const validatePlaylistId = (input: string): boolean | string => {
-    return extractPlaylistId(input) ? true : 'Invalid Spotify playlist URL or ID';
-  };
+  const validatePlaylistId = (input: string): boolean | string =>
+    !!extractPlaylistId(input) || 'Invalid Spotify playlist URL or ID';
 
   const extractPlaylistId = (input: string): string | null => {
     const trimmed = input.trim();
@@ -65,7 +61,8 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
   const handleImport = (data: FormData) => {
     const playlistId = extractPlaylistId(data.playlistUrl);
     if (!playlistId || !store) {
-      return;
+      // PlaylistID is validated by react-hook-form, so this should never happen
+      throw new Error('An unexpected error occurred.');
     }
 
     mutate(playlistId, {
@@ -74,7 +71,6 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
 
         reset();
         onClose();
-        navigate('/setlists');
       },
     });
   };
@@ -85,9 +81,7 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
   };
 
   return (
-    <Dialog onClose={handleClose} open={isOpen}>
-      <DialogTitle>Import from Spotify</DialogTitle>
-
+    <Dialog onClose={handleClose} open={isOpen} title="Import from Spotify">
       <form autoComplete="off" noValidate onSubmit={handleSubmit(handleImport)}>
         <div className="space-y-4">
           <InputField
@@ -107,7 +101,7 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
           )}
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button onClick={handleClose} type="button" variant="ghost">
+            <Button onClick={handleClose} type="button" variant="outlined">
               Cancel
             </Button>
             <Button

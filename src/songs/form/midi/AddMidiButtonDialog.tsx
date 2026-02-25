@@ -6,7 +6,6 @@ import { useProgramOptions } from './useProgramOptions';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { Dialog } from '../../../ui/Dialog';
-import { DialogTitle } from '../../../ui/DialogTitle';
 import { InputField } from '../../../ui/form/InputField';
 import { SelectField } from '../../../ui/form/SelectField';
 
@@ -48,7 +47,6 @@ export function AddMidiButtonDialog({
   const hasSelectableOptions = programOptions.length > 0;
 
   const handleAdd = (data: FormData) => {
-    console.log('onAdd data', data);
     onAdd(data);
     reset();
     onClose();
@@ -65,8 +63,7 @@ export function AddMidiButtonDialog({
   }));
 
   return (
-    <Dialog onClose={onClose} open={isOpen}>
-      <DialogTitle>Add MIDI Button</DialogTitle>
+    <Dialog onClose={onClose} open={isOpen} title="Add MIDI Button">
       {JSON.stringify(watch())}
 
       <form autoComplete="off" noValidate onSubmit={handleFormSubmit}>

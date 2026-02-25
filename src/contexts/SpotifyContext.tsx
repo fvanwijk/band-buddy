@@ -1,14 +1,14 @@
 import { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-type SpotifyContextType = {
+export type SpotifyContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
   sdk: SpotifyApi | null;
   logout: () => void;
 };
 
-const SpotifyContext = createContext<SpotifyContextType | undefined>(undefined);
+export const SpotifyContext = createContext<SpotifyContextType | undefined>(undefined);
 
 type SpotifyProviderProps = {
   children: React.ReactNode;
