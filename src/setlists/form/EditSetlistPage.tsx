@@ -18,7 +18,7 @@ export function EditSetlistPage() {
       backPath="/setlists"
       initialData={setlist}
       onSubmit={updateSetlist}
-      title="Edit Setlist"
+      title="Edit setlist"
     />
   );
 }
