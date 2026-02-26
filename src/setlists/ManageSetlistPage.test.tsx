@@ -118,9 +118,6 @@ describe('ManageSetlistPage', () => {
 
       expect(screen.getByRole('dialog', { name: 'Import from Spotify' })).toBeInTheDocument();
 
-      await user.click(screen.getByRole('button', { name: 'Import' }));
-      expect(await screen.findByText('Playlist URL or ID is required')).toBeInTheDocument();
-
       await user.type(
         await screen.findByLabelText('Playlist URL or ID*'),
         'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M',

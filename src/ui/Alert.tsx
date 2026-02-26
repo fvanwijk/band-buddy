@@ -1,4 +1,9 @@
-import { IconAlertTriangle, IconCircleCheck, IconInfoCircle, IconX } from '@tabler/icons-react';
+import {
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconInfoCircle,
+} from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 
 import { cn } from '../utils/cn';
@@ -21,7 +26,7 @@ const alertStyles: Record<AlertSeverity, string> = {
 };
 
 const defaultIcons: Record<AlertSeverity, ReactNode> = {
-  error: <IconX className="h-4 w-4" />,
+  error: <IconAlertCircle className="h-4 w-4" />,
   info: <IconInfoCircle className="h-4 w-4" />,
   neutral: <IconInfoCircle className="h-4 w-4" />,
   success: <IconCircleCheck className="h-4 w-4" />,
@@ -35,6 +40,7 @@ export function Alert({ children, hasIcon = true, icon, severity = 'neutral' }: 
         'flex items-start gap-2 rounded-lg border px-3 py-2 text-xs',
         alertStyles[severity],
       )}
+      role="alert"
     >
       {hasIcon && (icon || defaultIcons[severity])}
       <span>{children}</span>

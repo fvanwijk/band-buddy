@@ -15,7 +15,7 @@ type FormData = {
   playlistUrl: string;
 };
 
-type ImportSpotifyDialogProps = {
+export type ImportSpotifyDialogProps = {
   isOpen: boolean;
   onClose: () => void;
 };
@@ -25,10 +25,16 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
   const { sdk } = useSpotify();
   const processSpotifyPlaylist = useProcessSpotifyPlaylist();
 
-  const { mutate, isPending, error } = useMutation({
-    mutationFn: async (playlistId: string) => {
-      if (!sdk) {
-        throw new Error('Spotify SDK not available');
+  const {
+    mutate,
+    isPending,
+    error,
+    reset: resetMutation,
+  } = useMutation({
+    mutationFn: async (playlistId?: string) => {
+      if (!playlistId || !store || !sdk) {
+        // PlaylistID is validated by react-hook-form, so this should never happen
+        throw new Error('An unexpected error occurred.');
       }
       return await sdk.playlists.getPlaylist(playlistId);
     },
@@ -43,41 +49,41 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
     defaultValues: {
       playlistUrl: '',
     },
+    mode: 'onBlur',
   });
 
   const validatePlaylistId = (input: string): boolean | string =>
     !!extractPlaylistId(input) || 'Invalid Spotify playlist URL or ID';
 
-  const extractPlaylistId = (input: string): string | null => {
+  const extractPlaylistId = (input: string): string | undefined => {
     const trimmed = input.trim();
     try {
       const parsed = parse(trimmed);
-      return parsed?.type === 'playlist' ? parsed.id : null;
+      return parsed?.type === 'playlist' ? parsed.id : undefined;
     } catch {
-      return /^[a-zA-Z0-9]{22}$/.test(trimmed) ? trimmed : null;
+      return /^[a-zA-Z0-9]{22}$/.test(trimmed) ? trimmed : undefined;
     }
+  };
+
+  const resetAndClose = () => {
+    reset();
+    resetMutation();
+    onClose();
   };
 
   const handleImport = (data: FormData) => {
     const playlistId = extractPlaylistId(data.playlistUrl);
-    if (!playlistId || !store) {
-      // PlaylistID is validated by react-hook-form, so this should never happen
-      throw new Error('An unexpected error occurred.');
-    }
 
     mutate(playlistId, {
       onSuccess: (playlist) => {
         processSpotifyPlaylist(playlist);
-
-        reset();
-        onClose();
+        resetAndClose();
       },
     });
   };
 
   const handleClose = () => {
-    reset();
-    onClose();
+    resetAndClose();
   };
 
   return (
@@ -96,9 +102,7 @@ export function ImportSpotifyDialog({ isOpen, onClose }: ImportSpotifyDialogProp
             required
           />
 
-          {error && (
-            <Alert severity="error">{error instanceof Response ? 'Oeps' : error.message}</Alert>
-          )}
+          {error && <Alert severity="error">{error.message}</Alert>}
 
           <div className="flex justify-end gap-2 pt-2">
             <Button onClick={handleClose} type="button" variant="outlined">
