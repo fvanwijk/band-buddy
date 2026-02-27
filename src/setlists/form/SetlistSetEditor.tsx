@@ -19,33 +19,33 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
   const { getValues, register, setValue, watch } = useFormContext<SetlistFormData>();
   const setName = watch(`sets.${index}.name`);
   const [editing, setEditing] = useState(false);
-  const songs = watch(`sets.${index}.songs`);
+  const currentSetSongs = watch(`sets.${index}.songs`);
   const allSongs = useGetSongs(true);
   const addableSongs = allSongs.filter((song) => !song.isDeleted);
-  const allSets = watch('sets');
+  const allSetsOfSetlist = watch('sets');
 
   const songMap = useMemo(() => new Map(allSongs.map((song) => [song.id, song])), [allSongs]);
 
   const handleAddSong = () => {
     const usedSongIds = new Set(
-      allSets.flatMap((set) => set.songs.map((songRef) => songRef.songId)),
+      allSetsOfSetlist.flatMap((set) => set.songs.map((songRef) => songRef.songId)),
     );
 
     const songToAdd = addableSongs.find((song) => !usedSongIds.has(song.id)) ?? addableSongs[0];
     if (songToAdd) {
       setValue(`sets.${index}.songs`, [
-        ...songs,
+        ...currentSetSongs,
         {
           setId: '', // This will be set properly in the onSubmit handler of the form
           songId: songToAdd.id,
-          songIndex: songs.length,
+          songIndex: currentSetSongs.length,
         },
       ]);
     }
   };
 
   const handleRemoveSong = (songIndex: number) => {
-    const updated = songs.filter((_, i) => i !== songIndex);
+    const updated = currentSetSongs.filter((_, i) => i !== songIndex);
     setValue(`sets.${index}.songs`, updated);
   };
 
@@ -53,27 +53,28 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
     if (direction === 'up') {
       if (songIndex > 0) {
         // Move up within the same set
-        const updated = [...songs];
+        const updated = [...currentSetSongs];
         [updated[songIndex], updated[songIndex - 1]] = [updated[songIndex - 1], updated[songIndex]];
         setValue(`sets.${index}.songs`, updated);
       } else if (index > 0) {
         // Move to the end of the previous set
         const prevSetPath = `sets.${index - 1}.songs` as const;
         const prevSetSongs = getValues(prevSetPath);
-        setValue(prevSetPath, [...prevSetSongs, songs[songIndex]]);
+        setValue(prevSetPath, [...prevSetSongs, currentSetSongs[songIndex]]);
         handleRemoveSong(songIndex);
       }
     } else {
-      if (songIndex < songs.length - 1) {
+      if (songIndex < currentSetSongs.length - 1) {
         // Move down within the same set
-        const updated = [...songs];
+        const updated = [...currentSetSongs];
         [updated[songIndex], updated[songIndex + 1]] = [updated[songIndex + 1], updated[songIndex]];
         setValue(`sets.${index}.songs`, updated);
-      } else if (index < allSets.length - 1) {
+      } else if (index < allSetsOfSetlist.length - 1) {
         // Move to the beginning of the next set
         const nextSetPath = `sets.${index + 1}.songs` as const;
         const nextSetSongs = getValues(nextSetPath);
-        setValue(nextSetPath, [songs[songIndex], ...nextSetSongs]);
+        console.log(nextSetPath, nextSetSongs);
+        setValue(nextSetPath, [currentSetSongs[songIndex], ...nextSetSongs]);
         handleRemoveSong(songIndex);
       }
     }
@@ -109,7 +110,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
                   setEditing(true);
                 }
               }}
-              aria-label="Edit set name"
+              aria-label={`Edit set name for ${setName?.trim() ? setName : `Set ${index + 1}`}`}
               role="button"
             >
               {setName?.trim() ? setName : `Set ${index + 1}`}
@@ -130,14 +131,13 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
       </div>
 
       <div className="space-y-2">
-        {songs.length === 0 ? (
+        {currentSetSongs.length === 0 ? (
           <p className="text-sm text-slate-400">No songs in this set</p>
         ) : (
-          songs.map((songRef, songIndex) => {
+          currentSetSongs.map((songRef, songIndex) => {
             const song = songMap.get(songRef.songId);
             const isHardDeleted = !song;
             const isSoftDeleted = song?.isDeleted;
-            const isDeleted = isHardDeleted || isSoftDeleted;
 
             return (
               <div key={songIndex} className="flex items-center gap-2">
@@ -145,7 +145,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
 
                 {isHardDeleted ? (
                   <div className="flex-1">
-                    <span className="text-sm text-slate-400 line-through">[Deleted Song]</span>
+                    <span className="text-sm text-slate-400 line-through">[Deleted song]</span>
                   </div>
                 ) : isSoftDeleted ? (
                   <div className="flex-1">
@@ -157,6 +157,8 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
                 ) : (
                   <div className="flex-1">
                     <SelectField
+                      hideLabel
+                      label={`Song ${songIndex + 1} of ${setName?.trim() ? setName : `Set ${index + 1}`}`}
                       options={allSongs.map((s) => ({
                         label: `${s.artist} - ${s.title}`,
                         value: s.id,
@@ -168,7 +170,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
 
                 <div className="flex gap-1">
                   <Button
-                    disabled={(songIndex === 0 && index === 0) || isDeleted}
+                    disabled={songIndex === 0 && index === 0}
                     icon
                     onClick={() => handleMoveSong(songIndex, 'up')}
                     title="Move up"
@@ -179,7 +181,8 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
                   </Button>
                   <Button
                     disabled={
-                      (songIndex === songs.length - 1 && index === allSets.length - 1) || isDeleted
+                      songIndex === currentSetSongs.length - 1 &&
+                      index === allSetsOfSetlist.length - 1
                     }
                     icon
                     onClick={() => handleMoveSong(songIndex, 'down')}

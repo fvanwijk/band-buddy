@@ -12,13 +12,15 @@ type SelectOption =
 type SelectFieldProps = {
   error?: FieldError;
   helperText?: ReactNode;
-  label?: string;
+  hideLabel?: boolean;
+  label: string;
   options: SelectOption[];
 } & Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'>;
 
 export function SelectField({
   error,
   helperText,
+  hideLabel,
   label,
   options,
   ...selectProps
@@ -32,12 +34,17 @@ export function SelectField({
 
   return (
     <div>
-      {label && (
+      {!hideLabel && (
         <FormLabel className="mb-1.5 block" htmlFor={selectId} required={selectProps.required}>
           {label}
         </FormLabel>
       )}
-      <select {...selectProps} className={selectClass} id={selectId}>
+      <select
+        {...selectProps}
+        aria-label={hideLabel ? label : undefined}
+        className={selectClass}
+        id={selectId}
+      >
         {options.map((option) => {
           if ('value' in option) {
             return (

@@ -9,7 +9,7 @@ export const createSetlist = (overrides: Partial<Setlist> = {}): Setlist => ({
 });
 
 export const createSetlists = (): Setlist[] => [
-  createSetlist(),
+  createSetlist({ date: '2026-02-26' }),
   createSetlist({
     date: '2026-01-15',
     id: '1',

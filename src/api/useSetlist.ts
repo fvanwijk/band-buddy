@@ -128,6 +128,7 @@ export function useAddSetlist(onSuccess?: () => void) {
       sets: (SetlistSetTable & { songs: SetlistSongTable[] })[];
     },
   ) => {
+    console.log({ data });
     if (!store) return;
 
     const row: Record<string, unknown> = { ...data };

@@ -62,7 +62,7 @@ describe('SetlistForm', () => {
     // Set 1
     await user.click(screen.getByRole('button', { name: 'Add set' }));
     expect(screen.queryByRole('button', { name: 'Remove set' })).not.toBeInTheDocument(); // Only when there are 2 or more sets
-    await user.click(screen.getByRole('button', { name: 'Edit set name' }));
+    await user.click(screen.getByRole('button', { name: 'Edit set name for Set 1' }));
     await user.type(screen.getByLabelText('Set name'), 'Opening set');
     await user.click(screen.getByRole('button', { name: 'Add song to set' }));
     await user.click(screen.getByRole('button', { name: 'Delete song' }));

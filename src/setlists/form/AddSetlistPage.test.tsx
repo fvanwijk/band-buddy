@@ -38,7 +38,7 @@ describe('AddSetlistPage', () => {
     await persister.load();
     expect(store.getTable('setlists')).toEqual({
       '0': {
-        date: '2026-02-26',
+        date: new Date().toISOString().split('T')[0],
         title: 'Test Setlist',
         venue: '',
       },
