@@ -27,7 +27,10 @@ export function SongRow({ index, setlistId, song }: SongRowProps) {
         <span className="hidden text-right text-sm font-semibold text-slate-100 sm:block">
           {song.key}
         </span>
-        <span className="hidden text-right text-sm text-slate-400 sm:block">
+        <span
+          data-testid="song-duration"
+          className="hidden text-right text-sm text-slate-400 sm:block"
+        >
           {song.duration === undefined ? null : <FormattedDuration seconds={song.duration} />}
         </span>
         <span className="flex flex-col gap-0.5 text-right sm:hidden">

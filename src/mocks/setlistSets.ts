@@ -1,5 +1,6 @@
-import type { SetlistSet, SetlistSetTable } from '../types';
-import { createSetlistSongsTable } from './setlistSongs';
+import type { SetlistSet, SetlistSetTable, SetlistSongWithDetails } from '../types';
+import { createSetlistSongs } from './setlistSongs';
+import { createSongs } from './songs';
 
 export const createSetlistSet = (overrides: Partial<SetlistSet> = {}): SetlistSet => ({
   id: '0',
@@ -32,13 +33,21 @@ export const createSetlistSets = (): SetlistSet[] => [
   }),
 ];
 
-export const createSetlistSetsWithSongs = (): SetlistSet[] => {
+export const createSetlistSetsWithSongs = (): (SetlistSet & {
+  songs: SetlistSongWithDetails[];
+})[] => {
   const sets = createSetlistSets().slice(0, 3); // Only for setlist 1, setlist 2 has no songs
-  const songs = createSetlistSongsTable(); // Setlist songs for setlist 1
+  const setlistSongs = createSetlistSongs(); // Setlist songs for setlist 1
+  const songs = createSongs(); // All songs, used to get details for setlist songs
 
   return sets.map((set) => ({
     ...set,
-    songs: songs.filter((song) => song.setId === set.id),
+    songs: setlistSongs
+      .filter((song) => song.setId === set.id)
+      .map((setlistSong) => {
+        const songDetails = songs.find((song) => song.id === setlistSong.songId);
+        return { ...setlistSong, ...songDetails };
+      }),
   }));
 };
 

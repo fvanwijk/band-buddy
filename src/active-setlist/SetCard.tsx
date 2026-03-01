@@ -1,21 +1,22 @@
 import { FormattedDuration } from './FormattedDuration';
 import { SongRow } from './SongRow';
-import type { SetlistSetWithSongs } from '../types';
+import type { SetlistSetWithSongs, SetlistSong, Song } from '../types';
 import { parseDuration } from '../utils/duration';
 
 type SetCardProps = {
   set: SetlistSetWithSongs;
   setIndex: number;
   setlistId?: string;
-  sets: SetlistSetWithSongs[];
+  songStartIndex: number;
 };
 
-export function SetCard({ set, setIndex, setlistId, sets }: SetCardProps) {
-  // Calculate cumulative song count before this set
-  const songsBefore = sets.slice(0, setIndex).reduce((total, s) => total + s.songs.length, 0);
+export function SetCard({ set, setIndex, setlistId, songStartIndex }: SetCardProps) {
+  const songs = set.songs.filter(
+    (song): song is Omit<SetlistSong, 'id'> & Song => 'artist' in song,
+  );
 
   // Calculate set duration
-  const setSeconds = set.songs.reduce((total, songRef) => {
+  const setSeconds = songs.reduce((total, songRef) => {
     const duration = 'duration' in songRef ? songRef.duration : undefined;
     return total + parseDuration(duration);
   }, 0);
@@ -25,12 +26,12 @@ export function SetCard({ set, setIndex, setlistId, sets }: SetCardProps) {
       <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl shadow-black/40">
         <div className="text-brand-300 flex items-center justify-between border-b border-slate-700 bg-slate-800/50 px-6 py-3 text-xs font-semibold tracking-[0.2em] uppercase">
           <span>{set.name || `Set ${setIndex + 1}`}</span>
-          <span className="text-slate-400">
+          <span className="text-slate-400" data-testid="set-duration">
             <FormattedDuration seconds={setSeconds} />
           </span>
         </div>
 
-        {set.songs.length === 0 ? (
+        {songs.length === 0 ? (
           <div className="px-6 py-8 text-center text-slate-400">No songs in this set</div>
         ) : (
           <>
@@ -43,33 +44,18 @@ export function SetCard({ set, setIndex, setlistId, sets }: SetCardProps) {
             </div>
 
             <ul className="divide-y divide-slate-800">
-              {set.songs.map((song, index) => {
-                // TODO: isSong(song)
-                if (!('artist' in song)) return null;
-
-                return (
-                  <SongRow
-                    key={song.songId}
-                    index={songsBefore + index + 1}
-                    setlistId={setlistId}
-                    song={song}
-                  />
-                );
-              })}
+              {songs.map((song, index) => (
+                <SongRow
+                  key={song.songId}
+                  index={songStartIndex + index + 1}
+                  setlistId={setlistId}
+                  song={song}
+                />
+              ))}
             </ul>
           </>
         )}
       </div>
-
-      {setIndex < sets.length - 1 && (
-        <div className="flex items-center justify-center gap-4 py-4">
-          <div className="h-px flex-1 bg-slate-700" />
-          <span className="text-xs font-semibold tracking-[0.2em] text-slate-500 uppercase">
-            Break
-          </span>
-          <div className="h-px flex-1 bg-slate-700" />
-        </div>
-      )}
     </div>
   );
 }
