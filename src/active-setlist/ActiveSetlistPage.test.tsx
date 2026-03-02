@@ -1,0 +1,49 @@
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
+import { ActiveSetlistPage } from './ActiveSetlistPage';
+import { seedStore } from '../mocks/seed';
+import { StoreProvider } from '../store/StoreProvider';
+import { MockRouteProvider, getMockStore } from '../testUtils';
+
+describe('ActiveSetlistPage', () => {
+  const renderComponent = async (activeSetlistId?: string) => {
+    const { store, persister } = getMockStore();
+    await seedStore(store);
+    if (activeSetlistId) {
+      await store.setValue('activeSetlistId', activeSetlistId);
+    }
+    persister.save();
+
+    return render(<ActiveSetlistPage />, {
+      wrapper: ({ children }) => (
+        <StoreProvider>
+          <MockRouteProvider>{children}</MockRouteProvider>
+        </StoreProvider>
+      ),
+    });
+  };
+
+  it('renders empty state when there is no setlist at all', async () => {
+    await render(<ActiveSetlistPage />, { wrapper: MockRouteProvider });
+
+    expect(screen.getByText('No active setlist')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'setlist' })).toHaveAttribute('href', '/setlists');
+  });
+
+  it('renders empty state when no active setlist', async () => {
+    await renderComponent();
+
+    expect(await screen.findByText('No active setlist')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'setlist' })).toHaveAttribute('href', '/setlists');
+  });
+
+  it('renders setlist details when active setlist is present', async () => {
+    await renderComponent('0');
+
+    expect(await screen.findByText('Main Setlist')).toBeInTheDocument();
+    expect(screen.getByText('Feb 26, 2026')).toBeInTheDocument();
+    expect(screen.getByText('The Grand Arena')).toBeInTheDocument();
+    expect(screen.getByTestId('song-count-duration')).toHaveTextContent('6 songs • 27m 30s');
+  });
+});
