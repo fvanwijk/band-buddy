@@ -52,8 +52,7 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
       }));
       canvasRef.current?.loadPaths(scaledPaths);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [songId, zoom]);
+  }, [songId, storedCanvasPaths, zoom]);
 
   // Save immediately while drawing
   const handlePathsChange = useCallback(

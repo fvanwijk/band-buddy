@@ -30,7 +30,6 @@ export function AddMidiButtonDialog({
     handleSubmit,
     register,
     reset,
-    watch,
   } = useForm<FormData>({
     defaultValues: {
       instrumentId: instruments[0]?.id || '',
@@ -64,8 +63,6 @@ export function AddMidiButtonDialog({
 
   return (
     <Dialog onClose={onClose} open={isOpen} title="Add MIDI Button">
-      {JSON.stringify(watch())}
-
       <form autoComplete="off" noValidate onSubmit={handleFormSubmit}>
         <div className="space-y-4">
           <InputField
