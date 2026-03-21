@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import type { Tables, Values } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
 
+import { migrateBackup } from '../../services/migrations';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { SettingsCard } from '../SettingsCard';
@@ -57,14 +58,19 @@ export function DataSettings() {
         throw new Error('Invalid backup format.');
       }
 
-      if (parsed.version !== BACKUP_VERSION) {
-        throw new Error(
-          `Unsupported backup version ${parsed.version}. Expected ${BACKUP_VERSION}.`,
-        );
+      // Migrate backup if version doesn't match
+      const migrationResult = migrateBackup(parsed, parsed.version);
+
+      if (migrationResult.error) {
+        setStatus({
+          message: migrationResult.error,
+          severity: 'error',
+        });
+        return;
       }
 
-      store.setTables(parsed.tables as Tables);
-      store.setValues(parsed.values as Values);
+      store.setTables(migrationResult.tables);
+      store.setValues(migrationResult.values);
 
       setStatus({
         message: 'Backup imported successfully.',
