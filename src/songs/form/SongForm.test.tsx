@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { createRoutesStub } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SongForm, type SongFormProps } from './SongForm';
 import { seedInstruments } from '../../mocks/seed';
 import { createSong } from '../../mocks/songs';
 import { StoreProvider } from '../../store/StoreProvider';
 import { MockQueryClientProvider, getMockStore } from '../../testUtils';
+import { SongForm, type SongFormProps } from './SongForm';
 
 describe('SongForm', () => {
   const renderComponent = (props: Partial<SongFormProps> = {}, id?: string) =>

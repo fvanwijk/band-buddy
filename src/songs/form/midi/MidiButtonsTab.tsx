@@ -2,12 +2,12 @@ import { IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { AddMidiButtonDialog } from './AddMidiButtonDialog';
-import { MidiButtonCard } from './MidiButtonCard';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
+import { AddMidiButtonDialog } from './AddMidiButtonDialog';
+import { MidiButtonCard } from './MidiButtonCard';
 
 type MidiButtonsTabProps = {
   instruments: Instrument[];

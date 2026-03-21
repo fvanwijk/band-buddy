@@ -1,6 +1,6 @@
+import { Slider } from '../../ui/Slider';
 import { ResetButton } from './ResetButton';
 import { SettingHeading } from './SettingHeading';
-import { Slider } from '../../ui/Slider';
 
 type ZoomPanelProps = {
   onZoomChange: (zoom: number) => void;
@@ -28,7 +28,7 @@ export function ZoomPanel({ onZoomChange, zoom }: ZoomPanelProps) {
         step={0.05}
         value={zoom}
       />
-      <p className="text-brand-200 mt-1 text-center text-xs font-semibold">{zoom.toFixed(2)}×</p>
+      <p className="mt-1 text-center text-xs font-semibold text-brand-200">{zoom.toFixed(2)}×</p>
     </div>
   );
 }

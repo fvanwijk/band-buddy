@@ -29,7 +29,7 @@ export const WelcomeModal: FC<WelcomeModalProps> = ({ isOpen, onClose }) => (
 
       <div className="space-y-3">
         <div className="flex gap-3">
-          <IconMusic className="text-brand-400 mt-0.5 h-5 w-5 shrink-0" />
+          <IconMusic className="mt-0.5 h-5 w-5 shrink-0 text-brand-400" />
           <div>
             <p className="font-semibold text-slate-100">Build Your Song Library</p>
             <p className="text-slate-400">
@@ -40,7 +40,7 @@ export const WelcomeModal: FC<WelcomeModalProps> = ({ isOpen, onClose }) => (
         </div>
 
         <div className="flex gap-3">
-          <IconPlaylist className="text-brand-400 mt-0.5 h-5 w-5 shrink-0" />
+          <IconPlaylist className="mt-0.5 h-5 w-5 shrink-0 text-brand-400" />
           <div>
             <p className="font-semibold text-slate-100">Create Setlists</p>
             <p className="text-slate-400">
@@ -51,7 +51,7 @@ export const WelcomeModal: FC<WelcomeModalProps> = ({ isOpen, onClose }) => (
         </div>
 
         <div className="flex gap-3">
-          <IconSettings className="text-brand-400 mt-0.5 h-5 w-5 shrink-0" />
+          <IconSettings className="mt-0.5 h-5 w-5 shrink-0 text-brand-400" />
           <div>
             <p className="font-semibold text-slate-100">Configure Your Instruments</p>
             <p className="text-slate-400">

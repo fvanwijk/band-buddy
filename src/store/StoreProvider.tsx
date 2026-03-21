@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Provider, useCreateStore } from 'tinybase/ui-react';
 
-import { createAppStore, createStorePersister } from './store';
 import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
 import { seedStore } from '../mocks/seed';
 import { Logo } from '../ui/Logo';
+import { createAppStore, createStorePersister } from './store';
 
 type StoreProviderProps = {
   children: ReactNode;

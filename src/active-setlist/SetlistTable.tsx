@@ -1,8 +1,8 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 
-import { SetCard } from './SetCard';
 import type { SetlistSetWithSongs } from '../types';
+import { SetCard } from './SetCard';
 
 type SetlistTableProps = {
   setlistId?: string;

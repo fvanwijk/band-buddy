@@ -2,12 +2,12 @@ import { IconPlus } from '@tabler/icons-react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
-import { useProgramOptions } from './useProgramOptions';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { Dialog } from '../../../ui/Dialog';
 import { InputField } from '../../../ui/form/InputField';
 import { SelectField } from '../../../ui/form/SelectField';
+import { useProgramOptions } from './useProgramOptions';
 
 type FormData = Omit<MidiEvent, 'id'>;
 

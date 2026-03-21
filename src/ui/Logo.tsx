@@ -9,9 +9,9 @@ type LogoProps = {
 
 export function Logo({ className, iconClassName }: LogoProps) {
   return (
-    <span className={cn('text-brand-400 font-bold', className)}>
+    <span className={cn('font-bold text-brand-400', className)}>
       Band
-      <span className="text-brand-600 font-semibold">
+      <span className="font-semibold text-brand-600">
         b<IconMusic className={cn('-mx-0.5 inline rotate-180', iconClassName)} />
         ddy
       </span>

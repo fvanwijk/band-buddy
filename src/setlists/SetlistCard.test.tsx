@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SetlistCard } from './SetlistCard';
 import { StoreProvider } from '../store/StoreProvider';
 import { MockRouteProvider } from '../testUtils';
+import { SetlistCard } from './SetlistCard';
 
 describe('SetlistCard', () => {
   const renderComponent = (props = {}) =>

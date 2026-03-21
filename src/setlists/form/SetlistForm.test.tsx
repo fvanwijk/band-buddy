@@ -2,11 +2,11 @@ import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SetlistForm, type SetlistFormProps } from './SetlistForm';
 import { seedSongs } from '../../mocks/seed';
 import { createSetlist } from '../../mocks/setlists';
 import { StoreProvider } from '../../store/StoreProvider';
 import { MockRouteProvider, getMockStore } from '../../testUtils';
+import { SetlistForm, type SetlistFormProps } from './SetlistForm';
 
 describe('SetlistForm', () => {
   const renderComponent = (props: Partial<SetlistFormProps> = {}) =>

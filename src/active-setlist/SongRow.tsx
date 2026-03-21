@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
-import { FormattedDuration } from './FormattedDuration';
 import type { Song } from '../types';
+import { FormattedDuration } from './FormattedDuration';
 
 type SongRowProps = {
   index: number;

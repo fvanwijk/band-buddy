@@ -1,14 +1,13 @@
 // @ts-check
 
 import js from '@eslint/js';
-import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
-import importPlugin from 'eslint-plugin-import';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import sortKeysFixPlugin from 'eslint-plugin-sort-keys-fix';
 import unusedImportsPlugin from 'eslint-plugin-unused-imports';
-import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -20,7 +19,6 @@ export default defineConfig([
       globals: globals.browser,
     },
     plugins: {
-      import: importPlugin,
       'react-hooks': reactHooks,
       'sort-keys-fix': sortKeysFixPlugin,
       'unused-imports': unusedImportsPlugin,
@@ -35,16 +33,7 @@ export default defineConfig([
           ignoreRestSiblings: true,
         },
       ],
-      'import/order': [
-        'error',
-        {
-          alphabetize: { caseInsensitive: true, order: 'asc' },
-          groups: ['builtin', 'external', ['index', 'sibling', 'parent', 'object']],
-          'newlines-between': 'always',
-        },
-      ],
       'react-refresh/only-export-components': ['off'],
-      'sort-imports': ['error', { ignoreDeclarationSort: true }],
       'sort-keys-fix/sort-keys-fix': 'warn',
       'unused-imports/no-unused-imports': 'warn',
     },

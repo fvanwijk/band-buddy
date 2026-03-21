@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { SetCard } from './SetCard';
 import { createSetlistSetsWithSongs } from '../mocks/setlistSets';
 import { MockRouteProvider } from '../testUtils';
+import { SetCard } from './SetCard';
 
 describe('SetCard', () => {
   it('renders set name and duration', async () => {

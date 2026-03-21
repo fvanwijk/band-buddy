@@ -4,11 +4,6 @@ import type { FieldErrors } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-import { DetailsTab } from './DetailsTab';
-import { LyricsTab } from './lyrics/LyricsTab';
-import { calculateMeasures } from './measures';
-import { MidiButtonsTab } from './midi/MidiButtonsTab';
-import { SheetMusicFormTab } from './sheet-music/SheetMusicFormTab';
 import { useGetInstruments } from '../../api/useInstruments';
 import { useSheetMusic } from '../../hooks/useSheetMusic';
 import type { MidiEvent, Song } from '../../types';
@@ -18,6 +13,11 @@ import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
 import { formatDurationToString, parseDuration } from '../../utils/duration';
+import { DetailsTab } from './DetailsTab';
+import { LyricsTab } from './lyrics/LyricsTab';
+import { calculateMeasures } from './measures';
+import { MidiButtonsTab } from './midi/MidiButtonsTab';
+import { SheetMusicFormTab } from './sheet-music/SheetMusicFormTab';
 
 type SongSubmitData = Omit<Song, 'id'>;
 

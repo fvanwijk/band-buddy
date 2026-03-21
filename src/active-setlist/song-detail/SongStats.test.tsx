@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { SongStats } from './SongStats';
 import type { Song } from '../../types';
+import { SongStats } from './SongStats';
 
 const baseSong: Song = {
   artist: 'Queen',

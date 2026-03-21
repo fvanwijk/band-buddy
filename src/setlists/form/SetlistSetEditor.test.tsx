@@ -4,13 +4,13 @@ import type { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { type Mock, describe, expect, it, vi } from 'vitest';
 
-import type { SetlistFormData } from './SetlistForm';
-import { SetlistSetEditor } from './SetlistSetEditor';
 import { seedSongs } from '../../mocks/seed';
 import { createSetlistSetsWithSongs } from '../../mocks/setlistSets';
 import { createSongsTable } from '../../mocks/songs';
 import { StoreProvider } from '../../store/StoreProvider';
 import { getMockStore } from '../../testUtils';
+import type { SetlistFormData } from './SetlistForm';
+import { SetlistSetEditor } from './SetlistSetEditor';
 
 const Providers: FC<{ children: React.ReactNode | React.ReactNode[] }> = (props) => (
   <StoreProvider>

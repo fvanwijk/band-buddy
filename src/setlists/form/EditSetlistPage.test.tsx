@@ -3,10 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { createRoutesStub } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
-import { EditSetlistPage } from './EditSetlistPage';
 import { seedSetlists } from '../../mocks/seed';
 import { StoreProvider } from '../../store/StoreProvider';
 import { MockRouteProvider, getMockStore } from '../../testUtils';
+import { EditSetlistPage } from './EditSetlistPage';
 
 describe('EditSetlistPage', () => {
   const renderComponent = async () => {

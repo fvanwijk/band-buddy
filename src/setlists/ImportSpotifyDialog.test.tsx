@@ -1,14 +1,14 @@
 import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Fragment } from 'react/jsx-runtime';
 import { createRoutesStub } from 'react-router-dom';
+import { Fragment } from 'react/jsx-runtime';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ImportSpotifyDialog, type ImportSpotifyDialogProps } from './ImportSpotifyDialog';
 import type { SpotifyContextType } from '../contexts/SpotifyContext';
 import { StoreProvider } from '../store/StoreProvider';
 import { MockQueryClientProvider, MockSpotifyProvider } from '../testUtils';
+import { ImportSpotifyDialog, type ImportSpotifyDialogProps } from './ImportSpotifyDialog';
 
 describe('ImportSpotifyDialog', () => {
   const renderComponent = ({

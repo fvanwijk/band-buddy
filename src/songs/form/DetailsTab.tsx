@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
 
-import type { SongFormData } from './SongForm';
 import { InputField } from '../../ui/form/InputField';
 import { RadioGroup } from '../../ui/form/RadioGroup';
 import { Switch } from '../../ui/Switch';
+import type { SongFormData } from './SongForm';
 
 type DetailsTabProps = {
   calculatedMeasures: number | null;

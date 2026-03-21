@@ -4,12 +4,12 @@ import { useForm } from 'react-hook-form';
 import { parse } from 'spotify-uri';
 import { useStore } from 'tinybase/ui-react';
 
-import { useProcessSpotifyPlaylist } from './importSpotifyPlaylist';
 import { useSpotify } from '../contexts/SpotifyContext';
 import { Alert } from '../ui/Alert';
 import { Button } from '../ui/Button';
 import { Dialog } from '../ui/Dialog';
 import { InputField } from '../ui/form/InputField';
+import { useProcessSpotifyPlaylist } from './importSpotifyPlaylist';
 
 type FormData = {
   playlistUrl: string;

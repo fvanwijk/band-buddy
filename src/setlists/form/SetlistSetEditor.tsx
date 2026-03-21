@@ -2,12 +2,12 @@ import { IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-r
 import { useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import type { SetlistFormData } from './SetlistForm';
 import { useGetSongs } from '../../api/useSong';
 import { Button } from '../../ui/Button';
 import { DeleteButton } from '../../ui/DeleteButton';
 import { InputField } from '../../ui/form/InputField';
 import { SelectField } from '../../ui/form/SelectField';
+import type { SetlistFormData } from './SetlistForm';
 
 type SetlistSetEditorProps = {
   index: number;
@@ -100,7 +100,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
             />
           ) : (
             <h4
-              className="decoration-brand-400 h-7.5 cursor-pointer font-semibold text-white underline decoration-dashed underline-offset-4"
+              className="h-7.5 cursor-pointer font-semibold text-white underline decoration-brand-400 decoration-dashed underline-offset-4"
               tabIndex={0}
               onClick={() => {
                 setEditing(true);

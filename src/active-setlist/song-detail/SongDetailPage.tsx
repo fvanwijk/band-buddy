@@ -10,12 +10,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useStore } from 'tinybase/ui-react';
 
-import { DrawingOverlay } from './lyrics/DrawingOverlay';
-import { LyricsBlock } from './lyrics/LyricsBlock';
-import { MidiButtonsDisplay } from './midi-buttons-display/MidiButtonsDisplay';
-import { SettingsPanel } from './SettingsPanel';
-import { SheetMusicTab } from './SheetMusicTab';
-import { SongStats } from './SongStats';
 import { useGetInstruments } from '../../api/useInstruments';
 import { useGetSetlist } from '../../api/useSetlist';
 import { useGetSongs } from '../../api/useSong';
@@ -27,6 +21,12 @@ import { InputField } from '../../ui/form/InputField';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
+import { DrawingOverlay } from './lyrics/DrawingOverlay';
+import { LyricsBlock } from './lyrics/LyricsBlock';
+import { MidiButtonsDisplay } from './midi-buttons-display/MidiButtonsDisplay';
+import { SettingsPanel } from './SettingsPanel';
+import { SheetMusicTab } from './SheetMusicTab';
+import { SongStats } from './SongStats';
 export function SongDetailPage() {
   const { setlistId, songId, tab } = useParams<{
     setlistId: string;

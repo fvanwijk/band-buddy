@@ -47,7 +47,7 @@
 
 /* Link styling */
 .link {
-  @apply text-brand-300 hover:text-brand-200 decoration-brand-300/50 hover:decoration-brand-200 underline transition-colors;
+  @apply text-brand-300 underline decoration-brand-300/50 transition-colors hover:text-brand-200 hover:decoration-brand-200;
 }
 
 @keyframes metronome-pulse {

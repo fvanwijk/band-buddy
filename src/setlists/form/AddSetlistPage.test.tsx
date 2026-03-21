@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { createRoutesStub } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
-import { AddSetlistPage } from './AddSetlistPage';
 import { StoreProvider } from '../../store/StoreProvider';
 import { MockRouteProvider, getMockStore } from '../../testUtils';
+import { AddSetlistPage } from './AddSetlistPage';
 
 describe('AddSetlistPage', () => {
   it('should render a form to add a setlist', async () => {

@@ -3,15 +3,15 @@ import { IconAdjustments } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePopper } from 'react-popper';
 
-import { MetronomeVolumePanel } from './MetronomeVolumePanel';
-import { TransposePanel } from './TransposePanel';
-import { ZoomPanel } from './ZoomPanel';
 import { useGetShowDrawingTools, useSetShowDrawingTools } from '../../api/useSettings';
 import { useUpdateSong } from '../../api/useSong';
 import type { Song } from '../../types';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Checkbox } from '../../ui/Checkbox';
+import { MetronomeVolumePanel } from './MetronomeVolumePanel';
+import { TransposePanel } from './TransposePanel';
+import { ZoomPanel } from './ZoomPanel';
 
 type SettingsPanelProps = {
   onZoomChange: (zoom: number) => void;

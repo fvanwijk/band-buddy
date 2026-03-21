@@ -6,6 +6,7 @@ import { RouterProvider } from 'react-router-dom';
 import { SpotifyProvider } from './contexts/SpotifyContext.tsx';
 import { router } from './router.tsx';
 import { StoreProvider } from './store/StoreProvider.tsx';
+
 import './index.css';
 
 const queryClient = new QueryClient({

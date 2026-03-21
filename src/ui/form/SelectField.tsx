@@ -2,8 +2,8 @@ import { useId } from 'react';
 import type { ReactNode, SelectHTMLAttributes } from 'react';
 import type { FieldError } from 'react-hook-form';
 
-import { FormLabel } from './FormLabel';
 import { cn } from '../../utils/cn';
+import { FormLabel } from './FormLabel';
 
 type SelectOption =
   | { label: string; value: string }
@@ -28,7 +28,7 @@ export function SelectField({
   const generatedId = useId();
   const selectId = selectProps.id ?? generatedId;
   const selectClass = cn(
-    'focus:border-brand-400 focus:ring-brand-400/20 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:ring-2 focus:outline-none',
+    'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 focus:outline-none',
     selectProps.className,
   );
 

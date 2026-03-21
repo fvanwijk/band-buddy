@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { InstrumentForm } from './InstrumentForm';
 import { useGetInstrument, useUpdateInstrument } from '../../../api/useInstruments';
+import { InstrumentForm } from './InstrumentForm';
 
 export function EditInstrumentPage() {
   const backPath = '/settings/instruments';

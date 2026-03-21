@@ -4,11 +4,11 @@ import userEvent from '@testing-library/user-event';
 import { createRoutesStub } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ManageSetlistsPage } from './ManageSetlistsPage';
 import type { SpotifyContextType } from '../contexts/SpotifyContext';
 import { seedSetlists } from '../mocks/seed';
 import { StoreProvider } from '../store/StoreProvider';
 import { MockQueryClientProvider, MockSpotifyProvider, getMockStore } from '../testUtils';
+import { ManageSetlistsPage } from './ManageSetlistsPage';
 
 describe('ManageSetlistPage', () => {
   const renderComponent = (props: Partial<SpotifyContextType> = {}) =>

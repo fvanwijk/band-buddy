@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
-import { SetlistForm } from './SetlistForm';
 import { useAddSetlist } from '../../api/useSetlist';
+import { SetlistForm } from './SetlistForm';
 
 export function AddSetlistPage() {
   const backPath = '/setlists';

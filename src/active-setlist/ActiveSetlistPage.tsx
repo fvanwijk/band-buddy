@@ -2,10 +2,10 @@ import { IconPlayerPlay } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useValue } from 'tinybase/ui-react';
 
-import { SetlistHeader } from './SetlistHeader';
-import { SetlistTable } from './SetlistTable';
 import { useGetSetlist } from '../api/useSetlist';
 import { EmptyState } from '../ui/EmptyState';
+import { SetlistHeader } from './SetlistHeader';
+import { SetlistTable } from './SetlistTable';
 
 export function ActiveSetlistPage() {
   const activeSetlistId = useValue('activeSetlistId') as string | undefined;

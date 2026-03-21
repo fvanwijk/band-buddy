@@ -1,5 +1,5 @@
-import { FormattedDuration } from './FormattedDuration';
 import { formatDate } from '../utils/date';
+import { FormattedDuration } from './FormattedDuration';
 
 type SetlistHeaderProps = {
   date: string;
@@ -19,7 +19,7 @@ export function SetlistHeader({ date, name, songCount, totalSeconds, venue }: Se
         <span className="rounded-full bg-slate-900/70 px-3 py-1">{formatDate(date)}</span>
         {venue && <span className="rounded-full bg-slate-900/70 px-3 py-1">{venue}</span>}
         <span
-          className="bg-brand-400/10 text-brand-200 rounded-full px-3 py-1"
+          className="rounded-full bg-brand-400/10 px-3 py-1 text-brand-200"
           data-testid="song-count-duration"
         >
           {songCount} songs

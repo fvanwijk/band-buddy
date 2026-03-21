@@ -37,7 +37,7 @@ export function Switch({ label, name, onCheckedChange, ref, ...inputProps }: Swi
           'relative inline-flex h-6 w-12 items-center rounded-full transition-colors',
           inputProps.checked ? 'bg-brand-400/30' : 'bg-slate-700',
           inputProps.disabled && 'opacity-50',
-          'peer-focus-visible:ring-brand-400 peer-focus-visible:ring-2',
+          'peer-focus-visible:ring-2 peer-focus-visible:ring-brand-400',
         )}
       >
         <span

@@ -1,7 +1,7 @@
-import { SongMetadata } from './SongMetadata';
 import { Card } from '../ui/Card';
 import { DeleteButton } from '../ui/DeleteButton';
 import { EditButton } from '../ui/EditButton';
+import { SongMetadata } from './SongMetadata';
 
 type SongCardProps = {
   artist: string;

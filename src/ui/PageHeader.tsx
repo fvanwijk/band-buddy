@@ -13,7 +13,7 @@ export function PageHeader({ action, backPath, subtitle, title }: PageHeaderProp
   const header = (
     <header className="flex flex-1 flex-wrap items-center justify-between gap-3">
       <div className="flex-1">
-        <p className="text-brand-300 text-xs font-semibold tracking-[0.3em] uppercase">
+        <p className="text-xs font-semibold tracking-[0.3em] text-brand-300 uppercase">
           {subtitle}
         </p>
         <h1 className="text-2xl font-semibold text-slate-100">{title}</h1>

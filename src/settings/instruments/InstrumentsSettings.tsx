@@ -2,13 +2,13 @@ import { IconPlus } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { InstrumentCard } from './InstrumentCard';
 import { useDeleteInstrument, useGetInstruments } from '../../api/useInstruments';
 import { useMidiDevices } from '../../midi/useMidiDevices';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { SettingsCard } from '../SettingsCard';
+import { InstrumentCard } from './InstrumentCard';
 
 export function InstrumentsSettings() {
   const instruments = useGetInstruments();

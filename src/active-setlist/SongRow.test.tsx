@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { SongRow } from './SongRow';
 import { createSong } from '../mocks/songs';
 import { MockRouteProvider } from '../testUtils';
+import { SongRow } from './SongRow';
 
 describe('SongRow', () => {
   it('renders song details', () => {

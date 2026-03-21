@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { SetlistForm } from './SetlistForm';
 import { useGetSetlist, useUpdateSetlist } from '../../api/useSetlist';
+import { SetlistForm } from './SetlistForm';
 
 export function EditSetlistPage() {
   const { id } = useParams<{ id: string }>();

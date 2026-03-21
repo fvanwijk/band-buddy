@@ -59,9 +59,9 @@ export function ColorThemeCard() {
                 </div>
 
                 {isActive && (
-                  <div className="bg-brand-400/20 flex h-5 w-5 items-center justify-center rounded-full">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-400/20">
                     <svg
-                      className="text-brand-300 h-3 w-3"
+                      className="h-3 w-3 text-brand-300"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

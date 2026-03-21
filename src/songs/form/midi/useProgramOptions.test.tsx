@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { useProgramOptions } from './useProgramOptions';
 import { createInstrument } from '../../../mocks/instruments';
+import { useProgramOptions } from './useProgramOptions';
 
 type GroupOption = { label: string; options: Array<{ label: string; value: string }> };
 

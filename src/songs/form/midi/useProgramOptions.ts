@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { useNordProgramOptions } from './useNordProgramOptions';
 import type { Instrument } from '../../../types';
+import { useNordProgramOptions } from './useNordProgramOptions';
 
 type ProgramOption = { label: string; value: string };
 type NordProgramOption = { label: string; options: ProgramOption[] };

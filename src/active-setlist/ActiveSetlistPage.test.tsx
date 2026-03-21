@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { ActiveSetlistPage } from './ActiveSetlistPage';
 import { seedStore } from '../mocks/seed';
 import { StoreProvider } from '../store/StoreProvider';
 import { MockRouteProvider, getMockStore } from '../testUtils';
+import { ActiveSetlistPage } from './ActiveSetlistPage';
 
 describe('ActiveSetlistPage', () => {
   const renderComponent = async (activeSetlistId?: string) => {

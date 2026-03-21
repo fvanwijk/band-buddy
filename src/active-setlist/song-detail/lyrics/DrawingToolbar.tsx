@@ -110,7 +110,7 @@ export function DrawingToolbar({
                         className={cn(
                           'block h-5 w-5 rounded-full border transition-all',
                           selectedColor === option.value
-                            ? 'border-brand-400 ring-brand-400 ring-2'
+                            ? 'border-brand-400 ring-2 ring-brand-400'
                             : 'border-slate-700',
                         )}
                         style={{ backgroundColor: option.value }}

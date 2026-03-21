@@ -2,7 +2,6 @@ import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
-import { SetlistSetEditor } from './SetlistSetEditor';
 import { useGetSongs } from '../../api/useSong';
 import type { SetlistSetTable, SetlistSongTable, SetlistTable, SetlistWithSets } from '../../types';
 import { Alert } from '../../ui/Alert';
@@ -10,6 +9,7 @@ import { Button } from '../../ui/Button';
 import { InputField } from '../../ui/form/InputField';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
+import { SetlistSetEditor } from './SetlistSetEditor';
 
 export type SetlistFormData = SetlistTable & {
   sets: (SetlistSetTable & { songs: SetlistSongTable[] })[];

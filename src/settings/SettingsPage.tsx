@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { DataSettings } from './data/DataSettings';
-import { GeneralSettings } from './general/GeneralSettings';
-import { InstrumentsSettings } from './instruments/InstrumentsSettings';
 import { Page } from '../ui/Page';
 import { PageHeader } from '../ui/PageHeader';
 import { Tabs } from '../ui/Tabs';
 import { WelcomeModal } from '../ui/WelcomeModal';
+import { DataSettings } from './data/DataSettings';
+import { GeneralSettings } from './general/GeneralSettings';
+import { InstrumentsSettings } from './instruments/InstrumentsSettings';
 
 export function SettingsPage() {
   const { tab } = useParams<{ tab?: string }>();

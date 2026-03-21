@@ -19,7 +19,7 @@ export const Home = () => {
           <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
         </Link>
         <a
-          className="hover:text-brand-400 text-slate-300 transition-colors"
+          className="text-slate-300 transition-colors hover:text-brand-400"
           href="https://github.com/fvanwijk/band-buddy"
           rel="noopener noreferrer"
           target="_blank"
@@ -52,14 +52,14 @@ export const Home = () => {
           <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/50 to-slate-950 p-6 shadow-xl">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <IconPlaylist className="text-brand-300 h-6 w-6" />
+                <IconPlaylist className="h-6 w-6 text-brand-300" />
                 <div>
                   <p className="text-sm font-semibold text-slate-100">Active setlist view</p>
                   <p className="text-xs text-slate-400">Navigate songs hands-free on stage.</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <IconDeviceSpeaker className="text-brand-300 h-6 w-6" />
+                <IconDeviceSpeaker className="h-6 w-6 text-brand-300" />
                 <div>
                   <p className="text-sm font-semibold text-slate-100">Instant MIDI changes</p>
                   <p className="text-xs text-slate-400">
@@ -68,7 +68,7 @@ export const Home = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <IconMusic className="text-brand-300 h-6 w-6" />
+                <IconMusic className="h-6 w-6 text-brand-300" />
                 <div>
                   <p className="text-sm font-semibold text-slate-100">Song intelligence</p>
                   <p className="text-xs text-slate-400">Keep your song library in one place.</p>
@@ -80,7 +80,7 @@ export const Home = () => {
 
         <section className="grid gap-6 md:grid-cols-3">
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <IconBolt className="text-brand-300 mb-4 h-6 w-6" />
+            <IconBolt className="mb-4 h-6 w-6 text-brand-300" />
             <h3 className="text-lg font-semibold text-slate-100">Free and privacy-first</h3>
             <p className="mt-2 text-sm text-slate-400">
               Open source and completely free. Your data stays local in your browser—no accounts, no
@@ -88,14 +88,14 @@ export const Home = () => {
             </p>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <IconPlaylist className="text-brand-300 mb-4 h-6 w-6" />
+            <IconPlaylist className="mb-4 h-6 w-6 text-brand-300" />
             <h3 className="text-lg font-semibold text-slate-100">Setlist-first workflow</h3>
             <p className="mt-2 text-sm text-slate-400">
               Build shows around your repertoire and jump between songs in seconds.
             </p>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <IconBrowserCheck className="text-brand-300 mb-4 h-6 w-6" />
+            <IconBrowserCheck className="mb-4 h-6 w-6 text-brand-300" />
             <h3 className="text-lg font-semibold text-slate-100">Works everywhere</h3>
             <p className="mt-2 text-sm text-slate-400">
               Runs in any modern browser—desktop, tablet, or phone. Install as a PWA for offline
@@ -109,7 +109,7 @@ export const Home = () => {
         <div className="text-center text-sm text-slate-400">
           Built by{' '}
           <a
-            className="hover:text-brand-400 text-slate-300 transition-colors"
+            className="text-slate-300 transition-colors hover:text-brand-400"
             href="https://github.com/fvanwijk"
             rel="noopener noreferrer"
             target="_blank"

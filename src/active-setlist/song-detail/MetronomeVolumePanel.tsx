@@ -1,6 +1,6 @@
-import { SettingHeading } from './SettingHeading';
 import { useGetMetronomeVolume, useSetMetronomeVolume } from '../../api/useSettings';
 import { Slider } from '../../ui/Slider';
+import { SettingHeading } from './SettingHeading';
 
 export function MetronomeVolumePanel() {
   const volume = useGetMetronomeVolume();
@@ -22,7 +22,7 @@ export function MetronomeVolumePanel() {
           step={1}
           value={volume}
         />
-        <p className="text-brand-200 text-center text-xs font-semibold">{Math.round(volume)}%</p>
+        <p className="text-center text-xs font-semibold text-brand-200">{Math.round(volume)}%</p>
       </div>
     </div>
   );

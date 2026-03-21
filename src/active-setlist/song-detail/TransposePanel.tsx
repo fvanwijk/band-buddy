@@ -1,9 +1,9 @@
 import { IconMinus, IconPlus } from '@tabler/icons-react';
 
-import { ResetButton } from './ResetButton';
-import { SettingHeading } from './SettingHeading';
 import { Button } from '../../ui/Button';
 import { cn } from '../../utils/cn';
+import { ResetButton } from './ResetButton';
+import { SettingHeading } from './SettingHeading';
 
 type TransposePanelProps = {
   onTransposeChange: (delta: number) => void;
@@ -38,7 +38,7 @@ export function TransposePanel({ onTransposeChange, transpose }: TransposePanelP
         <span
           className={cn(
             'min-w-8 text-center text-xs',
-            transpose !== 0 ? 'text-brand-200 font-semibold' : 'text-slate-400',
+            transpose !== 0 ? 'font-semibold text-brand-200' : 'text-slate-400',
           )}
         >
           {formatTranspose(transpose)}

@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { SetlistTable } from './SetlistTable';
 import { createSetlistSetsWithSongs } from '../mocks/setlistSets';
 import { MockRouteProvider } from '../testUtils';
+import { SetlistTable } from './SetlistTable';
 
 describe('SetlistTable', () => {
   it('renders sets and breaks', () => {

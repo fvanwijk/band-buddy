@@ -1,13 +1,13 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { type CanvasPath, ReactSketchCanvas, type ReactSketchCanvasRef } from 'react-sketch-canvas';
 
+import { useGetShowDrawingTools } from '../../../api/useSettings';
+import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
+import { cn } from '../../../utils/cn';
 import { DrawingCursor } from './DrawingCursor';
 import { DrawingToolbar, colorOptions } from './DrawingToolbar';
 import { useDrawingCursor } from './useDrawingCursor';
 import { useScrollableDimensions } from './useScrollableDimensions';
-import { useGetShowDrawingTools } from '../../../api/useSettings';
-import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
-import { cn } from '../../../utils/cn';
 
 type DrawingOverlayProps = {
   children: ReactNode;

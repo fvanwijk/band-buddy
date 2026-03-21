@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { AddMidiButtonDialog } from './AddMidiButtonDialog';
 import { createInstruments } from '../../../mocks/instruments';
 import { MockRouteProvider } from '../../../testUtils';
+import { AddMidiButtonDialog } from './AddMidiButtonDialog';
 
 describe('AddMidiButtonDialog', () => {
   it('renders the dialog with form fields and submits data', async () => {

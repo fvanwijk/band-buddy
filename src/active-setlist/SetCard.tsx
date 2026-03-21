@@ -1,7 +1,7 @@
-import { FormattedDuration } from './FormattedDuration';
-import { SongRow } from './SongRow';
 import type { SetlistSetWithSongs, SetlistSong, Song } from '../types';
 import { parseDuration } from '../utils/duration';
+import { FormattedDuration } from './FormattedDuration';
+import { SongRow } from './SongRow';
 
 type SetCardProps = {
   set: SetlistSetWithSongs;
@@ -24,7 +24,7 @@ export function SetCard({ set, setIndex, setlistId, songStartIndex }: SetCardPro
   return (
     <div>
       <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl shadow-black/40">
-        <div className="text-brand-300 flex items-center justify-between border-b border-slate-700 bg-slate-800/50 px-6 py-3 text-xs font-semibold tracking-[0.2em] uppercase">
+        <div className="flex items-center justify-between border-b border-slate-700 bg-slate-800/50 px-6 py-3 text-xs font-semibold tracking-[0.2em] text-brand-300 uppercase">
           <span>{set.name || `Set ${setIndex + 1}`}</span>
           <span className="text-slate-400" data-testid="set-duration">
             <FormattedDuration seconds={setSeconds} />

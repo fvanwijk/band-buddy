@@ -1,6 +1,6 @@
-import { SongStat } from './SongStat';
 import type { Song } from '../../types';
 import { formatDuration } from '../../utils/duration';
+import { SongStat } from './SongStat';
 
 type SongStatsProps = {
   song: Song;

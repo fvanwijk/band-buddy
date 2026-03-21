@@ -1,7 +1,7 @@
-import { MidiDeviceStatus } from './MidiDeviceStatus';
 import type { Instrument } from '../../types';
 import { DeleteButton } from '../../ui/DeleteButton';
 import { EditButton } from '../../ui/EditButton';
+import { MidiDeviceStatus } from './MidiDeviceStatus';
 
 type InstrumentCardProps = {
   inputsById: Map<string, string>;

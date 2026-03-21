@@ -2,7 +2,6 @@ import { IconMusic, IconPlus, IconSearch } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { SongCard } from './SongCard';
 import { useDeleteSong, useGetSongs } from '../api/useSong';
 import { useSortedArray } from '../hooks/useSortedArray';
 import { Button } from '../ui/Button';
@@ -13,6 +12,7 @@ import { PageHeader } from '../ui/PageHeader';
 import { SortButtonsBar } from '../ui/sorting/SortButtonsBar';
 import { useSortState } from '../ui/sorting/useSortState';
 import { pluralize } from '../utils/pluralize';
+import { SongCard } from './SongCard';
 
 type SortField = 'artist' | 'key' | 'title';
 
@@ -90,7 +90,7 @@ export function ManageSongsPage() {
           <div className="relative">
             <IconSearch className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
-              className="focus:border-brand-500 focus:ring-brand-500 w-full rounded-lg border border-slate-700 bg-slate-800 py-2 pr-4 pl-10 text-slate-100 placeholder-slate-400 focus:ring-1 focus:outline-none"
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 py-2 pr-4 pl-10 text-slate-100 placeholder-slate-400 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none"
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title or artist..."
               type="text"

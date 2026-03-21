@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
-import { ProgramNamesField } from './ProgramNamesField';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument } from '../../../types';
 import { Alert } from '../../../ui/Alert';
@@ -12,6 +11,7 @@ import { InputField } from '../../../ui/form/InputField';
 import { SelectField } from '../../../ui/form/SelectField';
 import { Page } from '../../../ui/Page';
 import { PageHeader } from '../../../ui/PageHeader';
+import { ProgramNamesField } from './ProgramNamesField';
 
 type InstrumentFormData = {
   midiInId: string;

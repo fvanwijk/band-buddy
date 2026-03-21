@@ -14,7 +14,7 @@ export function Checkbox({ checked, className, label, onChange, ...props }: Chec
         <input
           {...props}
           checked={checked}
-          className="peer border-brand-200 hover:border-brand-300 checked:border-brand-500 checked:bg-brand-500 h-4 w-4 cursor-pointer appearance-none rounded border-2 bg-transparent transition-colors"
+          className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-brand-200 bg-transparent transition-colors checked:border-brand-500 checked:bg-brand-500 hover:border-brand-300"
           onChange={onChange}
           type="checkbox"
         />
