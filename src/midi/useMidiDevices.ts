@@ -32,7 +32,7 @@ export function useMidiDevices(): MidiDevicesState {
 
         WebMidi.addListener('connected', () => {
           if (!isMounted) return;
-          console.log('connected called');
+
           setInputs(WebMidi.inputs);
           setOutputs(WebMidi.outputs);
         });

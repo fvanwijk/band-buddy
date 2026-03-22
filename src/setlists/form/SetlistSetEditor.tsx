@@ -73,7 +73,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
         // Move to the beginning of the next set
         const nextSetPath = `sets.${index + 1}.songs` as const;
         const nextSetSongs = getValues(nextSetPath);
-        console.log(nextSetPath, nextSetSongs);
+
         setValue(nextSetPath, [currentSetSongs[songIndex], ...nextSetSongs]);
         handleRemoveSong(songIndex);
       }
