@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
+
 import { migrateV1ToV2 } from './migration';
 
 describe('v1-to-v2 migration', () => {
@@ -76,10 +77,7 @@ describe('v1-to-v2 migration', () => {
 
     const result = migrateV1ToV2(v1Backup);
 
-    const setlistSets = Object.values(result.tables.setlistSets || {}) as Record<
-      string,
-      unknown
-    >[];
+    const setlistSets = Object.values(result.tables.setlistSets || {}) as Record<string, unknown>[];
     const setlist1Sets = setlistSets.filter((s) => s.setlistId === '1');
     const setlist2Sets = setlistSets.filter((s) => s.setlistId === '2');
 

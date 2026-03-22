@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { type Mock, describe, expect, it, vi } from 'vitest';
+import { type Mock, describe, expect, it, vi } from 'vite-plus/test';
 
 import { seedSongs } from '../../mocks/seed';
 import { createSetlistSetsWithSongs } from '../../mocks/setlistSets';

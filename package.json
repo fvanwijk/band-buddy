@@ -10,12 +10,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite",
-    "format:check": "oxfmt --check",
-    "lint": "oxlint",
-    "preview": "vite preview",
-    "test": "vitest"
+    "build": "vp build",
+    "dev": "vp dev",
+    "format:check": "vp fmt --check",
+    "lint": "vp lint",
+    "preview": "vp preview",
+    "test": "vp test",
+    "prepare": "vp config"
   },
   "dependencies": {
     "@headlessui/react": "2.2.9",
@@ -59,8 +60,15 @@
     "oxlint": "1.56.0",
     "oxlint-tsgolint": "0.17.1",
     "typescript": "~5.9.3",
-    "vite": "^8.0.1",
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
     "vite-plugin-pwa": "1.2.0",
-    "vitest": "4.1.0"
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
+    "vite-plus": "latest"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    }
   }
 }

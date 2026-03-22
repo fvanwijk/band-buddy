@@ -2,7 +2,7 @@ import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRoutesStub } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import type { SpotifyContextType } from '../contexts/SpotifyContext';
 import { seedSetlists } from '../mocks/seed';

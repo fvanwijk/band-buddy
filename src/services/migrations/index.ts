@@ -1,5 +1,5 @@
-import { z, ZodError } from 'zod';
 import type { Tables, Values } from 'tinybase';
+import { z, ZodError } from 'zod';
 
 import { migrateV1ToV2 } from './v1-to-v2/migration';
 

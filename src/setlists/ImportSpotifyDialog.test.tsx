@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRoutesStub } from 'react-router-dom';
 import { Fragment } from 'react/jsx-runtime';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import type { SpotifyContextType } from '../contexts/SpotifyContext';
 import { StoreProvider } from '../store/StoreProvider';

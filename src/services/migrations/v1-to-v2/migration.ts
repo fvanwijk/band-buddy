@@ -1,5 +1,5 @@
-import { z, ZodError } from 'zod';
 import type { Tables, Values } from 'tinybase';
+import { z, ZodError } from 'zod';
 
 /**
  * Version 1 backup schemas (deprecated)
@@ -134,9 +134,7 @@ export function migrateV1ToV2(input: unknown): {
     // Second pass: create new setlistSongs with setId
     let songId = 0;
     for (const [, v1Song] of Object.entries(parsed.tables.setlistSongs)) {
-      const setId = setNumberToSetId.get(
-        `${v1Song.setlistId}:${v1Song.setNumber}`,
-      );
+      const setId = setNumberToSetId.get(`${v1Song.setlistId}:${v1Song.setNumber}`);
       if (!setId) {
         throw new Error(
           `Failed to find setId for setlistId=${v1Song.setlistId}, setNumber=${v1Song.setNumber}`,

@@ -13,18 +13,23 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 - React Hook Form for form management and validation
 - Tinybase for state management with localStorage persistence
 - Tailwind CSS 4.1.18 with CSS variables for theming (dark mode only)
-- Vite 7.0.4 as build tool
-- Prettier & ESLint for automatic formatting
+- Vite 8.x as build tool, managed via Vite+ (`vp` CLI)
+- Oxlint for linting (type-aware rules enforced), Oxfmt for code formatting
 - class-variance-authority (CVA) for composable component variants
 - clsx + tailwind-merge for conditional classname merging
 - @tabler/icons-react for consistent icon system
 
-**Development Commands:**
+**Development Commands (via Vite+):**
 
-- `npm run lint -- --fix` - Auto-fix formatting and linting issues
-- `npm run typecheck` - Oxlint type-aware checking (use during development)
-- `npm run build` - Full build with type checking and bundling
-- `npm run test` - Run Vitest unit tests
+- `vp dev` - Start development server
+- `vp build` - Build for production
+- `vp test` - Run Vitest unit tests
+- `vp lint` - Lint with Oxlint (type-aware, deny warnings; config in `.oxlintrc.json`)
+- `vp fmt` - Format code with Oxfmt
+- `vp check` - Run format, lint, and type checks together
+- `vp add <pkg>` / `vp remove <pkg>` - Add or remove dependencies (delegates to pnpm)
+
+> ⚠️ Use `vp test` and `vp lint` — not `vp vitest` or `vp oxlint` (those don't exist).
 
 ## Testing
 
@@ -35,7 +40,7 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 
 ## Mandatory Sorting Rules
 
-**All imports, import members, and object keys must be alphabetically sorted.** This is enforced by ESLint.
+**All imports, import members, and object keys must be alphabetically sorted.** This is enforced by Oxlint.
 
 ### Import Organization
 
@@ -757,7 +762,7 @@ src/
 3. ❌ Don't pass `undefined` to Tinybase → ✅ Conditionally add optional fields using `Record<string, T>`
 4. ❌ Don't mix import groups → ✅ Separate external and internal with blank line
 5. ❌ Don't forget `errors` destructuring from `formState` → ✅ `const { errors } = formState`
-6. ❌ Don't use unsorted imports or object keys → ✅ Run `npm run lint -- --fix` before committing
+6. ❌ Don't use unsorted imports or object keys → ✅ VS Code auto-fixes on save, or run `vp lint` manually
 7. ❌ Don't create standalone button elements → ✅ Use the `Button` component with props
 8. ❌ Don't use dark: prefixes → ✅ App is dark mode only, use base classes
 9. ❌ Don't use inline SVGs for icons → ✅ Use tabler icons (`IconMusic`, `IconPlus`, etc.). Icons must have explicit size classes (e.g., `className="h-4 w-4"`)
@@ -768,12 +773,4 @@ src/
 
 ## Code Formatting
 
-Prettier config: `.prettierrc`
-
-- **printWidth**: 100
-- **semi**: true
-- **singleQuote**: true
-- **tabWidth**: 2
-- **trailingComma**: all
-
-Always run `npm run lint -- --fix` to auto-format before submitting code.
+Oxfmt handles all code formatting. VS Code auto-formats on save. Run `vp fmt` to format manually, or `vp check` to verify formatting, linting, and types in one step.

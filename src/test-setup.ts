@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { beforeEach } from 'vitest';
+import { beforeEach } from 'vite-plus/test';
 
 beforeEach(() => {
   localStorage.clear();
