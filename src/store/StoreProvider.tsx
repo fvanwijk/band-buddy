@@ -59,7 +59,7 @@ export function StoreProvider({ children }: StoreProviderProps) {
       setIsInitialized(true);
     }
 
-    init();
+    void init();
   }, [store]);
 
   if (!isInitialized) {

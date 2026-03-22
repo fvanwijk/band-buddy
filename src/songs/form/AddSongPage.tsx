@@ -16,7 +16,7 @@ export function AddSongPage() {
     if (pendingFile) {
       storeSheetMusic.mutate({ file: pendingFile, songId: newSongId });
     }
-    navigate(backPath);
+    void navigate(backPath);
   });
 
   const handleSubmit = (data: Omit<Song, 'id'>, sheetMusicFile?: File) => {

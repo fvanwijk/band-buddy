@@ -165,10 +165,10 @@ describe('ImportSpotifyDialog', () => {
 
     expect(onCloseMock).toHaveBeenCalled();
     // Simulate closing of dialog
-    await rerender(<ImportSpotifyDialog isOpen={false} onClose={onCloseMock} />);
+    rerender(<ImportSpotifyDialog isOpen={false} onClose={onCloseMock} />);
     expect(screen.queryByRole('dialog', { name: 'Import from Spotify' })).not.toBeInTheDocument();
 
-    await rerender(<ImportSpotifyDialog isOpen onClose={onCloseMock} />);
+    rerender(<ImportSpotifyDialog isOpen onClose={onCloseMock} />);
 
     expect(screen.getByLabelText('Playlist URL or ID*')).toHaveValue('');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();

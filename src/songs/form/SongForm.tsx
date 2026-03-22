@@ -127,7 +127,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const songFormBasePath = id ? `/songs/edit/${id}` : '/songs/add';
 
   const handleTabChange = (tabId: string) => {
-    navigate(`${songFormBasePath}/${tabId}`);
+    void navigate(`${songFormBasePath}/${tabId}`);
   };
 
   const handleFormError = (formErrors: FieldErrors<SongFormData>) => {

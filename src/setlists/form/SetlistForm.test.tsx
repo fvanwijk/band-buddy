@@ -34,7 +34,7 @@ describe('SetlistForm', () => {
 
   it('should fill in the form and submit it', async () => {
     const { store, persister } = getMockStore();
-    await seedSongs(store);
+    seedSongs(store);
     await persister.save();
 
     const user = userEvent.setup();
@@ -43,9 +43,7 @@ describe('SetlistForm', () => {
     renderComponent({ onSubmit });
 
     // There are songs seeded
-    expect(
-      await screen.queryByText(/You don't have songs in your library/),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/You don't have songs in your library/)).not.toBeInTheDocument();
 
     // Validation
     await user.clear(await screen.findByLabelText('Performance date*'));

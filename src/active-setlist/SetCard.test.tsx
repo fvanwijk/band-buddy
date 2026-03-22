@@ -22,7 +22,7 @@ describe('SetCard', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
 
-    await rerender(<SetCard setIndex={1} set={sets[1]} setlistId="3" songStartIndex={3} />);
+    rerender(<SetCard setIndex={1} set={sets[1]} setlistId="3" songStartIndex={3} />);
 
     expect(screen.getByText('Named set')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();

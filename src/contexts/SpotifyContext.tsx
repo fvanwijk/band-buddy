@@ -42,7 +42,7 @@ export function SpotifyProvider({ children }: SpotifyProviderProps) {
           // Trigger token exchange by getting access token
           try {
             await spotifyApi.authenticate();
-          } catch (error: Error | unknown) {
+          } catch (error: unknown) {
             const e = error as Error;
             if (e?.message?.includes('No verifier found in cache')) {
               console.debug(
@@ -66,7 +66,7 @@ export function SpotifyProvider({ children }: SpotifyProviderProps) {
       }
     };
 
-    initializeSpotify();
+    void initializeSpotify();
   }, [clientId, redirectUri]);
 
   const logout = useCallback(() => {

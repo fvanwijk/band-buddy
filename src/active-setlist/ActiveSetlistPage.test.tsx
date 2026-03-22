@@ -9,11 +9,11 @@ import { ActiveSetlistPage } from './ActiveSetlistPage';
 describe('ActiveSetlistPage', () => {
   const renderComponent = async (activeSetlistId?: string) => {
     const { store, persister } = getMockStore();
-    await seedStore(store);
+    seedStore(store);
     if (activeSetlistId) {
-      await store.setValue('activeSetlistId', activeSetlistId);
+      store.setValue('activeSetlistId', activeSetlistId);
     }
-    persister.save();
+    await persister.save();
 
     return render(<ActiveSetlistPage />, {
       wrapper: ({ children }) => (
@@ -25,7 +25,7 @@ describe('ActiveSetlistPage', () => {
   };
 
   it('renders empty state when there is no setlist at all', async () => {
-    await render(<ActiveSetlistPage />, { wrapper: MockRouteProvider });
+    render(<ActiveSetlistPage />, { wrapper: MockRouteProvider });
 
     expect(screen.getByText('No active setlist')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'setlist' })).toHaveAttribute('href', '/setlists');

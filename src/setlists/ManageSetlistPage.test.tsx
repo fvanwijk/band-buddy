@@ -42,7 +42,7 @@ describe('ManageSetlistPage', () => {
     const user = userEvent.setup();
     const { store, persister } = getMockStore();
     seedSetlists(store);
-    persister.save();
+    await persister.save();
 
     renderComponent();
 
@@ -59,7 +59,7 @@ describe('ManageSetlistPage', () => {
     const { store, persister } = getMockStore();
     seedSetlists(store);
     store.setValue('activeSetlistId', '0');
-    persister.save();
+    await persister.save();
 
     renderComponent();
 
@@ -70,7 +70,7 @@ describe('ManageSetlistPage', () => {
   it('edits a setlist', async () => {
     const { store, persister } = getMockStore();
     seedSetlists(store);
-    persister.save();
+    await persister.save();
 
     renderComponent();
 
@@ -84,7 +84,7 @@ describe('ManageSetlistPage', () => {
     const user = userEvent.setup();
     const { store, persister } = getMockStore();
     seedSetlists(store);
-    persister.save();
+    await persister.save();
 
     renderComponent();
 

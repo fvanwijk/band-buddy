@@ -21,7 +21,9 @@ export function useProcessSpotifyPlaylist() {
     const existingSongs = new Set(
       Object.entries(songsTable).map(([, songRow]) => {
         const song = songRow as Record<string, unknown>;
-        return `${song.title}|${song.artist}`;
+        const artist = typeof song.artist === 'string' ? song.artist : '';
+        const title = typeof song.title === 'string' ? song.title : '';
+        return `${title}|${artist}`;
       }),
     );
 

@@ -61,7 +61,7 @@ describe('SongForm', () => {
   it('should fill in the form and submit it', async () => {
     const { store, persister } = getMockStore();
     seedInstruments(store);
-    persister.save();
+    await persister.save();
 
     const user = userEvent.setup();
     const onSubmit = vi.fn();

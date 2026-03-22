@@ -29,7 +29,7 @@ export function useStoreSheetMusic() {
     },
     onSuccess: (data) => {
       // Invalidate the query to refetch the sheet music
-      queryClient.invalidateQueries({ queryKey: ['sheetMusic', data.songId] });
+      void queryClient.invalidateQueries({ queryKey: ['sheetMusic', data.songId] });
     },
   });
 }

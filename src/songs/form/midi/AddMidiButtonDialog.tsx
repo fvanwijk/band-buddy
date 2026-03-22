@@ -53,7 +53,7 @@ export function AddMidiButtonDialog({
 
   const handleFormSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.stopPropagation(); // Prevent outer form from also submitting
-    handleSubmit(handleAdd)(e);
+    void handleSubmit(handleAdd)(e);
   };
 
   const instrumentOptions = instruments.map((inst) => ({

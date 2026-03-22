@@ -26,7 +26,7 @@ describe('SetlistSetEditor', () => {
   const renderComponent = async (onSubmitMock?: Mock) => {
     const { store, persister } = getMockStore();
     // Bohemian Rhapsody, September, Superstition, Billie Jean, etc...
-    await seedSongs(store);
+    seedSongs(store);
     await persister.save();
 
     return render(<SetlistSetEditor index={0} onRemove={() => {}} showRemove={false} />, {
@@ -50,7 +50,7 @@ describe('SetlistSetEditor', () => {
   it('should rename the set', async () => {
     const user = userEvent.setup();
     const onSubmitMock = vi.fn();
-    renderComponent(onSubmitMock);
+    await renderComponent(onSubmitMock);
 
     await user.click(await screen.findByRole('button', { name: 'Edit set name for Set 1' }));
     await user.type(await screen.findByLabelText('Set name'), 'New set name[Tab]');
@@ -73,7 +73,7 @@ describe('SetlistSetEditor', () => {
     const user = userEvent.setup();
 
     const onSubmitMock = vi.fn();
-    renderComponent(onSubmitMock);
+    await renderComponent(onSubmitMock);
 
     await user.selectOptions(
       await screen.findByLabelText('Song 1 of Set 1'),
@@ -93,7 +93,7 @@ describe('SetlistSetEditor', () => {
     const user = userEvent.setup();
 
     const onSubmitMock = vi.fn();
-    renderComponent(onSubmitMock);
+    await renderComponent(onSubmitMock);
 
     // The first set has 3 (deleted) songs, only the first song cannot be moved up, the last song can be moved down to the next set
     const moveUpButtons = await screen.findAllByRole('button', { name: 'Move up' });

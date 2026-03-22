@@ -17,7 +17,7 @@ export function SettingsPage() {
   const selectedTab = tab && ['general', 'instruments', 'data'].includes(tab) ? tab : 'general';
 
   const handleTabChange = (tabId: string) => {
-    navigate(`/settings/${tabId}`);
+    void navigate(`/settings/${tabId}`);
   };
 
   const handleShowWelcome = () => {

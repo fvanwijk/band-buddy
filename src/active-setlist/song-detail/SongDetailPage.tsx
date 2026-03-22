@@ -122,7 +122,7 @@ export function SongDetailPage() {
   const nextSong = nextSongId ? songsMap.get(nextSongId) : null;
 
   const handleTabChange = (tabId: string) => {
-    navigate(`/setlist/${setlistId}/song/${songId}/${tabId}`);
+    void navigate(`/setlist/${setlistId}/song/${songId}/${tabId}`);
   };
 
   const handleTriggerMidiEvent = (event: { instrumentId: string; programChange: number }) => {

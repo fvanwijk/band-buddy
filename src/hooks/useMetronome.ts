@@ -130,7 +130,7 @@ export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProp
   useEffect(() => {
     const resumeAudioContext = () => {
       if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-        audioContextRef.current.resume();
+        void audioContextRef.current.resume();
       }
     };
 

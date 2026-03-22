@@ -52,7 +52,7 @@ export function useMidiDevices(): MidiDevicesState {
       }
     };
 
-    initMidi();
+    void initMidi();
 
     return () => {
       isMounted = false;

@@ -25,7 +25,7 @@ export function EditSongPage() {
         storeSheetMusic.mutate({ file: pendingFile, songId: id });
       }
     }
-    navigate(backPath);
+    void navigate(backPath);
   });
 
   if (!id || !song) {

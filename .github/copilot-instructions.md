@@ -22,7 +22,7 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 **Development Commands:**
 
 - `npm run lint -- --fix` - Auto-fix formatting and linting issues
-- `npm run typecheck` - Quick TypeScript type checking (use during development)
+- `npm run typecheck` - Oxlint type-aware checking (use during development)
 - `npm run build` - Full build with type checking and bundling
 - `npm run test` - Run Vitest unit tests
 
