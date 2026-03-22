@@ -1,7 +1,7 @@
 import { IconFileMusic } from '@tabler/icons-react';
 
 import { useSheetMusic } from '../../hooks/useSheetMusic';
-import { EmptyStateBlock } from '../../ui/EmptyStateBlock';
+import { EmptyStateBlock } from '../../ui/empty-state-block/EmptyStateBlock';
 import { PdfViewer } from '../../ui/PdfViewer';
 
 type SheetMusicTabProps = {

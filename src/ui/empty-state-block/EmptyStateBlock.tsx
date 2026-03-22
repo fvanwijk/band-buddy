@@ -1,9 +1,6 @@
-import type { ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
-type EmptyStateBlockProps = {
-  children: ReactNode;
-  icon: ReactNode;
-};
+export type EmptyStateBlockProps = PropsWithChildren<{ icon: ReactNode }>;
 
 export function EmptyStateBlock({ children, icon }: EmptyStateBlockProps) {
   return (

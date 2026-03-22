@@ -3,9 +3,9 @@ import { IconBinary } from '@tabler/icons-react';
 import type { MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
-import { EmptyStateBlock } from '../../../ui/EmptyStateBlock';
+import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
 
-type MidiButtonsDisplayProps = {
+export type MidiButtonsDisplayProps = {
   isDisabled?: (event: MidiEvent) => boolean;
   midiEvents?: MidiEvent[];
   onTriggerEvent?: (event: MidiEvent) => void;

@@ -16,7 +16,7 @@ import { useGetSongs } from '../../api/useSong';
 import { useMetronome } from '../../hooks/useMetronome';
 import { useMidiDevices } from '../../midi/useMidiDevices';
 import { Button } from '../../ui/Button';
-import { EmptyStateBlock } from '../../ui/EmptyStateBlock';
+import { EmptyStateBlock } from '../../ui/empty-state-block/EmptyStateBlock';
 import { InputField } from '../../ui/form/InputField';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
@@ -26,7 +26,7 @@ import { LyricsBlock } from './lyrics/LyricsBlock';
 import { MidiButtonsDisplay } from './midi-buttons-display/MidiButtonsDisplay';
 import { SettingsPanel } from './SettingsPanel';
 import { SheetMusicTab } from './SheetMusicTab';
-import { SongStats } from './SongStats';
+import { SongStats } from './song-stats/SongStats';
 export function SongDetailPage() {
   const { setlistId, songId, tab } = useParams<{
     setlistId: string;

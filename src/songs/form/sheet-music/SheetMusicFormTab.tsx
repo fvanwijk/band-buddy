@@ -2,7 +2,7 @@ import { IconFileMusic, IconFileTypePdf, IconTrash, IconUpload } from '@tabler/i
 import type { FieldError, UseFormRegisterReturn, UseFormSetValue } from 'react-hook-form';
 
 import { Button } from '../../../ui/Button';
-import { EmptyStateBlock } from '../../../ui/EmptyStateBlock';
+import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
 import { PdfViewer } from '../../../ui/PdfViewer';
 import type { SongFormData } from '../SongForm';
 

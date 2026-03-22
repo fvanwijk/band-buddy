@@ -1,9 +1,9 @@
 import { IconMinus, IconPlus } from '@tabler/icons-react';
 
-import { Button } from '../../ui/Button';
-import { cn } from '../../utils/cn';
-import { ResetButton } from './ResetButton';
-import { SettingHeading } from './SettingHeading';
+import { Button } from '../../../ui/Button';
+import { cn } from '../../../utils/cn';
+import { ResetButton } from '../ResetButton';
+import { SettingHeading } from '../SettingHeading';
 
 type TransposePanelProps = {
   onTransposeChange: (delta: number) => void;

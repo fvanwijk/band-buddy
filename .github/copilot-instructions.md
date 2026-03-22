@@ -37,6 +37,67 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 - Prefer `renderHook()` for testing hooks
 - Colocate tests next to related code as `src/**/*.test.tsx`
 - Use `@testing-library/jest-dom` matchers (configured in `./src/test-setup.ts`)
+- Use `userEvent` for user interactions in tests; do not use `fireEvent` unless there is no viable `userEvent` alternative
+
+### Testing Library Query Patterns
+
+Always use `screen` object to access query methods (do not destructure from `render()`):
+
+```typescript
+const { getByRole } = render(<Component />);  // ❌ WRONG
+const { getByRole: button } = render(<Component />);  // ❌ WRONG
+
+const { container } = render(<Component />);
+getByRole('button');  // ❌ WRONG
+
+render(<Component />);
+screen.getByRole('button');  // ✅ CORRECT
+```
+
+**Query variant selection rules:**
+
+- **Sync existence check:** `.getByRole()`, `.getByLabelText()`, etc. (throws if not found)
+- **Async existence check:** `.findByRole()`, `.findByLabelText()`, etc. (waits and resolves promise)
+- **Sync non-existence check:** `.queryByRole()`, `.queryByLabelText()`, etc. (returns null if not found)
+- **Async non-existence check:** `waitFor(() => expect(screen.queryByRole(...)).not.toBeInTheDocument())` (assert absence after waiting)
+
+**Query priority (use first matching query type):**
+
+1. `getByRole` / `queryByRole` / `findByRole` (with accessible name)
+2. `getByLabelText` / `queryByLabelText` / `findByLabelText`
+3. `getByPlaceholderText` / `queryByPlaceholderText` / `findByPlaceholderText`
+4. `getByText` / `queryByText` / `findByText`
+5. `getByDisplayValue` / `queryByDisplayValue` / `findByDisplayValue`
+6. `getByAltText` / `queryByAltText` / `findByAltText`
+7. `getByTitle` / `queryByTitle` / `findByTitle`
+8. `getByTestId` / `queryByTestId` / `findByTestId` (only as last resort)
+
+### Render Helper Pattern
+
+When a test file has multiple tests rendering the same component, create a `renderComponent` helper to reduce duplication:
+
+```typescript
+describe('TransposePanel', () => {
+  const renderComponent = (props: Partial<TransposePanelProps> = {}) =>
+    render(
+      <TransposePanel
+        onTransposeChange={() => {}}
+        transpose={0}
+        {...props}
+      />,
+    );
+
+  it('test 1', () => {
+    renderComponent({ transpose: 2 });
+    // ... assertions
+  });
+
+  it('test 2', () => {
+    renderComponent({ onTransposeChange: vi.fn() });
+    // ... assertions
+  });
+});
+```
 
 ## Mandatory Sorting Rules
 
@@ -44,10 +105,15 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 
 ### Import Organization
 
-1. External libraries first (React, packages)
-2. Internal imports second (relative paths)
-3. Separate groups with blank lines
-4. Alphabetize within each group
+Oxfmt enforces 5 import groups in this order, each separated by a blank line:
+
+1. **builtin** — Node.js built-ins (e.g. `node:fs`)
+2. **external** — npm packages (React, libraries)
+3. **internal / subpath** — project-internal paths with aliases (combined)
+4. **parent / sibling / index** — relative imports `../`, `./` (combined)
+5. **style / unknown** — CSS imports and anything else
+
+Within each group, imports are sorted alphabetically.
 
 ```typescript
 // ✅ CORRECT
@@ -736,6 +802,30 @@ src/
 ├── App.tsx             # Main router
 ├── main.tsx            # Entry point
 └── index.css           # Global styles + theme
+```
+
+## Component Directory Structure
+
+**Every component with tests must have its own directory**, even if it's a small component. This keeps components and their tests colocated and organized:
+
+```
+src/ui/
+├── button/
+│   ├── Button.tsx
+│   └── Button.test.tsx
+├── empty-state-block/
+│   ├── EmptyStateBlock.tsx
+│   └── EmptyStateBlock.test.tsx
+├── transpose-panel/
+│   ├── TransposePanel.tsx
+│   └── TransposePanel.test.tsx
+└── ... (other components in subdirs)
+```
+
+Import from the subdirectory:
+
+```typescript
+import { TransposePanel } from './transpose-panel/TransposePanel';
 ```
 
 ## Key Patterns

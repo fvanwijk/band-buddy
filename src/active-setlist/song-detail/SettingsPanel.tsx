@@ -10,7 +10,7 @@ import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Checkbox } from '../../ui/Checkbox';
 import { MetronomeVolumePanel } from './MetronomeVolumePanel';
-import { TransposePanel } from './TransposePanel';
+import { TransposePanel } from './transpose-panel/TransposePanel';
 import { ZoomPanel } from './ZoomPanel';
 
 type SettingsPanelProps = {

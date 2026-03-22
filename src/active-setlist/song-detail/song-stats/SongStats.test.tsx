@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vite-plus/test';
 
-import type { Song } from '../../types';
+import type { Song } from '../../../types';
 import { SongStats } from './SongStats';
 
 const baseSong: Song = {
