@@ -1,8 +1,14 @@
-import '@testing-library/jest-dom';
-import { beforeEach } from 'vite-plus/test';
+import '@testing-library/jest-dom/vitest';
+import { cleanup } from '@testing-library/react';
+import { afterEach, beforeEach } from 'vite-plus/test';
 
 beforeEach(() => {
   localStorage.clear();
+});
+
+// afterEach is not registered globally, so auto cleanup is disabled in testing-library/react, and we need to call it manually after each test to reset the DOM.
+afterEach(() => {
+  cleanup();
 });
 
 // Polyfill DOMMatrix for Node test environment (for pdfjs-dist/react-pdf)

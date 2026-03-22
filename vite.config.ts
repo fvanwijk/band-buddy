@@ -55,7 +55,7 @@ export default defineConfig({
       reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
     },
     environment: 'jsdom',
-    globals: true,
+    globals: false,
     mockReset: true,
     setupFiles: './src/test-setup.ts',
     ui: true,
