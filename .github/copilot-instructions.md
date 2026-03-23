@@ -38,6 +38,13 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 - Colocate tests next to related code as `src/**/*.test.tsx`
 - Use `@testing-library/jest-dom` matchers (configured in `./src/test-setup.ts`)
 - Use `userEvent` for user interactions in tests; do not use `fireEvent` unless there is no viable `userEvent` alternative
+- Keep `vi.mock()` usage minimal: only mock true external side effects (e.g. browser/device APIs, audio, network boundaries)
+- Never mock child components in component/page tests; render the real child tree
+- When components rely on context/state (Tinybase, router, React Query, etc.), wrap renders with the real providers instead of mocking hooks
+- For Tinybase-backed tests, do not mount `Provider` directly with an ad hoc store. Seed data via `getMockStore()` or a real persister, `await persister.save()`, then render with `StoreProvider` so tests exercise the real load-from-localStorage path
+- Prefer asserting persisted Tinybase changes via localStorage payload (for persisted values/rows) instead of adding probe components just for test observation
+- For Tinybase-backed tests, do not mount `Provider` directly with an ad hoc store. Seed data via `getMockStore()` or a real persister, `await persister.save()`, then render with `StoreProvider` so tests exercise the real load-from-localStorage path
+- Use mock-data factories from `src/mocks/*.ts` wherever possible instead of inline fixture objects
 
 ### Testing Library Query Patterns
 
@@ -806,7 +813,7 @@ src/
 
 ## Component Directory Structure
 
-**Every component with tests must have its own directory**, even if it's a small component. This keeps components and their tests colocated and organized:
+**Every component with tests must have its own directory**, even if it's a small component. This applies across the codebase (not just `src/ui`):
 
 ```
 src/ui/

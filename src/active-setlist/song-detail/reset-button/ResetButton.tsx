@@ -1,6 +1,6 @@
 import { IconRefresh } from '@tabler/icons-react';
 
-import { Button } from '../../ui/Button';
+import { Button } from '../../../ui/Button';
 
 export function ResetButton({ onClick, title }: { onClick: () => void; title: string }) {
   return (

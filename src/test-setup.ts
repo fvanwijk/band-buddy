@@ -48,3 +48,13 @@ if (globalThis.DOMMatrix === undefined) {
   }
   globalThis.DOMMatrix = DOMMatrixMock as unknown as typeof DOMMatrix;
 }
+
+if (globalThis.ResizeObserver === undefined) {
+  class ResizeObserverMock {
+    constructor() {}
+    disconnect() {}
+    observe() {}
+    unobserve() {}
+  }
+  globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
+}

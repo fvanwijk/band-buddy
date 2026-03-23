@@ -1,7 +1,7 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 
 import { ActiveSetlistPage } from './active-setlist/ActiveSetlistPage';
-import { SongDetailPage } from './active-setlist/song-detail/SongDetailPage';
+import { SongDetailPage } from './active-setlist/song-detail/song-detail-page/SongDetailPage';
 import { Home } from './home/Home';
 import { Layout } from './Layout';
 import { NotFoundPage } from './NotFoundPage';

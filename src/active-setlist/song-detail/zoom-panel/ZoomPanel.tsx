@@ -1,6 +1,6 @@
-import { Slider } from '../../ui/Slider';
-import { ResetButton } from './ResetButton';
-import { SettingHeading } from './SettingHeading';
+import { Slider } from '../../../ui/Slider';
+import { ResetButton } from '../reset-button/ResetButton';
+import { SettingHeading } from '../setting-heading/SettingHeading';
 
 type ZoomPanelProps = {
   onZoomChange: (zoom: number) => void;

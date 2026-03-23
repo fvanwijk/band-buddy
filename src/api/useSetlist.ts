@@ -30,7 +30,6 @@ export function parseSetlists(
       const metaResult = setlistTableSchema.safeParse(setlistRow);
       if (!metaResult.success) return undefined;
       const setlist = { ...metaResult.data, id: setlistId };
-
       const sets = Object.entries(setlistSetsData)
         .map(([setId, setRow]) => {
           // Validate set row

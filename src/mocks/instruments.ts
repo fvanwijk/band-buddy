@@ -2,9 +2,9 @@ import type { Instrument, InstrumentTable } from '../types';
 
 export const createInstrument = (overrides: Partial<Instrument> = {}): Instrument => ({
   id: '0',
-  midiInId: 'midi-in',
+  midiInId: '1',
   midiInName: 'MIDI In',
-  midiOutId: 'midi-out',
+  midiOutId: '2',
   midiOutName: 'MIDI Out',
   name: 'Nord Stage 4',
   programNames: undefined,

@@ -10,23 +10,23 @@ import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useStore } from 'tinybase/ui-react';
 
-import { useGetInstruments } from '../../api/useInstruments';
-import { useGetSetlist } from '../../api/useSetlist';
-import { useGetSongs } from '../../api/useSong';
-import { useMetronome } from '../../hooks/useMetronome';
-import { useMidiDevices } from '../../midi/useMidiDevices';
-import { Button } from '../../ui/Button';
-import { EmptyStateBlock } from '../../ui/empty-state-block/EmptyStateBlock';
-import { InputField } from '../../ui/form/InputField';
-import { Page } from '../../ui/Page';
-import { PageHeader } from '../../ui/PageHeader';
-import { Tabs } from '../../ui/Tabs';
-import { DrawingOverlay } from './lyrics/DrawingOverlay';
-import { LyricsBlock } from './lyrics/LyricsBlock';
-import { MidiButtonsDisplay } from './midi-buttons-display/MidiButtonsDisplay';
-import { SettingsPanel } from './SettingsPanel';
-import { SheetMusicTab } from './SheetMusicTab';
-import { SongStats } from './song-stats/SongStats';
+import { useGetInstruments } from '../../../api/useInstruments';
+import { useGetSetlist } from '../../../api/useSetlist';
+import { useGetSongs } from '../../../api/useSong';
+import { useMetronome } from '../../../hooks/useMetronome';
+import { useMidiDevices } from '../../../midi/useMidiDevices';
+import { Button } from '../../../ui/Button';
+import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
+import { InputField } from '../../../ui/form/InputField';
+import { Page } from '../../../ui/Page';
+import { PageHeader } from '../../../ui/PageHeader';
+import { Tabs } from '../../../ui/Tabs';
+import { DrawingOverlay } from '../lyrics/DrawingOverlay';
+import { LyricsBlock } from '../lyrics/LyricsBlock';
+import { MidiButtonsDisplay } from '../midi-buttons-display/MidiButtonsDisplay';
+import { SettingsPanel } from '../settings-panel/SettingsPanel';
+import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
+import { SongStats } from '../song-stats/SongStats';
 export function SongDetailPage() {
   const { setlistId, songId, tab } = useParams<{
     setlistId: string;
@@ -58,6 +58,10 @@ export function SongDetailPage() {
 
   const isMidiButtonDisabled = useCallback(
     (event: { instrumentId: string }) => {
+      if (!isSupported || !isReady) {
+        return true;
+      }
+
       const instrument = instrumentsById.get(event.instrumentId);
       if (!instrument) {
         console.warn('Instrument not found for MIDI button');
@@ -78,7 +82,7 @@ export function SongDetailPage() {
   }
 
   // Flatten all sets into a single list of songs for easier navigation, ordered by setIndex and songIndex
-  const songFromSetlist = setlist.sets
+  const songsFromSetlist = setlist.sets
     .toSorted((a, b) => a.setIndex - b.setIndex)
     .flatMap((set) =>
       set.songs
@@ -91,7 +95,7 @@ export function SongDetailPage() {
     );
 
   // Find current song index
-  const currentSongIndex = songFromSetlist.findIndex((s) => s.songId === songId);
+  const currentSongIndex = songsFromSetlist.findIndex((s) => s.songId === songId);
 
   if (currentSongIndex === -1) {
     throw new Error('Song not found');
@@ -112,10 +116,11 @@ export function SongDetailPage() {
   const beatDurationSeconds = 60 / (currentSong.bpm || 120);
 
   // Get previous and next song IDs
-  const previousSongId = currentSongIndex > 0 ? songFromSetlist[currentSongIndex - 1].songId : null;
+  const previousSongId =
+    currentSongIndex > 0 ? songsFromSetlist[currentSongIndex - 1].songId : null;
   const nextSongId =
-    currentSongIndex < songFromSetlist.length - 1
-      ? songFromSetlist[currentSongIndex + 1].songId
+    currentSongIndex < songsFromSetlist.length - 1
+      ? songsFromSetlist[currentSongIndex + 1].songId
       : null;
 
   const previousSong = previousSongId ? songsMap.get(previousSongId) : null;

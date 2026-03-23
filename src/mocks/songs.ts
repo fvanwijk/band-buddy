@@ -2,7 +2,7 @@ import type { MidiEvent, Song, SongTable } from '../types';
 
 export const createMidiEvent = (overrides: Partial<MidiEvent> = {}): MidiEvent => ({
   id: '1',
-  instrumentId: '1',
+  instrumentId: '0',
   label: 'Piano',
   programChange: 1,
   ...overrides,

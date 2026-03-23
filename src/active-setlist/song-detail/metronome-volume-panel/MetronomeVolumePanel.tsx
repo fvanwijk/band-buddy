@@ -1,6 +1,6 @@
-import { useGetMetronomeVolume, useSetMetronomeVolume } from '../../api/useSettings';
-import { Slider } from '../../ui/Slider';
-import { SettingHeading } from './SettingHeading';
+import { useGetMetronomeVolume, useSetMetronomeVolume } from '../../../api/useSettings';
+import { Slider } from '../../../ui/Slider';
+import { SettingHeading } from '../setting-heading/SettingHeading';
 
 export function MetronomeVolumePanel() {
   const volume = useGetMetronomeVolume();
