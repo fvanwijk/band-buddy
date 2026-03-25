@@ -7,18 +7,19 @@ type ChordProps = {
 
 const normalizeChord = (value: string) => value.replace(/♭/g, 'b').replace(/♯/g, '#');
 
-const transposeChord = (value: string, transpose: number) => {
+export const transposeChord = (value: string, transpose: number) => {
+  const normalized = normalizeChord(value);
+
   if (transpose === 0) {
-    return value;
+    return normalized;
   }
 
   const interval = Interval.fromSemitones(transpose);
-  return TonalChord.transpose(value, interval);
+  return TonalChord.transpose(normalized, interval);
 };
 
 export function Chord({ children, transpose = 0 }: ChordProps) {
-  const normalized = normalizeChord(children);
-  const transposed = transposeChord(normalized, transpose);
+  const transposed = transposeChord(children, transpose);
 
   return <strong className="font-semibold text-brand-300">{transposed}</strong>;
 }

@@ -12,7 +12,7 @@ type ColorOption = {
 
 type DrawingMode = 'idle' | 'pen' | 'eraser';
 
-type DrawingToolbarProps = {
+export type DrawingToolbarProps = {
   mode: DrawingMode;
   onClear: () => void;
   onColorSelect: (color: string) => void;
