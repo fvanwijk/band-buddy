@@ -1,5 +1,5 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { type CanvasPath, ReactSketchCanvas, type ReactSketchCanvasRef } from 'react-sketch-canvas';
+import { ReactSketchCanvas, type ReactSketchCanvasRef } from 'react-sketch-canvas';
 
 import { useGetShowDrawingTools } from '../../../api/useSettings';
 import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
@@ -23,6 +23,7 @@ const ERASER_RADIUS = 10;
 
 export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayProps) {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
+  const hasLoadedInitialPathsRef = useRef(false);
   const showDrawingTools = useGetShowDrawingTools();
   const [mode, setMode] = useState<DrawingMode>('idle');
   const [selectedColor, setSelectedColor] = useState(defaultColor);
@@ -38,37 +39,48 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
     ERASER_RADIUS,
   );
 
-  // Initially load stored canvas paths when songId changes (not while we are drawing)
   useEffect(() => {
-    if (storedCanvasPaths.length > 0) {
-      canvasRef.current?.clearCanvas();
-      // Scale paths for display based on zoom level
-      const scaledPaths = storedCanvasPaths.map((path) => ({
-        ...path,
-        paths: path.paths?.map((point: { x: number; y: number }) => ({
-          x: point.x * zoom,
-          y: point.y * zoom,
-        })),
-      }));
-      canvasRef.current?.loadPaths(scaledPaths);
-    }
-  }, [songId, storedCanvasPaths, zoom]);
+    hasLoadedInitialPathsRef.current = false;
+    canvasRef.current?.clearCanvas();
+  }, [songId, zoom]);
 
-  // Save immediately while drawing
-  const handlePathsChange = useCallback(
-    (paths: CanvasPath[]) => {
-      // Scale paths back to 1:1 for storage
-      const unscaledPaths = paths.map((path) => ({
-        ...path,
-        paths: path.paths?.map((point: { x: number; y: number }) => ({
-          x: point.x / zoom,
-          y: point.y / zoom,
-        })),
-      }));
-      setCanvasPaths(unscaledPaths);
-    },
-    [setCanvasPaths, zoom],
-  );
+  // Load stored canvas paths once when the canvas is initialized for this song/zoom.
+  useEffect(() => {
+    if (hasLoadedInitialPathsRef.current || !canvasRef.current) {
+      return;
+    }
+
+    hasLoadedInitialPathsRef.current = true;
+    if (storedCanvasPaths.length === 0) {
+      return;
+    }
+
+    const scaledPaths = storedCanvasPaths.map((path) => ({
+      ...path,
+      paths: path.paths?.map((point: { x: number; y: number }) => ({
+        x: point.x * zoom,
+        y: point.y * zoom,
+      })),
+    }));
+    canvasRef.current.clearCanvas();
+    canvasRef.current.loadPaths(scaledPaths);
+  }, [storedCanvasPaths, zoom]);
+
+  const saveCanvasPaths = useCallback(async () => {
+    const paths = await canvasRef.current?.exportPaths();
+    if (!paths) {
+      return;
+    }
+
+    const unscaledPaths = paths.map((path) => ({
+      ...path,
+      paths: path.paths?.map((point: { x: number; y: number }) => ({
+        x: point.x / zoom,
+        y: point.y / zoom,
+      })),
+    }));
+    setCanvasPaths(unscaledPaths);
+  }, [setCanvasPaths, zoom]);
 
   const handleModeChange = (newMode: DrawingMode) => {
     setMode(newMode);
@@ -131,7 +143,7 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
               ref={canvasRef}
               canvasColor="transparent"
               eraserWidth={ERASER_RADIUS * 2 * zoom}
-              onChange={handlePathsChange}
+              onStroke={saveCanvasPaths}
               readOnly={mode === 'idle'}
               strokeColor={selectedColor}
               strokeWidth={PEN_RADIUS * zoom}
