@@ -15,6 +15,7 @@ import { useGetSetlist } from '../../../api/useSetlist';
 import { useGetSongs } from '../../../api/useSong';
 import { useMetronome } from '../../../hooks/useMetronome';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
+import { songDetailTabSchema } from '../../../schemas';
 import { Button } from '../../../ui/Button';
 import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
 import { InputField } from '../../../ui/form/InputField';
@@ -27,6 +28,7 @@ import { MidiButtonsDisplay } from '../midi-buttons-display/MidiButtonsDisplay';
 import { SettingsPanel } from '../settings-panel/SettingsPanel';
 import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
 import { SongStats } from '../song-stats/SongStats';
+
 export function SongDetailPage() {
   const { setlistId, songId, tab } = useParams<{
     setlistId: string;
@@ -43,10 +45,6 @@ export function SongDetailPage() {
 
   const [zoom, setZoom] = useState(1);
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
-
-  // Default to 'details' tab if not specified
-  const selectedTab =
-    tab && ['details', 'notes', 'sheet-music', 'midi'].includes(tab) ? tab : 'details';
 
   // Create songs map
   const songsMap = new Map(songs.map((song) => [song.id, song]));
@@ -105,6 +103,9 @@ export function SongDetailPage() {
   if (!currentSong) {
     throw new Error('Song not found');
   }
+
+  const parsedRouteTab = songDetailTabSchema.safeParse(tab);
+  const selectedTab = parsedRouteTab.success ? parsedRouteTab.data : 'details';
 
   // Initialize metronome
   useMetronome({
@@ -261,7 +262,7 @@ export function SongDetailPage() {
                 className="h-16 flex-1"
                 color="primary"
                 iconStart={<IconArrowLeft className="h-4 w-4" />}
-                to={`/setlist/${setlistId}/song/${previousSongId}/${selectedTab}`}
+                to={`/setlist/${setlistId}/song/${previousSongId}`}
                 variant="outlined"
               >
                 {previousSong?.title || 'Previous'}
@@ -273,7 +274,7 @@ export function SongDetailPage() {
                 className="col-start-2 h-16 flex-1"
                 color="primary"
                 iconEnd={<IconArrowRight className="h-4 w-4" />}
-                to={`/setlist/${setlistId}/song/${nextSongId}/${selectedTab}`}
+                to={`/setlist/${setlistId}/song/${nextSongId}`}
                 variant="outlined"
               >
                 {nextSong?.title || 'Next'}

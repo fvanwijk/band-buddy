@@ -9,8 +9,54 @@ import {
   useTable,
 } from 'tinybase/ui-react';
 
-import { songSchema } from '../schemas';
+import { songDetailTabSchema, songSchema } from '../schemas';
 import type { Song } from '../types';
+
+export function parseSongDefaultTab(
+  songRow: Record<string, unknown> | null | undefined,
+): Song['defaultTab'] | undefined {
+  const parsedTab = songDetailTabSchema.safeParse(songRow?.defaultTab);
+
+  return parsedTab.success ? parsedTab.data : undefined;
+}
+
+export function parseSongRow(
+  id: string | undefined,
+  songRow: Record<string, unknown> | null | undefined,
+  includeDeleted = false,
+): Song | null {
+  if (!id || !songRow || (songRow.isDeleted && !includeDeleted)) {
+    return null;
+  }
+
+  const parsedData: Record<string, unknown> = { ...songRow, id };
+
+  // Parse midiEvents if stored as JSON string
+  if (typeof songRow.midiEvents === 'string') {
+    try {
+      parsedData.midiEvents = JSON.parse(songRow.midiEvents);
+    } catch {
+      parsedData.midiEvents = undefined;
+    }
+  }
+
+  // Parse canvasPaths if stored as JSON string
+  if (typeof songRow.canvasPaths === 'string') {
+    try {
+      parsedData.canvasPaths = JSON.parse(songRow.canvasPaths);
+    } catch {
+      parsedData.canvasPaths = undefined;
+    }
+  }
+
+  const result = songSchema.safeParse(parsedData);
+  if (!result.success) {
+    console.log(result.error, parsedData);
+    return null;
+  }
+
+  return result.data;
+}
 
 /**
  * Get all songs from the store
@@ -54,37 +100,9 @@ export function useGetSongs(includeDeleted = false): Song[] {
  * Get a single song by ID
  */
 export function useGetSong(id: string | undefined, includeDeleted = false): Song | null {
-  const songRow = useRow('songs', id || '');
+  const songRow = useRow('songs', id || '') as Record<string, unknown> | null | undefined;
 
-  if (!id || !songRow || (songRow.isDeleted && !includeDeleted)) {
-    return null;
-  }
-
-  const songData = songRow as Record<string, unknown>;
-  const parsedData: Record<string, unknown> = { ...songData, id };
-  // Parse midiEvents if stored as JSON string
-  if (typeof songData.midiEvents === 'string') {
-    try {
-      parsedData.midiEvents = JSON.parse(songData.midiEvents);
-    } catch {
-      parsedData.midiEvents = undefined;
-    }
-  }
-  // Parse canvasPaths if stored as JSON string
-  if (typeof songData.canvasPaths === 'string') {
-    try {
-      parsedData.canvasPaths = JSON.parse(songData.canvasPaths);
-    } catch {
-      parsedData.canvasPaths = undefined;
-    }
-  }
-
-  const result = songSchema.safeParse(parsedData);
-  if (!result.success) {
-    console.log(result.error, parsedData);
-    return null;
-  }
-  return result.data;
+  return parseSongRow(id, songRow, includeDeleted);
 }
 
 /**

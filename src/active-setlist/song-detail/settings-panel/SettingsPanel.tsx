@@ -9,6 +9,7 @@ import type { Song } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { Card } from '../../../ui/Card';
 import { Checkbox } from '../../../ui/Checkbox';
+import { SelectField } from '../../../ui/form/SelectField';
 import { MetronomeVolumePanel } from '../metronome-volume-panel/MetronomeVolumePanel';
 import { TransposePanel } from '../transpose-panel/TransposePanel';
 import { ZoomPanel } from '../zoom-panel/ZoomPanel';
@@ -18,6 +19,8 @@ type SettingsPanelProps = {
   song: Song;
   zoom: number;
 };
+
+type SongDefaultTab = NonNullable<Song['defaultTab']>;
 
 export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) {
   const updateSong = useUpdateSong(song.id);
@@ -39,6 +42,20 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
   };
 
   const hasSettings = song.key || song.lyrics || song.bpm;
+
+  const defaultTabOptions = [
+    { label: 'Lyrics', value: 'details' },
+    { label: 'Notes', value: 'notes' },
+    { label: 'Sheet music', value: 'sheet-music' },
+    { label: 'MIDI buttons', value: 'midi' },
+  ];
+
+  const handleDefaultTabChange = (defaultTab: SongDefaultTab) => {
+    updateSong({
+      ...song,
+      defaultTab,
+    });
+  };
 
   return (
     <Popover>
@@ -87,6 +104,14 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               </p>
             </div>
           )}
+          <div className="bg-slate-800/20 p-3">
+            <SelectField
+              label="Default tab"
+              onChange={(event) => handleDefaultTabChange(event.target.value as SongDefaultTab)}
+              options={defaultTabOptions}
+              value={song.defaultTab || 'details'}
+            />
+          </div>
         </Card>
       </PopoverPanel>
     </Popover>

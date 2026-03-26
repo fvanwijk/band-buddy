@@ -21,12 +21,20 @@ vi.mock('../../../midi/useMidiDevices', () => ({
 
 describe('SongDetailPage', () => {
   const renderComponent = async ({
+    defaultTab,
     isSupported = true,
-    tab = 'details',
-  }: { isSupported?: boolean; tab?: string } = {}) => {
+    tab,
+  }: {
+    defaultTab?: 'details' | 'midi' | 'notes' | 'sheet-music';
+    isSupported?: boolean;
+    tab?: string;
+  } = {}) => {
     const sendProgramChangeMock = vi.fn();
     const { store, persister } = getMockStore();
     seedStore(store);
+    if (defaultTab) {
+      store.setPartialRow('songs', '0', { defaultTab });
+    }
     store.setValue('activeSetlistId', '1');
     await persister.save();
 
@@ -41,11 +49,13 @@ describe('SongDetailPage', () => {
     const RoutesStub = createRoutesStub([
       {
         Component: () => <SongDetailPage />,
-        path: '/setlist/:setlistId/song/:songId/:tab',
+        path: '/setlist/:setlistId/song/:songId/:tab?',
       },
     ]);
 
-    render(<RoutesStub initialEntries={[`/setlist/0/song/0/${tab}`]} />, {
+    const route = tab ? `/setlist/0/song/0/${tab}` : '/setlist/0/song/0';
+
+    render(<RoutesStub initialEntries={[route]} />, {
       wrapper: StoreProvider,
     });
 
@@ -58,7 +68,7 @@ describe('SongDetailPage', () => {
     expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'September' })).toHaveAttribute(
       'href',
-      '/setlist/0/song/1/details',
+      '/setlist/0/song/1',
     );
   });
 
@@ -101,5 +111,11 @@ describe('SongDetailPage', () => {
     await renderComponent({ isSupported: false, tab: 'midi' });
 
     expect(await screen.findByRole('button', { name: 'Organ' })).toBeDisabled();
+  });
+
+  it('uses explicit route tab even when default tab differs', async () => {
+    await renderComponent({ defaultTab: 'midi', tab: 'notes' });
+
+    expect(await screen.findByRole('tab', { name: 'Notes', selected: true })).toBeInTheDocument();
   });
 });

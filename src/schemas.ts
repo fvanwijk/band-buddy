@@ -23,11 +23,16 @@ export const instrumentSchema = instrumentTableSchema.extend({
   programNames: z.record(z.number(), z.string()).optional(),
 });
 
+export const songDetailTabSchema = z.enum(['details', 'notes', 'sheet-music', 'midi']);
+export const songDetailTabs = songDetailTabSchema.options;
+export type SongDetailTab = z.infer<typeof songDetailTabSchema>;
+
 // Song
 export const songTableSchema = z.object({
   artist: z.string(),
   bpm: z.number().optional(),
   canvasPaths: z.string().optional(), // Stored as JSON string
+  defaultTab: z.string().optional(),
   duration: z.number().optional(),
   isDeleted: z.boolean().optional(),
   key: z.string().optional(),
@@ -42,6 +47,7 @@ export const songTableSchema = z.object({
 });
 export const songSchema = songTableSchema.extend({
   canvasPaths: z.array(z.unknown()).optional(),
+  defaultTab: songDetailTabSchema.optional(),
   id: z.string(),
   midiEvents: z.array(midiEventSchema).optional(),
 });

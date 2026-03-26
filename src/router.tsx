@@ -1,6 +1,7 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 
 import { ActiveSetlistPage } from './active-setlist/ActiveSetlistPage';
+import { songDetailIndexLoader } from './active-setlist/song-detail/song-detail-page/songDetailIndexLoader';
 import { SongDetailPage } from './active-setlist/song-detail/song-detail-page/SongDetailPage';
 import { Home } from './home/Home';
 import { Layout } from './Layout';
@@ -29,8 +30,8 @@ export const router = createBrowserRouter([
       {
         children: [
           {
-            element: <Navigate to="details" replace />,
             index: true,
+            loader: songDetailIndexLoader,
           },
           {
             element: <SongDetailPage />,

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vite-plus/test';
 
@@ -27,6 +27,7 @@ describe('SettingsPanel', () => {
       createSongTable({
         artist: song.artist,
         bpm: song.bpm,
+        defaultTab: song.defaultTab,
         key: song.key,
         lyrics: song.lyrics,
         timeSignature: song.timeSignature,
@@ -101,6 +102,20 @@ describe('SettingsPanel', () => {
 
     await waitFor(() => {
       expect(getPersistedStore()).toContain('"showDrawingTools":false');
+    });
+  });
+
+  it('updates default tab when select field changes', async () => {
+    const user = userEvent.setup();
+    await renderComponent(songWithAllSettings);
+
+    await user.click(screen.getByTitle('Settings'));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Default tab' }), {
+      target: { value: 'midi' },
+    });
+
+    await waitFor(() => {
+      expect(getPersistedStore()).toContain('"defaultTab":"midi"');
     });
   });
 });
