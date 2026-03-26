@@ -105,7 +105,7 @@ export function SongDetailPage() {
   }
 
   const parsedRouteTab = songDetailTabSchema.safeParse(tab);
-  const selectedTab = parsedRouteTab.success ? parsedRouteTab.data : 'details';
+  const selectedTab = parsedRouteTab.success ? parsedRouteTab.data : 'lyrics';
 
   // Initialize metronome
   useMetronome({
@@ -212,8 +212,18 @@ export function SongDetailPage() {
                     No lyrics added yet
                   </EmptyStateBlock>
                 ),
-              id: 'details',
+              id: 'lyrics',
               label: 'Lyrics',
+            },
+            {
+              content: (
+                <SheetMusicTab
+                  sheetMusicFilename={currentSong.sheetMusicFilename}
+                  songId={songId}
+                />
+              ),
+              id: 'sheet-music',
+              label: 'Sheet Music',
             },
             {
               content: (
@@ -230,16 +240,6 @@ export function SongDetailPage() {
               ),
               id: 'notes',
               label: 'Notes',
-            },
-            {
-              content: (
-                <SheetMusicTab
-                  sheetMusicFilename={currentSong.sheetMusicFilename}
-                  songId={songId}
-                />
-              ),
-              id: 'sheet-music',
-              label: 'Sheet Music',
             },
             {
               content: (

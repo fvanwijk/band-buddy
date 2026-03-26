@@ -11,13 +11,13 @@ const createLoaderArgs = (songId: string, setlistId = '0') =>
   }) as unknown as LoaderFunctionArgs;
 
 describe('songDetailIndexLoader', () => {
-  it('redirects to details when no default tab is stored', async () => {
+  it('redirects to lyrics when no default tab is stored', async () => {
     localStorage.removeItem('band-buddy');
 
     const response = (await songDetailIndexLoader(createLoaderArgs('3'))) as Response;
 
     expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/details');
+    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/lyrics');
   });
 
   it('redirects to stored default tab for the song', async () => {
@@ -41,7 +41,7 @@ describe('songDetailIndexLoader', () => {
     expect(response.headers.get('Location')).toBe('/setlist/0/song/3/midi');
   });
 
-  it('falls back to details when stored tab is invalid', async () => {
+  it('falls back to lyrics when stored tab is invalid', async () => {
     localStorage.setItem(
       'band-buddy',
       JSON.stringify([
@@ -59,6 +59,27 @@ describe('songDetailIndexLoader', () => {
     const response = (await songDetailIndexLoader(createLoaderArgs('3'))) as Response;
 
     expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/details');
+    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/lyrics');
+  });
+
+  it('maps legacy details value to lyrics', async () => {
+    localStorage.setItem(
+      'band-buddy',
+      JSON.stringify([
+        {
+          songs: {
+            '3': {
+              defaultTab: 'details',
+            },
+          },
+        },
+        {},
+      ]),
+    );
+
+    const response = (await songDetailIndexLoader(createLoaderArgs('3'))) as Response;
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/lyrics');
   });
 });

@@ -13,7 +13,7 @@ async function getDefaultSongTab(songId: string): Promise<SongDetailTab> {
   const songRow = store.getRow('songs', songId) as Record<string, unknown> | null | undefined;
   const parsedTab = parseSongDefaultTab(songRow);
 
-  return parsedTab || 'details';
+  return parsedTab || 'lyrics';
 }
 
 export async function songDetailIndexLoader({ params }: LoaderFunctionArgs) {

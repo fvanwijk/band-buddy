@@ -25,7 +25,7 @@ describe('SongDetailPage', () => {
     isSupported = true,
     tab,
   }: {
-    defaultTab?: 'details' | 'midi' | 'notes' | 'sheet-music';
+    defaultTab?: 'lyrics' | 'midi' | 'notes' | 'sheet-music';
     isSupported?: boolean;
     tab?: string;
   } = {}) => {

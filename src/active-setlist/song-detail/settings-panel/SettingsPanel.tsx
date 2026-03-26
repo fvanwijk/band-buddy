@@ -44,9 +44,9 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
   const hasSettings = song.key || song.lyrics || song.bpm;
 
   const defaultTabOptions = [
-    { label: 'Lyrics', value: 'details' },
-    { label: 'Notes', value: 'notes' },
+    { label: 'Lyrics', value: 'lyrics' },
     { label: 'Sheet music', value: 'sheet-music' },
+    { label: 'Notes', value: 'notes' },
     { label: 'MIDI buttons', value: 'midi' },
   ];
 
@@ -109,7 +109,7 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               label="Default tab"
               onChange={(event) => handleDefaultTabChange(event.target.value as SongDefaultTab)}
               options={defaultTabOptions}
-              value={song.defaultTab || 'details'}
+              value={song.defaultTab || 'lyrics'}
             />
           </div>
         </Card>
