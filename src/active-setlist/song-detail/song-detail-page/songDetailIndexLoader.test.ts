@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs } from 'react-router-dom';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { songDetailIndexLoader } from './active-setlist/song-detail/song-detail-page/songDetailIndexLoader';
+import { songDetailIndexLoader } from './songDetailIndexLoader';
 
 const createLoaderArgs = (songId: string, setlistId = '0') =>
   ({
