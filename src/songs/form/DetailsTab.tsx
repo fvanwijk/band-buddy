@@ -106,37 +106,62 @@ export function DetailsTab({
         options={timeSignatureOptions}
         register={register('timeSignature')}
       />
-      <InputField
-        error={errors.bpm}
-        label="BPM"
-        max="200"
-        min="0"
-        placeholder="Enter BPM (0-200)"
-        {...register('bpm', {
-          max: { message: 'BPM must be at most 200', value: 200 },
-          min: { message: 'BPM must be at least 0', value: 0 },
-          valueAsNumber: true,
-        })}
-        type="number"
-      />
-      <div>
+
+      <div className="flex flex-col gap-6 sm:flex-row">
         <InputField
-          error={errors.durationString}
-          label="Duration (mm:ss)"
-          placeholder="Enter duration (mm:ss)"
-          {...register('durationString', {
-            pattern: {
-              message: 'Duration must be in mm:ss format',
-              value: /^\d{1,3}:[0-5]\d$/,
-            },
+          error={errors.bpm}
+          label="BPM"
+          max="200"
+          min="0"
+          placeholder="Enter BPM (0-200)"
+          {...register('bpm', {
+            max: { message: 'BPM must be at most 200', value: 200 },
+            min: { message: 'BPM must be at least 0', value: 0 },
+            valueAsNumber: true,
           })}
+          type="number"
         />
-        {!errors.durationString && calculatedMeasures !== null && (
-          <p className="mt-1 text-xs text-slate-500">
-            ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
-          </p>
-        )}
+        <fieldset>
+          <legend className="sr-only mb-1.5 text-sm font-medium text-slate-300">Duration</legend>
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <InputField
+                error={errors.durationMinutes}
+                label="Minutes"
+                min="0"
+                placeholder="m"
+                type="number"
+                {...register('durationMinutes', {
+                  max: { message: 'Minutes must be at most 999', value: 999 },
+                  min: { message: 'Minutes must be at least 0', value: 0 },
+                  valueAsNumber: true,
+                })}
+              />
+            </div>
+            <span className="mt-5 shrink-0 text-slate-400">:</span>
+            <div className="min-w-0 flex-1">
+              <InputField
+                error={errors.durationSeconds}
+                label="Seconds"
+                max="59"
+                min="0"
+                placeholder="ss"
+                type="number"
+                {...register('durationSeconds', {
+                  max: { message: 'Seconds must be at most 59', value: 59 },
+                  min: { message: 'Seconds must be at least 0', value: 0 },
+                  valueAsNumber: true,
+                })}
+              />
+            </div>
+          </div>
+        </fieldset>
       </div>
+      {!errors.durationMinutes && !errors.durationSeconds && calculatedMeasures !== null && (
+        <p className="text-xs text-slate-500">
+          ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
+        </p>
+      )}
     </div>
   );
 }

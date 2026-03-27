@@ -86,7 +86,8 @@ describe('SongForm', () => {
     await user.click(screen.getByLabelText('Major'));
     await user.click(screen.getByLabelText('4/4'));
     await user.type(screen.getByLabelText('BPM'), '120');
-    await user.type(screen.getByLabelText('Duration (mm:ss)'), '1:23');
+    await user.type(screen.getByLabelText('Minutes'), '1');
+    await user.type(screen.getByLabelText('Seconds'), '23');
 
     // Lyrics
     await user.click(screen.getByRole('tab', { name: 'Lyrics' }));
@@ -162,7 +163,8 @@ describe('SongForm', () => {
     expect(screen.getByLabelText('B♭')).toBeChecked();
     expect(screen.getByLabelText('4/4')).toBeChecked();
     expect(screen.getByLabelText('BPM')).toHaveValue(72);
-    expect(screen.getByLabelText('Duration (mm:ss)')).toHaveValue('5:55');
+    expect(screen.getByLabelText('Minutes')).toHaveValue(5);
+    expect(screen.getByLabelText('Seconds')).toHaveValue(55);
 
     await user.click(await screen.findByRole('button', { name: 'Save changes' }));
 

@@ -12,7 +12,6 @@ import { Button } from '../../ui/Button';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
-import { formatDurationToString, parseDuration } from '../../utils/duration';
 import { DetailsTab } from './DetailsTab';
 import { LyricsTab } from './lyrics/LyricsTab';
 import { calculateMeasures } from './measures';
@@ -23,7 +22,8 @@ import { SheetMusicFormTab } from './sheet-music/SheetMusicFormTab';
 type SongSubmitData = Omit<Song, 'id'>;
 
 export type SongFormData = SongSubmitData & {
-  durationString?: string;
+  durationMinutes?: number;
+  durationSeconds?: number;
   keyNote?: string;
   keyQuality?: string;
   sheetMusicFiles?: FileList;
@@ -60,7 +60,8 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     defaultValues: {
       ...initialData,
       defaultTab: initialData?.defaultTab || undefined,
-      durationString: initialData?.duration ? formatDurationToString(initialData.duration) : '',
+      durationMinutes: initialData?.duration ? Math.floor(initialData.duration / 60) : undefined,
+      durationSeconds: initialData?.duration ? initialData.duration % 60 : undefined,
       keyNote: existingNote || undefined,
       keyQuality: existingQuality || existingNote ? '' : undefined,
     },
@@ -71,8 +72,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     name: 'midiEvents',
   });
 
-  const durationString = watch('durationString');
-  const durationSeconds = parseDuration(durationString);
+  const durationMins = watch('durationMinutes');
+  const durationSecs = watch('durationSeconds');
+  const totalDurationSeconds = (durationMins || 0) * 60 + (durationSecs || 0);
   const bpm = watch('bpm');
   const lyrics = watch('lyrics');
   const midiEvents = watch('midiEvents') || [];
@@ -107,7 +109,8 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const detailsFields: (keyof SongFormData)[] = [
     'artist',
     'bpm',
-    'durationString',
+    'durationMinutes',
+    'durationSeconds',
     'keyNote',
     'keyQuality',
     'timeSignature',
@@ -122,9 +125,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const hasSettingsErrors = settingsFields.some((field) => !!errors[field]);
 
   useEffect(() => {
-    const measures = calculateMeasures(durationSeconds, bpm, timeSignature);
+    const measures = calculateMeasures(totalDurationSeconds, bpm, timeSignature);
     setCalculatedMeasures(measures);
-  }, [durationSeconds, bpm, timeSignature]);
+  }, [totalDurationSeconds, bpm, timeSignature]);
 
   const selectedTab =
     tab && ['details', 'lyrics', 'sheet-music', 'midi', 'settings'].includes(tab) ? tab : 'details';
@@ -151,21 +154,22 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   };
 
   const handleFormSubmit = ({
-    durationString,
+    durationMinutes,
+    durationSeconds,
     keyQuality,
     keyNote,
     sheetMusicFiles,
     defaultTab,
     ...data
   }: SongFormData) => {
-    const durationSeconds = parseDuration(durationString);
+    const totalSeconds = (durationMinutes || 0) * 60 + (durationSeconds || 0);
 
     onSubmit(
       {
         ...data,
         canvasPaths: initialData?.canvasPaths || [],
         defaultTab,
-        duration: durationSeconds || undefined,
+        duration: totalSeconds || undefined,
         key: (keyNote || existingNote) + (keyQuality || ''),
         notes: initialData?.notes,
         spotifyId: initialData?.spotifyId,
