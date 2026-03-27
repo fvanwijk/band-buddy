@@ -95,10 +95,10 @@ export function SheetMusicFormTab({
           </Button>
         </div>
       </div>
-
+      {/* Height is half A4 */}
       {file && (
         <div className="mt-4">
-          <PdfViewer file={file} />
+          <PdfViewer className="aspect-[2/1.414]" file={file} />
         </div>
       )}
     </div>
