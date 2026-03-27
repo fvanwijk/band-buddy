@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { migrateBackup } from './index';
+import { migrateBackup, migratePersistedStore } from './index';
+import { CURRENT_BACKUP_VERSION } from './persistedStoreVersion';
 
 describe('migrateBackup', () => {
   it('should return unchanged data for current version', () => {
@@ -86,5 +87,54 @@ describe('migrateBackup', () => {
 
     expect(result.error).toBeDefined();
     expect(result.error).toContain('invalid or corrupted');
+  });
+
+  it('should migrate persisted v1 local data to v2 format', () => {
+    const persistedV1 = JSON.stringify([
+      {
+        instruments: {},
+        setlistSongs: {
+          '0': { setNumber: 1, setlistId: '1', songId: '1', songIndex: 0 },
+        },
+        setlists: { '1': { date: '2024-01-01', title: 'Setlist 1' } },
+        songs: { '1': { artist: 'Artist 1', title: 'Song 1' } },
+      },
+      { locale: 'en-US' },
+    ]);
+
+    const result = migratePersistedStore(persistedV1, null);
+
+    expect(result.error).toBeUndefined();
+    expect(result.migrated).toBe(true);
+
+    const [tables, values] = JSON.parse(result.persisted || '[]') as [
+      Record<string, Record<string, unknown>>,
+      Record<string, unknown>,
+    ];
+
+    expect(values.locale).toBe('en-US');
+    expect(Object.values(tables.setlistSets || {})).toHaveLength(1);
+    expect(Object.values(tables.setlistSongs || {})).toEqual([
+      { setId: '0', songId: '1', songIndex: 0 },
+    ]);
+  });
+
+  it('should leave persisted current-version local data unchanged', () => {
+    const persistedV2 = JSON.stringify([
+      {
+        instruments: {},
+        setlistSets: { '1': { setIndex: 1, setlistId: '1' } },
+        setlistSongs: { '0': { setId: '1', songId: '1', songIndex: 0 } },
+        setlists: { '1': { date: '2024-01-01', title: 'Setlist 1' } },
+        songs: { '1': { artist: 'Artist 1', title: 'Song 1' } },
+      },
+      { locale: 'en-US' },
+    ]);
+
+    const result = migratePersistedStore(persistedV2, String(CURRENT_BACKUP_VERSION));
+
+    expect(result.error).toBeUndefined();
+    expect(result.migrated).toBe(false);
+    expect(result.persisted).toBe(persistedV2);
   });
 });

@@ -5,8 +5,13 @@ import { Provider, useCreateStore } from 'tinybase/ui-react';
 import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
 import { seedStore } from '../mocks/seed';
+import { migratePersistedStore } from '../services/migrations';
+import {
+  PERSISTED_STORE_VERSION_KEY,
+  persistStoreVersion,
+} from '../services/migrations/persistedStoreVersion';
 import { Logo } from '../ui/Logo';
-import { createAppStore, createStorePersister } from './store';
+import { createAppStore, createStorePersister, STORE_STORAGE_KEY } from './store';
 
 type StoreProviderProps = {
   children: ReactNode;
@@ -21,6 +26,14 @@ export function StoreProvider({ children }: StoreProviderProps) {
 
     async function init() {
       const persister = createStorePersister(store);
+
+      const migrationResult = migratePersistedStore(
+        localStorage.getItem(STORE_STORAGE_KEY),
+        localStorage.getItem(PERSISTED_STORE_VERSION_KEY),
+      );
+      if (migrationResult.migrated && migrationResult.persisted) {
+        localStorage.setItem(STORE_STORAGE_KEY, migrationResult.persisted);
+      }
 
       // Load from localStorage
       await persister.load();
@@ -54,6 +67,7 @@ export function StoreProvider({ children }: StoreProviderProps) {
 
       // Start auto-save
       await persister.startAutoSave();
+      persistStoreVersion(localStorage);
 
       // Mark as initialized
       setIsInitialized(true);

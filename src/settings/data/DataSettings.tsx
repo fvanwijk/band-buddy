@@ -4,6 +4,7 @@ import type { Tables, Values } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
 
 import { migrateBackup } from '../../services/migrations';
+import { persistStoreVersion } from '../../services/migrations/persistedStoreVersion';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { SettingsCard } from '../SettingsCard';
@@ -71,6 +72,7 @@ export function DataSettings() {
 
       store.setTables(migrationResult.tables);
       store.setValues(migrationResult.values);
+      persistStoreVersion(localStorage);
 
       setStatus({
         message: 'Backup imported successfully.',

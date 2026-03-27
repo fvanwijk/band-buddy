@@ -17,6 +17,8 @@ import {
   themeSchema,
 } from '../schemas';
 
+export const STORE_STORAGE_KEY = 'band-buddy';
+
 /**
  * Create a new store with proper relational schema using Zod
  *
@@ -59,5 +61,5 @@ export function createAppStore(): Store {
  * Create a persister for the given store
  */
 export function createStorePersister(store: Store) {
-  return createLocalPersister(store, 'band-buddy');
+  return createLocalPersister(store, STORE_STORAGE_KEY);
 }
