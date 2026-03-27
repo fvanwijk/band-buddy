@@ -17,6 +17,7 @@ import { DetailsTab } from './DetailsTab';
 import { LyricsTab } from './lyrics/LyricsTab';
 import { calculateMeasures } from './measures';
 import { MidiButtonsTab } from './midi/MidiButtonsTab';
+import { SettingsTab } from './SettingsTab';
 import { SheetMusicFormTab } from './sheet-music/SheetMusicFormTab';
 
 type SongSubmitData = Omit<Song, 'id'>;
@@ -58,6 +59,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   } = useForm<SongFormData>({
     defaultValues: {
       ...initialData,
+      defaultTab: initialData?.defaultTab || undefined,
       durationString: initialData?.duration ? formatDurationToString(initialData.duration) : '',
       keyNote: existingNote || undefined,
       keyQuality: existingQuality || existingNote ? '' : undefined,
@@ -112,10 +114,12 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     'title',
   ];
   const lyricsFields: (keyof SongFormData)[] = ['lyrics'];
+  const settingsFields: (keyof SongFormData)[] = ['defaultTab'];
 
   // Check which tabs have errors
   const hasDetailsErrors = detailsFields.some((field) => !!errors[field]);
   const hasLyricsErrors = lyricsFields.some((field) => !!errors[field]);
+  const hasSettingsErrors = settingsFields.some((field) => !!errors[field]);
 
   useEffect(() => {
     const measures = calculateMeasures(durationSeconds, bpm, timeSignature);
@@ -123,7 +127,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   }, [durationSeconds, bpm, timeSignature]);
 
   const selectedTab =
-    tab && ['details', 'lyrics', 'sheet-music', 'midi'].includes(tab) ? tab : 'details';
+    tab && ['details', 'lyrics', 'sheet-music', 'midi', 'settings'].includes(tab) ? tab : 'details';
   const songFormBasePath = id ? `/songs/edit/${id}` : '/songs/add';
 
   const handleTabChange = (tabId: string) => {
@@ -134,12 +138,15 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     // Check which tabs have errors using the fresh errors object
     const hasDetailsErrors = detailsFields.some((field) => !!formErrors[field]);
     const hasLyricsErrors = lyricsFields.some((field) => !!formErrors[field]);
+    const hasSettingsErrors = settingsFields.some((field) => !!formErrors[field]);
 
     // Navigate to the first tab with errors
     if (hasDetailsErrors) {
       handleTabChange('details');
     } else if (hasLyricsErrors) {
       handleTabChange('lyrics');
+    } else if (hasSettingsErrors) {
+      handleTabChange('settings');
     }
   };
 
@@ -148,6 +155,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     keyQuality,
     keyNote,
     sheetMusicFiles,
+    defaultTab,
     ...data
   }: SongFormData) => {
     const durationSeconds = parseDuration(durationString);
@@ -156,6 +164,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       {
         ...data,
         canvasPaths: initialData?.canvasPaths || [],
+        defaultTab,
         duration: durationSeconds || undefined,
         key: (keyNote || existingNote) + (keyQuality || ''),
         notes: initialData?.notes,
@@ -245,6 +254,12 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               ),
               id: 'midi',
               label: 'MIDI events',
+            },
+            {
+              content: <SettingsTab register={register} />,
+              hasError: hasSettingsErrors,
+              id: 'settings',
+              label: 'Settings',
             },
           ]}
         />

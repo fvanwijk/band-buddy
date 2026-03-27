@@ -5,6 +5,7 @@ import { usePopper } from 'react-popper';
 
 import { useGetShowDrawingTools, useSetShowDrawingTools } from '../../../api/useSettings';
 import { useUpdateSong } from '../../../api/useSong';
+import { defaultTabOptions } from '../../../songs/form/SettingsTab';
 import type { Song } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { Card } from '../../../ui/Card';
@@ -42,13 +43,6 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
   };
 
   const hasSettings = song.key || song.lyrics || song.bpm;
-
-  const defaultTabOptions = [
-    { label: 'Lyrics', value: 'lyrics' },
-    { label: 'Sheet music', value: 'sheet-music' },
-    { label: 'Notes', value: 'notes' },
-    { label: 'MIDI buttons', value: 'midi' },
-  ];
 
   const handleDefaultTabChange = (defaultTab: SongDefaultTab) => {
     updateSong({
