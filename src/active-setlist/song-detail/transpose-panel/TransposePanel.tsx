@@ -22,7 +22,7 @@ export function TransposePanel({ onTransposeChange, transpose }: TransposePanelP
           )
         }
       >
-        Transpose
+        Transpose lyrics
       </SettingHeading>
       <div className="flex items-center gap-2">
         <Button

@@ -15,7 +15,7 @@ export function ZoomPanel({ onZoomChange, zoom }: ZoomPanelProps) {
           zoom !== 1 && <ResetButton onClick={() => onZoomChange(1)} title="Reset zoom to 1×" />
         }
       >
-        Zoom
+        Zoom lyrics
       </SettingHeading>
       <Slider
         ariaLabel="Zoom"

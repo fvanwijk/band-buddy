@@ -10,7 +10,7 @@ describe('ZoomPanel', () => {
 
     render(<ZoomPanel onZoomChange={onZoomChange} zoom={1.25} />);
 
-    expect(screen.getByText('Zoom')).toBeInTheDocument();
+    expect(screen.getByText('Zoom lyrics')).toBeInTheDocument();
     expect(screen.getByText('1.25×')).toBeInTheDocument();
     expect(screen.getByText('0.75×')).toBeInTheDocument();
     expect(screen.getByText('2×')).toBeInTheDocument();
