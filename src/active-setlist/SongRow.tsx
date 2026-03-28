@@ -9,7 +9,12 @@ type SongRowProps = {
   song: Song;
 };
 
+const formatTranspose = (transpose: number) => (transpose > 0 ? `+${transpose}` : `${transpose}`);
+
 export function SongRow({ index, setlistId, song }: SongRowProps) {
+  const transposeLabel = song.transpose ? formatTranspose(song.transpose) : null;
+  const keyWithTranspose = [song.key, transposeLabel].filter(Boolean).join(' ');
+
   return (
     <li>
       <Link
@@ -26,6 +31,9 @@ export function SongRow({ index, setlistId, song }: SongRowProps) {
         </span>
         <span className="hidden text-right text-sm font-semibold text-slate-100 sm:block">
           {song.key}
+          {transposeLabel && (
+            <span className="text-xs font-normal text-slate-400"> {transposeLabel}</span>
+          )}
         </span>
         <span
           data-testid="song-duration"
@@ -34,7 +42,7 @@ export function SongRow({ index, setlistId, song }: SongRowProps) {
           {song.duration === undefined ? null : <FormattedDuration seconds={song.duration} />}
         </span>
         <span className="flex flex-col gap-0.5 text-right sm:hidden">
-          <span>{[song.timeSignature, song.key].filter(Boolean).join(' • ')}</span>
+          <span>{[song.timeSignature, keyWithTranspose].filter(Boolean).join(' • ')}</span>
           <span className="text-xs text-slate-400">
             {song.duration === undefined ? null : <FormattedDuration seconds={song.duration} />}
           </span>

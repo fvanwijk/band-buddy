@@ -21,4 +21,38 @@ describe('SongRow', () => {
     expect(screen.getByTestId('song-duration')).toHaveTextContent('5m 55s');
     expect(screen.getByText('4/4')).toBeInTheDocument();
   });
+
+  it('shows transpose indicator when transpose is non-zero', () => {
+    render(
+      <ul>
+        <SongRow index={1} setlistId="2" song={createSong({ transpose: 2 })} />
+      </ul>,
+      { wrapper: MockRouteProvider },
+    );
+
+    expect(screen.getAllByText('+2').length).toBeGreaterThan(0);
+  });
+
+  it('shows negative transpose indicator', () => {
+    render(
+      <ul>
+        <SongRow index={1} setlistId="2" song={createSong({ transpose: -3 })} />
+      </ul>,
+      { wrapper: MockRouteProvider },
+    );
+
+    expect(screen.getAllByText('-3').length).toBeGreaterThan(0);
+  });
+
+  it('does not show transpose indicator when transpose is 0', () => {
+    render(
+      <ul>
+        <SongRow index={1} setlistId="2" song={createSong({ transpose: 0 })} />
+      </ul>,
+      { wrapper: MockRouteProvider },
+    );
+
+    expect(screen.queryByText('+0')).toBeNull();
+    expect(screen.queryByText('0')).toBeNull();
+  });
 });
