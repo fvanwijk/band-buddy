@@ -5,37 +5,25 @@ import { parseSongDefaultTab } from '../../../api/useSong';
 import type { SongDetailTab } from '../../../schemas';
 import { createAppStore, createStorePersister } from '../../../store/store';
 
-async function getDefaultSongTab(
-  setlistId: string,
-  setIndex: number,
-  songIndex: number,
-): Promise<SongDetailTab> {
+async function getDefaultSongTab(setlistId: string, setlistSongId: string): Promise<SongDetailTab> {
   const store = createAppStore();
   const persister = createStorePersister(store);
   await persister.load();
 
-  const setlistSetsTable = store.getTable('setlistSets') as Record<string, Record<string, unknown>>;
-  const setlistSetEntry = Object.entries(setlistSetsTable).find(
-    ([, setRow]) => setRow.setlistId === setlistId && Number(setRow.setIndex) === setIndex,
-  );
-  if (!setlistSetEntry) {
+  const setlistSongRow = store.getRow('setlistSongs', setlistSongId) as
+    | Record<string, unknown>
+    | null
+    | undefined;
+  if (!setlistSongRow) {
     return 'lyrics';
   }
 
-  const [setId] = setlistSetEntry;
-  const setlistSongsTable = store.getTable('setlistSongs') as Record<
-    string,
-    Record<string, unknown>
-  >;
-  const setlistSongEntry = Object.entries(setlistSongsTable).find(
-    ([, setlistSongRow]) =>
-      setlistSongRow.setId === setId && Number(setlistSongRow.songIndex) === songIndex,
-  );
-  if (!setlistSongEntry) {
+  const setId = String(setlistSongRow.setId);
+  const setRow = store.getRow('setlistSets', setId) as Record<string, unknown> | null | undefined;
+  if (!setRow || String(setRow.setlistId) !== setlistId) {
     return 'lyrics';
   }
 
-  const [, setlistSongRow] = setlistSongEntry;
   const songId = String(setlistSongRow.songId);
   const songRow = store.getRow('songs', songId) as Record<string, unknown> | null | undefined;
 
@@ -43,13 +31,13 @@ async function getDefaultSongTab(
 }
 
 export async function songDetailIndexLoader({ params }: LoaderFunctionArgs) {
-  const { setlistId, setIndex, songIndex } = params;
+  const { setlistId, setlistSongId } = params;
 
-  if (!setlistId || !setIndex || !songIndex) {
+  if (!setlistId || !setlistSongId) {
     return redirect('/'); // TODO 404
   }
 
-  const defaultTab = await getDefaultSongTab(setlistId, Number(setIndex), Number(songIndex));
+  const defaultTab = await getDefaultSongTab(setlistId, setlistSongId);
 
-  return redirect(`/play/${setlistId}/${setIndex}/${songIndex}/${defaultTab}`);
+  return redirect(`/play/${setlistId}/${setlistSongId}/${defaultTab}`);
 }

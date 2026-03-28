@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
                 path: ':tab',
               },
             ],
-            path: ':setlistId/:setIndex/:songIndex',
+            path: ':setlistId/:setlistSongId',
           },
         ],
         path: 'play',

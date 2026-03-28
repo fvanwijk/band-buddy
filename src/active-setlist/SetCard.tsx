@@ -46,12 +46,11 @@ export function SetCard({ set, setIndex, setlistId, songStartIndex }: SetCardPro
             <ul className="divide-y divide-slate-800">
               {songs.map((song, index) => (
                 <SongRow
-                  key={song.songId}
+                  key={song.id}
                   index={songStartIndex + index + 1}
-                  setIndex={set.setIndex}
                   setlistId={setlistId}
+                  setlistSongId={song.id}
                   song={song}
-                  songIndex={song.songIndex}
                 />
               ))}
             </ul>

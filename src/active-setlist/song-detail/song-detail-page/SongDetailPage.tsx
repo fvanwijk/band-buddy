@@ -30,10 +30,9 @@ import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
 import { SongStats } from '../song-stats/SongStats';
 
 export function SongDetailPage() {
-  const { setlistId, setIndex, songIndex, tab } = useParams<{
+  const { setlistId, setlistSongId, tab } = useParams<{
     setlistId: string;
-    setIndex: string;
-    songIndex: string;
+    setlistSongId: string;
     tab: string;
   }>();
   const navigate = useNavigate();
@@ -76,12 +75,10 @@ export function SongDetailPage() {
     [instrumentsById, outputs],
   );
 
-  const setIndexNum = Number(setIndex);
-  const songIndexNum = Number(songIndex);
-
-  // Find the current song's ID from the setlist structure
-  const currentSet = setlist?.sets.find((s) => s.setIndex === setIndexNum);
-  const currentSongRef = currentSet?.songs.find((s) => s.songIndex === songIndexNum);
+  // Find the current song's details from the setlist structure
+  const currentSongRef = setlist?.sets
+    .flatMap((set) => set.songs)
+    .find((song) => song.id === setlistSongId);
   const currentSongId = currentSongRef?.songId;
 
   if (!setlist || !currentSongId) {
@@ -95,16 +92,13 @@ export function SongDetailPage() {
       set.songs
         .toSorted((a, b) => a.songIndex - b.songIndex)
         .map((songRef) => ({
-          setIndex: set.setIndex,
+          setlistSongId: songRef.id,
           songId: songRef.songId,
-          songIndex: songRef.songIndex,
         })),
     );
 
   // Find current position in the flattened list
-  const currentSongIndex = songsFromSetlist.findIndex(
-    (s) => s.setIndex === setIndexNum && s.songIndex === songIndexNum,
-  );
+  const currentSongIndex = songsFromSetlist.findIndex((s) => s.setlistSongId === setlistSongId);
 
   if (currentSongIndex === -1) {
     throw new Error('Song not found');
@@ -136,7 +130,7 @@ export function SongDetailPage() {
   const nextSong = nextEntry ? songsMap.get(nextEntry.songId) : null;
 
   const handleTabChange = (tabId: string) => {
-    void navigate(`/play/${setlistId}/${setIndex}/${songIndex}/${tabId}`);
+    void navigate(`/play/${setlistId}/${setlistSongId}/${tabId}`);
   };
 
   const handleTriggerMidiEvent = (event: { instrumentId: string; programChange: number }) => {
@@ -270,7 +264,7 @@ export function SongDetailPage() {
                 className="h-16 flex-1"
                 color="primary"
                 iconStart={<IconArrowLeft className="h-4 w-4" />}
-                to={`/play/${setlistId}/${previousEntry.setIndex}/${previousEntry.songIndex}`}
+                to={`/play/${setlistId}/${previousEntry.setlistSongId}`}
                 variant="outlined"
               >
                 {previousSong?.title || 'Previous'}
@@ -282,7 +276,7 @@ export function SongDetailPage() {
                 className="col-start-2 h-16 flex-1"
                 color="primary"
                 iconEnd={<IconArrowRight className="h-4 w-4" />}
-                to={`/play/${setlistId}/${nextEntry.setIndex}/${nextEntry.songIndex}`}
+                to={`/play/${setlistId}/${nextEntry.setlistSongId}`}
                 variant="outlined"
               >
                 {nextSong?.title || 'Next'}
