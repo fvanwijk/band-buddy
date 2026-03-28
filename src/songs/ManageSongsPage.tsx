@@ -108,6 +108,7 @@ export function ManageSongsPage() {
                 songId={song.id}
                 timeSignature={song.timeSignature}
                 title={song.title}
+                transpose={song.transpose}
               />
             ))}
           </div>

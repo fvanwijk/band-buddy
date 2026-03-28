@@ -11,6 +11,7 @@ type SongCardProps = {
   songId: string;
   timeSignature?: string;
   title: string;
+  transpose?: number;
 };
 
 export function SongCard({
@@ -21,6 +22,7 @@ export function SongCard({
   songId,
   timeSignature,
   title,
+  transpose,
 }: SongCardProps) {
   return (
     <Card
@@ -33,7 +35,12 @@ export function SongCard({
     >
       <h2 className="truncate text-sm font-semibold text-slate-100">{title}</h2>
       <p className="truncate text-xs text-slate-500">{artist}</p>
-      <SongMetadata duration={duration} keyNote={keyNote} timeSignature={timeSignature} />
+      <SongMetadata
+        duration={duration}
+        keyNote={keyNote}
+        timeSignature={timeSignature}
+        transpose={transpose}
+      />
     </Card>
   );
 }
