@@ -145,6 +145,79 @@ describe('v1-to-v2 migration', () => {
     expect(result.tables.setlistSongs).toEqual({});
   });
 
+  it('should derive setNumber from legacy setlistSongs row id when missing', () => {
+    const v1Backup = {
+      tables: {
+        instruments: {},
+        setlistSongs: {
+          '1_1_0': { setlistId: '1', songId: '1', songIndex: 0 },
+          '1_2_0': { setlistId: '1', songId: '2', songIndex: 0 },
+        },
+        setlists: {
+          '1': { date: '2024-01-01', title: 'Setlist 1' },
+        },
+        songs: {
+          '1': { artist: 'Artist 1', title: 'Song 1' },
+          '2': { artist: 'Artist 2', title: 'Song 2' },
+        },
+      },
+      values: {},
+      version: 1,
+    };
+
+    const result = migrateV1ToV2(v1Backup);
+
+    const setlistSets = Object.values(result.tables.setlistSets || {}) as Record<string, unknown>[];
+    expect(setlistSets).toHaveLength(2);
+    expect(setlistSets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ setIndex: 1, setlistId: '1' }),
+        expect.objectContaining({ setIndex: 2, setlistId: '1' }),
+      ]),
+    );
+
+    const songs = Object.values(result.tables.setlistSongs || {}) as Record<string, unknown>[];
+    expect(songs).toHaveLength(2);
+    expect(songs.every((song) => typeof song.setId === 'string')).toBe(true);
+  });
+
+  it('should derive setlistId and setNumber from legacy setlistSongs row id when both missing', () => {
+    const v1Backup = {
+      tables: {
+        instruments: {},
+        setlistSongs: {
+          '1_1_0': { songId: '1', songIndex: 0 },
+          '1_1_1': { songId: '2', songIndex: 1 },
+          '1_2_0': { songId: '3', songIndex: 0 },
+        },
+        setlists: {
+          '1': { date: '2024-01-01', title: 'Setlist 1' },
+        },
+        songs: {
+          '1': { artist: 'Artist 1', title: 'Song 1' },
+          '2': { artist: 'Artist 2', title: 'Song 2' },
+          '3': { artist: 'Artist 3', title: 'Song 3' },
+        },
+      },
+      values: {},
+      version: 1,
+    };
+
+    const result = migrateV1ToV2(v1Backup);
+
+    const setlistSets = Object.values(result.tables.setlistSets || {}) as Record<string, unknown>[];
+    expect(setlistSets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ setIndex: 1, setlistId: '1' }),
+        expect.objectContaining({ setIndex: 2, setlistId: '1' }),
+      ]),
+    );
+
+    const songs = Object.values(result.tables.setlistSongs || {}) as Record<string, unknown>[];
+    expect(songs).toHaveLength(3);
+    expect(songs.every((song) => typeof song.setId === 'string')).toBe(true);
+  });
+
   it('should throw error on invalid input', () => {
     const invalidBackup = {
       tables: {

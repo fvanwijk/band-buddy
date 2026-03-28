@@ -22,7 +22,7 @@ describe('persistedStoreVersion', () => {
   it('prefers explicit version metadata over inference', () => {
     const tables = {
       setlistSongs: {
-        '0': { setNumber: 1, setlistId: '1', songId: '1', songIndex: 0 },
+        '1_1_0': { songId: '1', songIndex: 0 },
       },
     } as unknown as Tables;
 
@@ -32,7 +32,7 @@ describe('persistedStoreVersion', () => {
   it('falls back to legacy inference when no version is stored', () => {
     const tables = {
       setlistSongs: {
-        '0': { setNumber: 1, setlistId: '1', songId: '1', songIndex: 0 },
+        '1_1_0': { songId: '1', songIndex: 0 },
       },
     } as unknown as Tables;
 

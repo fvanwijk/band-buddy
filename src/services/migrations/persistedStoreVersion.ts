@@ -11,11 +11,12 @@ export function inferLegacyPersistedStoreVersion(tables: Tables): number {
     return CURRENT_BACKUP_VERSION;
   }
 
-  const hasLegacySetNumber = Object.values(setlistSongs).some(
-    (song) => typeof song === 'object' && song !== null && 'setNumber' in song,
+  // v2 setlistSong rows have a 'setId' field; v1 rows only have 'songId' and 'songIndex'.
+  const hasV2SetId = Object.values(setlistSongs).some(
+    (song) => typeof song === 'object' && song !== null && 'setId' in song,
   );
 
-  return hasLegacySetNumber ? 1 : CURRENT_BACKUP_VERSION;
+  return hasV2SetId ? CURRENT_BACKUP_VERSION : 1;
 }
 
 export function parsePersistedStoreVersion(input: string | null): number | null {

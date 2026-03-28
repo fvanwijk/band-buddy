@@ -67,7 +67,9 @@ export function StoreProvider({ children }: StoreProviderProps) {
 
       // Start auto-save
       await persister.startAutoSave();
-      persistStoreVersion(localStorage);
+      if (!migrationResult.error) {
+        persistStoreVersion(localStorage);
+      }
 
       // Mark as initialized
       setIsInitialized(true);

@@ -86,7 +86,7 @@ describe('migrateBackup', () => {
     const result = migrateBackup(invalidBackup, 1);
 
     expect(result.error).toBeDefined();
-    expect(result.error).toContain('invalid or corrupted');
+    expect(result.error).toContain('Failed to derive setlistId/setNumber');
   });
 
   it('should migrate persisted v1 local data to v2 format', () => {

@@ -5,8 +5,8 @@ import { z, ZodError } from 'zod';
  * Version 1 backup schemas (deprecated)
  */
 const v1SetlistSongSchema = z.object({
-  setNumber: z.number(),
-  setlistId: z.string(),
+  setNumber: z.number().optional(),
+  setlistId: z.string().optional(),
   songId: z.string(),
   songIndex: z.number(),
 });
@@ -53,6 +53,27 @@ const v1BackupPayload = z.object({
   values: z.record(z.string(), z.unknown()).optional(),
   version: z.literal(1),
 });
+
+function deriveLegacySetlistSongPartsFromRowId(
+  rowId: string,
+): { setNumber: number; setlistId: string } | undefined {
+  // Legacy IDs are expected as: {setlistId}_{setIndex}_{songIndex}
+  const parts = rowId.split('_');
+  if (parts.length < 3) {
+    return undefined;
+  }
+
+  const setlistId = parts[0];
+  const setNumber = Number.parseInt(parts[parts.length - 2], 10);
+  if (!setlistId || Number.isNaN(setNumber)) {
+    return undefined;
+  }
+
+  return {
+    setNumber,
+    setlistId,
+  };
+}
 
 /**
  * Migrate from backup version 1 to version 2
@@ -106,12 +127,22 @@ export function migrateV1ToV2(input: unknown): {
     const setNumbers = new Map<string, Set<number>>();
 
     // First pass: collect all setNumbers for each setlistId
-    for (const [, setlistSong] of Object.entries(parsed.tables.setlistSongs)) {
-      const key = setlistSong.setlistId;
+    for (const [rowId, setlistSong] of Object.entries(parsed.tables.setlistSongs)) {
+      const derivedParts = deriveLegacySetlistSongPartsFromRowId(rowId);
+      const setlistId = setlistSong.setlistId ?? derivedParts?.setlistId;
+      const setNumber = setlistSong.setNumber ?? derivedParts?.setNumber;
+
+      if (!setlistId || setNumber === undefined) {
+        throw new Error(
+          `Failed to derive setlistId/setNumber for setlistSongs row '${rowId}'. Expected fields or legacy row id format '{setlistId}_{setIndex}_{songIndex}'.`,
+        );
+      }
+
+      const key = setlistId;
       if (!setNumbers.has(key)) {
         setNumbers.set(key, new Set());
       }
-      setNumbers.get(key)!.add(setlistSong.setNumber);
+      setNumbers.get(key)!.add(setNumber);
     }
 
     // Create setlistSets from unique setlistId + setNumber combinations
@@ -133,12 +164,20 @@ export function migrateV1ToV2(input: unknown): {
 
     // Second pass: create new setlistSongs with setId
     let songId = 0;
-    for (const [, v1Song] of Object.entries(parsed.tables.setlistSongs)) {
-      const setId = setNumberToSetId.get(`${v1Song.setlistId}:${v1Song.setNumber}`);
-      if (!setId) {
+    for (const [rowId, v1Song] of Object.entries(parsed.tables.setlistSongs)) {
+      const derivedParts = deriveLegacySetlistSongPartsFromRowId(rowId);
+      const setlistId = v1Song.setlistId ?? derivedParts?.setlistId;
+      const setNumber = v1Song.setNumber ?? derivedParts?.setNumber;
+
+      if (!setlistId || setNumber === undefined) {
         throw new Error(
-          `Failed to find setId for setlistId=${v1Song.setlistId}, setNumber=${v1Song.setNumber}`,
+          `Failed to derive setlistId/setNumber for setlistSongs row '${rowId}'. Expected fields or legacy row id format '{setlistId}_{setIndex}_{songIndex}'.`,
         );
+      }
+
+      const setId = setNumberToSetId.get(`${setlistId}:${setNumber}`);
+      if (!setId) {
+        throw new Error(`Failed to find setId for setlistId=${setlistId}, setNumber=${setNumber}`);
       }
       const songRow = {
         setId,
