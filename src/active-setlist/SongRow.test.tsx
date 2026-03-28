@@ -9,12 +9,12 @@ describe('SongRow', () => {
   it('renders song details', () => {
     render(
       <ul>
-        <SongRow index={3} setlistId="2" song={createSong()} />
+        <SongRow index={3} setIndex={0} setlistId="2" songIndex={0} song={createSong()} />
       </ul>,
       { wrapper: MockRouteProvider },
     );
 
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/setlist/2/song/0');
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/play/2/0/0');
     expect(screen.getByText('Bohemian Rhapsody')).toBeInTheDocument();
     expect(screen.getByText('Queen')).toBeInTheDocument();
     expect(screen.getByText('Bb')).toBeInTheDocument();
@@ -25,7 +25,13 @@ describe('SongRow', () => {
   it('shows transpose indicator when transpose is non-zero', () => {
     render(
       <ul>
-        <SongRow index={1} setlistId="2" song={createSong({ transpose: 2 })} />
+        <SongRow
+          index={1}
+          setIndex={0}
+          setlistId="2"
+          song={createSong({ transpose: 2 })}
+          songIndex={0}
+        />
       </ul>,
       { wrapper: MockRouteProvider },
     );
@@ -36,7 +42,13 @@ describe('SongRow', () => {
   it('shows negative transpose indicator', () => {
     render(
       <ul>
-        <SongRow index={1} setlistId="2" song={createSong({ transpose: -3 })} />
+        <SongRow
+          index={1}
+          setIndex={0}
+          setlistId="2"
+          song={createSong({ transpose: -3 })}
+          songIndex={0}
+        />
       </ul>,
       { wrapper: MockRouteProvider },
     );
@@ -47,7 +59,13 @@ describe('SongRow', () => {
   it('does not show transpose indicator when transpose is 0', () => {
     render(
       <ul>
-        <SongRow index={1} setlistId="2" song={createSong({ transpose: 0 })} />
+        <SongRow
+          index={1}
+          setIndex={0}
+          setlistId="2"
+          song={createSong({ transpose: 0 })}
+          songIndex={0}
+        />
       </ul>,
       { wrapper: MockRouteProvider },
     );

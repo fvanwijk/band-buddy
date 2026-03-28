@@ -48,8 +48,10 @@ export function SetCard({ set, setIndex, setlistId, songStartIndex }: SetCardPro
                 <SongRow
                   key={song.songId}
                   index={songStartIndex + index + 1}
+                  setIndex={set.setIndex}
                   setlistId={setlistId}
                   song={song}
+                  songIndex={song.songIndex}
                 />
               ))}
             </ul>

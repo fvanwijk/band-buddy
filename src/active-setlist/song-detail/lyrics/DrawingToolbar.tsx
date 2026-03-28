@@ -97,8 +97,8 @@ export function DrawingToolbar({
           </p>
           <div className="grid grid-cols-4 gap-2">
             {colorOptions.map((option) => (
-              <div>
-                <MenuItem key={option.value}>
+              <div key={option.value}>
+                <MenuItem>
                   {({ focus }) => (
                     <button
                       className={cn('rounded-full p-2 transition-colors', focus && 'bg-slate-800')}

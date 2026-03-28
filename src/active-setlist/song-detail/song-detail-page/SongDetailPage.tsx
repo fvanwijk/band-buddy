@@ -30,9 +30,10 @@ import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
 import { SongStats } from '../song-stats/SongStats';
 
 export function SongDetailPage() {
-  const { setlistId, songId, tab } = useParams<{
+  const { setlistId, setIndex, songIndex, tab } = useParams<{
     setlistId: string;
-    songId: string;
+    setIndex: string;
+    songIndex: string;
     tab: string;
   }>();
   const navigate = useNavigate();
@@ -75,7 +76,15 @@ export function SongDetailPage() {
     [instrumentsById, outputs],
   );
 
-  if (!setlist || !songId) {
+  const setIndexNum = Number(setIndex);
+  const songIndexNum = Number(songIndex);
+
+  // Find the current song's ID from the setlist structure
+  const currentSet = setlist?.sets.find((s) => s.setIndex === setIndexNum);
+  const currentSongRef = currentSet?.songs.find((s) => s.songIndex === songIndexNum);
+  const currentSongId = currentSongRef?.songId;
+
+  if (!setlist || !currentSongId) {
     throw new Error('Song not found');
   }
 
@@ -86,20 +95,22 @@ export function SongDetailPage() {
       set.songs
         .toSorted((a, b) => a.songIndex - b.songIndex)
         .map((songRef) => ({
-          setId: set.id,
+          setIndex: set.setIndex,
           songId: songRef.songId,
           songIndex: songRef.songIndex,
         })),
     );
 
-  // Find current song index
-  const currentSongIndex = songsFromSetlist.findIndex((s) => s.songId === songId);
+  // Find current position in the flattened list
+  const currentSongIndex = songsFromSetlist.findIndex(
+    (s) => s.setIndex === setIndexNum && s.songIndex === songIndexNum,
+  );
 
   if (currentSongIndex === -1) {
     throw new Error('Song not found');
   }
 
-  const currentSong = songsMap.get(songId);
+  const currentSong = songsMap.get(currentSongId);
   if (!currentSong) {
     throw new Error('Song not found');
   }
@@ -116,19 +127,16 @@ export function SongDetailPage() {
 
   const beatDurationSeconds = 60 / (currentSong.bpm || 120);
 
-  // Get previous and next song IDs
-  const previousSongId =
-    currentSongIndex > 0 ? songsFromSetlist[currentSongIndex - 1].songId : null;
-  const nextSongId =
-    currentSongIndex < songsFromSetlist.length - 1
-      ? songsFromSetlist[currentSongIndex + 1].songId
-      : null;
+  // Get previous and next entries
+  const previousEntry = currentSongIndex > 0 ? songsFromSetlist[currentSongIndex - 1] : null;
+  const nextEntry =
+    currentSongIndex < songsFromSetlist.length - 1 ? songsFromSetlist[currentSongIndex + 1] : null;
 
-  const previousSong = previousSongId ? songsMap.get(previousSongId) : null;
-  const nextSong = nextSongId ? songsMap.get(nextSongId) : null;
+  const previousSong = previousEntry ? songsMap.get(previousEntry.songId) : null;
+  const nextSong = nextEntry ? songsMap.get(nextEntry.songId) : null;
 
   const handleTabChange = (tabId: string) => {
-    void navigate(`/setlist/${setlistId}/song/${songId}/${tabId}`);
+    void navigate(`/play/${setlistId}/${setIndex}/${songIndex}/${tabId}`);
   };
 
   const handleTriggerMidiEvent = (event: { instrumentId: string; programChange: number }) => {
@@ -204,7 +212,7 @@ export function SongDetailPage() {
             {
               content:
                 currentSong.lyrics && currentSong.lyrics.trim().length > 0 ? (
-                  <DrawingOverlay songId={songId} zoom={zoom}>
+                  <DrawingOverlay songId={currentSongId} zoom={zoom}>
                     <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
                   </DrawingOverlay>
                 ) : (
@@ -219,7 +227,7 @@ export function SongDetailPage() {
               content: (
                 <SheetMusicTab
                   sheetMusicFilename={currentSong.sheetMusicFilename}
-                  songId={songId}
+                  songId={currentSongId}
                 />
               ),
               id: 'sheet-music',
@@ -231,7 +239,7 @@ export function SongDetailPage() {
                   className="text-sm"
                   label="Notes"
                   onChange={(event) => {
-                    store?.setPartialRow('songs', songId, { notes: event.target.value });
+                    store?.setPartialRow('songs', currentSongId, { notes: event.target.value });
                   }}
                   placeholder="Add notes, chord changes, or reminders..."
                   rows={12}
@@ -256,25 +264,25 @@ export function SongDetailPage() {
         />
         <nav className="fixed bottom-0 left-0 z-10 w-full bg-slate-950">
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 border-t border-slate-800 p-4">
-            {previousSongId && (
+            {previousEntry && (
               <Button
                 as={Link}
                 className="h-16 flex-1"
                 color="primary"
                 iconStart={<IconArrowLeft className="h-4 w-4" />}
-                to={`/setlist/${setlistId}/song/${previousSongId}`}
+                to={`/play/${setlistId}/${previousEntry.setIndex}/${previousEntry.songIndex}`}
                 variant="outlined"
               >
                 {previousSong?.title || 'Previous'}
               </Button>
             )}
-            {nextSongId && (
+            {nextEntry && (
               <Button
                 as={Link}
                 className="col-start-2 h-16 flex-1"
                 color="primary"
                 iconEnd={<IconArrowRight className="h-4 w-4" />}
-                to={`/setlist/${setlistId}/song/${nextSongId}`}
+                to={`/play/${setlistId}/${nextEntry.setIndex}/${nextEntry.songIndex}`}
                 variant="outlined"
               >
                 {nextSong?.title || 'Next'}

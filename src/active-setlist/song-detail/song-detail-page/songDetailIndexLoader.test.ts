@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { songDetailIndexLoader } from './songDetailIndexLoader';
 
-const createLoaderArgs = (songId: string, setlistId = '0') =>
+const createLoaderArgs = (songIndex: string, setIndex = '0', setlistId = '0') =>
   ({
     context: {},
-    params: { setlistId, songId },
-    request: new Request('http://localhost/setlist/0/song/0'),
+    params: { setIndex, setlistId, songIndex },
+    request: new Request(`http://localhost/play/${setlistId}/${setIndex}/${songIndex}`),
   }) as unknown as LoaderFunctionArgs;
 
 describe('songDetailIndexLoader', () => {
@@ -17,7 +17,7 @@ describe('songDetailIndexLoader', () => {
     const response = (await songDetailIndexLoader(createLoaderArgs('3'))) as Response;
 
     expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/lyrics');
+    expect(response.headers.get('Location')).toBe('/play/0/0/3/lyrics');
   });
 
   it('redirects to stored default tab for the song', async () => {
@@ -25,8 +25,21 @@ describe('songDetailIndexLoader', () => {
       'band-buddy',
       JSON.stringify([
         {
+          setlistSets: {
+            '0': {
+              setIndex: 0,
+              setlistId: '0',
+            },
+          },
+          setlistSongs: {
+            '0_0_3': {
+              setId: '0',
+              songId: '1',
+              songIndex: 3,
+            },
+          },
           songs: {
-            '3': {
+            '1': {
               defaultTab: 'midi',
             },
           },
@@ -38,7 +51,7 @@ describe('songDetailIndexLoader', () => {
     const response = (await songDetailIndexLoader(createLoaderArgs('3'))) as Response;
 
     expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/midi');
+    expect(response.headers.get('Location')).toBe('/play/0/0/3/midi');
   });
 
   it('falls back to lyrics when stored tab is invalid', async () => {
@@ -59,7 +72,7 @@ describe('songDetailIndexLoader', () => {
     const response = (await songDetailIndexLoader(createLoaderArgs('3'))) as Response;
 
     expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/lyrics');
+    expect(response.headers.get('Location')).toBe('/play/0/0/3/lyrics');
   });
 
   it('maps legacy details value to lyrics', async () => {
@@ -67,8 +80,8 @@ describe('songDetailIndexLoader', () => {
       'band-buddy',
       JSON.stringify([
         {
-          songs: {
-            '3': {
+          setlistSongs: {
+            '0_0_3': {
               defaultTab: 'details',
             },
           },
@@ -80,6 +93,6 @@ describe('songDetailIndexLoader', () => {
     const response = (await songDetailIndexLoader(createLoaderArgs('3'))) as Response;
 
     expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/setlist/0/song/3/lyrics');
+    expect(response.headers.get('Location')).toBe('/play/0/0/3/lyrics');
   });
 });

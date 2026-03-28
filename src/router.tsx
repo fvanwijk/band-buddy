@@ -24,21 +24,26 @@ export const router = createBrowserRouter([
   {
     children: [
       {
-        element: <ActiveSetlistPage />,
-        path: '/play',
-      },
-      {
         children: [
           {
+            element: <ActiveSetlistPage />,
             index: true,
-            loader: songDetailIndexLoader,
           },
           {
-            element: <SongDetailPage />,
-            path: ':tab',
+            children: [
+              {
+                index: true,
+                loader: songDetailIndexLoader,
+              },
+              {
+                element: <SongDetailPage />,
+                path: ':tab',
+              },
+            ],
+            path: ':setlistId/:setIndex/:songIndex',
           },
         ],
-        path: '/setlist/:setlistId/song/:songId',
+        path: 'play',
       },
       {
         element: <ManageSetlistsPage />,

@@ -49,11 +49,11 @@ describe('SongDetailPage', () => {
     const RoutesStub = createRoutesStub([
       {
         Component: () => <SongDetailPage />,
-        path: '/setlist/:setlistId/song/:songId/:tab?',
+        path: '/play/:setlistId/:setIndex/:songIndex/:tab?',
       },
     ]);
 
-    const route = tab ? `/setlist/0/song/0/${tab}` : '/setlist/0/song/0';
+    const route = tab ? `/play/0/0/0/${tab}` : '/play/0/0/0';
 
     render(<RoutesStub initialEntries={[route]} />, {
       wrapper: StoreProvider,
@@ -66,10 +66,7 @@ describe('SongDetailPage', () => {
     await renderComponent();
 
     expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'September' })).toHaveAttribute(
-      'href',
-      '/setlist/0/song/1',
-    );
+    expect(screen.getByRole('link', { name: 'September' })).toHaveAttribute('href', '/play/0/0/1');
   });
 
   it('toggles metronome button title when clicked', async () => {

@@ -5,13 +5,15 @@ import { FormattedDuration } from './FormattedDuration';
 
 type SongRowProps = {
   index: number;
+  setIndex: number;
   setlistId?: string;
   song: Song;
+  songIndex: number;
 };
 
 const formatTranspose = (transpose: number) => (transpose > 0 ? `+${transpose}` : `${transpose}`);
 
-export function SongRow({ index, setlistId, song }: SongRowProps) {
+export function SongRow({ index, setIndex, setlistId, song, songIndex }: SongRowProps) {
   const transposeLabel = song.transpose ? formatTranspose(song.transpose) : null;
   const keyWithTranspose = [song.key, transposeLabel].filter(Boolean).join(' ');
 
@@ -19,7 +21,7 @@ export function SongRow({ index, setlistId, song }: SongRowProps) {
     <li>
       <Link
         className="grid cursor-pointer grid-cols-[25px_4fr_75px] gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[25px_6fr_2fr_2fr_2fr]"
-        to={setlistId ? `/setlist/${setlistId}/song/${song.id}` : '#'}
+        to={setlistId ? `/play/${setlistId}/${setIndex}/${songIndex}` : '#'}
       >
         <span className="text-right text-slate-500">{index}</span>
         <span className="flex flex-col">
