@@ -12,11 +12,11 @@ import { Button } from '../../ui/Button';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
-import { DetailsTab } from './DetailsTab';
+import { DetailsTab } from './details/DetailsTab';
 import { LyricsTab } from './lyrics/LyricsTab';
 import { calculateMeasures } from './measures';
 import { MidiButtonsTab } from './midi/MidiButtonsTab';
-import { SettingsTab } from './SettingsTab';
+import { SettingsTab } from './settings/SettingsTab';
 import { SheetMusicFormTab } from './sheet-music/SheetMusicFormTab';
 
 type SongSubmitData = Omit<Song, 'id'>;
@@ -117,7 +117,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     'title',
   ];
   const lyricsFields: (keyof SongFormData)[] = ['lyrics'];
-  const settingsFields: (keyof SongFormData)[] = ['defaultTab'];
+  const settingsFields: (keyof SongFormData)[] = ['defaultTab', 'transpose'];
 
   // Check which tabs have errors
   const hasDetailsErrors = detailsFields.some((field) => !!errors[field]);
@@ -173,7 +173,6 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
         key: (keyNote || existingNote) + (keyQuality || ''),
         notes: initialData?.notes,
         spotifyId: initialData?.spotifyId,
-        transpose: initialData?.transpose,
       },
       sheetMusicFiles?.[0],
     );
@@ -260,7 +259,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               label: 'MIDI events',
             },
             {
-              content: <SettingsTab register={register} />,
+              content: <SettingsTab errors={errors} register={register} />,
               hasError: hasSettingsErrors,
               id: 'settings',
               label: 'Settings',

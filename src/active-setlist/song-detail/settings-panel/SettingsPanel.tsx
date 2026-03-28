@@ -5,7 +5,7 @@ import { usePopper } from 'react-popper';
 
 import { useGetShowDrawingTools, useSetShowDrawingTools } from '../../../api/useSettings';
 import { useUpdateSong } from '../../../api/useSong';
-import { defaultTabOptions } from '../../../songs/form/SettingsTab';
+import { defaultTabOptions } from '../../../songs/form/settings/SettingsTab';
 import type { Song } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { Card } from '../../../ui/Card';
