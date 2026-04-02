@@ -40,7 +40,7 @@ export type SongFormProps = {
 export function SongForm({ backPath, initialData, onSubmit, title }: SongFormProps) {
   const [calculatedMeasures, setCalculatedMeasures] = useState<number | null>(null);
 
-  const { id, tab } = useParams<{ id?: string; tab?: string }>();
+  const { id, tab } = useParams<{ id?: string; returnUrl?: string; tab?: string }>();
   const navigate = useNavigate();
 
   const instruments = useGetInstruments();
@@ -134,7 +134,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const songFormBasePath = id ? `/songs/edit/${id}` : '/songs/add';
 
   const handleTabChange = (tabId: string) => {
-    void navigate(`${songFormBasePath}/${tabId}`);
+    void navigate(`${songFormBasePath}/${tabId}${window.location.search}`);
   };
 
   const handleFormError = (formErrors: FieldErrors<SongFormData>) => {

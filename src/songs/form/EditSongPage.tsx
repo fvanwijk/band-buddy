@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { useGetSong, useUpdateSong } from '../../api/useSong';
 import { useDeleteSheetMusic, useStoreSheetMusic } from '../../hooks/useSheetMusic';
@@ -6,7 +6,8 @@ import type { Song } from '../../types';
 import { SongForm } from './SongForm';
 
 export function EditSongPage() {
-  const backPath = '/songs';
+  const [searchParams] = useSearchParams();
+  const backPath = searchParams.get('returnUrl') || '/songs';
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const song = useGetSong(id);

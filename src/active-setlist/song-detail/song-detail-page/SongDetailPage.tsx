@@ -17,6 +17,7 @@ import { useMetronome } from '../../../hooks/useMetronome';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import { songDetailTabSchema } from '../../../schemas';
 import { Button } from '../../../ui/Button';
+import { EditButton } from '../../../ui/EditButton';
 import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
 import { InputField } from '../../../ui/form/InputField';
 import { Page } from '../../../ui/Page';
@@ -176,6 +177,9 @@ export function SongDetailPage() {
       )}
       <SongStats song={currentSong} />
       <SettingsPanel onZoomChange={setZoom} song={currentSong} zoom={zoom} />
+      <EditButton
+        to={`/songs/edit/${currentSongId}/${selectedTab}?returnUrl=${encodeURIComponent(`/play/${setlistId}/${setlistSongId}/${selectedTab}`)}`}
+      />
     </div>
   );
 

@@ -64,7 +64,9 @@ export const router = createBrowserRouter([
       {
         children: [
           {
-            element: <Navigate to="details" replace />,
+            Component: () => (
+              <Navigate to={{ pathname: 'details', search: window.location.search }} replace />
+            ),
             index: true,
           },
           {
@@ -77,7 +79,9 @@ export const router = createBrowserRouter([
       {
         children: [
           {
-            element: <Navigate to="details" replace />,
+            Component: () => (
+              <Navigate to={{ pathname: 'details', search: window.location.search }} replace />
+            ),
             index: true,
           },
           {
