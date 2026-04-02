@@ -20,7 +20,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
   const setName = watch(`sets.${index}.name`);
   const [editing, setEditing] = useState(false);
   const currentSetSongs = watch(`sets.${index}.songs`);
-  const allSongs = useGetSongs(true);
+  const allSongs = useGetSongs(true, { sortBy: 'artist' });
   const addableSongs = allSongs.filter((song) => !song.isDeleted);
   const allSetsOfSetlist = watch('sets');
 

@@ -58,14 +58,24 @@ export function parseSongRow(
   return result.data;
 }
 
+type SortOptions = {
+  sortBy?: keyof Song | null;
+  sortDirection?: 'asc' | 'desc' | 'none';
+};
+
 /**
  * Get all songs from the store
  * @param includeDeleted - If true, includes soft-deleted songs. Defaults to false.
+ * @param sort.sortBy - Field to sort by. Defaults to 'title'. Pass null to disable sorting.
+ * @param sort.sortDirection - Sort direction. Defaults to 'asc'.
  */
-export function useGetSongs(includeDeleted = false): Song[] {
+export function useGetSongs(
+  includeDeleted = false,
+  { sortBy = 'title', sortDirection = 'asc' }: SortOptions = {},
+): Song[] {
   const songsData = useTable('songs') || {};
 
-  return Object.entries(songsData)
+  const songs = Object.entries(songsData)
     .map(([id, data]) => {
       const songData = data as Record<string, unknown>;
       const parsedData: Record<string, unknown> = { ...songData, id };
@@ -92,8 +102,26 @@ export function useGetSongs(includeDeleted = false): Song[] {
       }
       return result.data;
     })
-    .filter((song): song is Song => song !== null && (includeDeleted || !song.isDeleted))
-    .sort((a, b) => a.title.localeCompare(b.title));
+    .filter((song): song is Song => song !== null && (includeDeleted || !song.isDeleted));
+
+  if (!sortBy || sortDirection === 'none') {
+    return songs;
+  }
+
+  return songs.toSorted((a, b) => {
+    const valueA = a[sortBy];
+    const valueB = b[sortBy];
+
+    let comparison = 0;
+
+    if (typeof valueA === 'string' && typeof valueB === 'string') {
+      comparison = valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+    } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+      comparison = valueA - valueB;
+    }
+
+    return sortDirection === 'asc' ? comparison : -comparison;
+  });
 }
 
 /**
