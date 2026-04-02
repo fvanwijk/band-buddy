@@ -235,7 +235,7 @@ export function SongDetailPage() {
               content: (
                 <InputField
                   className="text-sm"
-                  label="Notes"
+                  label="Text notes"
                   onChange={(event) => {
                     store?.setPartialRow('songs', currentSongId, { notes: event.target.value });
                   }}
@@ -244,8 +244,8 @@ export function SongDetailPage() {
                   value={currentSong.notes || ''}
                 />
               ),
-              id: 'notes',
-              label: 'Notes',
+              id: 'text-notes',
+              label: 'Text notes',
             },
             {
               content: (

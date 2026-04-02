@@ -23,7 +23,7 @@ export const instrumentSchema = instrumentTableSchema.extend({
   programNames: z.record(z.number(), z.string()).optional(),
 });
 
-export const songDetailTabSchema = z.enum(['lyrics', 'notes', 'sheet-music', 'midi']);
+export const songDetailTabSchema = z.enum(['lyrics', 'text-notes', 'sheet-music', 'midi']);
 export const songDetailTabs = songDetailTabSchema.options;
 export type SongDetailTab = z.infer<typeof songDetailTabSchema>;
 
