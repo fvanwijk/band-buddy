@@ -3,12 +3,12 @@ import {
   IconArrowRight,
   IconBrandSpotify,
   IconMicrophone2Off,
+  IconNote,
   IconPlayerPlayFilled,
   IconPlayerStopFilled,
 } from '@tabler/icons-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useStore } from 'tinybase/ui-react';
 
 import { useGetInstruments } from '../../../api/useInstruments';
 import { useGetSetlist } from '../../../api/useSetlist';
@@ -19,7 +19,6 @@ import { songDetailTabSchema } from '../../../schemas';
 import { Button } from '../../../ui/Button';
 import { EditButton } from '../../../ui/EditButton';
 import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
-import { InputField } from '../../../ui/form/InputField';
 import { Page } from '../../../ui/Page';
 import { PageHeader } from '../../../ui/PageHeader';
 import { Tabs } from '../../../ui/Tabs';
@@ -29,6 +28,7 @@ import { MidiButtonsDisplay } from '../midi-buttons-display/MidiButtonsDisplay';
 import { SettingsPanel } from '../settings-panel/SettingsPanel';
 import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
 import { SongStats } from '../song-stats/SongStats';
+import { TextNotesBlock } from '../text-notes/TextNotesBlock';
 
 export function SongDetailPage() {
   const { setlistId, setlistSongId, tab } = useParams<{
@@ -37,7 +37,6 @@ export function SongDetailPage() {
     tab: string;
   }>();
   const navigate = useNavigate();
-  const store = useStore();
 
   const setlist = useGetSetlist(setlistId!);
   const instruments = useGetInstruments();
@@ -232,18 +231,16 @@ export function SongDetailPage() {
               label: 'Sheet Music',
             },
             {
-              content: (
-                <InputField
-                  className="text-sm"
-                  label="Text notes"
-                  onChange={(event) => {
-                    store?.setPartialRow('songs', currentSongId, { notes: event.target.value });
-                  }}
-                  placeholder="Add notes, chord changes, or reminders..."
-                  rows={12}
-                  value={currentSong.notes || ''}
-                />
-              ),
+              content:
+                currentSong.notes && currentSong.notes.trim().length > 0 ? (
+                  <DrawingOverlay songId={currentSongId} zoom={zoom}>
+                    <TextNotesBlock notes={currentSong.notes} />
+                  </DrawingOverlay>
+                ) : (
+                  <EmptyStateBlock icon={<IconNote className="h-8 w-8" />}>
+                    No text notes added yet
+                  </EmptyStateBlock>
+                ),
               id: 'text-notes',
               label: 'Text notes',
             },

@@ -18,6 +18,7 @@ import { calculateMeasures } from './measures';
 import { MidiButtonsTab } from './midi/MidiButtonsTab';
 import { SettingsTab } from './settings/SettingsTab';
 import { SheetMusicFormTab } from './sheet-music/SheetMusicFormTab';
+import { TextNotesTab } from './text-notes/TextNotesTab';
 
 type SongSubmitData = Omit<Song, 'id'>;
 
@@ -130,7 +131,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   }, [totalDurationSeconds, bpm, timeSignature]);
 
   const selectedTab =
-    tab && ['details', 'lyrics', 'sheet-music', 'midi', 'settings'].includes(tab) ? tab : 'details';
+    tab && ['details', 'lyrics', 'sheet-music', 'text-notes', 'midi', 'settings'].includes(tab)
+      ? tab
+      : 'details';
   const songFormBasePath = id ? `/songs/edit/${id}` : '/songs/add';
 
   const handleTabChange = (tabId: string) => {
@@ -171,7 +174,6 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
         defaultTab,
         duration: totalSeconds || undefined,
         key: (keyNote || existingNote) + (keyQuality || ''),
-        notes: initialData?.notes,
         spotifyId: initialData?.spotifyId,
       },
       sheetMusicFiles?.[0],
@@ -245,6 +247,11 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               ),
               id: 'sheet-music',
               label: 'Sheet Music',
+            },
+            {
+              content: <TextNotesTab register={register('notes')} />,
+              id: 'text-notes',
+              label: 'Text notes',
             },
             {
               content: (

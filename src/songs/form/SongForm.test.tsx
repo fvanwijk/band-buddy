@@ -99,6 +99,13 @@ describe('SongForm', () => {
     // Sheet music
     // TODO
 
+    // Text notes
+    await user.click(screen.getByRole('tab', { name: 'Text notes' }));
+    await user.type(
+      await screen.findByLabelText('Notes'),
+      'Act like a rock star while playing this song',
+    );
+
     // MIDI events
     await user.click(screen.getByRole('tab', { name: 'MIDI events' }));
 
@@ -133,6 +140,7 @@ describe('SongForm', () => {
         midiEvents: [
           { id: expect.any(String), instrumentId: '0', label: 'Piano', programChange: 0 },
         ],
+        notes: 'Act like a rock star while playing this song',
         timeSignature: '4/4',
         title: 'Test Title',
       },

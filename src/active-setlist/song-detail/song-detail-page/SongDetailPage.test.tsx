@@ -25,7 +25,7 @@ describe('SongDetailPage', () => {
     isSupported = true,
     tab,
   }: {
-    defaultTab?: 'lyrics' | 'midi' | 'notes' | 'sheet-music';
+    defaultTab?: 'lyrics' | 'midi' | 'text-notes' | 'sheet-music';
     isSupported?: boolean;
     tab?: string;
   } = {}) => {
@@ -79,22 +79,6 @@ describe('SongDetailPage', () => {
     expect(screen.getByTitle('Stop metronome')).toBeInTheDocument();
   });
 
-  it('updates notes in store when notes field changes', async () => {
-    const user = userEvent.setup();
-    await renderComponent();
-
-    await user.click(await screen.findByRole('tab', { name: 'Notes' }));
-
-    const notesField = screen.getAllByLabelText('Notes')[1];
-
-    await user.clear(notesField);
-    await user.type(notesField, 'Act like a rock star while playing this song');
-
-    expect(JSON.parse(localStorage.getItem('band-buddy')!)[0].songs[0].notes).toBe(
-      'Act like a rock star while playing this song',
-    );
-  });
-
   it('triggers MIDI program change when device is available', async () => {
     const user = userEvent.setup();
     const { sendProgramChangeMock } = await renderComponent({ tab: 'midi' });
@@ -111,8 +95,10 @@ describe('SongDetailPage', () => {
   });
 
   it('uses explicit route tab even when default tab differs', async () => {
-    await renderComponent({ defaultTab: 'midi', tab: 'notes' });
+    await renderComponent({ defaultTab: 'midi', tab: 'text-notes' });
 
-    expect(await screen.findByRole('tab', { name: 'Notes', selected: true })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('tab', { name: 'Text notes', selected: true }),
+    ).toBeInTheDocument();
   });
 });

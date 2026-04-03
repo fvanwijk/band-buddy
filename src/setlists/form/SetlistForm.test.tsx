@@ -80,7 +80,7 @@ describe('SetlistForm', () => {
           name: 'Opening set',
           setIndex: 1,
           setlistId: '',
-          songs: [{ setId: '', songId: '3', songIndex: 0 }],
+          songs: [{ setId: '', songId: '6', songIndex: 0 }],
         },
         {
           name: '',
