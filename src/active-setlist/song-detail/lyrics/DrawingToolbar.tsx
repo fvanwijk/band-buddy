@@ -49,7 +49,7 @@ export function DrawingToolbar({
       <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 p-2">
         <Button
           color={mode === 'idle' ? 'primary' : 'default'}
-          icon
+          isIcon
           onClick={() => onModeChange('idle')}
           title="Cancel"
           variant={mode === 'idle' ? 'filled' : 'outlined'}
@@ -58,7 +58,7 @@ export function DrawingToolbar({
         </Button>
         <Button
           color={mode === 'pen' ? 'primary' : 'default'}
-          icon
+          isIcon
           onClick={() => onModeChange('pen')}
           title="Pen"
           variant={mode === 'pen' ? 'filled' : 'outlined'}
@@ -68,7 +68,7 @@ export function DrawingToolbar({
 
         <Button
           color={mode === 'eraser' ? 'primary' : 'default'}
-          icon
+          isIcon
           onClick={() => onModeChange('eraser')}
           title="Eraser"
           variant={mode === 'eraser' ? 'filled' : 'outlined'}
@@ -82,7 +82,7 @@ export function DrawingToolbar({
           as={Button}
           className="p-1!"
           color="default"
-          icon
+          isIcon
           title={selectedOption?.label || 'Color'}
           variant="outlined"
         >
@@ -124,7 +124,7 @@ export function DrawingToolbar({
         </MenuItems>
       </Menu>
 
-      <Button color="default" icon onClick={onClear} title="Clear" variant="outlined">
+      <Button color="default" isIcon onClick={onClear} title="Clear" variant="outlined">
         <IconTrash className="h-4 w-4" />
       </Button>
     </div>

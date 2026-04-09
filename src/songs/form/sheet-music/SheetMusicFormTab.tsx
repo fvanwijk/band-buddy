@@ -90,7 +90,7 @@ export function SheetMusicFormTab({
           >
             Replace PDF
           </Button>
-          <Button color="danger" icon onClick={handleClear} title="Delete PDF" variant="outlined">
+          <Button color="danger" isIcon onClick={handleClear} title="Delete PDF" variant="outlined">
             <IconTrash className="h-4 w-4" />
           </Button>
         </div>

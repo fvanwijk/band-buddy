@@ -34,7 +34,7 @@ export function SetlistCard({
         <>
           <Button
             color={isActive ? 'primary' : 'default'}
-            icon
+            isIcon
             onClick={onActivate}
             title={isActive ? 'Active setlist' : 'Activate setlist'}
             variant={isActive ? 'filled' : 'outlined'}

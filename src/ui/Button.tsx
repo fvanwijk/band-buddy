@@ -23,22 +23,22 @@ const buttonVariants = cva(
         color: 'danger',
         variant: 'filled',
       },
-      // Ghost variants
+      // Text variants
       {
         className:
           'text-slate-300 hover:bg-slate-300/10 hover:text-slate-100 disabled:hover:text-slate-300',
         color: 'default',
-        variant: 'ghost',
+        variant: 'text',
       },
       {
         className: 'text-brand-300 hover:text-brand-400 disabled:hover:text-brand-300',
         color: 'primary',
-        variant: 'ghost',
+        variant: 'text',
       },
       {
         className: 'text-red-400 hover:text-red-300 disabled:hover:text-red-400',
         color: 'danger',
-        variant: 'ghost',
+        variant: 'text',
       },
       // Outlined variants
       {
@@ -63,14 +63,14 @@ const buttonVariants = cva(
       {
         className: 'gap-2',
         hasIcons: true,
-        icon: false,
+        isIcon: false,
       },
     ],
     defaultVariants: {
       color: 'default',
       hasIcons: false,
-      icon: false,
-      size: 'default',
+      isIcon: false,
+      size: 'small',
       variant: 'filled',
     },
     variants: {
@@ -83,18 +83,19 @@ const buttonVariants = cva(
         false: '',
         true: '',
       },
-      icon: {
+      isIcon: {
         false: '',
         true: 'p-2!',
       },
       size: {
-        default: 'px-3 py-1 text-sm',
-        icon: 'p-1.5',
+        large: 'px-4 py-2 text-base',
+        medium: 'px-3 py-1 text-sm',
+        small: 'px-2 py-0.5 text-xs',
       },
       variant: {
         filled: 'text-xs font-semibold uppercase tracking-[0.25em]',
-        ghost: 'bg-transparent hover:bg-opacity-10',
         outlined: 'border pl-4 pr-3 py-2 text-xs font-semibold uppercase tracking-[0.25em]',
+        text: 'bg-transparent hover:bg-opacity-10',
       },
     },
   },
@@ -114,7 +115,7 @@ export function Button<C extends ElementType = 'button'>({
   children,
   className = '',
   color,
-  icon = false,
+  isIcon = false,
   iconEnd,
   iconStart,
   size,
@@ -130,7 +131,7 @@ export function Button<C extends ElementType = 'button'>({
         buttonVariants({
           color,
           hasIcons,
-          icon,
+          isIcon,
           size,
           variant,
         }),

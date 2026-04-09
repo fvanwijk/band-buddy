@@ -63,7 +63,7 @@ export function MidiButtonsTab({
           <h3 className="text-sm font-semibold text-slate-200">MIDI Buttons</h3>
           <Button
             color="primary"
-            icon
+            isIcon
             onClick={() => setIsDialogOpen(true)}
             title="Add MIDI button"
             type="button"

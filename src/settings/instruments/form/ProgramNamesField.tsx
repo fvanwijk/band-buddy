@@ -47,7 +47,7 @@ export function ProgramNamesField({ onChange, value }: ProgramNamesFieldProps) {
       <div className="flex items-center justify-between">
         <FormLabel>Program Names</FormLabel>
         <div className="flex gap-2">
-          <Button color="primary" onClick={handleToggleBulkInput} type="button" variant="ghost">
+          <Button color="primary" onClick={handleToggleBulkInput} type="button" variant="text">
             {showBulkInput ? 'Collapse' : 'Edit'}
           </Button>
         </div>

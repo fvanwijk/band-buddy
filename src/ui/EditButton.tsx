@@ -10,7 +10,7 @@ type EditButtonProps = {
 
 export function EditButton({ title = 'Edit', ...props }: EditButtonProps) {
   return (
-    <Button as={Link} icon title={title} variant="outlined" {...props}>
+    <Button as={Link} isIcon title={title} variant="outlined" {...props}>
       <IconPencil className="h-4 w-4" />
     </Button>
   );

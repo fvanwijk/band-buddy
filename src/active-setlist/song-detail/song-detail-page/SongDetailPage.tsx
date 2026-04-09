@@ -160,7 +160,7 @@ export function SongDetailPage() {
       {currentSong.bpm && (
         <Button
           className="metronome-pulse"
-          icon
+          isIcon
           onClick={() => setIsMetronomeRunning((prev) => !prev)}
           style={{ animationDuration: `${beatDurationSeconds}s` }}
           title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}

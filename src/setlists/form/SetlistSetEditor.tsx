@@ -123,7 +123,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
             iconStart={<IconTrash className="h-4 w-4" />}
             onClick={onRemove}
             type="button"
-            variant="ghost"
+            variant="text"
           >
             Remove set
           </Button>
@@ -171,11 +171,11 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
                 <div className="flex gap-1">
                   <Button
                     disabled={songIndex === 0 && index === 0}
-                    icon
+                    isIcon
                     onClick={() => handleMoveSong(songIndex, 'up')}
                     title="Move up"
                     type="button"
-                    variant="ghost"
+                    variant="text"
                   >
                     <IconArrowUp className="h-4 w-4" />
                   </Button>
@@ -184,11 +184,11 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
                       songIndex === currentSetSongs.length - 1 &&
                       index === allSetsOfSetlist.length - 1
                     }
-                    icon
+                    isIcon
                     onClick={() => handleMoveSong(songIndex, 'down')}
                     title="Move down"
                     type="button"
-                    variant="ghost"
+                    variant="text"
                   >
                     <IconArrowDown className="h-4 w-4" />
                   </Button>

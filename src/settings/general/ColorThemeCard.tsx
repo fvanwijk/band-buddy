@@ -48,7 +48,7 @@ export function ColorThemeCard() {
                   ? 'border-brand-400 bg-brand-400/10'
                   : 'border-slate-700 bg-slate-800/50 hover:border-slate-600',
               ].join(' ')}
-              variant="ghost"
+              variant="text"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>

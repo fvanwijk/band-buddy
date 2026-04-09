@@ -10,7 +10,7 @@ type DeleteButtonProps = { title?: string } & Omit<
 
 export function DeleteButton({ title = 'Delete', ...props }: DeleteButtonProps) {
   return (
-    <Button color="danger" icon title={title} type="button" variant="outlined" {...props}>
+    <Button color="danger" isIcon title={title} type="button" variant="outlined" {...props}>
       <IconTrash className="h-4 w-4" />
     </Button>
   );

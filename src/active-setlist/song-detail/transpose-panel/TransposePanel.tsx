@@ -27,11 +27,11 @@ export function TransposePanel({ onTransposeChange, transpose }: TransposePanelP
       <div className="flex items-center gap-2">
         <Button
           className="h-7 w-7 text-xs"
-          icon
+          isIcon
           onClick={() => onTransposeChange(-1)}
           title="Transpose down"
           type="button"
-          variant="ghost"
+          variant="text"
         >
           <IconMinus className="h-4 w-4" />
         </Button>
@@ -45,11 +45,11 @@ export function TransposePanel({ onTransposeChange, transpose }: TransposePanelP
         </span>
         <Button
           className="h-7 w-7 text-xs"
-          icon
+          isIcon
           onClick={() => onTransposeChange(1)}
           title="Transpose up"
           type="button"
-          variant="ghost"
+          variant="text"
         >
           <IconPlus className="h-4 w-4" />
         </Button>

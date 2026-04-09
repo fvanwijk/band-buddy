@@ -11,7 +11,7 @@ export function SortButton({ isActive, label, onClick, sortDirection }: SortButt
   const directionSymbol = isActive && sortDirection ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
 
   return (
-    <Button onClick={onClick} variant="ghost">
+    <Button onClick={onClick} variant="text">
       {label}
       {directionSymbol}
     </Button>

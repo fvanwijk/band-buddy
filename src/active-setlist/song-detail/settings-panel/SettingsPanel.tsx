@@ -56,7 +56,7 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
       <PopoverButton
         as={Button}
         color="primary"
-        icon
+        isIcon
         ref={setReferenceElement}
         title="Settings"
         type="button"

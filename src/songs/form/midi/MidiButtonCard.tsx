@@ -40,7 +40,7 @@ export function MidiButtonCard({ event, instrument, isAvailable, onDelete }: Mid
       <div className="flex gap-2">
         <Button
           disabled={!isAvailable || !output}
-          icon
+          isIcon
           onClick={() => handleTestEvent(event)}
           title="Test MIDI button"
           type="button"

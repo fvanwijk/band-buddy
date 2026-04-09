@@ -109,7 +109,7 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
                   iconStart={<IconPlus className="h-4 w-4" />}
                   onClick={handleAddSet}
                   type="button"
-                  variant="ghost"
+                  variant="text"
                 >
                   Add set
                 </Button>
