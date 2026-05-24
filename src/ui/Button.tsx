@@ -9,7 +9,7 @@ const buttonVariants = cva(
     compoundVariants: [
       // Filled variants
       {
-        className: 'bg-slate-700 text-slate-300 hover:bg-slate-600 disabled:hover:bg-slate-700',
+        className: 'bg-slate-700 text-slate-100 hover:bg-slate-600 disabled:hover:bg-slate-700',
         color: 'default',
         variant: 'filled',
       },

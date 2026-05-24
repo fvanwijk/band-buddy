@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
 import { useHasSeenWelcome, useSetHasSeenWelcome } from './api/useSettings';
+import { useWakeLock } from './hooks/useWakeLock';
 import { Logo } from './ui/Logo';
 import { TopNav } from './ui/TopNav';
 import { WelcomeModal } from './ui/WelcomeModal';
 
 export function Layout() {
+  useWakeLock();
+
   const hasSeenWelcome = useHasSeenWelcome();
   const setHasSeenWelcome = useSetHasSeenWelcome();
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(!hasSeenWelcome);
