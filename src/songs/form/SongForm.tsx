@@ -68,7 +68,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     },
   });
 
-  const { append, remove } = useFieldArray({
+  const { append, remove, update } = useFieldArray({
     control,
     name: 'midiEvents',
   });
@@ -195,6 +195,16 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     }
   };
 
+  const handleEditMidiEvent = (eventId: string, event: Omit<MidiEvent, 'id'>) => {
+    const index = midiEvents.findIndex((item) => item.id === eventId);
+    if (index >= 0) {
+      update(index, {
+        ...event,
+        id: eventId,
+      });
+    }
+  };
+
   return (
     <Page>
       <PageHeader backPath={backPath} title={title} />
@@ -260,6 +270,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                   midiEvents={midiEvents}
                   onAddEvent={handleAddMidiEvent}
                   onDeleteEvent={handleDeleteMidiEvent}
+                  onEditEvent={handleEditMidiEvent}
                 />
               ),
               id: 'midi',

@@ -6,14 +6,15 @@ import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
-import { AddMidiButtonDialog } from './AddMidiButtonDialog';
 import { MidiButtonCard } from './MidiButtonCard';
+import { MidiButtonDialog } from './MidiButtonDialog';
 
 type MidiButtonsTabProps = {
   instruments: Instrument[];
   midiEvents?: MidiEvent[];
   onAddEvent?: (event: Omit<MidiEvent, 'id'>) => void;
   onDeleteEvent?: (eventId: string) => void;
+  onEditEvent?: (eventId: string, event: Omit<MidiEvent, 'id'>) => void;
 };
 
 export function MidiButtonsTab({
@@ -21,12 +22,35 @@ export function MidiButtonsTab({
   midiEvents,
   onAddEvent,
   onDeleteEvent,
+  onEditEvent,
 }: MidiButtonsTabProps) {
+  const [editingEvent, setEditingEvent] = useState<MidiEvent | undefined>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { isReady, outputs } = useMidiDevices();
 
-  const handleAddEvent = (event: Omit<MidiEvent, 'id'>) => {
-    onAddEvent?.(event);
+  const handleDialogClose = () => {
+    setEditingEvent(undefined);
+    setIsDialogOpen(false);
+  };
+
+  const handleDialogSubmit = (event: Omit<MidiEvent, 'id'>) => {
+    if (editingEvent) {
+      onEditEvent?.(editingEvent.id, event);
+    } else {
+      onAddEvent?.(event);
+    }
+
+    handleDialogClose();
+  };
+
+  const handleOpenAddDialog = () => {
+    setEditingEvent(undefined);
+    setIsDialogOpen(true);
+  };
+
+  const handleOpenEditDialog = (event: MidiEvent) => {
+    setEditingEvent(event);
+    setIsDialogOpen(true);
   };
 
   const outputsById = new Map(outputs.map((output) => [output.id, output]));
@@ -45,11 +69,20 @@ export function MidiButtonsTab({
         </Alert>
       )}
 
-      <AddMidiButtonDialog
+      <MidiButtonDialog
+        initialData={
+          editingEvent
+            ? {
+                instrumentId: editingEvent.instrumentId,
+                label: editingEvent.label,
+                programChange: editingEvent.programChange,
+              }
+            : undefined
+        }
         instruments={instruments}
         isOpen={isDialogOpen}
-        onAdd={handleAddEvent}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={handleDialogClose}
+        onSubmit={handleDialogSubmit}
       />
 
       {/* Buttons List */}
@@ -64,7 +97,7 @@ export function MidiButtonsTab({
           <Button
             color="primary"
             isIcon
-            onClick={() => setIsDialogOpen(true)}
+            onClick={handleOpenAddDialog}
             title="Add MIDI button"
             type="button"
             variant="outlined"
@@ -75,7 +108,7 @@ export function MidiButtonsTab({
         {!midiEvents || midiEvents.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/40 p-4 text-center text-sm text-slate-400">
             No MIDI buttons yet.{' '}
-            <button className="link" onClick={() => setIsDialogOpen(true)} type="button">
+            <button className="link" onClick={handleOpenAddDialog} type="button">
               Create one
             </button>
             .
@@ -93,6 +126,7 @@ export function MidiButtonsTab({
                   instrument={instrument}
                   isAvailable={isAvailable}
                   onDelete={() => onDeleteEvent?.(event.id)}
+                  onEdit={handleOpenEditDialog}
                 />
               );
             })}

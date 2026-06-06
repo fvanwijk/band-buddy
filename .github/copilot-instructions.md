@@ -33,6 +33,23 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 
 ## Testing
 
+### Agent-safe Vite+ Commands (Required)
+
+- Always run Vite+ commands in non-interactive mode when executed by an agent or automated terminal session.
+- Use this exact pattern: `CI=1 command vp ...`
+- Do not use plain `vp ...` in agent terminals, because interactive output can hang or fail to stream.
+- Apply this to all Vite+ commands, including generation, linting, tests, build, and storybook.
+
+Examples:
+
+- `CI=1 command vp run generate:api`
+- `CI=1 command vp run generate:msw`
+- `CI=1 command vp run lint`
+- `CI=1 command vp test run --no-ui`
+- `CI=1 command vp run build`
+
+### Writing tests
+
 - Use Vitest with @testing-library/react
 - Prefer `renderHook()` for testing hooks
 - Colocate tests next to related code as `src/**/*.test.tsx`

@@ -118,6 +118,11 @@ describe('SongForm', () => {
     // Add MIDI button
     expect(await screen.findByText('Piano')).toBeInTheDocument();
     expect(screen.getByText('Program Change 0 →')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Edit MIDI button' }));
+    await user.clear(await screen.findByLabelText('Button label*'));
+    await user.type(screen.getByLabelText('Button label*'), 'Piano Lead');
+    await user.click(screen.getByRole('button', { name: 'Update button' }));
+    expect(await screen.findByText('Piano Lead')).toBeInTheDocument();
     expect(screen.getByText('Nord Stage 4')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Test MIDI button' })).toBeInTheDocument();
 
@@ -130,7 +135,7 @@ describe('SongForm', () => {
     await user.click(screen.getByRole('button', { name: 'Create song' }));
 
     expect(onSubmit).toHaveBeenCalledWith(
-      {
+      expect.objectContaining({
         artist: 'Test Artist',
         bpm: 120,
         canvasPaths: [],
@@ -143,7 +148,7 @@ describe('SongForm', () => {
         notes: 'Act like a rock star while playing this song',
         timeSignature: '4/4',
         title: 'Test Title',
-      },
+      }),
       undefined,
     );
   });

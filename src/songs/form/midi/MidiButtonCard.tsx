@@ -1,4 +1,4 @@
-import { IconPlayerPlay } from '@tabler/icons-react';
+import { IconPencil, IconPlayerPlay } from '@tabler/icons-react';
 
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
@@ -10,9 +10,16 @@ type MidiButtonCardProps = {
   instrument?: Instrument;
   isAvailable: boolean;
   onDelete: (eventId: string) => void;
+  onEdit: (event: MidiEvent) => void;
 };
 
-export function MidiButtonCard({ event, instrument, isAvailable, onDelete }: MidiButtonCardProps) {
+export function MidiButtonCard({
+  event,
+  instrument,
+  isAvailable,
+  onDelete,
+  onEdit,
+}: MidiButtonCardProps) {
   const { outputs } = useMidiDevices();
 
   const output = instrument?.midiInId
@@ -47,6 +54,15 @@ export function MidiButtonCard({ event, instrument, isAvailable, onDelete }: Mid
           variant="outlined"
         >
           <IconPlayerPlay className="h-4 w-4" />
+        </Button>
+        <Button
+          isIcon
+          onClick={() => onEdit(event)}
+          title="Edit MIDI button"
+          type="button"
+          variant="outlined"
+        >
+          <IconPencil className="h-4 w-4" />
         </Button>
         <DeleteButton onClick={() => onDelete(event.id)} title="Delete MIDI button" />
       </div>

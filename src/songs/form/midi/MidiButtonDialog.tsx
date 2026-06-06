@@ -1,4 +1,5 @@
 import { IconPlus } from '@tabler/icons-react';
+import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
@@ -11,19 +12,23 @@ import { useProgramOptions } from './useProgramOptions';
 
 type FormData = Omit<MidiEvent, 'id'>;
 
-type AddMidiButtonDialogProps = {
+type MidiButtonDialogProps = {
+  initialData?: FormData;
   instruments: Instrument[];
   isOpen: boolean;
-  onAdd: (event: Omit<MidiEvent, 'id'>) => void;
   onClose: () => void;
+  onSubmit: (event: Omit<MidiEvent, 'id'>) => void;
 };
 
-export function AddMidiButtonDialog({
+export function MidiButtonDialog({
+  initialData,
   instruments,
   isOpen,
-  onAdd,
   onClose,
-}: AddMidiButtonDialogProps) {
+  onSubmit,
+}: MidiButtonDialogProps) {
+  const isEditMode = !!initialData;
+
   const {
     control,
     formState: { errors },
@@ -32,9 +37,9 @@ export function AddMidiButtonDialog({
     reset,
   } = useForm<FormData>({
     defaultValues: {
-      instrumentId: instruments[0]?.id || '',
-      label: '',
-      programChange: 0,
+      instrumentId: initialData?.instrumentId || instruments[0]?.id || '',
+      label: initialData?.label || '',
+      programChange: initialData?.programChange ?? 0,
     },
     mode: 'all',
   });
@@ -45,9 +50,20 @@ export function AddMidiButtonDialog({
   const programOptions = useProgramOptions(selectedInstrument);
   const hasSelectableOptions = programOptions.length > 0;
 
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    reset({
+      instrumentId: initialData?.instrumentId || instruments[0]?.id || '',
+      label: initialData?.label || '',
+      programChange: initialData?.programChange ?? 0,
+    });
+  }, [initialData, instruments, isOpen, reset]);
+
   const handleAdd = (data: FormData) => {
-    onAdd(data);
-    reset();
+    onSubmit(data);
     onClose();
   };
 
@@ -62,7 +78,11 @@ export function AddMidiButtonDialog({
   }));
 
   return (
-    <Dialog onClose={onClose} open={isOpen} title="Add MIDI Button">
+    <Dialog
+      onClose={onClose}
+      open={isOpen}
+      title={isEditMode ? 'Edit MIDI Button' : 'Add MIDI Button'}
+    >
       <form autoComplete="off" noValidate onSubmit={handleFormSubmit}>
         <div className="space-y-4">
           <InputField
@@ -128,11 +148,11 @@ export function AddMidiButtonDialog({
           <Button
             color="primary"
             className="flex-1"
-            iconStart={<IconPlus className="h-4 w-4" />}
+            iconStart={!isEditMode ? <IconPlus className="h-4 w-4" /> : undefined}
             type="submit"
             variant="filled"
           >
-            Add button
+            {isEditMode ? 'Update button' : 'Add button'}
           </Button>
         </div>
       </form>
