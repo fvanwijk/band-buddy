@@ -20,10 +20,22 @@ export function SheetMusicTab({ sheetMusicFilename, songId }: SheetMusicTabProps
     );
   }
 
-  if (!sheetMusicFilename || !file) {
+  if (!sheetMusicFilename) {
     return (
       <EmptyStateBlock icon={<IconFileMusic className="h-8 w-8" />}>
         No sheet music added yet
+      </EmptyStateBlock>
+    );
+  }
+
+  if (!file) {
+    return (
+      <EmptyStateBlock icon={<IconFileMusic className="h-8 w-8" />}>
+        <div>
+          <p className="mb-1">Failed to load sheet music.</p>
+          <p className="mb-3">It may have been deleted or become inaccessible.</p>
+          <p className="text-lg font-bold">{sheetMusicFilename}</p>
+        </div>
       </EmptyStateBlock>
     );
   }

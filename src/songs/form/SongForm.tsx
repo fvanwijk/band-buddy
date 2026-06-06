@@ -60,7 +60,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   } = useForm<SongFormData>({
     defaultValues: {
       ...initialData,
-      defaultTab: initialData?.defaultTab || undefined,
+      defaultTab: initialData?.defaultTab || 'auto',
       durationMinutes: initialData?.duration ? Math.floor(initialData.duration / 60) : undefined,
       durationSeconds: initialData?.duration ? initialData.duration % 60 : undefined,
       keyNote: existingNote || undefined,

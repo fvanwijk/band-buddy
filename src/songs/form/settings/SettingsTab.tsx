@@ -10,9 +10,10 @@ type SettingsTabProps = {
 };
 
 export const defaultTabOptions = [
+  { label: 'Auto', value: 'auto' },
   { label: 'Lyrics', value: 'lyrics' },
   { label: 'Sheet music', value: 'sheet-music' },
-  { label: 'Notes', value: 'notes' },
+  { label: 'Notes', value: 'text-notes' },
   { label: 'MIDI buttons', value: 'midi' },
 ];
 

@@ -9,13 +9,13 @@ import {
   useTable,
 } from 'tinybase/ui-react';
 
-import { songDetailTabSchema, songSchema } from '../schemas';
+import { songDefaultTabSchema, songSchema } from '../schemas';
 import type { Song } from '../types';
 
 export function parseSongDefaultTab(
   songRow: Record<string, unknown> | null | undefined,
 ): Song['defaultTab'] | undefined {
-  const parsedTab = songDetailTabSchema.safeParse(songRow?.defaultTab);
+  const parsedTab = songDefaultTabSchema.safeParse(songRow?.defaultTab);
 
   return parsedTab.success ? parsedTab.data : undefined;
 }

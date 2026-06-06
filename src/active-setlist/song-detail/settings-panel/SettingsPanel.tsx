@@ -103,7 +103,7 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               label="Default tab"
               onChange={(event) => handleDefaultTabChange(event.target.value as SongDefaultTab)}
               options={defaultTabOptions}
-              value={song.defaultTab || 'lyrics'}
+              value={song.defaultTab || 'auto'}
             />
           </div>
         </Card>

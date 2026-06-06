@@ -4,6 +4,7 @@ import type { LoaderFunctionArgs } from 'react-router-dom';
 import { parseSongDefaultTab } from '../../../api/useSong';
 import type { SongDetailTab } from '../../../schemas';
 import { createAppStore, createStorePersister } from '../../../store/store';
+import { resolveAutoSongTab } from './resolveAutoSongTab';
 
 async function getDefaultSongTab(setlistId: string, setlistSongId: string): Promise<SongDetailTab> {
   const store = createAppStore();
@@ -26,8 +27,13 @@ async function getDefaultSongTab(setlistId: string, setlistSongId: string): Prom
 
   const songId = String(setlistSongRow.songId);
   const songRow = store.getRow('songs', songId) as Record<string, unknown> | null | undefined;
+  const defaultTab = parseSongDefaultTab(songRow);
 
-  return parseSongDefaultTab(songRow) || 'lyrics';
+  if (!defaultTab || defaultTab === 'auto') {
+    return resolveAutoSongTab(songRow);
+  }
+
+  return defaultTab;
 }
 
 export async function songDetailIndexLoader({ params }: LoaderFunctionArgs) {

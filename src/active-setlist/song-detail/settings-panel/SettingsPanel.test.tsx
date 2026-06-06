@@ -118,4 +118,13 @@ describe('SettingsPanel', () => {
       expect(getPersistedStore()).toContain('"defaultTab":"midi"');
     });
   });
+
+  it('defaults the select field to auto when no song preference is stored', async () => {
+    const user = userEvent.setup();
+    await renderComponent(songWithAllSettings);
+
+    await user.click(screen.getByTitle('Settings'));
+
+    expect(screen.getByRole('combobox', { name: 'Default tab' })).toHaveValue('auto');
+  });
 });

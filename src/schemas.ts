@@ -29,6 +29,8 @@ export const instrumentSchema = instrumentTableSchema.extend({
 export const songDetailTabSchema = z.enum(['lyrics', 'text-notes', 'sheet-music', 'midi']);
 export const songDetailTabs = songDetailTabSchema.options;
 export type SongDetailTab = z.infer<typeof songDetailTabSchema>;
+export const songDefaultTabSchema = z.enum(['auto', ...songDetailTabs]);
+export type SongDefaultTab = z.infer<typeof songDefaultTabSchema>;
 
 // Song
 export const songTableSchema = z.object({
@@ -50,7 +52,7 @@ export const songTableSchema = z.object({
 });
 export const songSchema = songTableSchema.extend({
   canvasPaths: z.array(z.unknown()).optional(),
-  defaultTab: songDetailTabSchema.optional(),
+  defaultTab: songDefaultTabSchema.optional(),
   id: z.string(),
   midiEvents: z.array(midiEventSchema).optional(),
 });
