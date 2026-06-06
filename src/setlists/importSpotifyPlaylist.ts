@@ -18,12 +18,12 @@ export function useProcessSpotifyPlaylist() {
       return;
     }
     const songsTable = store.getTable('songs') || {};
-    const existingSongs = new Set(
-      Object.entries(songsTable).map(([, songRow]) => {
+    const existingSongIdsByKey = new Map<string, string>(
+      Object.entries(songsTable).map(([songId, songRow]) => {
         const song = songRow as Record<string, unknown>;
         const artist = typeof song.artist === 'string' ? song.artist : '';
         const title = typeof song.title === 'string' ? song.title : '';
-        return `${title}|${artist}`;
+        return [`${title}|${artist}`, songId] as const;
       }),
     );
 
@@ -37,13 +37,16 @@ export function useProcessSpotifyPlaylist() {
           .join(', ');
         const title = track.name;
         const songKey = `${title}|${artist}`;
+        const existingSongId = existingSongIdsByKey.get(songKey);
 
-        if (existingSongs.has(songKey)) {
+        if (existingSongId) {
+          songIds.push(existingSongId);
           return;
         }
 
         const songData: Omit<Song, 'id'> = {
           artist,
+          duration: Math.round(track.duration_ms / 1000),
           key: '',
           spotifyId: track.id,
           timeSignature: '',
@@ -53,7 +56,7 @@ export function useProcessSpotifyPlaylist() {
         const songId = store.addRow('songs', songData as unknown as Row);
         if (songId) {
           songIds.push(songId);
-          existingSongs.add(songKey);
+          existingSongIdsByKey.set(songKey, songId);
         }
       }
     });

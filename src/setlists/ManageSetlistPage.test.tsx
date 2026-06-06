@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 
 import type { SpotifyContextType } from '../contexts/SpotifyContext';
 import { seedSetlists } from '../mocks/seed';
+import { createSongTable } from '../mocks/songs';
 import { StoreProvider } from '../store/StoreProvider';
 import { MockQueryClientProvider, MockSpotifyProvider, getMockStore } from '../testUtils';
 import { ManageSetlistsPage } from './ManageSetlistsPage';
@@ -117,6 +118,53 @@ describe('ManageSetlistPage', () => {
       await user.click(await screen.findByRole('button', { name: 'Import from Spotify' }));
 
       expect(screen.getByRole('dialog', { name: 'Import from Spotify' })).toBeInTheDocument();
+
+      await user.type(
+        await screen.findByLabelText('Playlist URL or ID*'),
+        'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M',
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Import' }));
+
+      expect(getPlaylistMock).toHaveBeenCalledWith('37i9dQZF1DXcBWIGoYBM5M');
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: 'Import from Spotify' }),
+        ).not.toBeInTheDocument(),
+      );
+
+      expect(screen.getByText('Test Playlist')).toBeInTheDocument();
+      expect(screen.getByText('1 set')).toBeInTheDocument();
+      expect(screen.getByText('1 song')).toBeInTheDocument();
+    });
+
+    it('creates a setlist when imported songs already exist in the library', async () => {
+      const user = userEvent.setup();
+      const { store, persister } = getMockStore();
+      store.setRow(
+        'songs',
+        'existing-song-id',
+        createSongTable({
+          artist: 'Test Artist',
+          spotifyId: '1',
+          title: 'Test Song',
+        }),
+      );
+      await persister.save();
+
+      const getPlaylistMock = vi.fn().mockResolvedValue({
+        name: 'Test Playlist',
+        tracks: {
+          items: [{ track: { artists: [{ name: 'Test Artist' }], id: '1', name: 'Test Song' } }],
+        },
+      });
+
+      renderComponent({
+        sdk: { playlists: { getPlaylist: getPlaylistMock } } as unknown as SpotifyApi,
+      });
+
+      await user.click(await screen.findByRole('button', { name: 'Import from Spotify' }));
 
       await user.type(
         await screen.findByLabelText('Playlist URL or ID*'),
