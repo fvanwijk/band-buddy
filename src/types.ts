@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   instrumentSchema,
   instrumentTableSchema,
+  midiEventActionSchema,
   midiEventSchema,
   setlistSchema,
   setlistSetSchema,
@@ -20,6 +21,7 @@ export type SetlistSongTable = z.infer<typeof setlistSongTableSchema>;
 export type SetlistTable = z.infer<typeof setlistTableSchema>;
 export type SetlistSetTable = z.infer<typeof setlistSetTableSchema>;
 
+export type MidiEventAction = z.infer<typeof midiEventActionSchema>;
 export type MidiEvent = z.infer<typeof midiEventSchema>;
 export type Instrument = z.infer<typeof instrumentSchema>;
 export type Song = z.infer<typeof songSchema>;

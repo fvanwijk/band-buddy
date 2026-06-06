@@ -1,6 +1,6 @@
 import type { Tables } from 'tinybase';
 
-export const CURRENT_BACKUP_VERSION = 2;
+export const CURRENT_BACKUP_VERSION = 3;
 export const PERSISTED_STORE_VERSION_KEY = 'band-buddy-version';
 
 // Legacy installs persisted Tinybase data without a separate version key.
@@ -16,7 +16,49 @@ export function inferLegacyPersistedStoreVersion(tables: Tables): number {
     (song) => typeof song === 'object' && song !== null && 'setId' in song,
   );
 
-  return hasV2SetId ? CURRENT_BACKUP_VERSION : 1;
+  if (!hasV2SetId) {
+    return 1;
+  }
+
+  const songs = tables.songs;
+  if (!songs) {
+    return CURRENT_BACKUP_VERSION;
+  }
+
+  const hasV2MidiShape = Object.values(songs).some((song) => {
+    if (typeof song !== 'object' || song === null) {
+      return false;
+    }
+
+    const midiEvents = (song as Record<string, unknown>).midiEvents;
+    if (typeof midiEvents !== 'string') {
+      return false;
+    }
+
+    try {
+      const parsed = JSON.parse(midiEvents);
+      if (!Array.isArray(parsed)) {
+        return false;
+      }
+
+      return parsed.some((event) => {
+        if (typeof event !== 'object' || event === null) {
+          return false;
+        }
+
+        const typedEvent = event as Record<string, unknown>;
+        return (
+          typeof typedEvent.instrumentId === 'string' &&
+          typeof typedEvent.programChange === 'number' &&
+          !Array.isArray(typedEvent.events)
+        );
+      });
+    } catch {
+      return false;
+    }
+  });
+
+  return hasV2MidiShape ? 2 : CURRENT_BACKUP_VERSION;
 }
 
 export function parsePersistedStoreVersion(input: string | null): number | null {

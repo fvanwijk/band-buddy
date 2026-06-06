@@ -1,11 +1,14 @@
 import { z } from 'zod';
 
-// MIDI Event - stored as JSON string in the DB, but parsed into an array of objects in the app
-// TODO: Consider normalizing this in the DB for easier querying and updates
-export const midiEventBaseSchema = z.object({
+// MIDI events are stored as JSON in the songs table.
+// Each button can trigger multiple program changes across instruments.
+export const midiEventActionSchema = z.object({
   instrumentId: z.string(),
-  label: z.string(),
   programChange: z.number(),
+});
+export const midiEventBaseSchema = z.object({
+  events: z.array(midiEventActionSchema).min(1),
+  label: z.string(),
 });
 export const midiEventSchema = midiEventBaseSchema.extend({ id: z.string() });
 

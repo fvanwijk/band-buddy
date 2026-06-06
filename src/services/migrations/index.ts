@@ -3,6 +3,7 @@ import { z, ZodError } from 'zod';
 
 import { CURRENT_BACKUP_VERSION, resolvePersistedStoreVersion } from './persistedStoreVersion';
 import { migrateV1ToV2 } from './v1-to-v2/migration';
+import { migrateV2ToV3 } from './v2-to-v3/migration';
 
 const CURRENT_VERSION = CURRENT_BACKUP_VERSION;
 
@@ -79,7 +80,7 @@ export function migratePersistedStore(
 }
 
 /**
- * Migrate backup from input version to the current app version (2)
+ * Migrate backup from input version to the current app version
  * Runs all necessary migrations sequentially
  */
 export function migrateBackup(
@@ -124,6 +125,11 @@ export function migrateBackup(
     if (inputVersion <= 1 && CURRENT_VERSION >= 2) {
       const result = migrateV1ToV2(current);
       current = { tables: result.tables, values: result.values, version: 2 };
+    }
+
+    if (inputVersion <= 2 && CURRENT_VERSION >= 3) {
+      const result = migrateV2ToV3(current);
+      current = { tables: result.tables, values: result.values, version: 3 };
     }
 
     // Final parse and normalize

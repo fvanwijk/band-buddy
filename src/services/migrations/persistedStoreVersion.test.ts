@@ -10,7 +10,7 @@ import {
 
 describe('persistedStoreVersion', () => {
   it('parses a valid stored version', () => {
-    expect(parsePersistedStoreVersion('2')).toBe(2);
+    expect(parsePersistedStoreVersion('3')).toBe(3);
   });
 
   it('returns null for invalid stored versions', () => {
@@ -26,7 +26,7 @@ describe('persistedStoreVersion', () => {
       },
     } as unknown as Tables;
 
-    expect(resolvePersistedStoreVersion('2', tables)).toBe(2);
+    expect(resolvePersistedStoreVersion('3', tables)).toBe(3);
   });
 
   it('falls back to legacy inference when no version is stored', () => {
@@ -47,5 +47,19 @@ describe('persistedStoreVersion', () => {
     } as unknown as Tables;
 
     expect(inferLegacyPersistedStoreVersion(tables)).toBe(CURRENT_BACKUP_VERSION);
+  });
+
+  it('infers v2 when songs still use single-action MIDI button shape', () => {
+    const tables = {
+      setlistSets: { '0': { setIndex: 1, setlistId: '1' } },
+      setlistSongs: { '0': { setId: '0', songId: '1', songIndex: 0 } },
+      songs: {
+        '1': {
+          midiEvents: '[{"id":"midi-1","instrumentId":"0","label":"Organ","programChange":12}]',
+        },
+      },
+    } as unknown as Tables;
+
+    expect(inferLegacyPersistedStoreVersion(tables)).toBe(2);
   });
 });

@@ -1,24 +1,38 @@
 import type { MidiEvent, Song, SongTable } from '../types';
 
 export const createMidiEvent = (overrides: Partial<MidiEvent> = {}): MidiEvent => ({
+  events: [
+    {
+      instrumentId: '0',
+      programChange: 1,
+    },
+  ],
   id: '1',
-  instrumentId: '0',
   label: 'Piano',
-  programChange: 1,
   ...overrides,
 });
 
 export const createMidiEvents = (): MidiEvent[] => [
   createMidiEvent(),
   createMidiEvent({
+    events: [
+      {
+        instrumentId: '0',
+        programChange: 5,
+      },
+    ],
     id: '2',
     label: 'EP',
-    programChange: 5,
   }),
   createMidiEvent({
+    events: [
+      {
+        instrumentId: '0',
+        programChange: 12,
+      },
+    ],
     id: '3',
     label: 'Organ',
-    programChange: 12,
   }),
 ];
 

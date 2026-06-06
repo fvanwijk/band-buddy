@@ -1,14 +1,12 @@
 import { IconPlus } from '@tabler/icons-react';
 import { useEffect } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { Dialog } from '../../../ui/Dialog';
 import { InputField } from '../../../ui/form/InputField';
-import { SelectField } from '../../../ui/form/SelectField';
-import { useProgramOptions } from './useProgramOptions';
+import { MidiEventRow } from './MidiEventRow';
 
 type FormData = Omit<MidiEvent, 'id'>;
 
@@ -37,18 +35,27 @@ export function MidiButtonDialog({
     reset,
   } = useForm<FormData>({
     defaultValues: {
-      instrumentId: initialData?.instrumentId || instruments[0]?.id || '',
+      events: initialData?.events || [
+        {
+          instrumentId: instruments[0]?.id || '',
+          programChange: 0,
+        },
+      ],
       label: initialData?.label || '',
-      programChange: initialData?.programChange ?? 0,
     },
     mode: 'all',
   });
 
-  const selectedInstrumentId = useWatch({ control, name: 'instrumentId' });
+  const { append, fields, remove } = useFieldArray({
+    control,
+    name: 'events',
+  });
 
-  const selectedInstrument = instruments.find((inst) => inst.id === selectedInstrumentId);
-  const programOptions = useProgramOptions(selectedInstrument);
-  const hasSelectableOptions = programOptions.length > 0;
+  const selectedEvents =
+    useWatch({
+      control,
+      name: 'events',
+    }) || [];
 
   useEffect(() => {
     if (!isOpen) {
@@ -56,9 +63,13 @@ export function MidiButtonDialog({
     }
 
     reset({
-      instrumentId: initialData?.instrumentId || instruments[0]?.id || '',
+      events: initialData?.events || [
+        {
+          instrumentId: instruments[0]?.id || '',
+          programChange: 0,
+        },
+      ],
       label: initialData?.label || '',
-      programChange: initialData?.programChange ?? 0,
     });
   }, [initialData, instruments, isOpen, reset]);
 
@@ -79,6 +90,7 @@ export function MidiButtonDialog({
 
   return (
     <Dialog
+      contentClassName="max-w-3xl"
       onClose={onClose}
       open={isOpen}
       title={isEditMode ? 'Edit MIDI Button' : 'Add MIDI Button'}
@@ -93,52 +105,39 @@ export function MidiButtonDialog({
             required
           />
 
-          <SelectField
-            error={errors.instrumentId}
-            helperText={
-              instruments.length === 0 ? (
-                <>
-                  Add the first instrument in{' '}
-                  <Link className="link" to="/settings/instruments">
-                    Settings → Instruments
-                  </Link>
-                </>
-              ) : undefined
-            }
-            label="Instrument"
-            options={instrumentOptions}
-            {...register('instrumentId', { required: 'Instrument is required' })}
-            required
-          />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-200">MIDI Events</h3>
+              <Button
+                isIcon
+                onClick={() =>
+                  append({
+                    instrumentId: instruments[0]?.id || '',
+                    programChange: 0,
+                  })
+                }
+                title="Add MIDI event row"
+                type="button"
+                variant="outlined"
+              >
+                <IconPlus className="h-4 w-4" />
+              </Button>
+            </div>
 
-          {hasSelectableOptions ? (
-            <SelectField
-              error={errors.programChange}
-              label="Program"
-              options={programOptions}
-              {...register('programChange', {
-                required: 'Program is required',
-                valueAsNumber: true,
-              })}
-              required
-            />
-          ) : (
-            <InputField
-              error={errors.programChange}
-              label="Program Change number"
-              max="511"
-              min="0"
-              placeholder="0-511"
-              {...register('programChange', {
-                max: { message: 'Program change must be at most 511', value: 511 },
-                min: { message: 'Program change must be at least 0', value: 0 },
-                required: 'Program change is required',
-                valueAsNumber: true,
-              })}
-              required
-              type="number"
-            />
-          )}
+            {fields.map((field, index) => (
+              <MidiEventRow
+                canRemove={fields.length > 1}
+                errors={errors}
+                index={index}
+                instrumentOptions={instrumentOptions}
+                instruments={instruments}
+                key={field.id}
+                onRemove={() => remove(index)}
+                register={register}
+                selectedInstrumentId={selectedEvents[index]?.instrumentId}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="mt-6 flex gap-3">

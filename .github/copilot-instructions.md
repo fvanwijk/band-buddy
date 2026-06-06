@@ -832,6 +832,8 @@ src/
 
 **Every component with tests must have its own directory**, even if it's a small component. This applies across the codebase (not just `src/ui`):
 
+**Define only one React component per file.** Extract additional components into their own files instead of defining multiple component functions in one file.
+
 ```
 src/ui/
 ├── button/

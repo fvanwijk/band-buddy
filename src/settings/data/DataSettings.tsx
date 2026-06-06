@@ -15,7 +15,7 @@ type BackupPayload = {
   values: Values;
 };
 
-const BACKUP_VERSION = 2;
+const BACKUP_VERSION = 3;
 
 type StatusState = {
   message: string;

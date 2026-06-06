@@ -143,7 +143,11 @@ describe('SongForm', () => {
         key: 'Ab',
         lyrics: 'Is this the real life? Is this just fantasy?',
         midiEvents: [
-          { id: expect.any(String), instrumentId: '0', label: 'Piano', programChange: 0 },
+          {
+            events: [{ instrumentId: '0', programChange: 0 }],
+            id: expect.any(String),
+            label: 'Piano',
+          },
         ],
         notes: 'Act like a rock star while playing this song',
         timeSignature: '4/4',

@@ -35,11 +35,11 @@ describe('MidiButtonDialog', () => {
     await user.type(screen.getByLabelText('Button label*'), 'Test Button');
 
     // Program for Nora Stage that is default selected
-    await user.selectOptions(screen.getByLabelText('Program*'), 'A-21 (8)');
+    await user.selectOptions(screen.getByLabelText('Program 1'), 'A-21 (8)');
 
-    await user.selectOptions(screen.getByLabelText('Instrument*'), 'Yamaha Montage');
+    await user.selectOptions(screen.getByLabelText('Instrument 1'), 'Yamaha Montage');
 
-    const pc = screen.getByLabelText('Program Change number*');
+    const pc = screen.getByLabelText('Program Change number 1');
     await user.type(pc, '999');
 
     await user.click(screen.getByRole('button', { name: 'Add button' }));
@@ -47,12 +47,17 @@ describe('MidiButtonDialog', () => {
     await user.clear(pc);
     await user.type(pc, '12');
 
+    await user.click(screen.getByRole('button', { name: 'Add MIDI event row' }));
+    await user.selectOptions(screen.getByLabelText('Program 2'), '5');
+
     await user.click(screen.getByRole('button', { name: 'Add button' }));
 
     expect(onSubmit).toHaveBeenCalledWith({
-      instrumentId: '1',
+      events: [
+        { instrumentId: '1', programChange: 12 },
+        { instrumentId: '0', programChange: 5 },
+      ],
       label: 'Test Button',
-      programChange: 12,
     });
 
     expect(onClose).toHaveBeenCalled();
@@ -66,9 +71,8 @@ describe('MidiButtonDialog', () => {
 
     renderComponent({
       initialData: {
-        instrumentId: '0',
+        events: [{ instrumentId: '0', programChange: 8 }],
         label: 'Piano',
-        programChange: 8,
       },
       onClose,
       onSubmit,
@@ -83,9 +87,8 @@ describe('MidiButtonDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Update button' }));
 
     expect(onSubmit).toHaveBeenCalledWith({
-      instrumentId: '0',
+      events: [{ instrumentId: '0', programChange: 8 }],
       label: 'Piano Lead',
-      programChange: 8,
     });
     expect(onClose).toHaveBeenCalled();
   });

@@ -16,6 +16,7 @@ import { useGetSongs } from '../../../api/useSong';
 import { useMetronome } from '../../../hooks/useMetronome';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import { songDetailTabSchema } from '../../../schemas';
+import type { MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { EditButton } from '../../../ui/EditButton';
 import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
@@ -55,22 +56,24 @@ export function SongDetailPage() {
   );
 
   const isMidiButtonDisabled = useCallback(
-    (event: { instrumentId: string }) => {
+    (event: MidiEvent) => {
       if (!isSupported || !isReady) {
         return true;
       }
 
-      const instrument = instrumentsById.get(event.instrumentId);
-      if (!instrument) {
-        console.warn('Instrument not found for MIDI button');
-        return true;
-      }
+      return event.events.some((action) => {
+        const instrument = instrumentsById.get(action.instrumentId);
+        if (!instrument) {
+          console.warn('Instrument not found for MIDI button');
+          return true;
+        }
 
-      const output = outputs.find((o) => o.id === instrument.midiInId);
-      if (!output) {
-        console.warn('The MIDI input that is configured for the instrument is not available');
-      }
-      return !output;
+        const output = outputs.find((o) => o.id === instrument.midiInId);
+        if (!output) {
+          console.warn('The MIDI input that is configured for the instrument is not available');
+        }
+        return !output;
+      });
     },
     [instrumentsById, outputs],
   );
@@ -133,26 +136,27 @@ export function SongDetailPage() {
     void navigate(`/play/${setlistId}/${setlistSongId}/${tabId}`);
   };
 
-  const handleTriggerMidiEvent = (event: { instrumentId: string; programChange: number }) => {
+  const handleTriggerMidiEvent = (event: MidiEvent) => {
     if (!isSupported || !isReady) {
       return;
     }
 
-    const instrument = instrumentsById.get(event.instrumentId);
-    if (!instrument) {
-      console.warn('Instrument not found for MIDI button');
-      return;
-    }
-    const selectedDevice = instrument.midiInId;
-    if (!selectedDevice) {
-      console.warn('No MIDI input device configured for the instrument');
-      return;
-    }
+    event.events.forEach((action) => {
+      const instrument = instrumentsById.get(action.instrumentId);
+      if (!instrument) {
+        console.warn('Instrument not found for MIDI button');
+        return;
+      }
 
-    const output = outputs.find((o) => o.id === selectedDevice);
-    if (output) {
-      output.sendProgramChange(event.programChange);
-    }
+      const selectedDevice = instrument.midiInId;
+      if (!selectedDevice) {
+        console.warn('No MIDI input device configured for the instrument');
+        return;
+      }
+
+      const output = outputs.find((o) => o.id === selectedDevice);
+      output?.sendProgramChange(action.programChange);
+    });
   };
 
   const toolbar = (

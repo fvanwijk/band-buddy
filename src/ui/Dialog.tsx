@@ -2,10 +2,12 @@ import { IconX } from '@tabler/icons-react';
 import { type ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
+import { cn } from '../utils/cn';
 import { DialogTitle } from './DialogTitle';
 
 type DialogProps = {
   children: ReactNode;
+  contentClassName?: string;
   header?: ReactNode;
   onClose?: () => void;
   open: boolean;
@@ -13,7 +15,15 @@ type DialogProps = {
   title: string;
 };
 
-export function Dialog({ children, header, onClose, open, portal = true, title }: DialogProps) {
+export function Dialog({
+  children,
+  contentClassName,
+  header,
+  onClose,
+  open,
+  portal = true,
+  title,
+}: DialogProps) {
   useEffect(() => {
     if (!open || !onClose) return;
 
@@ -37,7 +47,12 @@ export function Dialog({ children, header, onClose, open, portal = true, title }
     >
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
-      <div className="relative z-10 w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
+      <div
+        className={cn(
+          'relative z-10 w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl',
+          contentClassName,
+        )}
+      >
         {onClose && (
           <button
             onClick={onClose}

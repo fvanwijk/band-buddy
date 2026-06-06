@@ -73,9 +73,8 @@ export function MidiButtonsTab({
         initialData={
           editingEvent
             ? {
-                instrumentId: editingEvent.instrumentId,
+                events: editingEvent.events,
                 label: editingEvent.label,
-                programChange: editingEvent.programChange,
               }
             : undefined
         }
@@ -116,14 +115,17 @@ export function MidiButtonsTab({
         ) : (
           <div className="space-y-2">
             {midiEvents.map((event) => {
-              const instrument = instruments.find((inst) => inst.id === event.instrumentId);
               const isAvailable =
-                isReady && !!instrument?.midiInId && outputsById.has(instrument.midiInId);
+                isReady &&
+                event.events.every((action) => {
+                  const instrument = instruments.find((inst) => inst.id === action.instrumentId);
+                  return !!instrument?.midiInId && outputsById.has(instrument.midiInId);
+                });
               return (
                 <MidiButtonCard
                   key={event.id}
                   event={event}
-                  instrument={instrument}
+                  instruments={instruments}
                   isAvailable={isAvailable}
                   onDelete={() => onDeleteEvent?.(event.id)}
                   onEdit={handleOpenEditDialog}
