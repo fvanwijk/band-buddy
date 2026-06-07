@@ -135,6 +135,7 @@ export function MidiButtonDialog({
                 onRemove={() => remove(index)}
                 register={register}
                 selectedInstrumentId={selectedEvents[index]?.instrumentId}
+                selectedProgramChange={selectedEvents[index]?.programChange}
               />
             ))}
           </div>

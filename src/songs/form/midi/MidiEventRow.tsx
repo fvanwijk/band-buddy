@@ -1,7 +1,8 @@
-import { IconTrash } from '@tabler/icons-react';
+import { IconPlayerPlay, IconTrash } from '@tabler/icons-react';
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
+import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { InputField } from '../../../ui/form/InputField';
@@ -19,6 +20,7 @@ type MidiEventRowProps = {
   onRemove: () => void;
   register: UseFormRegister<FormData>;
   selectedInstrumentId?: string;
+  selectedProgramChange?: number;
 };
 
 export function MidiEventRow({
@@ -30,10 +32,23 @@ export function MidiEventRow({
   onRemove,
   register,
   selectedInstrumentId,
+  selectedProgramChange,
 }: MidiEventRowProps) {
+  const { isReady, isSupported, outputs } = useMidiDevices();
   const selectedInstrument = instruments.find((inst) => inst.id === selectedInstrumentId);
+  const output = selectedInstrument?.midiInId
+    ? outputs.find((device) => device.id === selectedInstrument.midiInId)
+    : undefined;
   const programOptions = useProgramOptions(selectedInstrument);
   const hasSelectableOptions = programOptions.length > 0;
+
+  const handleTestEvent = () => {
+    if (!output || !isReady || !isSupported || typeof selectedProgramChange !== 'number') {
+      return;
+    }
+
+    output.sendProgramChange(selectedProgramChange);
+  };
 
   return (
     <div className="flex items-center gap-2 rounded-xl border border-slate-700/80 p-2">
@@ -93,6 +108,21 @@ export function MidiEventRow({
           type="number"
         />
       )}
+
+      <div className="shrink-0">
+        <Button
+          disabled={
+            !isReady || !isSupported || !output || typeof selectedProgramChange !== 'number'
+          }
+          isIcon
+          onClick={handleTestEvent}
+          title="Test MIDI event row"
+          type="button"
+          variant="outlined"
+        >
+          <IconPlayerPlay className="h-4 w-4" />
+        </Button>
+      </div>
 
       <div className="shrink-0">
         <Button
