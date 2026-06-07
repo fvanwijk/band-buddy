@@ -11,9 +11,13 @@ import { InputField } from '../../../ui/form/InputField';
 import { SelectField } from '../../../ui/form/SelectField';
 import { Page } from '../../../ui/Page';
 import { PageHeader } from '../../../ui/PageHeader';
+import { MidiChannelsField } from './MidiChannelsField';
 import { ProgramNamesField } from './ProgramNamesField';
 
+const defaultMidiChannels = Array.from({ length: 16 }, (_, index) => index + 1);
+
 type InstrumentFormData = {
+  midiChannels: number[];
   midiInId: string;
   midiOutId: string;
   name: string;
@@ -24,6 +28,7 @@ type InstrumentFormProps = {
   backPath: string;
   initialData?: Instrument;
   onSubmit: (data: {
+    midiChannels?: number[];
     midiInId: string;
     midiInName: string;
     midiOutId?: string;
@@ -45,6 +50,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
     setValue,
   } = useForm<InstrumentFormData>({
     defaultValues: {
+      midiChannels: initialData?.midiChannels ?? defaultMidiChannels,
       midiInId: initialData?.midiInId || '',
       midiOutId: initialData?.midiOutId || '',
       name: initialData?.name || '',
@@ -52,6 +58,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
     },
   });
 
+  const midiChannels = useWatch({ control, name: 'midiChannels' });
   const programNames = useWatch({ control, name: 'programNames' });
 
   // Important: Input and output options are swapped because
@@ -96,6 +103,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
       : undefined;
 
     const submitData: {
+      midiChannels?: number[];
       midiInId: string;
       midiInName: string;
       midiOutId?: string;
@@ -103,6 +111,7 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
       name: string;
       programNames?: Record<number, string>;
     } = {
+      midiChannels: data.midiChannels.length > 0 ? data.midiChannels : [1],
       midiInId: data.midiInId,
       midiInName,
       midiOutId: data.midiOutId || undefined,
@@ -167,6 +176,11 @@ export function InstrumentForm({ backPath, initialData, onSubmit, title }: Instr
               label="MIDI Out (Optional)"
               options={outputOptions}
               {...register('midiOutId')}
+            />
+
+            <MidiChannelsField
+              onChange={(value) => setValue('midiChannels', value)}
+              value={midiChannels}
             />
 
             <ProgramNamesField

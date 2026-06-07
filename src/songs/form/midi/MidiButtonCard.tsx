@@ -1,5 +1,6 @@
 import { IconPencil, IconPlayerPlay } from '@tabler/icons-react';
 
+import { sendProgramChangeToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
@@ -28,11 +29,11 @@ export function MidiButtonCard({
   const handleTestEvent = (event: MidiEvent) => {
     event.events.forEach((action) => {
       const instrument = instruments.find((inst) => inst.id === action.instrumentId);
-      const output = instrument?.midiInId
-        ? outputs.find((device) => device.id === instrument.midiInId)
-        : undefined;
+      if (!instrument) {
+        return;
+      }
 
-      output?.sendProgramChange(action.programChange);
+      sendProgramChangeToInstrument(instrument, outputs, action.programChange);
     });
   };
 

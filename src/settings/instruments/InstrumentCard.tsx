@@ -10,12 +10,21 @@ type InstrumentCardProps = {
   onDeleteClick: (id: string) => void;
 };
 
+const allMidiChannels = Array.from({ length: 16 }, (_, index) => index + 1);
+
 export function InstrumentCard({
   inputsById,
   instrument,
   outputsById,
   onDeleteClick,
 }: InstrumentCardProps) {
+  const midiChannels =
+    instrument.midiChannels && instrument.midiChannels.length > 0
+      ? instrument.midiChannels
+          .filter((channel) => Number.isInteger(channel) && channel >= 1 && channel <= 16)
+          .sort((a, b) => a - b)
+      : [1];
+  const selectedChannels = new Set(midiChannels);
   const midiInAvailable = inputsById.has(instrument.midiInId);
   const midiOutAvailable = instrument.midiOutId ? outputsById.has(instrument.midiOutId) : true;
 
@@ -43,6 +52,27 @@ export function InstrumentCard({
         ) : (
           <MidiDeviceStatus isOptional label="MIDI Out" name="None" />
         )}
+      </div>
+      <div className="space-y-1">
+        <p className="text-xs font-semibold text-slate-500">MIDI Channels</p>
+        <div className="flex flex-wrap gap-1" role="list" aria-label="MIDI channels">
+          {allMidiChannels.map((channel) => {
+            const isSelected = selectedChannels.has(channel);
+
+            return (
+              <span
+                aria-label={`Channel ${channel}${isSelected ? ' active' : ''}`}
+                className={`inline-flex h-5 w-5 items-center justify-center rounded-xs text-[10px] leading-none font-semibold ${
+                  isSelected ? 'bg-brand-900 text-white' : 'bg-slate-800 text-slate-400'
+                }`}
+                key={channel}
+                role="listitem"
+              >
+                {channel}
+              </span>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

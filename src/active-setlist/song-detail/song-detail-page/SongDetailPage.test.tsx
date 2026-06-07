@@ -85,7 +85,7 @@ describe('SongDetailPage', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Organ' }));
 
-    expect(sendProgramChangeMock).toHaveBeenCalledWith(12);
+    expect(sendProgramChangeMock).toHaveBeenCalledWith(12, { channels: [1] });
   });
 
   it('disables midi buttons when MIDI is not supported', async () => {

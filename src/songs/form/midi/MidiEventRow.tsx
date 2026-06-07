@@ -2,6 +2,7 @@ import { IconPlayerPlay, IconTrash } from '@tabler/icons-react';
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
+import { sendProgramChangeToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
@@ -43,11 +44,17 @@ export function MidiEventRow({
   const hasSelectableOptions = programOptions.length > 0;
 
   const handleTestEvent = () => {
-    if (!output || !isReady || !isSupported || typeof selectedProgramChange !== 'number') {
+    if (
+      !output ||
+      !selectedInstrument ||
+      !isReady ||
+      !isSupported ||
+      typeof selectedProgramChange !== 'number'
+    ) {
       return;
     }
 
-    output.sendProgramChange(selectedProgramChange);
+    sendProgramChangeToInstrument(selectedInstrument, outputs, selectedProgramChange);
   };
 
   return (

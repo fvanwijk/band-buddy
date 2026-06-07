@@ -14,6 +14,7 @@ export const midiEventSchema = midiEventBaseSchema.extend({ id: z.string() });
 
 // Instrument
 export const instrumentTableSchema = z.object({
+  midiChannels: z.string().optional(),
   midiInId: z.string(),
   midiInName: z.string(),
   midiOutId: z.string().optional(),
@@ -23,6 +24,7 @@ export const instrumentTableSchema = z.object({
 });
 export const instrumentSchema = instrumentTableSchema.extend({
   id: z.string(),
+  midiChannels: z.array(z.number().int().min(1).max(16)).optional(),
   programNames: z.record(z.number(), z.string()).optional(),
 });
 
