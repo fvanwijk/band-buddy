@@ -4,6 +4,8 @@ import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { DeleteButton } from '../../../ui/DeleteButton';
+import { useNordProgramOptions } from './useNordProgramOptions';
+import { getProgramChangeLabel } from './useProgramOptions';
 
 type MidiButtonCardProps = {
   event: MidiEvent;
@@ -21,6 +23,7 @@ export function MidiButtonCard({
   onEdit,
 }: MidiButtonCardProps) {
   const { outputs } = useMidiDevices();
+  const nordProgramOptions = useNordProgramOptions();
 
   const handleTestEvent = (event: MidiEvent) => {
     event.events.forEach((action) => {
@@ -40,9 +43,15 @@ export function MidiButtonCard({
         <div className="space-y-1 text-xs text-slate-500">
           {event.events.map((action, index) => {
             const instrument = instruments.find((inst) => inst.id === action.instrumentId);
+            const programLabel = getProgramChangeLabel(
+              instrument,
+              action.programChange,
+              nordProgramOptions,
+            );
+
             return (
               <p className="flex items-center gap-2" key={`${event.id}-${index}`}>
-                <span>Program Change {action.programChange} →</span>
+                <span>Program change {programLabel ?? action.programChange} →</span>
                 <span className="flex items-center gap-1.5">
                   <span
                     className={`h-2 w-2 rounded-full ${isAvailable ? 'bg-green-500' : 'bg-red-500'}`}
