@@ -1,11 +1,14 @@
 import { IconPencil, IconPlayerPlay } from '@tabler/icons-react';
 
-import { sendProgramChangeToInstrument } from '../../../midi/sendProgramChangeToInstrument';
+import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { DeleteButton } from '../../../ui/DeleteButton';
-import { useNordProgramOptions } from './useNordProgramOptions';
+import {
+  getInstrumentControlChangeLabel,
+  getInstrumentNrpnLabel,
+} from './instrumentMidiLookupTables';
 import { getProgramChangeLabel } from './useProgramOptions';
 
 type MidiButtonCardProps = {
@@ -24,7 +27,40 @@ export function MidiButtonCard({
   onEdit,
 }: MidiButtonCardProps) {
   const { outputs } = useMidiDevices();
-  const nordProgramOptions = useNordProgramOptions();
+
+  const getActionLabel = (
+    action: MidiEvent['events'][number],
+    instrument: Instrument | undefined,
+  ) => {
+    if (action.type === 'controlChange') {
+      const label = getInstrumentControlChangeLabel(action, instrument);
+      if (label) {
+        return label;
+      }
+
+      return `CC ${action.controller} = ${action.value}`;
+    }
+
+    if (action.type === 'nrpn') {
+      const label = getInstrumentNrpnLabel(action, instrument);
+      if (label) {
+        return label;
+      }
+
+      const valueLabel =
+        typeof action.valueLsb === 'number'
+          ? `${action.valueMsb}:${action.valueLsb}`
+          : `${action.valueMsb}`;
+      return `NRPN ${action.parameterMsb}:${action.parameterLsb} = ${valueLabel}`;
+    }
+
+    if (!action.type || action.type === 'programChange') {
+      const programLabel = getProgramChangeLabel(instrument, action.programChange);
+      return `Program change ${programLabel ?? action.programChange}`;
+    }
+
+    return 'Unknown MIDI action';
+  };
 
   const handleTestEvent = (event: MidiEvent) => {
     event.events.forEach((action) => {
@@ -33,7 +69,7 @@ export function MidiButtonCard({
         return;
       }
 
-      sendProgramChangeToInstrument(instrument, outputs, action.programChange);
+      sendMidiActionToInstrument(action, instrument, outputs);
     });
   };
 
@@ -44,15 +80,10 @@ export function MidiButtonCard({
         <div className="space-y-1 text-xs text-slate-500">
           {event.events.map((action, index) => {
             const instrument = instruments.find((inst) => inst.id === action.instrumentId);
-            const programLabel = getProgramChangeLabel(
-              instrument,
-              action.programChange,
-              nordProgramOptions,
-            );
 
             return (
               <p className="flex items-center gap-2" key={`${event.id}-${index}`}>
-                <span>Program change {programLabel ?? action.programChange} →</span>
+                <span>{getActionLabel(action, instrument)} -</span>
                 <span className="flex items-center gap-1.5">
                   <span
                     className={`h-2 w-2 rounded-full ${isAvailable ? 'bg-green-500' : 'bg-red-500'}`}

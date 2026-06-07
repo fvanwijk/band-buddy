@@ -14,6 +14,42 @@ type LegacyMidiEvent = {
   programChange: number;
 };
 
+function normalizeAction(event: unknown): unknown {
+  if (typeof event !== 'object' || event === null) {
+    return event;
+  }
+
+  const typedEvent = event as Record<string, unknown>;
+  if (typeof typedEvent.programChange !== 'number') {
+    return event;
+  }
+
+  if (typedEvent.type === undefined || typedEvent.type === 'programChange') {
+    return {
+      ...typedEvent,
+      type: 'programChange',
+    };
+  }
+
+  return event;
+}
+
+function normalizeMidiEvent(event: unknown): unknown {
+  if (typeof event !== 'object' || event === null) {
+    return event;
+  }
+
+  const typedEvent = event as Record<string, unknown>;
+  if (!Array.isArray(typedEvent.events)) {
+    return event;
+  }
+
+  return {
+    ...typedEvent,
+    events: typedEvent.events.map((action) => normalizeAction(action)),
+  };
+}
+
 function isLegacyMidiEvent(event: unknown): event is LegacyMidiEvent {
   if (typeof event !== 'object' || event === null) {
     return false;
@@ -36,7 +72,7 @@ function isLegacyMidiEvent(event: unknown): event is LegacyMidiEvent {
  * Changes:
  * - songs[*].midiEvents entries now support multiple actions per button
  * - Legacy shape: { id, instrumentId, label, programChange }
- * - New shape: { id, label, events: [{ instrumentId, programChange }] }
+ * - New shape: { id, label, events: [{ instrumentId, programChange, type: 'programChange' }] }
  */
 export function migrateV2ToV3(input: unknown): {
   tables: Tables;
@@ -66,7 +102,7 @@ export function migrateV2ToV3(input: unknown): {
           if (Array.isArray(parsedEvents)) {
             const nextEvents = parsedEvents.map((event) => {
               if (!isLegacyMidiEvent(event)) {
-                return event;
+                return normalizeMidiEvent(event);
               }
 
               return {
@@ -74,6 +110,7 @@ export function migrateV2ToV3(input: unknown): {
                   {
                     instrumentId: event.instrumentId,
                     programChange: event.programChange,
+                    type: 'programChange',
                   },
                 ],
                 id: event.id,

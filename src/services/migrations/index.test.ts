@@ -125,7 +125,7 @@ describe('migrateBackup', () => {
     expect(migratedSong).toBeDefined();
     expect(JSON.parse(String(migratedSong.midiEvents))).toEqual([
       {
-        events: [{ instrumentId: '0', programChange: 12 }],
+        events: [{ instrumentId: '0', programChange: 12, type: 'programChange' }],
         id: 'midi-1',
         label: 'Organ',
       },

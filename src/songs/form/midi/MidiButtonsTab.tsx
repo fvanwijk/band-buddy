@@ -87,8 +87,9 @@ export function MidiButtonsTab({
       {/* Buttons List */}
       <div>
         <p className="mb-3 text-xs text-slate-500">
-          Create buttons that send MIDI program changes to your instruments. During a performance,
-          click these buttons to instantly switch sounds and effects on your connected MIDI devices.
+          Create buttons that send MIDI messages to your instruments. During a performance, click
+          these buttons to instantly switch sounds and trigger instrument parameters on your
+          connected MIDI devices.
         </p>
 
         <div className="mb-3 flex items-center gap-4">

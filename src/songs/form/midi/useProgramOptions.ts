@@ -1,39 +1,70 @@
 import { useMemo } from 'react';
 
 import type { Instrument } from '../../../types';
-import { useNordProgramOptions } from './useNordProgramOptions';
+import {
+  getInstrumentProgramChangeOptions,
+  type MidiSelectOption,
+  type MidiSelectOptionGroup,
+} from './instrumentMidiLookupTables';
 
-export type ProgramOption = { label: string; value: string };
-export type NordProgramOption = { label: string; options: ProgramOption[] };
+export type ProgramOption = MidiSelectOption;
+export type NordProgramOption = MidiSelectOptionGroup;
 
 const isNordProgramOption = (
   option: ProgramOption | NordProgramOption,
 ): option is NordProgramOption => 'options' in option;
 
+function appendProgramNamesToOptions(
+  options: ProgramOption[] | NordProgramOption[],
+  programNames: Record<string, string>,
+): ProgramOption[] | NordProgramOption[] {
+  if (options.length === 0) {
+    return options;
+  }
+
+  const firstOption = options[0];
+
+  if (isNordProgramOption(firstOption)) {
+    const groupedOptions = options as NordProgramOption[];
+
+    return groupedOptions.map((group) => ({
+      label: group.label,
+      options: group.options.map((opt) => {
+        const programName = programNames[Number(opt.value)];
+        return {
+          ...opt,
+          label: programName ? `${opt.label} ${programName}` : opt.label,
+        };
+      }),
+    }));
+  }
+
+  const flatOptions = options as ProgramOption[];
+  return flatOptions.map((option) => {
+    const programName = programNames[Number(option.value)];
+    return {
+      ...option,
+      label: programName ? `${option.label} ${programName}` : option.label,
+    };
+  });
+}
+
 export function buildProgramOptions(
   instrument: Instrument | undefined,
-  nordProgramOptions: NordProgramOption[],
 ): ProgramOption[] | NordProgramOption[] {
-  const isNord = instrument?.name.includes('Nord') ?? false;
+  const lookupOptions = getInstrumentProgramChangeOptions(instrument);
   const programNames = instrument?.programNames;
   const hasProgramNames = !!programNames && Object.keys(programNames).length > 0;
 
-  if (hasProgramNames) {
-    // If program names are defined, show custom list with names appended.
-    if (isNord) {
-      return nordProgramOptions.map((group) => ({
-        label: group.label,
-        options: group.options.map((opt) => {
-          const programName = programNames?.[Number(opt.value)];
-          return {
-            ...opt,
-            label: programName ? `${opt.label} ${programName}` : opt.label,
-          };
-        }),
-      }));
+  if (lookupOptions) {
+    if (!hasProgramNames) {
+      return lookupOptions;
     }
 
-    // For non-Nord instruments, show flat list with program names.
+    return appendProgramNamesToOptions(lookupOptions, programNames);
+  }
+
+  if (hasProgramNames) {
     return Object.entries(programNames)
       .map(([programNum, name]) => ({
         label: `${programNum}: ${name}`,
@@ -42,21 +73,15 @@ export function buildProgramOptions(
       .sort((a, b) => Number(a.value) - Number(b.value));
   }
 
-  // If no program names but Nord instrument, show Nord options.
-  if (isNord) {
-    return nordProgramOptions;
-  }
-
-  // No program names and not Nord, return empty for numeric input.
   return [];
 }
 
 export function getProgramChangeLabel(
   instrument: Instrument | undefined,
   programChange: number,
-  nordProgramOptions: NordProgramOption[],
 ): string | undefined {
-  const options = buildProgramOptions(instrument, nordProgramOptions);
+  const options = buildProgramOptions(instrument);
+
   const value = programChange.toString();
 
   if (options.length === 0) {
@@ -86,10 +111,5 @@ export function getProgramChangeLabel(
 export function useProgramOptions(
   instrument: Instrument | undefined,
 ): ProgramOption[] | NordProgramOption[] {
-  const nordProgramOptions = useNordProgramOptions();
-
-  return useMemo(
-    () => buildProgramOptions(instrument, nordProgramOptions),
-    [instrument, nordProgramOptions],
-  );
+  return useMemo(() => buildProgramOptions(instrument), [instrument]);
 }

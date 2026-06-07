@@ -35,14 +35,14 @@ describe('v2-to-v3 migration', () => {
 
     expect(midiEvents).toEqual([
       {
-        events: [{ instrumentId: 'inst-1', programChange: 12 }],
+        events: [{ instrumentId: 'inst-1', programChange: 12, type: 'programChange' }],
         id: 'midi-1',
         label: 'Verse',
       },
     ]);
   });
 
-  it('keeps already-migrated midiEvents unchanged', () => {
+  it('normalizes already-migrated program change actions to include explicit type', () => {
     const v2Backup = {
       tables: {
         songs: {
@@ -66,9 +66,13 @@ describe('v2-to-v3 migration', () => {
     const result = migrateV2ToV3(v2Backup);
 
     const row = result.tables.songs?.['1'] as Record<string, unknown>;
-    expect(JSON.parse(row.midiEvents as string)).toEqual(
-      JSON.parse(v2Backup.tables.songs['1'].midiEvents),
-    );
+    expect(JSON.parse(row.midiEvents as string)).toEqual([
+      {
+        events: [{ instrumentId: 'inst-1', programChange: 12, type: 'programChange' }],
+        id: 'midi-1',
+        label: 'Verse',
+      },
+    ]);
   });
 
   it('throws on invalid payload', () => {

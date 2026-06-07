@@ -1,7 +1,12 @@
-import type { Instrument } from '../types';
+import type { Instrument, MidiEventAction } from '../types';
 
 type MidiOutputLike = {
   id: string;
+  sendControlChange?: (
+    controller: number,
+    value: number,
+    options?: { channels?: number | number[]; time?: number | string },
+  ) => unknown;
   sendProgramChange: (
     program?: number,
     options?: { channels?: number | number[]; time?: number | string },
@@ -25,6 +30,40 @@ export function sendProgramChangeToInstrument(
   outputs: MidiOutputLike[],
   programChange: number,
 ) {
+  sendMidiActionToInstrument(
+    {
+      instrumentId: instrument.id,
+      programChange,
+      type: 'programChange',
+    },
+    instrument,
+    outputs,
+  );
+}
+
+function sendNrpnToOutput(
+  output: MidiOutputLike,
+  action: Extract<MidiEventAction, { type: 'nrpn' }>,
+  options: { channels: number[] },
+) {
+  if (!output.sendControlChange) {
+    return;
+  }
+
+  output.sendControlChange(99, action.parameterMsb, options);
+  output.sendControlChange(98, action.parameterLsb, options);
+  output.sendControlChange(6, action.valueMsb, options);
+
+  if (typeof action.valueLsb === 'number') {
+    output.sendControlChange(38, action.valueLsb, options);
+  }
+}
+
+export function sendMidiActionToInstrument(
+  action: MidiEventAction,
+  instrument: Instrument,
+  outputs: MidiOutputLike[],
+) {
   if (!instrument.midiInId) {
     return;
   }
@@ -34,5 +73,23 @@ export function sendProgramChangeToInstrument(
     return;
   }
 
-  output.sendProgramChange(programChange, { channels: getMidiChannels(instrument) });
+  const channels = getMidiChannels(instrument);
+
+  if (!action.type || action.type === 'programChange') {
+    output.sendProgramChange(action.programChange, { channels });
+    return;
+  }
+
+  if (action.type === 'controlChange') {
+    if (!output.sendControlChange) {
+      return;
+    }
+
+    output.sendControlChange(action.controller, action.value, { channels });
+    return;
+  }
+
+  if (action.type === 'nrpn') {
+    sendNrpnToOutput(output, action, { channels });
+  }
 }

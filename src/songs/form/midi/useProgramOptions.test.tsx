@@ -65,14 +65,7 @@ describe('useProgramOptions', () => {
 
   it('returns the same Nord label text used in select options', () => {
     const instrument = createInstrument({ name: 'Nord Stage' });
-    const nordProgramOptions: GroupOption[] = [
-      {
-        label: 'Bank A',
-        options: [{ label: 'A-18 (7)', value: '7' }],
-      },
-    ];
-
-    const label = getProgramChangeLabel(instrument, 7, nordProgramOptions);
+    const label = getProgramChangeLabel(instrument, 7);
 
     expect(label).toBe('A-18 (7)');
   });
@@ -85,7 +78,7 @@ describe('useProgramOptions', () => {
       },
     });
 
-    const label = getProgramChangeLabel(instrument, 7, []);
+    const label = getProgramChangeLabel(instrument, 7);
 
     expect(label).toBe('7: Crunch');
   });

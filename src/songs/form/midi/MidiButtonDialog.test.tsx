@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import { createInstruments } from '../../../mocks/instruments';
+import { createInstrument, createInstruments } from '../../../mocks/instruments';
 import { MockRouteProvider } from '../../../testUtils';
 import { MidiButtonDialog } from './MidiButtonDialog';
 
@@ -34,12 +34,9 @@ describe('MidiButtonDialog', () => {
     expect(screen.getByText('Label is required')).toBeInTheDocument();
     await user.type(screen.getByLabelText('Button label*'), 'Test Button');
 
-    // Program for Nora Stage that is default selected
-    await user.selectOptions(screen.getByLabelText('Program 1'), 'A-21 (8)');
+    await user.selectOptions(screen.getByDisplayValue('Nord Stage 4'), 'Yamaha Montage');
 
-    await user.selectOptions(screen.getByLabelText('Instrument 1'), 'Yamaha Montage');
-
-    const pc = screen.getByLabelText('Program Change number 1');
+    const pc = await screen.findByRole('spinbutton', { name: /Program Change number 1/ });
     await user.type(pc, '999');
 
     await user.click(screen.getByRole('button', { name: 'Add button' }));
@@ -48,14 +45,18 @@ describe('MidiButtonDialog', () => {
     await user.type(pc, '12');
 
     await user.click(screen.getByRole('button', { name: 'Add MIDI event row' }));
-    await user.selectOptions(screen.getByLabelText('Program 2'), '5');
+    const secondRowProgram = screen.getAllByRole('combobox').at(-1);
+    if (!secondRowProgram) {
+      throw new Error('Second row program select not found');
+    }
+    await user.selectOptions(secondRowProgram, '5');
 
     await user.click(screen.getByRole('button', { name: 'Add button' }));
 
     expect(onSubmit).toHaveBeenCalledWith({
       events: [
-        { instrumentId: '1', programChange: 12 },
-        { instrumentId: '0', programChange: 5 },
+        { instrumentId: '1', programChange: 12, type: 'programChange' },
+        { instrumentId: '0', programChange: 5, type: 'programChange' },
       ],
       label: 'Test Button',
     });
@@ -91,5 +92,78 @@ describe('MidiButtonDialog', () => {
       label: 'Piano Lead',
     });
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('submits NRPN action data', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+
+    renderComponent({ onSubmit });
+
+    await user.type(screen.getByLabelText('Button label*'), 'NRPN Test');
+    await user.selectOptions(screen.getByDisplayValue('Program Change'), 'NRPN');
+    const nrpnParameterMsb = await screen.findByRole('spinbutton', {
+      name: /NRPN parameter MSB 1/,
+    });
+    await user.clear(nrpnParameterMsb);
+    await user.type(nrpnParameterMsb, '1');
+    const nrpnParameterLsb = await screen.findByRole('spinbutton', {
+      name: /NRPN parameter LSB 1/,
+    });
+    await user.clear(nrpnParameterLsb);
+    await user.type(nrpnParameterLsb, '7');
+    const nrpnValueMsb = await screen.findByRole('spinbutton', { name: /NRPN value MSB 1/ });
+    await user.clear(nrpnValueMsb);
+    await user.type(nrpnValueMsb, '64');
+    const nrpnValueLsb = await screen.findByRole('spinbutton', { name: /NRPN value LSB 1/ });
+    await user.clear(nrpnValueLsb);
+    await user.type(nrpnValueLsb, '3');
+
+    await user.click(screen.getByRole('button', { name: 'Add button' }));
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      events: [
+        {
+          instrumentId: '0',
+          parameterLsb: 7,
+          parameterMsb: 1,
+          type: 'nrpn',
+          valueLsb: 3,
+          valueMsb: 64,
+        },
+      ],
+      label: 'NRPN Test',
+    });
+  });
+
+  it('applies Rev2 template and submits CC action', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+
+    renderComponent({
+      instruments: [createInstrument({ id: 'rev2', name: 'Prophet Rev2' })],
+      onSubmit,
+    });
+
+    await user.type(screen.getByLabelText('Button label*'), 'Rev2 Bank');
+    await user.selectOptions(screen.getByDisplayValue('Program Change'), 'Control Change');
+    const controllerSelect = screen.getByDisplayValue('Bank Select (32)');
+    await user.selectOptions(controllerSelect, 'Bank Select (32)');
+    const ccValueSelect = screen.getByDisplayValue('User Bank 1');
+    await user.selectOptions(ccValueSelect, 'Factory Bank 2');
+
+    await user.click(screen.getByRole('button', { name: 'Add button' }));
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      events: [
+        {
+          controller: 32,
+          instrumentId: 'rev2',
+          type: 'controlChange',
+          value: 5,
+        },
+      ],
+      label: 'Rev2 Bank',
+    });
   });
 });

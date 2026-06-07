@@ -14,7 +14,7 @@ import { useGetInstruments } from '../../../api/useInstruments';
 import { useGetSetlist } from '../../../api/useSetlist';
 import { useGetSongs } from '../../../api/useSong';
 import { useMetronome } from '../../../hooks/useMetronome';
-import { sendProgramChangeToInstrument } from '../../../midi/sendProgramChangeToInstrument';
+import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import { songDetailTabSchema } from '../../../schemas';
 import type { MidiEvent } from '../../../types';
@@ -155,7 +155,7 @@ export function SongDetailPage() {
         return;
       }
 
-      sendProgramChangeToInstrument(instrument, outputs, action.programChange);
+      sendMidiActionToInstrument(action, instrument, outputs);
     });
   };
 

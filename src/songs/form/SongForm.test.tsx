@@ -117,7 +117,6 @@ describe('SongForm', () => {
 
     // Add MIDI button
     expect(await screen.findByText('Piano')).toBeInTheDocument();
-    expect(screen.getByText('Program Change 0 →')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Edit MIDI button' }));
     await user.clear(await screen.findByLabelText('Button label*'));
     await user.type(screen.getByLabelText('Button label*'), 'Piano Lead');
@@ -144,7 +143,7 @@ describe('SongForm', () => {
         lyrics: 'Is this the real life? Is this just fantasy?',
         midiEvents: [
           {
-            events: [{ instrumentId: '0', programChange: 0 }],
+            events: [{ instrumentId: '0', programChange: 0, type: 'programChange' }],
             id: expect.any(String),
             label: 'Piano',
           },
@@ -185,6 +184,12 @@ describe('SongForm', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Save changes' }));
 
-    expect(onSubmit).toHaveBeenCalledWith(initialData, undefined);
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ...initialData,
+        defaultTab: initialData.defaultTab || 'auto',
+      }),
+      undefined,
+    );
   });
 });

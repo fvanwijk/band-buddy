@@ -1,11 +1,31 @@
 import { z } from 'zod';
 
 // MIDI events are stored as JSON in the songs table.
-// Each button can trigger multiple program changes across instruments.
-export const midiEventActionSchema = z.object({
+// Each button can trigger multiple MIDI messages across instruments.
+const midiProgramChangeActionSchema = z.object({
   instrumentId: z.string(),
-  programChange: z.number(),
+  programChange: z.number().int().min(0).max(511),
+  type: z.literal('programChange').optional(),
 });
+const midiControlChangeActionSchema = z.object({
+  controller: z.number().int().min(0).max(127),
+  instrumentId: z.string(),
+  type: z.literal('controlChange'),
+  value: z.number().int().min(0).max(127),
+});
+const midiNrpnActionSchema = z.object({
+  instrumentId: z.string(),
+  parameterLsb: z.number().int().min(0).max(127),
+  parameterMsb: z.number().int().min(0).max(127),
+  type: z.literal('nrpn'),
+  valueLsb: z.number().int().min(0).max(127).optional(),
+  valueMsb: z.number().int().min(0).max(127),
+});
+export const midiEventActionSchema = z.union([
+  midiProgramChangeActionSchema,
+  midiControlChangeActionSchema,
+  midiNrpnActionSchema,
+]);
 export const midiEventBaseSchema = z.object({
   events: z.array(midiEventActionSchema).min(1),
   label: z.string(),

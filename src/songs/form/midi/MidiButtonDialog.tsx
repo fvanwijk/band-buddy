@@ -2,13 +2,54 @@ import { IconPlus } from '@tabler/icons-react';
 import { useEffect } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
-import type { Instrument, MidiEvent } from '../../../types';
+import type { Instrument, MidiEvent, MidiEventAction } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { Dialog } from '../../../ui/Dialog';
 import { InputField } from '../../../ui/form/InputField';
 import { MidiEventRow } from './MidiEventRow';
 
 type FormData = Omit<MidiEvent, 'id'>;
+
+function getDefaultMidiEvent(instrumentId: string): MidiEvent['events'][number] {
+  return {
+    instrumentId,
+    programChange: 0,
+    type: 'programChange',
+  };
+}
+
+function normalizeMidiAction(action: MidiEventAction): MidiEventAction {
+  if (action.type === 'controlChange') {
+    return {
+      controller: action.controller,
+      instrumentId: action.instrumentId,
+      type: 'controlChange',
+      value: action.value,
+    };
+  }
+
+  if (action.type === 'nrpn') {
+    return {
+      instrumentId: action.instrumentId,
+      parameterLsb: action.parameterLsb,
+      parameterMsb: action.parameterMsb,
+      type: 'nrpn',
+      valueLsb: action.valueLsb,
+      valueMsb: action.valueMsb,
+    };
+  }
+
+  const normalizedProgramChange: Extract<MidiEventAction, { type?: 'programChange' }> = {
+    instrumentId: action.instrumentId,
+    programChange: action.programChange,
+  };
+
+  if (action.type) {
+    normalizedProgramChange.type = action.type;
+  }
+
+  return normalizedProgramChange;
+}
 
 type MidiButtonDialogProps = {
   initialData?: FormData;
@@ -33,14 +74,10 @@ export function MidiButtonDialog({
     handleSubmit,
     register,
     reset,
+    setValue,
   } = useForm<FormData>({
     defaultValues: {
-      events: initialData?.events || [
-        {
-          instrumentId: instruments[0]?.id || '',
-          programChange: 0,
-        },
-      ],
+      events: initialData?.events || [getDefaultMidiEvent(instruments[0]?.id || '')],
       label: initialData?.label || '',
     },
     mode: 'all',
@@ -54,6 +91,7 @@ export function MidiButtonDialog({
   const selectedEvents =
     useWatch({
       control,
+      defaultValue: initialData?.events || [getDefaultMidiEvent(instruments[0]?.id || '')],
       name: 'events',
     }) || [];
 
@@ -63,18 +101,16 @@ export function MidiButtonDialog({
     }
 
     reset({
-      events: initialData?.events || [
-        {
-          instrumentId: instruments[0]?.id || '',
-          programChange: 0,
-        },
-      ],
+      events: initialData?.events || [getDefaultMidiEvent(instruments[0]?.id || '')],
       label: initialData?.label || '',
     });
   }, [initialData, instruments, isOpen, reset]);
 
   const handleAdd = (data: FormData) => {
-    onSubmit(data);
+    onSubmit({
+      ...data,
+      events: data.events.map((action) => normalizeMidiAction(action)),
+    });
     onClose();
   };
 
@@ -90,7 +126,7 @@ export function MidiButtonDialog({
 
   return (
     <Dialog
-      contentClassName="max-w-3xl"
+      contentClassName="max-w-5xl"
       onClose={onClose}
       open={isOpen}
       title={isEditMode ? 'Edit MIDI Button' : 'Add MIDI Button'}
@@ -114,6 +150,7 @@ export function MidiButtonDialog({
                   append({
                     instrumentId: instruments[0]?.id || '',
                     programChange: 0,
+                    type: 'programChange',
                   })
                 }
                 title="Add MIDI event row"
@@ -134,8 +171,9 @@ export function MidiButtonDialog({
                 key={field.id}
                 onRemove={() => remove(index)}
                 register={register}
+                selectedAction={selectedEvents[index]}
                 selectedInstrumentId={selectedEvents[index]?.instrumentId}
-                selectedProgramChange={selectedEvents[index]?.programChange}
+                setValue={setValue}
               />
             ))}
           </div>
