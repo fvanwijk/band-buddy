@@ -30,10 +30,15 @@ function appendProgramNamesToOptions(
     return groupedOptions.map((group) => ({
       label: group.label,
       options: group.options.map((opt) => {
-        const programName = programNames[Number(opt.value)];
+        const programNum = Number(opt.value);
+        const programName = programNames[programNum];
+        // Extract base label (e.g., "A-11" from "A-11 (0)")
+        const baseLabel = opt.label.match(/^([^(]+)/)?.[1].trim() || opt.label;
         return {
           ...opt,
-          label: programName ? `${opt.label} ${programName}` : opt.label,
+          label: programName
+            ? `${baseLabel} ${programName} (${programNum})`
+            : `${baseLabel} (${programNum})`,
         };
       }),
     }));
@@ -41,10 +46,15 @@ function appendProgramNamesToOptions(
 
   const flatOptions = options as ProgramOption[];
   return flatOptions.map((option) => {
-    const programName = programNames[Number(option.value)];
+    const programNum = Number(option.value);
+    const programName = programNames[programNum];
+    // Extract base label (e.g., "P1" from "P1 (0)")
+    const baseLabel = option.label.match(/^([^(]+)/)?.[1].trim() || option.label;
     return {
       ...option,
-      label: programName ? `${option.label} ${programName}` : option.label,
+      label: programName
+        ? `${baseLabel} ${programName} (${programNum})`
+        : `${baseLabel} (${programNum})`,
     };
   });
 }
@@ -67,7 +77,7 @@ export function buildProgramOptions(
   if (hasProgramNames) {
     return Object.entries(programNames)
       .map(([programNum, name]) => ({
-        label: `${programNum}: ${name}`,
+        label: `${name} (${programNum})`,
         value: programNum,
       }))
       .sort((a, b) => Number(a.value) - Number(b.value));

@@ -1,5 +1,6 @@
 import type { Instrument, MidiEvent } from '../../../types';
 import { createNordProgramOptions } from './useNordProgramOptions';
+import { createRev2ProgramOptions } from './useRev2ProgramOptions';
 
 export type MidiSelectOption = {
   label: string;
@@ -61,6 +62,9 @@ const instrumentMidiLookups: InstrumentMidiLookup[] = [
       },
     },
     instrumentNameIncludes: ['rev2'],
+    programChange: {
+      options: createRev2ProgramOptions(),
+    },
   },
 ];
 
