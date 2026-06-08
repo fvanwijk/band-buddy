@@ -41,6 +41,6 @@ describe('SheetMusicTab', () => {
 
     render(<SheetMusicTab sheetMusicFilename="song.pdf" songId="1" />);
 
-    expect(screen.getByText('No sheet music added yet')).toBeInTheDocument();
+    expect(screen.getByText('Failed to load sheet music.')).toBeInTheDocument();
   });
 });
