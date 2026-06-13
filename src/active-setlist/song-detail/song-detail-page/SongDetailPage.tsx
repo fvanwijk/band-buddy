@@ -116,8 +116,8 @@ export function SongDetailPage() {
   const parsedRouteTab = songDetailTabSchema.safeParse(tab);
   const selectedTab = parsedRouteTab.success ? parsedRouteTab.data : 'lyrics';
 
-  // Initialize metronome
-  useMetronome({
+  // Initialize metronome/sequencer transport
+  const { currentBeat, currentMeasure } = useMetronome({
     bpm: currentSong.bpm || 120,
     isRunning: isMetronomeRunning,
     timeSignature: currentSong.timeSignature || '4/4',
@@ -162,21 +162,26 @@ export function SongDetailPage() {
   const toolbar = (
     <div className="flex items-center gap-4">
       {currentSong.bpm && (
-        <Button
-          className="metronome-pulse"
-          isIcon
-          onClick={() => setIsMetronomeRunning((prev) => !prev)}
-          style={{ animationDuration: `${beatDurationSeconds}s` }}
-          title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
-          type="button"
-          variant="outlined"
-        >
-          {isMetronomeRunning ? (
-            <IconPlayerStopFilled className="h-4 w-4" />
-          ) : (
-            <IconPlayerPlayFilled className="h-4 w-4" />
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            className="metronome-pulse"
+            isIcon
+            onClick={() => setIsMetronomeRunning((prev) => !prev)}
+            style={{ animationDuration: `${beatDurationSeconds}s` }}
+            title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
+            type="button"
+            variant="outlined"
+          >
+            {isMetronomeRunning ? (
+              <IconPlayerStopFilled className="h-4 w-4" />
+            ) : (
+              <IconPlayerPlayFilled className="h-4 w-4" />
+            )}
+          </Button>
+          <span className="min-w-16 text-xs font-medium text-slate-300" title="Metronome counter">
+            M{currentMeasure}:B{currentBeat}
+          </span>
+        </div>
       )}
       <SongStats song={currentSong} />
       <SettingsPanel onZoomChange={setZoom} song={currentSong} zoom={zoom} />

@@ -12,7 +12,14 @@ const useMetronomeMock = vi.fn();
 const useMidiDevicesMock = vi.fn();
 
 vi.mock('../../../hooks/useMetronome', () => ({
-  useMetronome: (args: unknown) => useMetronomeMock(args),
+  useMetronome: (args: unknown) => {
+    useMetronomeMock(args);
+
+    return {
+      currentBeat: 0,
+      currentMeasure: 0,
+    };
+  },
 }));
 
 vi.mock('../../../midi/useMidiDevices', () => ({
@@ -73,6 +80,8 @@ describe('SongDetailPage', () => {
     const user = userEvent.setup();
 
     await renderComponent();
+
+    expect(await screen.findByText('M0:B0')).toBeInTheDocument();
 
     await user.click(await screen.findByTitle('Start metronome'));
 
