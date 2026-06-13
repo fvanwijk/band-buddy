@@ -27,9 +27,11 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 - `vp lint` - Lint with Oxlint (type-aware, deny warnings; config in `.oxlintrc.json`)
 - `vp fmt` - Format code with Oxfmt
 - `vp check` - Run format, lint, and type checks together
+- `vp i` / `vp install` - Install dependencies (Vite+ manages pnpm)
 - `vp add <pkg>` / `vp remove <pkg>` - Add or remove dependencies (delegates to pnpm)
 
 > ⚠️ Use `vp test` and `vp lint` — not `vp vitest` or `vp oxlint` (those don't exist).
+> ⚠️ Use `vp i` for dependency management — Vite+ manages pnpm, do not install pnpm globally.
 
 ## Testing
 
