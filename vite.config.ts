@@ -108,7 +108,7 @@ export default defineConfig({
     host: '127.0.0.1',
   },
   staged: {
-    '*': 'vp check',
+    '*': ['vp run format:check', 'vp run lint --fix --no-error-on-unmatched-pattern'],
   },
   test: {
     coverage: {
