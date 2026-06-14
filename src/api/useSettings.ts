@@ -7,6 +7,7 @@ import {
   hasSeenWelcomeSchema,
   localeSchema,
   metronomeVolumeSchema,
+  showMidiEventLogPanelSchema,
   showDrawingToolsSchema,
   themeSchema,
 } from '../schemas';
@@ -117,4 +118,20 @@ export function useGetShowDrawingTools(): boolean {
  */
 export function useSetShowDrawingTools() {
   return useSetValueCallback('showDrawingTools', (show: boolean) => show, []);
+}
+
+/**
+ * Hook to get whether MIDI event log panel is open
+ */
+export function useGetShowMidiEventLogPanel(): boolean {
+  const show = useValue('showMidiEventLogPanel');
+  const result = showMidiEventLogPanelSchema.safeParse(show);
+  return result.success ? result.data : false;
+}
+
+/**
+ * Hook to set whether MIDI event log panel is open
+ */
+export function useSetShowMidiEventLogPanel() {
+  return useSetValueCallback('showMidiEventLogPanel', (show: boolean) => show, []);
 }

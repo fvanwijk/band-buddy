@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Output } from 'webmidi';
 
+import { registerOutboundMidiMessage } from '../midi/midiEventLogBus';
 import { EventScheduler } from '../vendor/signal-player';
 import type { SchedulerEvent, MidiNoteEvent } from '../vendor/signal-player';
 
@@ -171,19 +172,43 @@ export function useSequencerTransport({
       if (!midiOutput) return;
 
       try {
+        const noteOnData = [0x90 + (event.channel - 1), event.note, event.velocity];
+
         // Send note on with attack (velocity is deprecated)
         midiOutput.sendNoteOn(event.note, {
           attack: (event.velocity / 127) * (safeVolume / 100), // 0-1 range
           channels: event.channel,
           time: performance.now() / 1000,
         });
+        registerOutboundMidiMessage({
+          channels: [event.channel],
+          data: noteOnData,
+          deviceId: midiOutput.id,
+          deviceName: midiOutput.name,
+          emitLogEntry: false,
+          source: 'sequencer',
+          type: 'noteOn',
+          value: event.note,
+        });
 
         // Schedule note off
         if (event.duration) {
+          const noteOffData = [0x80 + (event.channel - 1), event.note, 0];
           const noteOffTime = (performance.now() + event.duration) / 1000;
           midiOutput.sendNoteOff(event.note, {
             channels: event.channel,
             time: noteOffTime,
+          });
+          registerOutboundMidiMessage({
+            channels: [event.channel],
+            data: noteOffData,
+            deviceId: midiOutput.id,
+            deviceName: midiOutput.name,
+            emitLogEntry: false,
+            source: 'sequencer',
+            timestamp: Date.now() + event.duration,
+            type: 'noteOff',
+            value: event.note,
           });
         }
       } catch (error) {

@@ -9,6 +9,7 @@ import {
   instrumentTableSchema,
   localeSchema,
   metronomeVolumeSchema,
+  showMidiEventLogPanelSchema,
   setlistSetTableSchema,
   setlistSongTableSchema,
   setlistTableSchema,
@@ -51,6 +52,7 @@ export function createAppStore(): Store {
     locale: localeSchema,
     metronomeVolume: metronomeVolumeSchema,
     showDrawingTools: showDrawingToolsSchema,
+    showMidiEventLogPanel: showMidiEventLogPanelSchema,
     theme: themeSchema,
   });
 

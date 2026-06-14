@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
 import { useHasSeenWelcome, useSetHasSeenWelcome } from './api/useSettings';
+import { useMidiEventLogContext } from './contexts/MidiEventLogContext';
 import { useWakeLock } from './hooks/useWakeLock';
+import { useMidiEventLog } from './midi/useMidiEventLog';
+import { MidiEventLogPanel } from './settings/instruments/MidiEventLogPanel';
 import { Logo } from './ui/Logo';
 import { TopNav } from './ui/TopNav';
 import { WelcomeModal } from './ui/WelcomeModal';
@@ -13,6 +16,8 @@ export function Layout() {
   const hasSeenWelcome = useHasSeenWelcome();
   const setHasSeenWelcome = useSetHasSeenWelcome();
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(!hasSeenWelcome);
+  const { isOpen: isMidiLogOpen, setIsOpen: setIsMidiLogOpen } = useMidiEventLogContext();
+  const { clearLog, entries } = useMidiEventLog(isMidiLogOpen);
 
   const handleCloseWelcome = () => {
     setIsWelcomeOpen(false);
@@ -36,6 +41,14 @@ export function Layout() {
 
         <WelcomeModal isOpen={isWelcomeOpen} onClose={handleCloseWelcome} />
       </div>
+
+      {isMidiLogOpen && (
+        <MidiEventLogPanel
+          entries={entries}
+          onClear={clearLog}
+          onClose={() => setIsMidiLogOpen(false)}
+        />
+      )}
     </>
   );
 }

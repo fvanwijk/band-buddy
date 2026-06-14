@@ -5,6 +5,7 @@ import { usePopper } from 'react-popper';
 
 import { useGetShowDrawingTools, useSetShowDrawingTools } from '../../../api/useSettings';
 import { useUpdateSong } from '../../../api/useSong';
+import { useMidiEventLogContext } from '../../../contexts/MidiEventLogContext';
 import { defaultTabOptions } from '../../../songs/form/settings/SettingsTab';
 import type { Song } from '../../../types';
 import { Button } from '../../../ui/Button';
@@ -25,6 +26,7 @@ type SongDefaultTab = NonNullable<Song['defaultTab']>;
 
 export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) {
   const updateSong = useUpdateSong(song.id);
+  const { isOpen: isMidiEventLogOpen, setIsOpen: setIsMidiEventLogOpen } = useMidiEventLogContext();
   const showDrawingTools = useGetShowDrawingTools();
   const setShowDrawingTools = useSetShowDrawingTools();
   const transpose = song.transpose ?? 0;
@@ -105,6 +107,13 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               options={defaultTabOptions}
               value={song.defaultTab || 'auto'}
             />
+            <div className="mt-3 border-t border-slate-700/40 pt-3">
+              <Checkbox
+                checked={isMidiEventLogOpen}
+                label="Show MIDI event log"
+                onChange={(event) => setIsMidiEventLogOpen(event.target.checked)}
+              />
+            </div>
           </div>
         </Card>
       </PopoverPanel>
