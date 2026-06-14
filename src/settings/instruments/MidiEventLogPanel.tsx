@@ -14,18 +14,42 @@ type MidiEventLogPanelProps = {
 
 export function MidiEventLogPanel({ entries, onClear, onClose }: MidiEventLogPanelProps) {
   const [showInput, setShowInput] = useState(true);
+  const [showCc, setShowCc] = useState(true);
+  const [showNote, setShowNote] = useState(true);
   const [showOutput, setShowOutput] = useState(true);
+  const [showProgramChange, setShowProgramChange] = useState(true);
+  const [showUnknown, setShowUnknown] = useState(true);
 
   const filteredEntries = useMemo(
     () =>
       entries.filter((entry) => {
         if (entry.direction === 'in') {
-          return showInput;
+          if (!showInput) {
+            return false;
+          }
+        } else if (!showOutput) {
+          return false;
         }
 
-        return showOutput;
+        if (entry.type === 'cc') {
+          return showCc;
+        }
+
+        if (entry.type === 'noteOn') {
+          return showNote;
+        }
+
+        if (entry.type === 'noteOff') {
+          return showNote;
+        }
+
+        if (entry.type === 'programChange') {
+          return showProgramChange;
+        }
+
+        return showUnknown;
       }),
-    [entries, showInput, showOutput],
+    [entries, showCc, showInput, showNote, showOutput, showProgramChange, showUnknown],
   );
 
   return (
@@ -53,6 +77,28 @@ export function MidiEventLogPanel({ entries, onClear, onClose }: MidiEventLogPan
             checked={showOutput}
             label="Output"
             onChange={(event) => setShowOutput(event.target.checked)}
+          />
+        </div>
+        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2">
+          <Checkbox
+            checked={showNote}
+            label="Note"
+            onChange={(event) => setShowNote(event.target.checked)}
+          />
+          <Checkbox
+            checked={showProgramChange}
+            label="PC"
+            onChange={(event) => setShowProgramChange(event.target.checked)}
+          />
+          <Checkbox
+            checked={showCc}
+            label="CC"
+            onChange={(event) => setShowCc(event.target.checked)}
+          />
+          <Checkbox
+            checked={showUnknown}
+            label="Other"
+            onChange={(event) => setShowUnknown(event.target.checked)}
           />
         </div>
       </div>
