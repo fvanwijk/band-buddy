@@ -12,8 +12,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../../api/useInstruments';
 import { useGetSetlist } from '../../../api/useSetlist';
+import { useGetMetronomeVolume } from '../../../api/useSettings';
 import { useGetSongs } from '../../../api/useSong';
-import { useMetronome } from '../../../hooks/useMetronome';
+import { useSequencerTransport } from '../../../hooks/useSequencerTransport';
 import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import { songDetailTabSchema } from '../../../schemas';
@@ -42,11 +43,13 @@ export function SongDetailPage() {
 
   const setlist = useGetSetlist(setlistId!);
   const instruments = useGetInstruments();
+  const metronomeVolume = useGetMetronomeVolume();
   const songs = useGetSongs();
   const { isReady, isSupported, outputs } = useMidiDevices();
 
   const [zoom, setZoom] = useState(1);
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
+  const [metronomePulseKey, setMetronomePulseKey] = useState(0);
 
   // Create songs map
   const songsMap = new Map(songs.map((song) => [song.id, song]));
@@ -116,11 +119,27 @@ export function SongDetailPage() {
   const parsedRouteTab = songDetailTabSchema.safeParse(tab);
   const selectedTab = parsedRouteTab.success ? parsedRouteTab.data : 'lyrics';
 
-  // Initialize metronome/sequencer transport
-  const { currentBeat, currentMeasure } = useMetronome({
+  // Extract time signature numerator (e.g., '4/4' -> 4)
+  const timeSignatureNumerator = useMemo(() => {
+    const [numerator] = (currentSong.timeSignature || '4/4').split('/').map(Number);
+    return Number.isFinite(numerator) && numerator > 0 ? numerator : 4;
+  }, [currentSong.timeSignature]);
+
+  // Get first available MIDI output for metronome clicks
+  const metronomeOutput = useMemo(() => {
+    if (!isSupported || !isReady || outputs.length === 0) {
+      return undefined;
+    }
+    return outputs[0];
+  }, [isSupported, isReady, outputs]);
+
+  // Initialize sequencer transport with MIDI clicks
+  const { currentBeat, currentMeasure } = useSequencerTransport({
     bpm: currentSong.bpm || 120,
     isRunning: isMetronomeRunning,
-    timeSignature: currentSong.timeSignature || '4/4',
+    metronomeVolume,
+    midiOutput: metronomeOutput,
+    timeSignatureNumerator,
   });
 
   const beatDurationSeconds = 60 / (currentSong.bpm || 120);
@@ -159,14 +178,28 @@ export function SongDetailPage() {
     });
   };
 
+  const handleMetronomeToggle = () => {
+    setIsMetronomeRunning((prev) => {
+      const next = !prev;
+
+      // Restart pulse animation exactly when transitioning to playing state.
+      if (next) {
+        setMetronomePulseKey((key) => key + 1);
+      }
+
+      return next;
+    });
+  };
+
   const toolbar = (
     <div className="flex items-center gap-4">
       {currentSong.bpm && (
         <div className="flex items-center gap-2">
           <Button
+            key={metronomePulseKey}
             className="metronome-pulse"
             isIcon
-            onClick={() => setIsMetronomeRunning((prev) => !prev)}
+            onClick={handleMetronomeToggle}
             style={{ animationDuration: `${beatDurationSeconds}s` }}
             title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
             type="button"

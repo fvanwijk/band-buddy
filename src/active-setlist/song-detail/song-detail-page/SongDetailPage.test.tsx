@@ -8,12 +8,12 @@ import { StoreProvider } from '../../../store/StoreProvider';
 import { getMockStore } from '../../../testUtils';
 import { SongDetailPage } from './SongDetailPage';
 
-const useMetronomeMock = vi.fn();
+const useSequencerTransportMock = vi.fn();
 const useMidiDevicesMock = vi.fn();
 
-vi.mock('../../../hooks/useMetronome', () => ({
-  useMetronome: (args: unknown) => {
-    useMetronomeMock(args);
+vi.mock('../../../hooks/useSequencerTransport', () => ({
+  useSequencerTransport: (args: unknown) => {
+    useSequencerTransportMock(args);
 
     return {
       currentBeat: 0,
