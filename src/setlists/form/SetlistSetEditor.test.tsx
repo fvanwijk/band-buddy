@@ -148,11 +148,11 @@ describe('SetlistSetEditor', () => {
 
   it('should render soft deleted songs', async () => {
     const { store, persister } = getMockStore();
-    await Promise.all(
-      createSongsTable().map((song, i) =>
-        store.setRow('songs', i.toString(), { ...song, isDeleted: true }),
-      ),
-    );
+
+    createSongsTable().forEach((song, i) => {
+      store.setRow('songs', i.toString(), { ...song, isDeleted: true });
+    });
+
     await persister.save();
 
     render(<SetlistSetEditor index={0} onRemove={() => {}} showRemove={false} />, {

@@ -4,6 +4,69 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vite-plus';
 
 export default defineConfig({
+  fmt: {
+    ignorePatterns: [],
+    printWidth: 100,
+    semi: true,
+    singleQuote: true,
+    sortImports: {
+      groups: [
+        'builtin',
+        'external',
+        ['internal', 'subpath'],
+        ['parent', 'sibling', 'index'],
+        'style',
+        'unknown',
+      ],
+    },
+    sortPackageJson: false,
+    sortTailwindcss: {
+      functions: ['clsx', 'cn'],
+      stylesheet: 'src/index.css',
+    },
+    tabWidth: 2,
+    trailingComma: 'all',
+  },
+  lint: {
+    env: {
+      builtin: true,
+    },
+    ignorePatterns: ['dist'],
+    options: {
+      denyWarnings: true,
+      typeAware: true,
+      typeCheck: true,
+    },
+    overrides: [
+      {
+        env: {
+          browser: true,
+          es2020: true,
+        },
+        files: ['**/*.{ts,tsx}'],
+        jsPlugins: ['eslint-plugin-sort-keys-fix'],
+        rules: {
+          'no-unused-vars': [
+            'error',
+            {
+              argsIgnorePattern: '^_',
+              destructuredArrayIgnorePattern: '^_',
+              ignoreRestSiblings: true,
+              varsIgnorePattern: '^_',
+            },
+          ],
+          'react/only-export-components': ['off'],
+          'sort-keys-fix/sort-keys-fix': 'warn',
+        },
+      },
+      {
+        files: ['**/*.test.ts', '**/*.test.tsx'],
+        rules: {
+          'typescript/unbound-method': 'off',
+        },
+      },
+    ],
+  },
   plugins: [
     react(),
     tailwindcss(),

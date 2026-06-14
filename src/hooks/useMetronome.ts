@@ -102,9 +102,9 @@ export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProp
 
       if (!Number.isFinite(scaledVolume) || scaledVolume < 0 || scaledVolume > 127) {
         console.warn('Invalid volume calculated', {
+          clamped: clampedVolume,
           normalized: normalizedVolume,
           original: volume,
-          clamped: clampedVolume,
           scaled: scaledVolume,
         });
         return;
@@ -135,7 +135,7 @@ export function useMetronome({ bpm, isRunning, timeSignature }: UseMetronomeProp
         velocity,
       });
     } catch (error) {
-      console.error('Failed to play metronome click', { note, error, velocity });
+      console.error('Failed to play metronome click', { error, note, velocity });
     }
   }, []);
 

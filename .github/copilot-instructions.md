@@ -33,8 +33,6 @@ You are helping develop BandBuddy, a React/TypeScript musician companion app. Fo
 > ⚠️ Use `vp test` and `vp lint` — not `vp vitest` or `vp oxlint` (those don't exist).
 > ⚠️ Use `vp i` for dependency management — Vite+ manages pnpm, do not install pnpm globally.
 
-## Testing
-
 ### Agent-safe Vite+ Commands (Required)
 
 - Always run Vite+ commands in non-interactive mode when executed by an agent or automated terminal session.
@@ -49,6 +47,8 @@ Examples:
 - `CI=1 command vp run lint`
 - `CI=1 command vp test run --no-ui`
 - `CI=1 command vp run build`
+
+## Testing
 
 ### Writing tests
 
