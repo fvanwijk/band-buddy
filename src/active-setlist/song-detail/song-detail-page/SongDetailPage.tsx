@@ -4,17 +4,14 @@ import {
   IconBrandSpotify,
   IconMicrophone2Off,
   IconNote,
-  IconPlayerPlayFilled,
-  IconPlayerStopFilled,
 } from '@tabler/icons-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../../api/useInstruments';
 import { useGetSetlist } from '../../../api/useSetlist';
 import { useGetMetronomeVolume } from '../../../api/useSettings';
 import { useGetSongs } from '../../../api/useSong';
-import { useSequencerTransport } from '../../../hooks/useSequencerTransport';
 import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import { songDetailTabSchema } from '../../../schemas';
@@ -27,6 +24,7 @@ import { PageHeader } from '../../../ui/PageHeader';
 import { Tabs } from '../../../ui/Tabs';
 import { DrawingOverlay } from '../lyrics/DrawingOverlay';
 import { LyricsBlock } from '../lyrics/LyricsBlock';
+import { MetronomeControl } from '../metronome-control/MetronomeControl';
 import { MidiButtonsDisplay } from '../midi-buttons-display/MidiButtonsDisplay';
 import { SettingsPanel } from '../settings-panel/SettingsPanel';
 import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
@@ -34,6 +32,7 @@ import { SongStats } from '../song-stats/SongStats';
 import { TextNotesBlock } from '../text-notes/TextNotesBlock';
 
 export function SongDetailPage() {
+  const midiEventHighlightTimeoutRef = useRef<number | null>(null);
   const { setlistId, setlistSongId, tab } = useParams<{
     setlistId: string;
     setlistSongId: string;
@@ -48,8 +47,8 @@ export function SongDetailPage() {
   const { isReady, isSupported, outputs } = useMidiDevices();
 
   const [zoom, setZoom] = useState(1);
-  const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
-  const [metronomePulseKey, setMetronomePulseKey] = useState(0);
+  const [highlightedMidiEventId, setHighlightedMidiEventId] = useState<string | null>(null);
+  const lastAutoTriggerPositionRef = useRef<string | null>(null);
 
   // Create songs map
   const songsMap = new Map(songs.map((song) => [song.id, song]));
@@ -116,33 +115,82 @@ export function SongDetailPage() {
     throw new Error('Song not found');
   }
 
+  const midiEventsById = useMemo(
+    () => new Map((currentSong.midiEvents || []).map((event) => [event.id, event])),
+    [currentSong.midiEvents],
+  );
+
   const parsedRouteTab = songDetailTabSchema.safeParse(tab);
   const selectedTab = parsedRouteTab.success ? parsedRouteTab.data : 'lyrics';
 
-  // Extract time signature numerator (e.g., '4/4' -> 4)
-  const timeSignatureNumerator = useMemo(() => {
-    const [numerator] = (currentSong.timeSignature || '4/4').split('/').map(Number);
-    return Number.isFinite(numerator) && numerator > 0 ? numerator : 4;
-  }, [currentSong.timeSignature]);
+  const handleTriggerMidiEvent = useCallback(
+    (event: MidiEvent) => {
+      if (!isSupported || !isReady) {
+        return;
+      }
 
-  // Get first available MIDI output for metronome clicks
-  const metronomeOutput = useMemo(() => {
-    if (!isSupported || !isReady || outputs.length === 0) {
-      return undefined;
-    }
-    return outputs[0];
-  }, [isSupported, isReady, outputs]);
+      event.events.forEach((action) => {
+        const instrument = instrumentsById.get(action.instrumentId);
+        if (!instrument) {
+          console.warn('Instrument not found for MIDI button');
+          return;
+        }
 
-  // Initialize sequencer transport with MIDI clicks
-  const { currentBeat, currentMeasure } = useSequencerTransport({
-    bpm: currentSong.bpm || 120,
-    isRunning: isMetronomeRunning,
-    metronomeVolume,
-    midiOutput: metronomeOutput,
-    timeSignatureNumerator,
-  });
+        const selectedDevice = instrument.midiInId;
+        if (!selectedDevice) {
+          console.warn('No MIDI input device configured for the instrument');
+          return;
+        }
 
-  const beatDurationSeconds = 60 / (currentSong.bpm || 120);
+        sendMidiActionToInstrument(action, instrument, outputs);
+      });
+
+      setHighlightedMidiEventId(event.id);
+      if (midiEventHighlightTimeoutRef.current !== null) {
+        window.clearTimeout(midiEventHighlightTimeoutRef.current);
+      }
+
+      midiEventHighlightTimeoutRef.current = window.setTimeout(() => {
+        setHighlightedMidiEventId(null);
+        midiEventHighlightTimeoutRef.current = null;
+      }, 1500);
+    },
+    [instrumentsById, isReady, isSupported, outputs],
+  );
+
+  const handleAutoTriggerMidiEvents = useCallback(
+    (beat: number, measure: number) => {
+      const triggerPosition = `${measure}:${beat}`;
+      if (lastAutoTriggerPositionRef.current === triggerPosition) {
+        return;
+      }
+
+      lastAutoTriggerPositionRef.current = triggerPosition;
+
+      const triggers = currentSong.midiButtonTriggers || [];
+      triggers.forEach((trigger) => {
+        if (trigger.beat !== beat || trigger.measure !== measure) {
+          return;
+        }
+
+        const midiEvent = midiEventsById.get(trigger.midiEventId);
+        if (!midiEvent) {
+          return;
+        }
+
+        handleTriggerMidiEvent(midiEvent);
+      });
+    },
+    [currentSong.midiButtonTriggers, handleTriggerMidiEvent, midiEventsById],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (midiEventHighlightTimeoutRef.current !== null) {
+        window.clearTimeout(midiEventHighlightTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Get previous and next entries
   const previousEntry = currentSongIndex > 0 ? songsFromSetlist[currentSongIndex - 1] : null;
@@ -156,66 +204,20 @@ export function SongDetailPage() {
     void navigate(`/play/${setlistId}/${setlistSongId}/${tabId}`);
   };
 
-  const handleTriggerMidiEvent = (event: MidiEvent) => {
-    if (!isSupported || !isReady) {
-      return;
-    }
-
-    event.events.forEach((action) => {
-      const instrument = instrumentsById.get(action.instrumentId);
-      if (!instrument) {
-        console.warn('Instrument not found for MIDI button');
-        return;
-      }
-
-      const selectedDevice = instrument.midiInId;
-      if (!selectedDevice) {
-        console.warn('No MIDI input device configured for the instrument');
-        return;
-      }
-
-      sendMidiActionToInstrument(action, instrument, outputs);
-    });
-  };
-
-  const handleMetronomeToggle = () => {
-    setIsMetronomeRunning((prev) => {
-      const next = !prev;
-
-      // Restart pulse animation exactly when transitioning to playing state.
-      if (next) {
-        setMetronomePulseKey((key) => key + 1);
-      }
-
-      return next;
-    });
-  };
-
   const toolbar = (
     <div className="flex items-center gap-4">
-      {currentSong.bpm && (
-        <div className="flex items-center gap-2">
-          <Button
-            key={metronomePulseKey}
-            className="metronome-pulse"
-            isIcon
-            onClick={handleMetronomeToggle}
-            style={{ animationDuration: `${beatDurationSeconds}s` }}
-            title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
-            type="button"
-            variant="outlined"
-          >
-            {isMetronomeRunning ? (
-              <IconPlayerStopFilled className="h-4 w-4" />
-            ) : (
-              <IconPlayerPlayFilled className="h-4 w-4" />
-            )}
-          </Button>
-          <span className="min-w-16 text-xs font-medium text-slate-300" title="Metronome counter">
-            M{currentMeasure}:B{currentBeat}
-          </span>
-        </div>
-      )}
+      <MetronomeControl
+        bpm={currentSong.bpm}
+        isReady={isReady}
+        isSupported={isSupported}
+        metronomeVolume={metronomeVolume}
+        onBeatChange={handleAutoTriggerMidiEvents}
+        onStop={() => {
+          lastAutoTriggerPositionRef.current = null;
+        }}
+        outputs={outputs}
+        timeSignature={currentSong.timeSignature}
+      />
       <SongStats song={currentSong} />
       <SettingsPanel onZoomChange={setZoom} song={currentSong} zoom={zoom} />
       <EditButton
@@ -289,6 +291,7 @@ export function SongDetailPage() {
             {
               content: (
                 <MidiButtonsDisplay
+                  highlightedMidiEventId={highlightedMidiEventId}
                   isDisabled={isMidiButtonDisabled}
                   midiEvents={currentSong.midiEvents}
                   onTriggerEvent={handleTriggerMidiEvent}
@@ -299,6 +302,7 @@ export function SongDetailPage() {
             },
           ]}
         />
+
         <nav className="fixed bottom-0 left-0 z-10 w-full bg-slate-950">
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 border-t border-slate-800 p-4">
             {previousEntry && (

@@ -3,27 +3,37 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useMidiDevices } from '../../../midi/useMidiDevices';
-import type { Instrument, MidiEvent } from '../../../types';
+import type { Instrument, MidiButtonTrigger, MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 import { MidiButtonCard } from './MidiButtonCard';
 import { MidiButtonDialog } from './MidiButtonDialog';
+import { MidiButtonTriggersFormSection } from './MidiButtonTriggersFormSection';
 
 type MidiButtonsTabProps = {
   instruments: Instrument[];
+  midiButtonTriggers?: MidiButtonTrigger[];
   midiEvents?: MidiEvent[];
+  onAddMidiButtonTrigger?: (trigger: Omit<MidiButtonTrigger, 'id'>) => void;
   onAddEvent?: (event: Omit<MidiEvent, 'id'>) => void;
+  onDeleteMidiButtonTrigger?: (triggerId: string) => void;
   onDeleteEvent?: (eventId: string) => void;
+  onEditMidiButtonTrigger?: (triggerId: string, trigger: Omit<MidiButtonTrigger, 'id'>) => void;
   onEditEvent?: (eventId: string, event: Omit<MidiEvent, 'id'>) => void;
 };
 
 export function MidiButtonsTab({
   instruments,
+  midiButtonTriggers,
   midiEvents,
+  onAddMidiButtonTrigger,
   onAddEvent,
+  onDeleteMidiButtonTrigger,
   onDeleteEvent,
+  onEditMidiButtonTrigger,
   onEditEvent,
 }: MidiButtonsTabProps) {
+  const hasMidiEvents = (midiEvents?.length ?? 0) > 0;
   const [editingEvent, setEditingEvent] = useState<MidiEvent | undefined>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { isReady, outputs } = useMidiDevices();
@@ -54,7 +64,6 @@ export function MidiButtonsTab({
   };
 
   const outputsById = new Map(outputs.map((output) => [output.id, output]));
-
   return (
     <div className="space-y-6">
       {instruments.length === 0 && (
@@ -105,7 +114,7 @@ export function MidiButtonsTab({
             <IconPlus className="h-4 w-4" />
           </Button>
         </div>
-        {!midiEvents || midiEvents.length === 0 ? (
+        {!hasMidiEvents ? (
           <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/40 p-4 text-center text-sm text-slate-400">
             No MIDI buttons yet.{' '}
             <button className="link" onClick={handleOpenAddDialog} type="button">
@@ -115,7 +124,7 @@ export function MidiButtonsTab({
           </div>
         ) : (
           <div className="space-y-2">
-            {midiEvents.map((event) => {
+            {midiEvents?.map((event) => {
               const isAvailable =
                 isReady &&
                 event.events.every((action) => {
@@ -136,6 +145,14 @@ export function MidiButtonsTab({
           </div>
         )}
       </div>
+
+      <MidiButtonTriggersFormSection
+        midiButtonTriggers={midiButtonTriggers}
+        midiEvents={midiEvents}
+        onAddMidiButtonTrigger={onAddMidiButtonTrigger}
+        onDeleteMidiButtonTrigger={onDeleteMidiButtonTrigger}
+        onEditMidiButtonTrigger={onEditMidiButtonTrigger}
+      />
     </div>
   );
 }

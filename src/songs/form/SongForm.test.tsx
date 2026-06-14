@@ -131,6 +131,9 @@ describe('SongForm', () => {
     await user.type(await screen.findByLabelText('Button label*'), 'Piano');
     await user.click(screen.getByRole('button', { name: 'Add button' }));
 
+    // Add automatic trigger
+    await user.click(screen.getByRole('button', { name: 'Add MIDI button trigger' }));
+
     await user.click(screen.getByRole('button', { name: 'Create song' }));
 
     expect(onSubmit).toHaveBeenCalledWith(
@@ -141,6 +144,14 @@ describe('SongForm', () => {
         duration: 83,
         key: 'Ab',
         lyrics: 'Is this the real life? Is this just fantasy?',
+        midiButtonTriggers: [
+          expect.objectContaining({
+            beat: 1,
+            id: expect.any(String),
+            measure: 1,
+            midiEventId: expect.any(String),
+          }),
+        ],
         midiEvents: [
           {
             events: [{ instrumentId: '0', programChange: 0, type: 'programChange' }],

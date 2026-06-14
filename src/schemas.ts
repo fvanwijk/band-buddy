@@ -31,6 +31,12 @@ export const midiEventBaseSchema = z.object({
   label: z.string(),
 });
 export const midiEventSchema = midiEventBaseSchema.extend({ id: z.string() });
+export const midiButtonTriggerBaseSchema = z.object({
+  beat: z.number().int().min(1).max(16),
+  measure: z.number().int().min(1),
+  midiEventId: z.string(),
+});
+export const midiButtonTriggerSchema = midiButtonTriggerBaseSchema.extend({ id: z.string() });
 
 // Instrument
 export const instrumentTableSchema = z.object({
@@ -64,6 +70,7 @@ export const songTableSchema = z.object({
   isDeleted: z.boolean().optional(),
   key: z.string().optional(),
   lyrics: z.string().optional(),
+  midiButtonTriggers: z.string().optional(), // Stored as JSON string
   midiEvents: z.string().optional(), // Stored as JSON string
   notes: z.string().optional(),
   sheetMusicFilename: z.string().optional(),
@@ -76,6 +83,7 @@ export const songSchema = songTableSchema.extend({
   canvasPaths: z.array(z.unknown()).optional(),
   defaultTab: songDefaultTabSchema.optional(),
   id: z.string(),
+  midiButtonTriggers: z.array(midiButtonTriggerSchema).optional(),
   midiEvents: z.array(midiEventSchema).optional(),
 });
 

@@ -4,14 +4,17 @@ import type { MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
+import { cn } from '../../../utils/cn';
 
 export type MidiButtonsDisplayProps = {
+  highlightedMidiEventId?: string | null;
   isDisabled?: (event: MidiEvent) => boolean;
   midiEvents?: MidiEvent[];
   onTriggerEvent?: (event: MidiEvent) => void;
 };
 
 export function MidiButtonsDisplay({
+  highlightedMidiEventId,
   isDisabled,
   midiEvents,
   onTriggerEvent,
@@ -37,10 +40,15 @@ export function MidiButtonsDisplay({
         {midiEvents.map((event) => (
           <Button
             key={event.id}
+            className={cn(
+              'h-24 rounded-lg text-xl! transition-all',
+              highlightedMidiEventId === event.id &&
+                'border-brand-300! bg-brand-400/30! ring-2 ring-brand-300/80',
+            )}
             color="primary"
             disabled={isDisabled?.(event)}
             onClick={() => onTriggerEvent?.(event)}
-            className="h-24 rounded-lg text-xl!"
+            style={{ transitionDuration: highlightedMidiEventId === event.id ? '150ms' : '1500ms' }}
             variant="outlined"
           >
             {event.label}

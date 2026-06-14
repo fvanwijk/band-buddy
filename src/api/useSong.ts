@@ -40,6 +40,15 @@ export function parseSongRow(
     }
   }
 
+  // Parse midiButtonTriggers if stored as JSON string
+  if (typeof songRow.midiButtonTriggers === 'string') {
+    try {
+      parsedData.midiButtonTriggers = JSON.parse(songRow.midiButtonTriggers);
+    } catch {
+      parsedData.midiButtonTriggers = undefined;
+    }
+  }
+
   // Parse canvasPaths if stored as JSON string
   if (typeof songRow.canvasPaths === 'string') {
     try {
@@ -85,6 +94,14 @@ export function useGetSongs(
           parsedData.midiEvents = JSON.parse(songData.midiEvents);
         } catch {
           parsedData.midiEvents = undefined;
+        }
+      }
+      // Parse midiButtonTriggers if stored as JSON string
+      if (typeof songData.midiButtonTriggers === 'string') {
+        try {
+          parsedData.midiButtonTriggers = JSON.parse(songData.midiButtonTriggers);
+        } catch {
+          parsedData.midiButtonTriggers = undefined;
         }
       }
       // Parse canvasPaths if stored as JSON string
@@ -152,6 +169,12 @@ export function useAddSong(onSuccess?: (id: string) => void) {
         delete finalData.midiEvents;
       }
 
+      if (data.midiButtonTriggers && data.midiButtonTriggers.length > 0) {
+        finalData.midiButtonTriggers = JSON.stringify(data.midiButtonTriggers);
+      } else {
+        delete finalData.midiButtonTriggers;
+      }
+
       Object.entries(finalData).forEach(([key, value]) => {
         if (value === undefined) {
           delete finalData[key];
@@ -186,6 +209,12 @@ export function useUpdateSong(id: string, onSuccess?: () => void) {
         finalData.midiEvents = JSON.stringify(data.midiEvents);
       } else {
         delete finalData.midiEvents;
+      }
+
+      if (data.midiButtonTriggers && data.midiButtonTriggers.length > 0) {
+        finalData.midiButtonTriggers = JSON.stringify(data.midiButtonTriggers);
+      } else {
+        delete finalData.midiButtonTriggers;
       }
 
       if (data.canvasPaths && data.canvasPaths.length > 0) {

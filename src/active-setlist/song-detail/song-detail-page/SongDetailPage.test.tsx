@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRoutesStub } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vite-plus/test';
@@ -31,16 +31,37 @@ describe('SongDetailPage', () => {
     defaultTab,
     isSupported = true,
     tab,
+    withAutoMidiButtonTrigger = false,
   }: {
     defaultTab?: 'lyrics' | 'midi' | 'text-notes' | 'sheet-music';
     isSupported?: boolean;
     tab?: string;
+    withAutoMidiButtonTrigger?: boolean;
   } = {}) => {
     const sendProgramChangeMock = vi.fn();
     const { store, persister } = getMockStore();
     seedStore(store);
     if (defaultTab) {
       store.setPartialRow('songs', '0', { defaultTab });
+    }
+    if (withAutoMidiButtonTrigger) {
+      const songRow = store.getRow('songs', '0') as Record<string, unknown>;
+      const midiEvents = JSON.parse(String(songRow.midiEvents)) as Array<{
+        id: string;
+        label: string;
+      }>;
+      const targetMidiEvent = midiEvents.find((event) => event.label === 'Organ') ?? midiEvents[0];
+
+      store.setPartialRow('songs', '0', {
+        midiButtonTriggers: JSON.stringify([
+          {
+            beat: 1,
+            id: 'trigger-1',
+            measure: 1,
+            midiEventId: targetMidiEvent.id,
+          },
+        ]),
+      });
     }
     store.setValue('activeSetlistId', '1');
     await persister.save();
@@ -109,5 +130,23 @@ describe('SongDetailPage', () => {
     expect(
       await screen.findByRole('tab', { name: 'Text notes', selected: true }),
     ).toBeInTheDocument();
+  });
+
+  it('highlights triggered MIDI button and fades in 1.5 seconds', async () => {
+    const user = userEvent.setup();
+
+    await renderComponent({ tab: 'midi' });
+
+    await user.click(await screen.findByRole('button', { name: 'Organ' }));
+
+    const organButton = await screen.findByRole('button', { name: 'Organ' });
+    expect(organButton.className).toContain('ring-brand-300/80');
+
+    await waitFor(
+      () => {
+        expect(organButton.className).not.toContain('ring-brand-300/80');
+      },
+      { timeout: 1800 },
+    );
   });
 });

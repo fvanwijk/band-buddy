@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../api/useInstruments';
 import { useSheetMusic } from '../../hooks/useSheetMusic';
-import type { MidiEvent, Song } from '../../types';
+import type { MidiButtonTrigger, MidiEvent, Song } from '../../types';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { Page } from '../../ui/Page';
@@ -72,12 +72,22 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     control,
     name: 'midiEvents',
   });
+  const {
+    append: appendMidiButtonTrigger,
+    remove: removeMidiButtonTrigger,
+    replace: replaceMidiButtonTriggers,
+    update: updateMidiButtonTrigger,
+  } = useFieldArray({
+    control,
+    name: 'midiButtonTriggers',
+  });
 
   const durationMins = watch('durationMinutes');
   const durationSecs = watch('durationSeconds');
   const totalDurationSeconds = (durationMins || 0) * 60 + (durationSecs || 0);
   const bpm = watch('bpm');
   const lyrics = watch('lyrics');
+  const midiButtonTriggers = watch('midiButtonTriggers') || [];
   const midiEvents = watch('midiEvents') || [];
   const sheetMusicFiles = watch('sheetMusicFiles');
   const sheetMusicFilename = watch('sheetMusicFilename');
@@ -129,6 +139,21 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     const measures = calculateMeasures(totalDurationSeconds, bpm, timeSignature);
     setCalculatedMeasures(measures);
   }, [totalDurationSeconds, bpm, timeSignature]);
+
+  useEffect(() => {
+    if (!midiButtonTriggers.length) {
+      return;
+    }
+
+    const midiEventIds = new Set(midiEvents.map((event) => event.id));
+    const nextTriggers = midiButtonTriggers.filter((trigger) =>
+      midiEventIds.has(trigger.midiEventId),
+    );
+
+    if (nextTriggers.length !== midiButtonTriggers.length) {
+      replaceMidiButtonTriggers(nextTriggers);
+    }
+  }, [midiButtonTriggers, midiEvents, replaceMidiButtonTriggers]);
 
   const selectedTab =
     tab && ['details', 'lyrics', 'sheet-music', 'text-notes', 'midi', 'settings'].includes(tab)
@@ -205,6 +230,34 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     }
   };
 
+  const handleAddMidiButtonTrigger = (trigger: Omit<MidiButtonTrigger, 'id'>) => {
+    const newTrigger: MidiButtonTrigger = {
+      ...trigger,
+      id: `midi-trigger-${Date.now()}`,
+    };
+    appendMidiButtonTrigger(newTrigger);
+  };
+
+  const handleDeleteMidiButtonTrigger = (triggerId: string) => {
+    const index = midiButtonTriggers.findIndex((trigger) => trigger.id === triggerId);
+    if (index >= 0) {
+      removeMidiButtonTrigger(index);
+    }
+  };
+
+  const handleEditMidiButtonTrigger = (
+    triggerId: string,
+    trigger: Omit<MidiButtonTrigger, 'id'>,
+  ) => {
+    const index = midiButtonTriggers.findIndex((item) => item.id === triggerId);
+    if (index >= 0) {
+      updateMidiButtonTrigger(index, {
+        ...trigger,
+        id: triggerId,
+      });
+    }
+  };
+
   return (
     <Page>
       <PageHeader backPath={backPath} title={title} />
@@ -267,9 +320,13 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               content: (
                 <MidiButtonsTab
                   instruments={instruments}
+                  midiButtonTriggers={midiButtonTriggers}
                   midiEvents={midiEvents}
+                  onAddMidiButtonTrigger={handleAddMidiButtonTrigger}
                   onAddEvent={handleAddMidiEvent}
+                  onDeleteMidiButtonTrigger={handleDeleteMidiButtonTrigger}
                   onDeleteEvent={handleDeleteMidiEvent}
+                  onEditMidiButtonTrigger={handleEditMidiButtonTrigger}
                   onEditEvent={handleEditMidiEvent}
                 />
               ),
