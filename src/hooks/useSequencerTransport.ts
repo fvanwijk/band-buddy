@@ -35,6 +35,9 @@ const LOOK_AHEAD_TIME = 50; // 50ms lookahead for scheduling
 const TIMEBASE = 480; // Ticks per quarter note
 const DEFAULT_MIDI_CHANNEL = 10; // Channel 10 = drums in MIDI
 const DEFAULT_MIDI_NOTE = 36; // Kick drum
+const DOWNBEAT_VELOCITY = 127;
+const SECONDARY_ACCENT_VELOCITY = 108;
+const REGULAR_BEAT_VELOCITY = 90;
 
 /**
  * Sequencer transport hook using EventScheduler for accurate metronome timing
@@ -83,6 +86,12 @@ export function useSequencerTransport({
         const beatNumber = Math.round(tick / TIMEBASE);
         const beatInMeasure = beatNumber % safeBeats;
         const isDownbeat = beatInMeasure === 0;
+        const isSecondaryAccent = safeBeats === 6 && beatInMeasure === 3;
+        const velocity = isDownbeat
+          ? DOWNBEAT_VELOCITY
+          : isSecondaryAccent
+            ? SECONDARY_ACCENT_VELOCITY
+            : REGULAR_BEAT_VELOCITY;
 
         events.push({
           channel: safeChannel,
@@ -90,7 +99,7 @@ export function useSequencerTransport({
           note: safeNote,
           tick,
           type: 'note',
-          velocity: isDownbeat ? 127 : 90,
+          velocity,
         } as MidiNoteEvent);
       }
 
@@ -122,8 +131,13 @@ export function useSequencerTransport({
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
 
-          // Downbeat: higher pitch (1000 Hz), regular beat: lower (800 Hz)
-          osc.frequency.value = event.velocity > 100 ? 1000 : 800;
+          // Downbeat: 1000 Hz, 6/8 secondary accent: 900 Hz, regular beat: 800 Hz
+          osc.frequency.value =
+            event.velocity >= DOWNBEAT_VELOCITY
+              ? 1000
+              : event.velocity >= SECONDARY_ACCENT_VELOCITY
+                ? 900
+                : 800;
           osc.type = 'sine';
 
           // Envelope: quick attack and decay
