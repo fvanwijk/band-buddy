@@ -1,5 +1,5 @@
 import { IconX } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { MidiEventLogEntry } from '../../midi/useMidiEventLog';
 import { Button } from '../../ui/Button';
@@ -12,13 +12,59 @@ type MidiEventLogPanelProps = {
   onClose: () => void;
 };
 
+const DEFAULT_PANEL_WIDTH = 384;
+const MIN_PANEL_WIDTH = 175;
+
 export function MidiEventLogPanel({ entries, onClear, onClose }: MidiEventLogPanelProps) {
+  const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
   const [showInput, setShowInput] = useState(true);
   const [showCc, setShowCc] = useState(true);
   const [showNote, setShowNote] = useState(true);
   const [showOutput, setShowOutput] = useState(true);
   const [showProgramChange, setShowProgramChange] = useState(true);
   const [showUnknown, setShowUnknown] = useState(true);
+  const dragStartXRef = useRef(0);
+  const dragStartWidthRef = useRef(DEFAULT_PANEL_WIDTH);
+
+  const clampWidth = useCallback((width: number) => {
+    return Math.min(Math.max(width, MIN_PANEL_WIDTH), window.innerWidth);
+  }, []);
+
+  const handleResizeStart = (event: React.MouseEvent<HTMLDivElement>) => {
+    dragStartXRef.current = event.clientX;
+    dragStartWidthRef.current = panelWidth;
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    if (!isResizing) {
+      return;
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const delta = dragStartXRef.current - event.clientX;
+      const nextWidth = clampWidth(dragStartWidthRef.current + delta);
+      setPanelWidth(nextWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [clampWidth, isResizing]);
 
   const filteredEntries = useMemo(
     () =>
@@ -53,7 +99,16 @@ export function MidiEventLogPanel({ entries, onClear, onClose }: MidiEventLogPan
   );
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 flex w-96 flex-col border-l border-slate-700 bg-slate-950 shadow-lg">
+    <div
+      className="fixed inset-y-0 right-0 z-50 flex flex-col border-l border-slate-700 bg-slate-950 shadow-lg"
+      style={{ maxWidth: '100%', width: `${panelWidth}px` }}
+    >
+      <div
+        aria-label="Resize MIDI event log panel"
+        className="absolute top-0 bottom-0 left-0 w-2 cursor-col-resize bg-transparent transition-colors hover:bg-brand-400/30"
+        onMouseDown={handleResizeStart}
+        role="separator"
+      />
       {/* Header */}
       <div className="border-b border-slate-700 bg-slate-900 px-4 py-3">
         <div className="flex items-center justify-between">
