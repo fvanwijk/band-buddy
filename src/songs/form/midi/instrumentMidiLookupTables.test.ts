@@ -10,14 +10,26 @@ import {
 } from './instrumentMidiLookupTables';
 
 describe('instrumentMidiLookupTables', () => {
-  it('returns 128 controller options for Rev2 with CC32 special label', () => {
+  it('returns 128 controller options for Rev2 with CSV-backed labels', () => {
     const instrument = createInstrument({ name: 'Prophet Rev2' });
 
     const options = getInstrumentControlChangeControllerOptions(instrument);
 
     expect(options).toHaveLength(128);
-    expect(options?.[0]).toEqual({ label: '0', value: '0' });
+    expect(options?.[1]).toEqual({ label: 'MOD Wheel (1)', value: '1' });
     expect(options?.[32]).toEqual({ label: 'Bank Select (32)', value: '32' });
+    expect(options?.[127]).toEqual({ label: '127', value: '127' });
+  });
+
+  it('returns 128 controller options for Nord Stage 4 with CSV-backed labels', () => {
+    const instrument = createInstrument({ name: 'Nord Stage 4' });
+
+    const options = getInstrumentControlChangeControllerOptions(instrument);
+
+    expect(options).toHaveLength(128);
+    expect(options?.[0]).toEqual({ label: 'Global - Bank select MSB (0)', value: '0' });
+    expect(options?.[32]).toEqual({ label: 'Global - Bank select LSB (32)', value: '32' });
+    expect(options?.[118]).toEqual({ label: 'Global - Section edit (118)', value: '118' });
     expect(options?.[127]).toEqual({ label: '127', value: '127' });
   });
 
@@ -53,6 +65,22 @@ describe('instrumentMidiLookupTables', () => {
     );
 
     expect(label).toBe('Bank Select (32) - Factory Bank 2 (#5)');
+  });
+
+  it('formats mapped Nord Stage 4 CC action labels with controller names', () => {
+    const instrument = createInstrument({ name: 'Nord Stage 4' });
+
+    const label = getInstrumentControlChangeLabel(
+      {
+        controller: 118,
+        instrumentId: instrument.id,
+        type: 'controlChange',
+        value: 1,
+      },
+      instrument,
+    );
+
+    expect(label).toBe('Global - Section edit (118) = 1');
   });
 
   it('returns grouped Nord program options and labels from the lookup table', () => {

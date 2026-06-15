@@ -166,4 +166,52 @@ describe('MidiButtonDialog', () => {
       label: 'Rev2 Bank',
     });
   });
+
+  it('uses labeled controller select for Nord Stage 4 CC actions', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+
+    renderComponent({
+      instruments: [createInstrument({ id: 'nord', name: 'Nord Stage 4' })],
+      onSubmit,
+    });
+
+    await user.type(screen.getByLabelText('Button label*'), 'Nord Section Edit');
+    await user.selectOptions(screen.getByDisplayValue('Program Change'), 'Control Change');
+
+    const controllerSelect = screen.getByDisplayValue('Global - Bank select MSB (0)');
+    await user.selectOptions(controllerSelect, 'Global - Section edit (118)');
+
+    const ccValueInput = screen.getByRole('spinbutton', { name: /CC Value 1/ });
+    await user.clear(ccValueInput);
+    await user.type(ccValueInput, '1');
+
+    await user.click(screen.getByRole('button', { name: 'Add button' }));
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      events: [
+        {
+          controller: 118,
+          instrumentId: 'nord',
+          type: 'controlChange',
+          value: 1,
+        },
+      ],
+      label: 'Nord Section Edit',
+    });
+  });
+
+  it('keeps numeric CC fields for instruments without lookup tables', async () => {
+    const user = userEvent.setup();
+
+    renderComponent({
+      instruments: [createInstrument({ id: 'yamaha', name: 'Yamaha Montage' })],
+    });
+
+    await user.selectOptions(screen.getByDisplayValue('Program Change'), 'Control Change');
+
+    expect(screen.getByRole('spinbutton', { name: 'Controller #*' })).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: /CC Value 1/ })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /Controller 1/ })).not.toBeInTheDocument();
+  });
 });
