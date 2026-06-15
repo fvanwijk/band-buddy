@@ -23,7 +23,6 @@ export function MidiButtonTriggersFormSection({
   const configuredMidiButtonTriggers = midiButtonTriggers ?? [];
   const hasMidiEvents = (midiEvents?.length ?? 0) > 0;
   const hasMidiButtonTriggers = (midiButtonTriggers?.length ?? 0) > 0;
-  const midiEventsById = new Map(availableMidiEvents.map((event) => [event.id, event]));
 
   const handleAddTrigger = () => {
     if (!hasMidiEvents) {
@@ -150,21 +149,16 @@ export function MidiButtonTriggersFormSection({
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2">
-                <span className="text-xs text-slate-500">
-                  {midiEventsById.get(trigger.midiEventId)?.label || 'Unknown button'}
-                </span>
-                <Button
-                  color="danger"
-                  isIcon
-                  onClick={() => onDeleteMidiButtonTrigger?.(trigger.id)}
-                  title="Delete MIDI button trigger"
-                  type="button"
-                  variant="outlined"
-                >
-                  <IconTrash className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button
+                color="danger"
+                isIcon
+                onClick={() => onDeleteMidiButtonTrigger?.(trigger.id)}
+                title="Delete MIDI button trigger"
+                type="button"
+                variant="outlined"
+              >
+                <IconTrash className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </div>

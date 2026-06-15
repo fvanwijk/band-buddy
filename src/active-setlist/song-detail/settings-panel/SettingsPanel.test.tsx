@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { MidiEventLogProvider } from '../../../contexts/MidiEventLogContext';
 import { createSong, createSongTable } from '../../../mocks/songs';
 import { StoreProvider } from '../../../store/StoreProvider';
 import { getMockStore } from '../../../testUtils';
@@ -38,7 +39,11 @@ describe('SettingsPanel', () => {
     await persister.save();
 
     render(<SettingsPanel onZoomChange={() => {}} song={song} zoom={1} />, {
-      wrapper: StoreProvider,
+      wrapper: ({ children }) => (
+        <StoreProvider>
+          <MidiEventLogProvider>{children}</MidiEventLogProvider>
+        </StoreProvider>
+      ),
     });
     await screen.findByTitle('Settings');
   };

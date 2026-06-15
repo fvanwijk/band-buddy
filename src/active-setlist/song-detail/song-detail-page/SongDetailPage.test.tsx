@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createRoutesStub } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
+import { MidiEventLogProvider } from '../../../contexts/MidiEventLogContext';
 import { seedStore } from '../../../mocks/seed';
 import { StoreProvider } from '../../../store/StoreProvider';
 import { getMockStore } from '../../../testUtils';
@@ -84,7 +85,11 @@ describe('SongDetailPage', () => {
     const route = tab ? `/play/0/0/${tab}` : '/play/0/0';
 
     render(<RoutesStub initialEntries={[route]} />, {
-      wrapper: StoreProvider,
+      wrapper: ({ children }) => (
+        <StoreProvider>
+          <MidiEventLogProvider>{children}</MidiEventLogProvider>
+        </StoreProvider>
+      ),
     });
 
     return { sendProgramChangeMock };
