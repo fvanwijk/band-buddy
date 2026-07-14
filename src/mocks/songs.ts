@@ -131,19 +131,21 @@ export const createSongs = (): Song[] => [
 ];
 
 export const createSongTable = (overrides: Partial<SongTable> = {}): SongTable => {
-  const { id, canvasPaths, midiEvents, ...table } = createSong();
+  const { id, canvasPaths, midiButtonTriggers, midiEvents, ...table } = createSong();
   return {
     ...table,
     canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
+    midiButtonTriggers: midiButtonTriggers ? JSON.stringify(midiButtonTriggers) : undefined,
     midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
     ...overrides,
   };
 };
 
 export const createSongsTable = (): SongTable[] =>
-  createSongs().map(({ id, canvasPaths, midiEvents, ...table }) => ({
+  createSongs().map(({ id, canvasPaths, midiButtonTriggers, midiEvents, ...table }) => ({
     ...table,
     canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
+    midiButtonTriggers: midiButtonTriggers ? JSON.stringify(midiButtonTriggers) : undefined,
     midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
   }));
 

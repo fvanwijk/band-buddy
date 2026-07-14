@@ -1,12 +1,21 @@
 overrides:
-  vite: 'npm:@voidzero-dev/vite-plus-core@latest'
-  vitest: 'npm:@voidzero-dev/vite-plus-test@latest'
+  vite: 'catalog:'
+  vitest: 'catalog:'
 
 peerDependencyRules:
   allowAny:
     - vite
     - vitest
+  allowedVersions:
+    vite: '*'
+    vitest: '*'
 
 onlyBuiltDependencies:
   - esbuild
   - msw
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.4
+  vitest: 4.1.10
+  vite-plus: 0.2.4
+  '@vitest/coverage-v8': 4.1.10
+  '@vitest/ui': 4.1.10
