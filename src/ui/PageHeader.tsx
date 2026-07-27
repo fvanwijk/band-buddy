@@ -16,7 +16,7 @@ export function PageHeader({ action, backPath, subtitle, title }: PageHeaderProp
         <p className="text-xs font-semibold tracking-[0.3em] text-brand-300 uppercase">
           {subtitle}
         </p>
-        <h1 className="text-2xl font-semibold text-slate-100">{title}</h1>
+        <h1 className="text-lg font-semibold text-slate-100 sm:text-2xl">{title}</h1>
       </div>
       {action}
     </header>

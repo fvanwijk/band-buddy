@@ -6,10 +6,11 @@ import { usePopper } from 'react-popper';
 import { useGetShowDrawingTools, useSetShowDrawingTools } from '../../../api/useSettings';
 import { useUpdateSong } from '../../../api/useSong';
 import { useMidiEventLogContext } from '../../../contexts/MidiEventLogContext';
+import { Grid } from '../../../settings/Grid';
+import { GridCell } from '../../../settings/GridCell';
 import { defaultTabOptions } from '../../../songs/form/settings/SettingsTab';
 import type { Song } from '../../../types';
 import { Button } from '../../../ui/Button';
-import { Card } from '../../../ui/Card';
 import { Checkbox } from '../../../ui/Checkbox';
 import { SelectField } from '../../../ui/form/SelectField';
 import { MetronomeVolumePanel } from '../metronome-volume-panel/MetronomeVolumePanel';
@@ -72,7 +73,7 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
         {...attributes.popper}
         className="z-20 shadow-lg"
       >
-        <Card className="p-1" contentClassName="w-56 space-y-1">
+        <Grid className="divide-slate-800 border-slate-800 bg-slate-900">
           {hasSettings ? (
             <>
               {song.key && (
@@ -93,29 +94,29 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               )}
             </>
           ) : (
-            <div className="p-3 text-xs">
+            <GridCell className="p-3">
               <p className="mb-1 text-slate-200">No settings available for this song.</p>
               <p className="text-slate-400">
                 Add more information such as lyrics, key or BPM to enable settings.
               </p>
-            </div>
+            </GridCell>
           )}
-          <div className="bg-slate-800/20 p-3">
+          <GridCell className="p-3">
             <SelectField
               label="Default tab"
               onChange={(event) => handleDefaultTabChange(event.target.value as SongDefaultTab)}
               options={defaultTabOptions}
               value={song.defaultTab || 'auto'}
             />
-            <div className="mt-3 border-t border-slate-700/40 pt-3">
-              <Checkbox
-                checked={isMidiEventLogOpen}
-                label="Show MIDI event log"
-                onChange={(event) => setIsMidiEventLogOpen(event.target.checked)}
-              />
-            </div>
-          </div>
-        </Card>
+          </GridCell>
+          <GridCell className="p-3">
+            <Checkbox
+              checked={isMidiEventLogOpen}
+              label="Show MIDI event log"
+              onChange={(event) => setIsMidiEventLogOpen(event.target.checked)}
+            />
+          </GridCell>
+        </Grid>
       </PopoverPanel>
     </Popover>
   );

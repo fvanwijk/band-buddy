@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useMidiDevices } from '../../../midi/useMidiDevices';
+import { Grid } from '../../../settings/Grid';
 import type { Instrument, MidiButtonTrigger, MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
+import { Card } from '../../../ui/Card';
 import { MidiButtonCard } from './MidiButtonCard';
 import { MidiButtonDialog } from './MidiButtonDialog';
 import { MidiButtonTriggersFormSection } from './MidiButtonTriggersFormSection';
@@ -65,7 +67,7 @@ export function MidiButtonsTab({
 
   const outputsById = new Map(outputs.map((output) => [output.id, output]));
   return (
-    <div className="space-y-6">
+    <Card>
       {instruments.length === 0 && (
         <Alert severity="info">
           <p>
@@ -123,7 +125,7 @@ export function MidiButtonsTab({
             .
           </div>
         ) : (
-          <div className="space-y-2">
+          <Grid>
             {midiEvents?.map((event) => {
               const isAvailable =
                 isReady &&
@@ -142,7 +144,7 @@ export function MidiButtonsTab({
                 />
               );
             })}
-          </div>
+          </Grid>
         )}
       </div>
 
@@ -153,6 +155,6 @@ export function MidiButtonsTab({
         onDeleteMidiButtonTrigger={onDeleteMidiButtonTrigger}
         onEditMidiButtonTrigger={onEditMidiButtonTrigger}
       />
-    </div>
+    </Card>
   );
 }

@@ -1,5 +1,6 @@
 import { IconMinus, IconPlus } from '@tabler/icons-react';
 
+import { GridCell } from '../../../settings/GridCell';
 import { Button } from '../../../ui/Button';
 import { cn } from '../../../utils/cn';
 import { ResetButton } from '../reset-button/ResetButton';
@@ -14,7 +15,7 @@ const formatTranspose = (transpose: number) => (transpose > 0 ? `+${transpose}` 
 
 export function TransposePanel({ onTransposeChange, transpose }: TransposePanelProps) {
   return (
-    <div className="bg-slate-800/20 p-3">
+    <GridCell className="p-3">
       <SettingHeading
         resetButton={
           transpose !== 0 && (
@@ -54,6 +55,6 @@ export function TransposePanel({ onTransposeChange, transpose }: TransposePanelP
           <IconPlus className="h-4 w-4" />
         </Button>
       </div>
-    </div>
+    </GridCell>
   );
 }

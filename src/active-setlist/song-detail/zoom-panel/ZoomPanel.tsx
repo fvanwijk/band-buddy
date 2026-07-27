@@ -1,3 +1,4 @@
+import { GridCell } from '../../../settings/GridCell';
 import { Slider } from '../../../ui/Slider';
 import { ResetButton } from '../reset-button/ResetButton';
 import { SettingHeading } from '../setting-heading/SettingHeading';
@@ -9,7 +10,7 @@ type ZoomPanelProps = {
 
 export function ZoomPanel({ onZoomChange, zoom }: ZoomPanelProps) {
   return (
-    <div className="bg-slate-800/20 p-3">
+    <GridCell className="p-3">
       <SettingHeading
         resetButton={
           zoom !== 1 && <ResetButton onClick={() => onZoomChange(1)} title="Reset zoom to 1×" />
@@ -29,6 +30,6 @@ export function ZoomPanel({ onZoomChange, zoom }: ZoomPanelProps) {
         value={zoom}
       />
       <p className="mt-1 text-center text-xs font-semibold text-brand-200">{zoom.toFixed(2)}×</p>
-    </div>
+    </GridCell>
   );
 }

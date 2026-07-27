@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { useSpotify } from '../../contexts/SpotifyContext';
 import { Button } from '../../ui/Button';
-import { SettingsCard } from '../SettingsCard';
+import { GridCell } from '../GridCell';
 
 export function SpotifyCard() {
   const { isAuthenticated, isLoading, sdk, logout } = useSpotify();
@@ -41,7 +41,7 @@ export function SpotifyCard() {
   };
 
   return (
-    <SettingsCard>
+    <GridCell>
       <div className="flex items-start justify-between">
         <div>
           <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-100">
@@ -65,7 +65,7 @@ export function SpotifyCard() {
           <p className="text-sm text-slate-400">Checking connection...</p>
         ) : isAuthenticated && userProfile ? (
           <div className="space-y-4">
-            <div className="rounded-lg border border-slate-700 bg-slate-800/40 p-4">
+            <div className="rounded-lg bg-slate-800/40 p-4">
               <p className="text-sm text-slate-400">Logged in as</p>
               <p className="mt-1 font-semibold text-slate-100">{userProfile.display_name}</p>
             </div>
@@ -90,6 +90,6 @@ export function SpotifyCard() {
           </Button>
         )}
       </div>
-    </SettingsCard>
+    </GridCell>
   );
 }

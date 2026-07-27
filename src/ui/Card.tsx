@@ -1,24 +1,17 @@
-import type { ReactNode } from 'react';
+import type { FC, PropsWithChildren } from 'react';
 
 import { cn } from '../utils/cn';
 
-type CardProps = {
-  actions?: ReactNode;
-  children: ReactNode;
+type CardProps = PropsWithChildren<{
   className?: string;
-  contentClassName?: string;
-};
+}>;
 
-export function Card({ actions, children, className, contentClassName }: CardProps) {
-  return (
-    <div
-      className={cn(
-        'flex items-center justify-between gap-3 overflow-hidden rounded border border-slate-700 bg-slate-900 p-4 shadow-sm transition-shadow hover:shadow-md',
-        className,
-      )}
-    >
-      <div className={cn('min-w-0 flex-1', contentClassName)}>{children}</div>
-      {actions && <div className="ml-4 flex gap-2">{actions}</div>}
-    </div>
-  );
-}
+export const Card: FC<CardProps> = ({ className, ...props }) => (
+  <div
+    className={cn(
+      'flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6',
+      className,
+    )}
+    {...props}
+  />
+);

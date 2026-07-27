@@ -12,7 +12,7 @@ type InputFieldProps = {
   id?: string;
   label: string;
   rows?: number;
-  size?: 'medium' | 'small';
+  size?: 'medium' | 'small' | 'xsmall';
 } & Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> &
   Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>;
 
@@ -22,15 +22,16 @@ export function InputField({
   hideLabel,
   label,
   rows,
+  size = 'medium',
   ...inputProps
 }: InputFieldProps) {
   const generatedId = useId();
   const inputId = inputProps.id ?? generatedId;
   const isTextarea = rows !== undefined;
-  const size = inputProps.size ?? 'medium';
   const inputClass = cn(
-    'w-full rounded-lg border border-slate-700 bg-slate-800 text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 focus:outline-none',
-    size === 'small' ? 'px-2 py-1 text-sm' : 'px-3 py-2',
+    'w-full rounded-lg border border-brand-900 bg-brand-950/40 text-slate-100 placeholder-slate-500 hover:border-brand-700 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 focus:outline-none',
+    { medium: 'px-3 py-2', small: 'px-2.5 py-1', xsmall: 'px-2 py-1 text-sm' }[size],
+    '[&::-webkit-calendar-picker-indicator]:invert',
     inputProps.className,
   );
   return (

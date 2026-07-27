@@ -7,6 +7,7 @@ import { useDeleteSetlist, useGetSetlists } from '../api/useSetlist';
 import { useActivateSetlist } from '../api/useSettings';
 import { useSpotify } from '../contexts/SpotifyContext';
 import { useSortedArray } from '../hooks/useSortedArray';
+import { Grid } from '../settings/Grid';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { EmptyState } from '../ui/EmptyState';
@@ -106,7 +107,7 @@ export function ManageSetlistsPage() {
             </span>
           </div>
 
-          <div className="grid gap-2">
+          <Grid>
             {displaySetlists.map((setlist) => (
               <SetlistCard
                 key={setlist.id}
@@ -120,7 +121,7 @@ export function ManageSetlistsPage() {
                 title={setlist.title}
               />
             ))}
-          </div>
+          </Grid>
         </div>
       )}
     </Page>

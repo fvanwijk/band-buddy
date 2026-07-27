@@ -1,5 +1,5 @@
 import { Switch } from '../../ui/Switch';
-import { SettingsCard } from '../SettingsCard';
+import { GridCell } from '../GridCell';
 
 type MidiEventLogCardProps = {
   isOpen: boolean;
@@ -8,7 +8,7 @@ type MidiEventLogCardProps = {
 
 export function MidiEventLogCard({ isOpen, onOpenChange }: MidiEventLogCardProps) {
   return (
-    <SettingsCard>
+    <GridCell>
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-slate-100">MIDI Event Log</h2>
@@ -18,6 +18,6 @@ export function MidiEventLogCard({ isOpen, onOpenChange }: MidiEventLogCardProps
         </div>
         <Switch checked={isOpen} label="Show event log" onCheckedChange={onOpenChange} />
       </div>
-    </SettingsCard>
+    </GridCell>
   );
 }

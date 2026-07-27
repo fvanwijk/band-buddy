@@ -95,7 +95,7 @@ const buttonVariants = cva(
       variant: {
         filled: 'text-xs font-semibold uppercase tracking-[0.25em]',
         outlined: 'border pl-4 pr-3 py-2 text-xs font-semibold uppercase tracking-[0.25em]',
-        text: 'bg-transparent hover:bg-opacity-10',
+        text: 'border border-transparent bg-transparent hover:bg-opacity-10',
       },
     },
   },

@@ -4,6 +4,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { useGetSongs } from '../../api/useSong';
 import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
 import { DeleteButton } from '../../ui/DeleteButton';
 import { InputField } from '../../ui/form/InputField';
 import { SelectField } from '../../ui/form/SelectField';
@@ -81,7 +82,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
   };
 
   return (
-    <div className="space-y-2 rounded border border-slate-700 bg-slate-900 p-4">
+    <Card className="rounded-md p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {editing ? (
@@ -95,7 +96,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
               id={`set-name-${index}`}
               className="ml-0"
               placeholder={`Set ${index + 1} name (optional)`}
-              size="small"
+              size="xsmall"
               type="text"
             />
           ) : (
@@ -163,6 +164,7 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
                         label: `${s.artist} - ${s.title}`,
                         value: s.id,
                       }))}
+                      size="small"
                       {...register(`sets.${index}.songs.${songIndex}.songId`)}
                     />
                   </div>
@@ -211,6 +213,6 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
       >
         Add song to set
       </Button>
-    </div>
+    </Card>
   );
 }

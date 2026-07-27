@@ -2,6 +2,7 @@ import { IconFileMusic, IconFileTypePdf, IconTrash, IconUpload } from '@tabler/i
 import type { FieldError, UseFormRegisterReturn, UseFormSetValue } from 'react-hook-form';
 
 import { Button } from '../../../ui/Button';
+import { Card } from '../../../ui/Card';
 import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
 import { PdfViewer } from '../../../ui/PdfViewer';
 import type { SongFormData } from '../SongForm';
@@ -66,7 +67,7 @@ export function SheetMusicFormTab({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <Card>
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <p className="text-sm text-slate-300">{displayFilename}</p>
@@ -101,6 +102,6 @@ export function SheetMusicFormTab({
           <PdfViewer className="aspect-[2/1.414]" file={file} />
         </div>
       )}
-    </div>
+    </Card>
   );
 }

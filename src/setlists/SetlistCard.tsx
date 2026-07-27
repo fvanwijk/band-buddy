@@ -1,9 +1,9 @@
 import { IconPlayerPlay } from '@tabler/icons-react';
 
 import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
 import { DeleteButton } from '../ui/DeleteButton';
 import { EditButton } from '../ui/EditButton';
+import { ListItem } from '../ui/ListItem';
 import { formatDate } from '../utils/date';
 import { pluralize } from '../utils/pluralize';
 
@@ -29,7 +29,7 @@ export function SetlistCard({
   title,
 }: SetlistCardProps) {
   return (
-    <Card
+    <ListItem
       actions={
         <>
           <Button
@@ -51,6 +51,6 @@ export function SetlistCard({
         <span>{formatDate(date)}</span>•<span>{pluralize(setsCount, 'set')}</span>•
         <span>{pluralize(songsCount, 'song')}</span>
       </div>
-    </Card>
+    </ListItem>
   );
 }

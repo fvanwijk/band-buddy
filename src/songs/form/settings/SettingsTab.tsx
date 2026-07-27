@@ -1,5 +1,6 @@
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
 
+import { Card } from '../../../ui/Card';
 import { InputField } from '../../../ui/form/InputField';
 import { SelectField } from '../../../ui/form/SelectField';
 import type { SongFormData } from '../SongForm';
@@ -19,7 +20,7 @@ export const defaultTabOptions = [
 
 export function SettingsTab({ errors, register }: SettingsTabProps) {
   return (
-    <div className="space-y-4">
+    <Card>
       <SelectField
         helperText="When you open a song during a performance, it will automatically show the tab you select here. You can change the default tab for each song, so feel free to choose the one that best suits the content of your song.For example, if your song has PDF sheet music, setting the default tab to 'Sheet music' can be helpful for quick access during performances."
         label="Default tab"
@@ -43,6 +44,6 @@ export function SettingsTab({ errors, register }: SettingsTabProps) {
             value === undefined || Number.isInteger(value) || 'Transpose must be a whole number',
         })}
       />
-    </div>
+    </Card>
   );
 }

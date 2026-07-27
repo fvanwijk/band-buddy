@@ -1,4 +1,5 @@
 import { useGetMetronomeVolume, useSetMetronomeVolume } from '../../../api/useSettings';
+import { GridCell } from '../../../settings/GridCell';
 import { Slider } from '../../../ui/Slider';
 import { SettingHeading } from '../setting-heading/SettingHeading';
 
@@ -11,7 +12,7 @@ export function MetronomeVolumePanel() {
   };
 
   return (
-    <div className="space-y-3 bg-slate-800/20 p-3">
+    <GridCell className="p-3">
       <SettingHeading>Metronome volume</SettingHeading>
       <div className="space-y-2">
         <Slider
@@ -24,6 +25,6 @@ export function MetronomeVolumePanel() {
         />
         <p className="text-center text-xs font-semibold text-brand-200">{Math.round(volume)}%</p>
       </div>
-    </div>
+    </GridCell>
   );
 }

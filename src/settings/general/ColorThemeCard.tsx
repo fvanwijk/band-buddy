@@ -1,7 +1,7 @@
 import { useGetTheme, useSetTheme } from '../../api/useSettings';
 import { THEMES, type ThemeName } from '../../config/themes';
 import { Button } from '../../ui/Button';
-import { SettingsCard } from '../SettingsCard';
+import { GridCell } from '../GridCell';
 
 // Color preview swatches for each theme
 const themeColors = {
@@ -27,7 +27,7 @@ export function ColorThemeCard() {
   const setTheme = useSetTheme();
 
   return (
-    <SettingsCard>
+    <GridCell>
       <h2 className="text-lg font-semibold text-slate-100">Color Theme</h2>
       <p className="mt-2 text-sm text-slate-400">
         Choose your preferred color scheme. Based on triadic color harmony.
@@ -92,6 +92,6 @@ export function ColorThemeCard() {
           );
         })}
       </div>
-    </SettingsCard>
+    </GridCell>
   );
 }

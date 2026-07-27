@@ -3,6 +3,8 @@ import { IconPlus, IconTrash } from '@tabler/icons-react';
 import type { MidiButtonTrigger, MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
+import { InputField } from '../../../ui/form/InputField';
+import { SelectField } from '../../../ui/form/SelectField';
 
 type MidiButtonTriggersFormSectionProps = {
   midiButtonTriggers?: MidiButtonTrigger[];
@@ -76,78 +78,55 @@ export function MidiButtonTriggersFormSection({
               className="grid grid-cols-1 items-end gap-3 rounded-lg border border-slate-800 bg-slate-900/40 p-3 sm:grid-cols-[1fr_140px_120px_auto]"
               key={trigger.id}
             >
-              <div>
-                <label
-                  className="mb-1.5 block text-xs text-slate-300"
-                  htmlFor={`trigger-event-${trigger.id}`}
-                >
-                  Button
-                </label>
-                <select
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100"
-                  id={`trigger-event-${trigger.id}`}
-                  onChange={(event) => {
-                    onEditMidiButtonTrigger?.(trigger.id, {
-                      beat: trigger.beat,
-                      measure: trigger.measure,
-                      midiEventId: event.target.value,
-                    });
-                  }}
-                  value={trigger.midiEventId}
-                >
-                  {availableMidiEvents.map((midiEvent) => (
-                    <option key={midiEvent.id} value={midiEvent.id}>
-                      {midiEvent.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SelectField
+                id={`trigger-event-${trigger.id}`}
+                label="Button"
+                onChange={(event) => {
+                  onEditMidiButtonTrigger?.(trigger.id, {
+                    beat: trigger.beat,
+                    measure: trigger.measure,
+                    midiEventId: event.target.value,
+                  });
+                }}
+                options={availableMidiEvents.map((midiEvent) => ({
+                  label: midiEvent.label,
+                  value: midiEvent.id,
+                }))}
+                size="small"
+                value={trigger.midiEventId}
+              />
 
-              <div>
-                <label
-                  className="mb-1.5 block text-xs text-slate-300"
-                  htmlFor={`trigger-measure-${trigger.id}`}
-                >
-                  Measure
-                </label>
-                <input
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100"
-                  id={`trigger-measure-${trigger.id}`}
-                  min={1}
-                  onChange={(event) => {
-                    onEditMidiButtonTrigger?.(trigger.id, {
-                      beat: trigger.beat,
-                      measure: Math.max(1, Number.parseInt(event.target.value, 10) || 1),
-                      midiEventId: trigger.midiEventId,
-                    });
-                  }}
-                  type="number"
-                  value={trigger.measure}
-                />
-              </div>
+              <InputField
+                id={`trigger-measure-${trigger.id}`}
+                label="Measure"
+                min={1}
+                onChange={(event) => {
+                  onEditMidiButtonTrigger?.(trigger.id, {
+                    beat: trigger.beat,
+                    measure: Math.max(1, Number.parseInt(event.target.value, 10) || 1),
+                    midiEventId: trigger.midiEventId,
+                  });
+                }}
+                size="small"
+                type="number"
+                value={trigger.measure}
+              />
 
-              <div>
-                <label
-                  className="mb-1.5 block text-xs text-slate-300"
-                  htmlFor={`trigger-beat-${trigger.id}`}
-                >
-                  Beat
-                </label>
-                <input
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100"
-                  id={`trigger-beat-${trigger.id}`}
-                  min={1}
-                  onChange={(event) => {
-                    onEditMidiButtonTrigger?.(trigger.id, {
-                      beat: Math.max(1, Number.parseInt(event.target.value, 10) || 1),
-                      measure: trigger.measure,
-                      midiEventId: trigger.midiEventId,
-                    });
-                  }}
-                  type="number"
-                  value={trigger.beat}
-                />
-              </div>
+              <InputField
+                id={`trigger-beat-${trigger.id}`}
+                label="Beat"
+                min={1}
+                onChange={(event) => {
+                  onEditMidiButtonTrigger?.(trigger.id, {
+                    beat: Math.max(1, Number.parseInt(event.target.value, 10) || 1),
+                    measure: trigger.measure,
+                    midiEventId: trigger.midiEventId,
+                  });
+                }}
+                size="small"
+                type="number"
+                value={trigger.beat}
+              />
 
               <Button
                 color="danger"

@@ -263,7 +263,6 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       <PageHeader backPath={backPath} title={title} />
       <form
         autoComplete="off"
-        className="flex flex-1 flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6"
         noValidate
         onSubmit={handleSubmit(handleFormSubmit, handleFormError)}
       >

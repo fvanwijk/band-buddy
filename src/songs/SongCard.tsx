@@ -1,6 +1,6 @@
-import { Card } from '../ui/Card';
 import { DeleteButton } from '../ui/DeleteButton';
 import { EditButton } from '../ui/EditButton';
+import { ListItem } from '../ui/ListItem';
 import { SongMetadata } from './SongMetadata';
 
 type SongCardProps = {
@@ -25,7 +25,7 @@ export function SongCard({
   transpose,
 }: SongCardProps) {
   return (
-    <Card
+    <ListItem
       actions={
         <>
           <EditButton title="Edit song" to={`/songs/edit/${songId}`} />
@@ -41,6 +41,6 @@ export function SongCard({
         timeSignature={timeSignature}
         transpose={transpose}
       />
-    </Card>
+    </ListItem>
   );
 }

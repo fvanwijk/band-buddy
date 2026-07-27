@@ -9,6 +9,7 @@ import {
 import { Link } from 'react-router-dom';
 
 import { Button } from '../ui/Button';
+import { FeatureCard } from '../ui/feature-card/FeatureCard';
 import { Logo } from '../ui/Logo';
 
 export const Home = () => {
@@ -49,7 +50,7 @@ export const Home = () => {
               Start the app
             </Button>
           </div>
-          <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/50 to-slate-950 p-6 shadow-xl">
+          <div className="rounded-3xl border border-slate-800 bg-linear-to-br from-slate-900 via-slate-900/50 to-slate-950 p-6 shadow-xl">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <IconPlaylist className="h-6 w-6 text-brand-300" />
@@ -79,29 +80,21 @@ export const Home = () => {
         </section>
 
         <section className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <IconBolt className="mb-4 h-6 w-6 text-brand-300" />
-            <h3 className="text-lg font-semibold text-slate-100">Free and privacy-first</h3>
-            <p className="mt-2 text-sm text-slate-400">
-              Open source and completely free. Your data stays local in your browser—no accounts, no
-              tracking, no cloud required.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <IconPlaylist className="mb-4 h-6 w-6 text-brand-300" />
-            <h3 className="text-lg font-semibold text-slate-100">Setlist-first workflow</h3>
-            <p className="mt-2 text-sm text-slate-400">
-              Build shows around your repertoire and jump between songs in seconds.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <IconBrowserCheck className="mb-4 h-6 w-6 text-brand-300" />
-            <h3 className="text-lg font-semibold text-slate-100">Works everywhere</h3>
-            <p className="mt-2 text-sm text-slate-400">
-              Runs in any modern browser—desktop, tablet, or phone. Install as a PWA for offline
-              access.
-            </p>
-          </div>
+          <FeatureCard
+            description="Open source and completely free. Your data stays local in your browser—no accounts, no tracking, no cloud required."
+            icon={<IconBolt className="h-6 w-6" />}
+            title="Free and privacy-first"
+          />
+          <FeatureCard
+            description="Build shows around your repertoire and jump between songs in seconds."
+            icon={<IconPlaylist className="h-6 w-6" />}
+            title="Setlist-first workflow"
+          />
+          <FeatureCard
+            description="Runs in any modern browser—desktop, tablet, or phone. Install as a PWA for offline access."
+            icon={<IconBrowserCheck className="h-6 w-6" />}
+            title="Works everywhere"
+          />
         </section>
       </main>
 

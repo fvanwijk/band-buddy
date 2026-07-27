@@ -15,6 +15,7 @@ type SelectFieldProps = {
   hideLabel?: boolean;
   label: string;
   options: SelectOption[];
+  size?: 'medium' | 'small' | 'xsmall';
 } & Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'>;
 
 export function SelectField({
@@ -23,12 +24,14 @@ export function SelectField({
   hideLabel,
   label,
   options,
+  size = 'medium',
   ...selectProps
 }: SelectFieldProps) {
   const generatedId = useId();
   const selectId = selectProps.id ?? generatedId;
   const selectClass = cn(
-    'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 focus:outline-none',
+    'w-full rounded-lg border border-brand-900 bg-brand-950/40 pr-6 text-slate-100 hover:border-brand-700 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 focus:outline-none',
+    { medium: 'py-2 pl-3', small: 'py-1 pl-2.5', xsmall: 'py-1 pl-2 text-sm' }[size],
     selectProps.className,
   );
 

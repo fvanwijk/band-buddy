@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
 
+import { Card } from '../../../ui/Card';
 import { InputField } from '../../../ui/form/InputField';
 import { RadioGroup } from '../../../ui/form/RadioGroup';
 import { Switch } from '../../../ui/Switch';
@@ -64,7 +65,7 @@ export function DetailsTab({
   ];
 
   return (
-    <div className="space-y-4">
+    <Card>
       <InputField
         error={errors.artist}
         label="Artist"
@@ -162,6 +163,6 @@ export function DetailsTab({
           ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
         </p>
       )}
-    </div>
+    </Card>
   );
 }

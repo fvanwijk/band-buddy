@@ -509,6 +509,8 @@ Consistent page layout wrapper with flex column, full height, and gap:
 
 Location: `src/components/InputField.tsx`, `src/components/SelectField.tsx`
 
+**Always use `InputField` and `SelectField` for form fields. Never use raw `<input>`, `<select>`, or `<label>` elements with Tailwind classes directly.**
+
 Reusable form inputs with validation display:
 
 ```typescript
@@ -830,6 +832,32 @@ src/
 └── index.css           # Global styles + theme
 ```
 
+## React Component Style
+
+Always use `const` arrow functions with `FC<...Props>` notation for React components:
+
+```typescript
+// ✅ CORRECT
+type FeatureCardProps = {
+  title: string;
+};
+
+export const FeatureCard: FC<FeatureCardProps> = ({ title }) => {
+  return <div>{title}</div>;
+};
+
+// ❌ WRONG
+export function FeatureCard({ title }: FeatureCardProps) {
+  return <div>{title}</div>;
+}
+```
+
+Import `FC` from React:
+
+```typescript
+import type { FC } from 'react';
+```
+
 ## Component Directory Structure
 
 **Every component with tests must have its own directory**, even if it's a small component. This applies across the codebase (not just `src/ui`):
@@ -888,6 +916,8 @@ import { TransposePanel } from './transpose-panel/TransposePanel';
 11. ❌ Don't use template literals for conditional classes → ✅ Use `cn()` utility function
 12. ❌ Don't manually add BackButton wrapper → ✅ Use `backPath` prop on PageHeader
 13. ❌ Don't mix up MIDI input/output terminology → ✅ WebMIDI inputs = instrument outputs, WebMIDI outputs = instrument inputs (always add explanatory comment)
+14. ❌ Don't use `function` declarations for React components → ✅ Use `const` arrow functions with `FC<...Props>` type annotation
+15. ❌ Don't use raw `<input>`, `<select>`, or `<label>` elements with Tailwind classes → ✅ Use `InputField` and `SelectField` components
 
 ## Code Formatting
 

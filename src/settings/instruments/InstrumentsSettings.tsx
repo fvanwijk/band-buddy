@@ -8,7 +8,8 @@ import { useMidiDevices } from '../../midi/useMidiDevices';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
-import { SettingsCard } from '../SettingsCard';
+import { Grid } from '../Grid';
+import { GridCell } from '../GridCell';
 import { InstrumentCard } from './InstrumentCard';
 import { MidiEventLogCard } from './MidiEventLogCard';
 
@@ -45,8 +46,8 @@ export function InstrumentsSettings() {
 
   return (
     <>
-      <div className="flex flex-col gap-4">
-        <SettingsCard>
+      <Grid>
+        <GridCell>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-slate-100">Instruments</h2>
@@ -107,10 +108,10 @@ export function InstrumentsSettings() {
               ))
             )}
           </div>
-        </SettingsCard>
+        </GridCell>
 
         <MidiEventLogCard isOpen={isEventLogOpen} onOpenChange={setIsEventLogOpen} />
-      </div>
+      </Grid>
 
       <ConfirmDialog
         isOpen={!!deleteInstrumentId}

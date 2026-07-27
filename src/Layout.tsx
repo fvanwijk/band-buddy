@@ -26,8 +26,8 @@ export function Layout() {
 
   return (
     <>
-      <div className="sticky top-0 z-30 mx-auto max-w-5xl bg-slate-950/80 backdrop-blur-xs">
-        <header className="flex items-center justify-between gap-3 border-b border-slate-900 px-4 py-2">
+      <div className="sticky top-0 z-30 border-b border-slate-900 bg-slate-950 backdrop-blur-xs">
+        <header className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
           <Link to="/">
             <Logo className="text-md sm:text-2xl" iconClassName="h-4 w-4" />
           </Link>

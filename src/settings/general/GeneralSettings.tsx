@@ -1,3 +1,4 @@
+import { Grid } from '../Grid';
 import { AboutCard } from './AboutCard';
 import { ColorThemeCard } from './ColorThemeCard';
 import { LocaleCard } from './LocaleCard';
@@ -9,11 +10,11 @@ type GeneralSettingsProps = {
 
 export function GeneralSettings({ onShowWelcome }: GeneralSettingsProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <Grid>
       <ColorThemeCard />
       <LocaleCard />
       <SpotifyCard />
       <AboutCard onShowWelcome={onShowWelcome} />
-    </div>
+    </Grid>
   );
 }

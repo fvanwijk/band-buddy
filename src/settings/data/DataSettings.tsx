@@ -7,7 +7,8 @@ import { migrateBackup } from '../../services/migrations';
 import { persistStoreVersion } from '../../services/migrations/persistedStoreVersion';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
-import { SettingsCard } from '../SettingsCard';
+import { Grid } from '../Grid';
+import { GridCell } from '../GridCell';
 
 type BackupPayload = {
   tables: Tables;
@@ -100,8 +101,8 @@ export function DataSettings() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <SettingsCard>
+    <Grid>
+      <GridCell>
         <div className="space-y-4">
           <div className="space-y-2">
             <h2 className="text-lg font-semibold text-slate-100">Back up your data</h2>
@@ -151,7 +152,7 @@ export function DataSettings() {
             </Alert>
           )}
         </div>
-      </SettingsCard>
-    </div>
+      </GridCell>
+    </Grid>
   );
 }

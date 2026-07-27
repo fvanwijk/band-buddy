@@ -1,5 +1,7 @@
 import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
+import { Card } from '../../../ui/Card';
+
 type LyricsTabProps = {
   error?: FieldError;
   register: UseFormRegisterReturn;
@@ -7,7 +9,7 @@ type LyricsTabProps = {
 
 export function LyricsTab({ error, register }: LyricsTabProps) {
   return (
-    <div className="space-y-4">
+    <Card>
       <div>
         <label htmlFor="lyrics" className="mb-1.5 block text-sm font-medium text-slate-300">
           Chords & lyrics
@@ -24,6 +26,6 @@ export function LyricsTab({ error, register }: LyricsTabProps) {
         </p>
         {error && <p className="mt-1 text-xs text-red-400">{error.message}</p>}
       </div>
-    </div>
+    </Card>
   );
 }

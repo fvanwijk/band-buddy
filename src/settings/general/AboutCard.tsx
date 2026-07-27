@@ -1,7 +1,7 @@
 import { IconInfoCircle } from '@tabler/icons-react';
 
 import { Button } from '../../ui/Button';
-import { SettingsCard } from '../SettingsCard';
+import { GridCell } from '../GridCell';
 
 type AboutCardProps = {
   onShowWelcome: () => void;
@@ -9,7 +9,7 @@ type AboutCardProps = {
 
 export function AboutCard({ onShowWelcome }: AboutCardProps) {
   return (
-    <SettingsCard>
+    <GridCell>
       <h2 className="text-lg font-semibold text-slate-100">About</h2>
       <p className="mt-2 text-sm text-slate-400">
         BandBuddy is your companion for managing band repertoire and live performances.
@@ -25,6 +25,6 @@ export function AboutCard({ onShowWelcome }: AboutCardProps) {
           Show Welcome Guide
         </Button>
       </div>
-    </SettingsCard>
+    </GridCell>
   );
 }

@@ -30,7 +30,7 @@ export function SettingsPage() {
 
   return (
     <Page>
-      <PageHeader title="Preferences" subtitle="Settings" />
+      <PageHeader title="Preferences" />
 
       <Tabs
         activeTabId={selectedTab}
