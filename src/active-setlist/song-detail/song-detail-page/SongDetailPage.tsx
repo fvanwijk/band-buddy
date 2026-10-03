@@ -3,7 +3,6 @@ import {
   IconArrowRight,
   IconBrandSpotify,
   IconMicrophone2Off,
-  IconNote,
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -253,7 +252,7 @@ export function SongDetailPage() {
             {
               content:
                 currentSong.lyrics && currentSong.lyrics.trim().length > 0 ? (
-                  <DrawingOverlay songId={currentSongId} zoom={zoom}>
+                  <DrawingOverlay canvasType="lyrics" songId={currentSongId} zoom={zoom}>
                     <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
                   </DrawingOverlay>
                 ) : (
@@ -275,16 +274,13 @@ export function SongDetailPage() {
               label: 'Sheet Music',
             },
             {
-              content:
-                currentSong.notes && currentSong.notes.trim().length > 0 ? (
-                  <DrawingOverlay songId={currentSongId} zoom={zoom}>
+              content: (
+                <div className="flex h-[calc(100dvh-311px)] flex-col">
+                  <DrawingOverlay canvasType="textNotes" songId={currentSongId} zoom={zoom}>
                     <TextNotesBlock notes={currentSong.notes} />
                   </DrawingOverlay>
-                ) : (
-                  <EmptyStateBlock icon={<IconNote className="h-8 w-8" />}>
-                    No text notes added yet
-                  </EmptyStateBlock>
-                ),
+                </div>
+              ),
               id: 'text-notes',
               label: 'Text notes',
             },

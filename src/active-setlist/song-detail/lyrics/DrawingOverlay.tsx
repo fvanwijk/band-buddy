@@ -2,7 +2,11 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { ReactSketchCanvas, type ReactSketchCanvasRef } from 'react-sketch-canvas';
 
 import { useGetShowDrawingTools } from '../../../api/useSettings';
-import { useGetSongCanvasPaths, useSetSongCanvasPaths } from '../../../api/useSong';
+import {
+  type SongCanvasType,
+  useGetSongCanvasPaths,
+  useSetSongCanvasPaths,
+} from '../../../api/useSong';
 import { cn } from '../../../utils/cn';
 import { DrawingCursor } from './DrawingCursor';
 import { DrawingToolbar, colorOptions } from './DrawingToolbar';
@@ -10,6 +14,7 @@ import { useDrawingCursor } from './useDrawingCursor';
 import { useScrollableDimensions } from './useScrollableDimensions';
 
 type DrawingOverlayProps = {
+  canvasType: SongCanvasType;
   children: ReactNode;
   songId: string;
   zoom?: number;
@@ -21,15 +26,15 @@ const defaultColor = colorOptions[0].value;
 const PEN_RADIUS = 4;
 const ERASER_RADIUS = 10;
 
-export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayProps) {
+export function DrawingOverlay({ canvasType, children, songId, zoom = 1 }: DrawingOverlayProps) {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
   const hasLoadedInitialPathsRef = useRef(false);
   const showDrawingTools = useGetShowDrawingTools();
   const [mode, setMode] = useState<DrawingMode>('idle');
   const [selectedColor, setSelectedColor] = useState(defaultColor);
 
-  const storedCanvasPaths = useGetSongCanvasPaths(songId);
-  const setCanvasPaths = useSetSongCanvasPaths(songId);
+  const storedCanvasPaths = useGetSongCanvasPaths(songId, canvasType);
+  const setCanvasPaths = useSetSongCanvasPaths(songId, canvasType);
 
   const { containerRef, overlayRef, dimensions } = useScrollableDimensions();
   const { cursorPosition, cursorRadius, handleMouseLeave, handleMouseMove } = useDrawingCursor(
@@ -42,7 +47,7 @@ export function DrawingOverlay({ children, songId, zoom = 1 }: DrawingOverlayPro
   useEffect(() => {
     hasLoadedInitialPathsRef.current = false;
     canvasRef.current?.clearCanvas();
-  }, [songId, zoom]);
+  }, [canvasType, songId, zoom]);
 
   // Load stored canvas paths once when the canvas is initialized for this song/zoom.
   useEffect(() => {

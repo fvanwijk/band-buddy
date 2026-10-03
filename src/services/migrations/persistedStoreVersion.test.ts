@@ -10,7 +10,7 @@ import {
 
 describe('persistedStoreVersion', () => {
   it('parses a valid stored version', () => {
-    expect(parsePersistedStoreVersion('3')).toBe(3);
+    expect(parsePersistedStoreVersion(String(CURRENT_BACKUP_VERSION))).toBe(CURRENT_BACKUP_VERSION);
   });
 
   it('returns null for invalid stored versions', () => {
@@ -26,7 +26,9 @@ describe('persistedStoreVersion', () => {
       },
     } as unknown as Tables;
 
-    expect(resolvePersistedStoreVersion('3', tables)).toBe(3);
+    expect(resolvePersistedStoreVersion(String(CURRENT_BACKUP_VERSION), tables)).toBe(
+      CURRENT_BACKUP_VERSION,
+    );
   });
 
   it('falls back to legacy inference when no version is stored', () => {

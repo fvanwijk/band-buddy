@@ -1,6 +1,6 @@
 import type { Tables } from 'tinybase';
 
-export const CURRENT_BACKUP_VERSION = 3;
+export const CURRENT_BACKUP_VERSION = 4;
 export const PERSISTED_STORE_VERSION_KEY = 'band-buddy-version';
 
 // Legacy installs persisted Tinybase data without a separate version key.

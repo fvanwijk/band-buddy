@@ -3,20 +3,21 @@ import { useRef, useState } from 'react';
 import type { Tables, Values } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
 
-import { migrateBackup } from '../../services/migrations';
-import { persistStoreVersion } from '../../services/migrations/persistedStoreVersion';
+import {
+  CURRENT_BACKUP_VERSION,
+  persistStoreVersion,
+} from '../../services/migrations/persistedStoreVersion';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { Grid } from '../Grid';
 import { GridCell } from '../GridCell';
+import { ImportSummaryDialog } from './import-summary-dialog/ImportSummaryDialog';
 
 type BackupPayload = {
   tables: Tables;
   version: number;
   values: Values;
 };
-
-const BACKUP_VERSION = 3;
 
 type StatusState = {
   message: string;
@@ -27,6 +28,7 @@ export function DataSettings() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const store = useStore();
   const [status, setStatus] = useState<StatusState>(null);
+  const [importFile, setImportFile] = useState<File | null>(null);
 
   const handleExport = () => {
     if (!store) return;
@@ -34,7 +36,7 @@ export function DataSettings() {
     const payload: BackupPayload = {
       tables: store.getTables(),
       values: store.getValues(),
-      version: BACKUP_VERSION,
+      version: CURRENT_BACKUP_VERSION,
     };
 
     const blob = new Blob([JSON.stringify(payload)], {
@@ -49,53 +51,32 @@ export function DataSettings() {
     URL.revokeObjectURL(url);
   };
 
-  const handleImport = async (file: File) => {
+  const handleImport = (tables: Tables, values: Values) => {
     if (!store) return;
 
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text) as Partial<BackupPayload>;
+    store.setTables(tables);
+    store.setValues(values);
+    persistStoreVersion(localStorage);
 
-      if (!parsed.tables || !parsed.values || typeof parsed.version !== 'number') {
-        throw new Error('Invalid backup format.');
-      }
+    setStatus({
+      message: 'Backup imported successfully.',
+      severity: 'success',
+    });
+    setImportFile(null);
+  };
 
-      // Migrate backup if version doesn't match
-      const migrationResult = migrateBackup(parsed, parsed.version);
-
-      if (migrationResult.error) {
-        setStatus({
-          message: migrationResult.error,
-          severity: 'error',
-        });
-        return;
-      }
-
-      store.setTables(migrationResult.tables);
-      store.setValues(migrationResult.values);
-      persistStoreVersion(localStorage);
-
-      setStatus({
-        message: 'Backup imported successfully.',
-        severity: 'success',
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to import backup.';
-      setStatus({
-        message,
-        severity: 'error',
-      });
-    }
+  const handleCancelImport = () => {
+    setImportFile(null);
   };
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      await handleImport(file);
+      setImportFile(file);
       e.target.value = '';
     }
   };
@@ -153,6 +134,8 @@ export function DataSettings() {
           )}
         </div>
       </GridCell>
+
+      <ImportSummaryDialog file={importFile} onClose={handleCancelImport} onImport={handleImport} />
     </Grid>
   );
 }

@@ -93,7 +93,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const sheetMusicFilename = watch('sheetMusicFilename');
   const timeSignature = watch('timeSignature');
 
-  const hasDrawings = initialData?.canvasPaths && initialData.canvasPaths.length > 0;
+  const hasDrawings =
+    (initialData?.lyricsCanvasPaths && initialData.lyricsCanvasPaths.length > 0) ||
+    (initialData?.canvasPaths && initialData.canvasPaths.length > 0);
   const lyricsChanged = lyrics !== (initialData?.lyrics || '');
   const showDrawingWarning = hasDrawings && lyricsChanged;
 
@@ -199,7 +201,9 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
         defaultTab,
         duration: totalSeconds || undefined,
         key: (keyNote || existingNote) + (keyQuality || ''),
+        lyricsCanvasPaths: initialData?.lyricsCanvasPaths || [],
         spotifyId: initialData?.spotifyId,
+        textNotesCanvasPaths: initialData?.textNotesCanvasPaths || [],
       },
       sheetMusicFiles?.[0],
     );

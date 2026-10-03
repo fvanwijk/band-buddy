@@ -131,23 +131,45 @@ export const createSongs = (): Song[] => [
 ];
 
 export const createSongTable = (overrides: Partial<SongTable> = {}): SongTable => {
-  const { id, canvasPaths, midiButtonTriggers, midiEvents, ...table } = createSong();
+  const {
+    id,
+    canvasPaths,
+    lyricsCanvasPaths,
+    midiButtonTriggers,
+    midiEvents,
+    textNotesCanvasPaths,
+    ...table
+  } = createSong();
   return {
     ...table,
     canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
+    lyricsCanvasPaths: lyricsCanvasPaths ? JSON.stringify(lyricsCanvasPaths) : undefined,
     midiButtonTriggers: midiButtonTriggers ? JSON.stringify(midiButtonTriggers) : undefined,
     midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
+    textNotesCanvasPaths: textNotesCanvasPaths ? JSON.stringify(textNotesCanvasPaths) : undefined,
     ...overrides,
   };
 };
 
 export const createSongsTable = (): SongTable[] =>
-  createSongs().map(({ id, canvasPaths, midiButtonTriggers, midiEvents, ...table }) => ({
-    ...table,
-    canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
-    midiButtonTriggers: midiButtonTriggers ? JSON.stringify(midiButtonTriggers) : undefined,
-    midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
-  }));
+  createSongs().map(
+    ({
+      id,
+      canvasPaths,
+      lyricsCanvasPaths,
+      midiButtonTriggers,
+      midiEvents,
+      textNotesCanvasPaths,
+      ...table
+    }) => ({
+      ...table,
+      canvasPaths: canvasPaths ? JSON.stringify(canvasPaths) : undefined,
+      lyricsCanvasPaths: lyricsCanvasPaths ? JSON.stringify(lyricsCanvasPaths) : undefined,
+      midiButtonTriggers: midiButtonTriggers ? JSON.stringify(midiButtonTriggers) : undefined,
+      midiEvents: midiEvents ? JSON.stringify(midiEvents) : undefined,
+      textNotesCanvasPaths: textNotesCanvasPaths ? JSON.stringify(textNotesCanvasPaths) : undefined,
+    }),
+  );
 
 export const createLyrics = (): string => `[Verse 1]
  

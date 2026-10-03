@@ -70,11 +70,13 @@ export const songTableSchema = z.object({
   isDeleted: z.boolean().optional(),
   key: z.string().optional(),
   lyrics: z.string().optional(),
+  lyricsCanvasPaths: z.string().optional(), // Stored as JSON string
   midiButtonTriggers: z.string().optional(), // Stored as JSON string
   midiEvents: z.string().optional(), // Stored as JSON string
   notes: z.string().optional(),
   sheetMusicFilename: z.string().optional(),
   spotifyId: z.string().optional(),
+  textNotesCanvasPaths: z.string().optional(), // Stored as JSON string
   timeSignature: z.string().optional(),
   title: z.string(),
   transpose: z.number().optional(),
@@ -83,8 +85,10 @@ export const songSchema = songTableSchema.extend({
   canvasPaths: z.array(z.unknown()).optional(),
   defaultTab: songDefaultTabSchema.optional(),
   id: z.string(),
+  lyricsCanvasPaths: z.array(z.unknown()).optional(),
   midiButtonTriggers: z.array(midiButtonTriggerSchema).optional(),
   midiEvents: z.array(midiEventSchema).optional(),
+  textNotesCanvasPaths: z.array(z.unknown()).optional(),
 });
 
 // Setlist Song ---

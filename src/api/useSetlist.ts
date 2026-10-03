@@ -59,6 +59,12 @@ export function parseSetlists(
                     canvasPaths: songResult.data.canvasPaths
                       ? JSON.parse(songResult.data.canvasPaths)
                       : [],
+                    lyricsCanvasPaths: songResult.data.lyricsCanvasPaths
+                      ? JSON.parse(songResult.data.lyricsCanvasPaths)
+                      : [],
+                    textNotesCanvasPaths: songResult.data.textNotesCanvasPaths
+                      ? JSON.parse(songResult.data.textNotesCanvasPaths)
+                      : [],
                   }
                 : undefined;
               return song ? { ...setlistSong, ...song } : setlistSong;

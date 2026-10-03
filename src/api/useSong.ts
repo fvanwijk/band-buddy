@@ -12,6 +12,30 @@ import {
 import { songDefaultTabSchema, songSchema } from '../schemas';
 import type { Song } from '../types';
 
+export type SongCanvasType = 'lyrics' | 'textNotes';
+
+const parseCanvasPaths = (value: unknown) => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return undefined;
+  }
+};
+
+const getCanvasColumn = (
+  canvasType: SongCanvasType,
+): 'lyricsCanvasPaths' | 'textNotesCanvasPaths' => {
+  if (canvasType === 'lyrics') {
+    return 'lyricsCanvasPaths';
+  }
+
+  return 'textNotesCanvasPaths';
+};
+
 export function parseSongDefaultTab(
   songRow: Record<string, unknown> | null | undefined,
 ): Song['defaultTab'] | undefined {
@@ -49,14 +73,9 @@ export function parseSongRow(
     }
   }
 
-  // Parse canvasPaths if stored as JSON string
-  if (typeof songRow.canvasPaths === 'string') {
-    try {
-      parsedData.canvasPaths = JSON.parse(songRow.canvasPaths);
-    } catch {
-      parsedData.canvasPaths = undefined;
-    }
-  }
+  parsedData.canvasPaths = parseCanvasPaths(songRow.canvasPaths);
+  parsedData.lyricsCanvasPaths = parseCanvasPaths(songRow.lyricsCanvasPaths);
+  parsedData.textNotesCanvasPaths = parseCanvasPaths(songRow.textNotesCanvasPaths);
 
   const result = songSchema.safeParse(parsedData);
   if (!result.success) {
@@ -104,14 +123,9 @@ export function useGetSongs(
           parsedData.midiButtonTriggers = undefined;
         }
       }
-      // Parse canvasPaths if stored as JSON string
-      if (typeof songData.canvasPaths === 'string') {
-        try {
-          parsedData.canvasPaths = JSON.parse(songData.canvasPaths);
-        } catch {
-          parsedData.canvasPaths = undefined;
-        }
-      }
+      parsedData.canvasPaths = parseCanvasPaths(songData.canvasPaths);
+      parsedData.lyricsCanvasPaths = parseCanvasPaths(songData.lyricsCanvasPaths);
+      parsedData.textNotesCanvasPaths = parseCanvasPaths(songData.textNotesCanvasPaths);
       const result = songSchema.safeParse(parsedData);
       if (!result.success) {
         console.log(result.error, parsedData);
@@ -223,6 +237,18 @@ export function useUpdateSong(id: string, onSuccess?: () => void) {
         delete finalData.canvasPaths;
       }
 
+      if (data.lyricsCanvasPaths && data.lyricsCanvasPaths.length > 0) {
+        finalData.lyricsCanvasPaths = JSON.stringify(data.lyricsCanvasPaths);
+      } else if (data.lyricsCanvasPaths !== undefined) {
+        delete finalData.lyricsCanvasPaths;
+      }
+
+      if (data.textNotesCanvasPaths && data.textNotesCanvasPaths.length > 0) {
+        finalData.textNotesCanvasPaths = JSON.stringify(data.textNotesCanvasPaths);
+      } else if (data.textNotesCanvasPaths !== undefined) {
+        delete finalData.textNotesCanvasPaths;
+      }
+
       Object.entries(finalData).forEach(([key, value]) => {
         if (value === undefined) {
           delete finalData[key];
@@ -276,28 +302,37 @@ export function useDeleteSong(onSuccess?: () => void) {
 /**
  * Hook to get canvas paths for a song
  */
-export function useGetSongCanvasPaths(songId: string | undefined): CanvasPath[] {
+export function useGetSongCanvasPaths(
+  songId: string | undefined,
+  canvasType: SongCanvasType,
+): CanvasPath[] {
   const songRow = useRow('songs', songId || '');
 
   if (!songId || !songRow) {
     return [];
   }
+
   const songData = songRow as Record<string, unknown>;
-  if (!songData.canvasPaths || typeof songData.canvasPaths !== 'string') {
-    return [];
+  const canvasColumn = getCanvasColumn(canvasType);
+  const parsedPaths = parseCanvasPaths(songData[canvasColumn]);
+
+  if (Array.isArray(parsedPaths)) {
+    return parsedPaths as CanvasPath[];
   }
 
-  try {
-    return JSON.parse(songData.canvasPaths) as CanvasPath[];
-  } catch {
-    return [];
+  // Backward compatibility for older songs that used one shared canvas.
+  if (canvasType === 'lyrics') {
+    const legacyPaths = parseCanvasPaths(songData.canvasPaths);
+    return Array.isArray(legacyPaths) ? (legacyPaths as CanvasPath[]) : [];
   }
+
+  return [];
 }
 
 /**
  * Hook to set canvas paths for a song
  */
-export function useSetSongCanvasPaths(songId: string | undefined) {
+export function useSetSongCanvasPaths(songId: string | undefined, canvasType: SongCanvasType) {
   const store = useStore();
 
   return useCallback(
@@ -306,14 +341,15 @@ export function useSetSongCanvasPaths(songId: string | undefined) {
         return;
       }
 
+      const canvasColumn = getCanvasColumn(canvasType);
       if (paths.length === 0) {
-        store.setPartialRow('songs', songId, { canvasPaths: '' });
+        store.setPartialRow('songs', songId, { [canvasColumn]: '' });
       } else {
         store.setPartialRow('songs', songId, {
-          canvasPaths: JSON.stringify(paths),
+          [canvasColumn]: JSON.stringify(paths),
         });
       }
     },
-    [songId, store],
+    [canvasType, songId, store],
   );
 }

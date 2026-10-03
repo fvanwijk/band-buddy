@@ -5,7 +5,7 @@ import { CURRENT_BACKUP_VERSION } from './persistedStoreVersion';
 
 describe('migrateBackup', () => {
   it('should return unchanged data for current version', () => {
-    const v3Backup = {
+    const currentBackup = {
       tables: {
         instruments: {},
         setlistSets: { '1': { setIndex: 1, setlistId: '1' } },
@@ -14,14 +14,14 @@ describe('migrateBackup', () => {
         songs: { '1': { artist: 'Artist 1', title: 'Song 1' } },
       },
       values: { locale: 'en-US' },
-      version: 3,
+      version: CURRENT_BACKUP_VERSION,
     };
 
-    const result = migrateBackup(v3Backup, 3);
+    const result = migrateBackup(currentBackup, CURRENT_BACKUP_VERSION);
 
     expect(result.error).toBeUndefined();
-    expect(result.tables.songs).toEqual(v3Backup.tables.songs);
-    expect(result.values).toEqual(v3Backup.values);
+    expect(result.tables.songs).toEqual(currentBackup.tables.songs);
+    expect(result.values).toEqual(currentBackup.values);
   });
 
   it('should migrate from v1 to v2', () => {
@@ -48,13 +48,13 @@ describe('migrateBackup', () => {
   });
 
   it('should reject future versions', () => {
-    const v4Backup = {
+    const futureBackup = {
       tables: {},
       values: {},
-      version: 4,
+      version: CURRENT_BACKUP_VERSION + 1,
     };
 
-    const result = migrateBackup(v4Backup, 4);
+    const result = migrateBackup(futureBackup, CURRENT_BACKUP_VERSION + 1);
 
     expect(result.error).toBeDefined();
     expect(result.error).toContain('newer');
@@ -132,6 +132,30 @@ describe('migrateBackup', () => {
     ]);
   });
 
+  it('should migrate v3 shared canvas paths to v4 lyrics canvas paths', () => {
+    const v3Backup = {
+      tables: {
+        songs: {
+          '1': {
+            artist: 'Artist 1',
+            canvasPaths: '[{"drawMode":true,"paths":[{"x":1,"y":2}]}]',
+            title: 'Song 1',
+          },
+        },
+      },
+      values: {},
+      version: 3,
+    };
+
+    const result = migrateBackup(v3Backup, 3);
+
+    expect(result.error).toBeUndefined();
+
+    const migratedSong = result.tables.songs?.['1'] as Record<string, unknown>;
+    expect(migratedSong.canvasPaths).toBeUndefined();
+    expect(migratedSong.lyricsCanvasPaths).toBe('[{"drawMode":true,"paths":[{"x":1,"y":2}]}]');
+  });
+
   it('should migrate persisted v1 local data to v2 format', () => {
     const persistedV1 = JSON.stringify([
       {
@@ -163,7 +187,7 @@ describe('migrateBackup', () => {
   });
 
   it('should leave persisted current-version local data unchanged', () => {
-    const persistedV3 = JSON.stringify([
+    const persistedCurrentVersion = JSON.stringify([
       {
         instruments: {},
         setlistSets: { '1': { setIndex: 1, setlistId: '1' } },
@@ -174,10 +198,10 @@ describe('migrateBackup', () => {
       { locale: 'en-US' },
     ]);
 
-    const result = migratePersistedStore(persistedV3, String(CURRENT_BACKUP_VERSION));
+    const result = migratePersistedStore(persistedCurrentVersion, String(CURRENT_BACKUP_VERSION));
 
     expect(result.error).toBeUndefined();
     expect(result.migrated).toBe(false);
-    expect(result.persisted).toBe(persistedV3);
+    expect(result.persisted).toBe(persistedCurrentVersion);
   });
 });
