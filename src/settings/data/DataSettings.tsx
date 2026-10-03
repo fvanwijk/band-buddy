@@ -51,11 +51,26 @@ export function DataSettings() {
     URL.revokeObjectURL(url);
   };
 
-  const handleImport = (tables: Tables, values: Values) => {
+  const handleImport = (tables: Tables, values: Values, replace: boolean, deepMerge: boolean) => {
     if (!store) return;
 
-    store.setTables(tables);
-    store.setValues(values);
+    store.transaction(() => {
+      if (replace) {
+        store.setTables(tables);
+        store.setValues(values);
+      } else {
+        Object.entries(tables).forEach(([tableId, table]) => {
+          Object.entries(table).forEach(([rowId, row]) => {
+            if (deepMerge) {
+              store.setPartialRow(tableId, rowId, row);
+            } else {
+              store.setRow(tableId, rowId, row);
+            }
+          });
+        });
+        store.setPartialValues(values);
+      }
+    });
     persistStoreVersion(localStorage);
 
     setStatus({
@@ -94,7 +109,8 @@ export function DataSettings() {
               members to sync your data.
             </p>
             <p className="text-sm text-slate-400">
-              Importing a backup replaces your current data on this device.
+              Importing a backup lets you choose to replace or merge it with your current data on
+              this device.
             </p>
           </div>
 
@@ -121,6 +137,7 @@ export function DataSettings() {
 
           <input
             accept="application/json"
+            aria-label="Backup file"
             className="hidden"
             onChange={handleFileChange}
             ref={fileInputRef}

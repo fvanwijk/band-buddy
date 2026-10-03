@@ -9,7 +9,7 @@ type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
 
 export function Checkbox({ checked, className, label, onChange, ...props }: CheckboxProps) {
   return (
-    <label className="flex cursor-pointer items-center gap-2">
+    <label className={cn('flex cursor-pointer items-center gap-2', className)}>
       <div className="relative inline-flex">
         <input
           {...props}
@@ -18,12 +18,7 @@ export function Checkbox({ checked, className, label, onChange, ...props }: Chec
           onChange={onChange}
           type="checkbox"
         />
-        <IconCheck
-          className={cn(
-            'pointer-events-none absolute top-1/2 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100',
-            className,
-          )}
-        />
+        <IconCheck className="pointer-events-none absolute top-1/2 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100" />
       </div>
       <span className="text-sm text-slate-400">{label}</span>
     </label>
