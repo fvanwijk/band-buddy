@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Tables, Values } from 'tinybase';
 import { describe, expect, it } from 'vite-plus/test';
@@ -75,7 +75,11 @@ describe('DataSettings', () => {
     await renderComponent();
     await selectBackup(importedBackup());
 
-    await userEvent.click(screen.getByRole('button', { name: 'Import' }));
+    await userEvent.click(
+      within(screen.getByRole('dialog', { name: 'Confirm import' })).getByRole('button', {
+        name: 'Import',
+      }),
+    );
 
     expect(await screen.findByText('Backup imported successfully.')).toBeInTheDocument();
     await waitFor(() =>
@@ -90,7 +94,11 @@ describe('DataSettings', () => {
     await selectBackup(importedBackup());
 
     await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Import' }));
+    await userEvent.click(
+      within(screen.getByRole('dialog', { name: 'Confirm import' })).getByRole('button', {
+        name: 'Import',
+      }),
+    );
 
     await waitFor(() =>
       expect(Object.keys(getPersisted().tables.songs).toSorted()).toEqual([
@@ -110,7 +118,11 @@ describe('DataSettings', () => {
 
     await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
     await userEvent.click(screen.getByRole('checkbox', { name: /Deep merge/ }));
-    await userEvent.click(screen.getByRole('button', { name: 'Import' }));
+    await userEvent.click(
+      within(screen.getByRole('dialog', { name: 'Confirm import' })).getByRole('button', {
+        name: 'Import',
+      }),
+    );
 
     await waitFor(() => expect(getPersisted().tables.songs.shared.title).toBe('New title'));
     expect(getPersisted().tables.songs.shared.notes).toBe('Keep me');
@@ -127,5 +139,27 @@ describe('DataSettings', () => {
 
     expect(await screen.findByText('Invalid backup format.')).toBeInTheDocument();
     expect(Object.keys(getPersisted().tables.songs)).toEqual(['existing', 'shared']);
+  });
+
+  it('keeps the data when clearing the database is cancelled', async () => {
+    await renderComponent();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Clear database' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Clear database' });
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(Object.keys(getPersisted().tables.songs)).toEqual(['existing', 'shared']);
+  });
+
+  it('clears the database after confirmation', async () => {
+    await renderComponent();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Clear database' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Clear database' });
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Clear database' }));
+
+    expect(await screen.findByText('Database cleared successfully.')).toBeInTheDocument();
+    await waitFor(() => expect(getPersisted().tables.songs).toBeUndefined());
   });
 });

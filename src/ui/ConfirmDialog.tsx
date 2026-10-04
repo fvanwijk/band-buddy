@@ -4,6 +4,7 @@ import { Button } from './Button';
 import { Dialog } from './Dialog';
 
 type ConfirmDialogProps = {
+  confirmLabel?: string;
   isOpen: boolean;
   message: string;
   onClose: () => void;
@@ -11,7 +12,14 @@ type ConfirmDialogProps = {
   title: string;
 };
 
-export function ConfirmDialog({ isOpen, message, onClose, onConfirm, title }: ConfirmDialogProps) {
+export function ConfirmDialog({
+  confirmLabel = 'Delete',
+  isOpen,
+  message,
+  onClose,
+  onConfirm,
+  title,
+}: ConfirmDialogProps) {
   const handleConfirm = () => {
     onConfirm();
     onClose();
@@ -34,7 +42,7 @@ export function ConfirmDialog({ isOpen, message, onClose, onConfirm, title }: Co
           type="button"
           variant="filled"
         >
-          Delete
+          {confirmLabel}
         </Button>
       </div>
     </Dialog>

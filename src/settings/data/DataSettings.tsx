@@ -1,4 +1,4 @@
-import { IconDownload, IconUpload } from '@tabler/icons-react';
+import { IconDownload, IconTrash, IconUpload } from '@tabler/icons-react';
 import { useRef, useState } from 'react';
 import type { Tables, Values } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
@@ -9,6 +9,7 @@ import {
 } from '../../services/migrations/persistedStoreVersion';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
+import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { Grid } from '../Grid';
 import { GridCell } from '../GridCell';
 import { ImportSummaryDialog } from './import-summary-dialog/ImportSummaryDialog';
@@ -29,6 +30,22 @@ export function DataSettings() {
   const store = useStore();
   const [status, setStatus] = useState<StatusState>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
+  const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
+
+  const handleClearDatabase = () => {
+    if (!store) return;
+
+    store.transaction(() => {
+      store.delTables();
+      store.delValues();
+    });
+    persistStoreVersion(localStorage);
+
+    setStatus({
+      message: 'Database cleared successfully.',
+      severity: 'success',
+    });
+  };
 
   const handleExport = () => {
     if (!store) return;
@@ -133,6 +150,15 @@ export function DataSettings() {
             >
               Import
             </Button>
+            <Button
+              color="danger"
+              iconStart={<IconTrash className="h-4 w-4" />}
+              onClick={() => setIsClearDialogOpen(true)}
+              type="button"
+              variant="outlined"
+            >
+              Clear database
+            </Button>
           </div>
 
           <input
@@ -153,6 +179,15 @@ export function DataSettings() {
       </GridCell>
 
       <ImportSummaryDialog file={importFile} onClose={handleCancelImport} onImport={handleImport} />
+
+      <ConfirmDialog
+        confirmLabel="Clear database"
+        isOpen={isClearDialogOpen}
+        message="This permanently removes all songs, setlists, instruments, and settings from this device. Export a backup first if you want to keep your data."
+        onClose={() => setIsClearDialogOpen(false)}
+        onConfirm={handleClearDatabase}
+        title="Clear database"
+      />
     </Grid>
   );
 }
