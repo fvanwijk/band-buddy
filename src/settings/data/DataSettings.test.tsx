@@ -93,7 +93,7 @@ describe('DataSettings', () => {
     await renderComponent();
     await selectBackup(importedBackup());
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Merge' }));
     await userEvent.click(
       within(screen.getByRole('dialog', { name: 'Confirm import' })).getByRole('button', {
         name: 'Import',
@@ -116,8 +116,7 @@ describe('DataSettings', () => {
     await renderComponent();
     await selectBackup(importedBackup());
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
-    await userEvent.click(screen.getByRole('checkbox', { name: /Deep merge/ }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Deep merge' }));
     await userEvent.click(
       within(screen.getByRole('dialog', { name: 'Confirm import' })).getByRole('button', {
         name: 'Import',

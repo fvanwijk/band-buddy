@@ -9,7 +9,7 @@ import { createSongTable } from '../../../mocks/songs';
 import { CURRENT_BACKUP_VERSION } from '../../../services/migrations/persistedStoreVersion';
 import { StoreProvider } from '../../../store/StoreProvider';
 import { getMockStore } from '../../../testUtils';
-import { ImportSummaryDialog } from './ImportSummaryDialog';
+import { ImportSummaryDialog, type ImportMode } from './ImportSummaryDialog';
 
 const backup: { tables: Tables; values: Values; version: number } = {
   tables: {
@@ -39,7 +39,7 @@ describe('ImportSummaryDialog', () => {
   }: {
     file?: File | null;
     onClose?: () => void;
-    onImport?: (tables: Tables, values: Values, replace: boolean, deepMerge: boolean) => void;
+    onImport?: (tables: Tables, values: Values, mode: ImportMode) => void;
   } = {}) => {
     const { persister, store } = getMockStore();
     // Only s1 exists in the current data, so the backup has exactly one matching song
@@ -111,21 +111,34 @@ describe('ImportSummaryDialog', () => {
     expect(await screen.findByText(/is newer than app version/)).toBeInTheDocument();
   });
 
-  it('defaults to replacing without showing matches or the deep merge option', async () => {
+  it('defaults to replacing without showing matches', async () => {
     await renderComponent();
 
     await screen.findByText('Nord Stage 4');
 
-    expect(screen.getByRole('radio', { name: 'Replace all current data' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Replace' })).toBeChecked();
     expect(screen.queryByText(/will be replaced/)).not.toBeInTheDocument();
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(screen.queryByText(/already existing/)).not.toBeInTheDocument();
+  });
+
+  it('explains each import mode', async () => {
+    await renderComponent();
+    await screen.findByText('Nord Stage 4');
+
+    expect(screen.getByRole('radio', { name: 'Replace' })).toHaveAccessibleDescription(
+      'Delete all current data and use only the backup.',
+    );
+    expect(screen.getByRole('radio', { name: 'Merge' })).toHaveAccessibleDescription(/overwritten/);
+    expect(screen.getByRole('radio', { name: 'Deep merge' })).toHaveAccessibleDescription(
+      /combined field by field/,
+    );
   });
 
   it('shows how many rows will be replaced when merging', async () => {
     await renderComponent();
     await screen.findByText('Nord Stage 4');
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Merge' }));
 
     expect(within(getSection('Songs')).getByText('1 will be replaced')).toBeInTheDocument();
     expect(within(getSection('Instruments')).getByText('0 will be replaced')).toBeInTheDocument();
@@ -136,23 +149,10 @@ describe('ImportSummaryDialog', () => {
     await renderComponent();
     await screen.findByText('Nord Stage 4');
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
-    await userEvent.click(screen.getByRole('checkbox', { name: /Deep merge/ }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Deep merge' }));
 
     expect(within(getSection('Songs')).getByText('1 already existing')).toBeInTheDocument();
     expect(screen.queryByText(/will be replaced/)).not.toBeInTheDocument();
-  });
-
-  it('hides the deep merge option again when switching back to replace', async () => {
-    await renderComponent();
-    await screen.findByText('Nord Stage 4');
-
-    await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
-    expect(screen.getByRole('checkbox', { name: /Deep merge/ })).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('radio', { name: 'Replace all current data' }));
-
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 
   it('imports with replace by default', async () => {
@@ -162,18 +162,18 @@ describe('ImportSummaryDialog', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, true, false);
+    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, 'replace');
   });
 
-  it('imports with a shallow merge', async () => {
+  it('imports with a merge', async () => {
     const onImport = vi.fn();
     await renderComponent({ onImport });
     await screen.findByText('Nord Stage 4');
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Merge' }));
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, false, false);
+    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, 'merge');
   });
 
   it('imports with a deep merge', async () => {
@@ -181,24 +181,10 @@ describe('ImportSummaryDialog', () => {
     await renderComponent({ onImport });
     await screen.findByText('Nord Stage 4');
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
-    await userEvent.click(screen.getByRole('checkbox', { name: /Deep merge/ }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Deep merge' }));
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, false, true);
-  });
-
-  it('does not use deep merge when it was checked before switching back to replace', async () => {
-    const onImport = vi.fn();
-    await renderComponent({ onImport });
-    await screen.findByText('Nord Stage 4');
-
-    await userEvent.click(screen.getByRole('radio', { name: 'Merge with current data' }));
-    await userEvent.click(screen.getByRole('checkbox', { name: /Deep merge/ }));
-    await userEvent.click(screen.getByRole('radio', { name: 'Replace all current data' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Import' }));
-
-    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, true, false);
+    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, 'deepMerge');
   });
 
   it('calls onClose without importing when cancelled', async () => {

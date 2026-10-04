@@ -9,7 +9,6 @@ import { THEMES, type ThemeName } from '../../../config/themes';
 import { migrateBackup } from '../../../services/migrations';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
-import { Checkbox } from '../../../ui/Checkbox';
 import { Dialog } from '../../../ui/Dialog';
 import { RadioGroup } from '../../../ui/form/RadioGroup';
 import { ImportSettingsSection } from './ImportSettingsSection';
@@ -21,7 +20,7 @@ type BackupPayload = {
   values: Values;
 };
 
-type ImportMode = 'merge' | 'replace';
+export type ImportMode = 'deepMerge' | 'merge' | 'replace';
 
 type ImportFormData = {
   mode: ImportMode;
@@ -30,12 +29,26 @@ type ImportFormData = {
 type ImportSummaryDialogProps = {
   file: File | null;
   onClose: () => void;
-  onImport: (tables: Tables, values: Values, replace: boolean, deepMerge: boolean) => void;
+  onImport: (tables: Tables, values: Values, mode: ImportMode) => void;
 };
 
 const modeOptions = [
-  { label: 'Replace all current data', value: 'replace' },
-  { label: 'Merge with current data', value: 'merge' },
+  {
+    description: 'Delete all current data and use only the backup.',
+    label: 'Replace',
+    value: 'replace',
+  },
+  {
+    description: 'Keep current data and add the backup. Rows with the same ID are overwritten.',
+    label: 'Merge',
+    value: 'merge',
+  },
+  {
+    description:
+      'Keep current data and add the backup. Rows with the same ID are combined field by field.',
+    label: 'Deep merge',
+    value: 'deepMerge',
+  },
 ];
 
 const getCellAsString = (value: unknown, fallback: string): string =>
@@ -45,17 +58,15 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
   const store = useStore();
   const [error, setError] = useState<string | null>(null);
   const [parsed, setParsed] = useState<{ tables: Tables; values: Values } | null>(null);
-  const [deepMerge, setDeepMerge] = useState(false);
   const { register, reset, watch } = useForm<ImportFormData>({
     defaultValues: { mode: 'replace' },
   });
-  const isMerge = watch('mode') === 'merge';
+  const mode = watch('mode');
 
   useEffect(() => {
     if (!file) {
       setError(null);
       setParsed(null);
-      setDeepMerge(false);
       reset();
       return;
     }
@@ -99,7 +110,7 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
 
   const handleConfirm = () => {
     if (!parsed) return;
-    onImport(parsed.tables, parsed.values, !isMerge, isMerge && deepMerge);
+    onImport(parsed.tables, parsed.values, mode);
   };
 
   const songs = Object.values(parsed?.tables.songs ?? {});
@@ -119,11 +130,11 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
   }
 
   const getMatchLabel = (tableId: string) => {
-    if (!isMerge || !store) return undefined;
+    if (mode === 'replace' || !store) return undefined;
     const matches = Object.keys(parsed?.tables[tableId] ?? {}).filter((rowId) =>
       store.hasRow(tableId, rowId),
     ).length;
-    return deepMerge ? `${matches} already existing` : `${matches} will be replaced`;
+    return mode === 'deepMerge' ? `${matches} already existing` : `${matches} will be replaced`;
   };
 
   return (
@@ -166,16 +177,13 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
             {settings.length > 0 && <ImportSettingsSection settings={settings} />}
           </div>
 
-          <div className="mb-6 space-y-3">
-            <RadioGroup label="Import mode" options={modeOptions} register={register('mode')} />
-            {isMerge && (
-              <Checkbox
-                checked={deepMerge}
-                label="Deep merge matching rows (merge fields instead of replacing the whole row)"
-                onChange={(e) => setDeepMerge(e.target.checked)}
-              />
-            )}
-          </div>
+          <RadioGroup
+            className="mb-6"
+            label="Import mode"
+            options={modeOptions}
+            register={register('mode')}
+            vertical
+          />
 
           <div className="flex gap-3">
             <Button className="flex-1" onClick={onClose} type="button" variant="outlined">

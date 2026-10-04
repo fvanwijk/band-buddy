@@ -12,7 +12,7 @@ import { Button } from '../../ui/Button';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { Grid } from '../Grid';
 import { GridCell } from '../GridCell';
-import { ImportSummaryDialog } from './import-summary-dialog/ImportSummaryDialog';
+import { ImportSummaryDialog, type ImportMode } from './import-summary-dialog/ImportSummaryDialog';
 
 type BackupPayload = {
   tables: Tables;
@@ -68,17 +68,17 @@ export function DataSettings() {
     URL.revokeObjectURL(url);
   };
 
-  const handleImport = (tables: Tables, values: Values, replace: boolean, deepMerge: boolean) => {
+  const handleImport = (tables: Tables, values: Values, mode: ImportMode) => {
     if (!store) return;
 
     store.transaction(() => {
-      if (replace) {
+      if (mode === 'replace') {
         store.setTables(tables);
         store.setValues(values);
       } else {
         Object.entries(tables).forEach(([tableId, table]) => {
           Object.entries(table).forEach(([rowId, row]) => {
-            if (deepMerge) {
+            if (mode === 'deepMerge') {
               store.setPartialRow(tableId, rowId, row);
             } else {
               store.setRow(tableId, rowId, row);
