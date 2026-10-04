@@ -31,6 +31,12 @@ const backup: { tables: Tables; values: Values; version: number } = {
 const createBackupFile = (payload: unknown = backup) =>
   new File([JSON.stringify(payload)], 'backup.json', { type: 'application/json' });
 
+// Selecting setlists always includes all three setlist tables
+const allTables: Tables = { ...backup.tables, setlistSets: {}, setlistSongs: {} };
+
+const without = (tables: Tables, tableId: string): Tables =>
+  Object.fromEntries(Object.entries(tables).filter(([id]) => id !== tableId));
+
 describe('ImportSummaryDialog', () => {
   const renderComponent = async ({
     file = createBackupFile(),
@@ -39,7 +45,7 @@ describe('ImportSummaryDialog', () => {
   }: {
     file?: File | null;
     onClose?: () => void;
-    onImport?: (tables: Tables, values: Values, mode: ImportMode) => void;
+    onImport?: (tables: Tables, values: Values | undefined, mode: ImportMode) => void;
   } = {}) => {
     const { persister, store } = getMockStore();
     // Only s1 exists in the current data, so the backup has exactly one matching song
@@ -51,7 +57,7 @@ describe('ImportSummaryDialog', () => {
     });
   };
 
-  const getSection = (label: string) => screen.getByText(label).parentElement as HTMLElement;
+  const getSection = (label: string) => screen.getByRole('group', { name: label });
 
   it('renders nothing without a file', async () => {
     await renderComponent({ file: null });
@@ -88,7 +94,7 @@ describe('ImportSummaryDialog', () => {
 
     await screen.findByText('Nord Stage 4');
 
-    expect(screen.queryByText('Settings')).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Settings' })).not.toBeInTheDocument();
   });
 
   it('shows an error for an invalid backup and lets the user close the dialog', async () => {
@@ -162,7 +168,7 @@ describe('ImportSummaryDialog', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, 'replace');
+    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'replace');
   });
 
   it('imports with a merge', async () => {
@@ -173,7 +179,7 @@ describe('ImportSummaryDialog', () => {
     await userEvent.click(screen.getByRole('radio', { name: 'Merge' }));
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, 'merge');
+    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'merge');
   });
 
   it('imports with a deep merge', async () => {
@@ -184,7 +190,132 @@ describe('ImportSummaryDialog', () => {
     await userEvent.click(screen.getByRole('radio', { name: 'Deep merge' }));
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(backup.tables, backup.values, 'deepMerge');
+    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'deepMerge');
+  });
+
+  describe('selecting what to import', () => {
+    it('selects everything by default', async () => {
+      await renderComponent();
+      await screen.findByText('Nord Stage 4');
+
+      ['Songs', 'Setlists', 'Instruments', 'Settings'].forEach((name) => {
+        expect(screen.getByRole('checkbox', { name })).toBeChecked();
+      });
+    });
+
+    it('leaves out songs when they are deselected', async () => {
+      const onImport = vi.fn();
+      await renderComponent({ onImport });
+      await screen.findByText('Nord Stage 4');
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Songs' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Import' }));
+
+      expect(onImport).toHaveBeenCalledWith(without(allTables, 'songs'), backup.values, 'replace');
+    });
+
+    it('leaves out all three setlist tables when setlists are deselected', async () => {
+      const onImport = vi.fn();
+      await renderComponent({ onImport });
+      await screen.findByText('Nord Stage 4');
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Setlists' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Import' }));
+
+      expect(onImport).toHaveBeenCalledWith(
+        { instruments: backup.tables.instruments, songs: backup.tables.songs },
+        backup.values,
+        'replace',
+      );
+    });
+
+    it('leaves out instruments when they are deselected', async () => {
+      const onImport = vi.fn();
+      await renderComponent({ onImport });
+      await screen.findByText('Nord Stage 4');
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Instruments' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Import' }));
+
+      expect(onImport).toHaveBeenCalledWith(
+        without(allTables, 'instruments'),
+        backup.values,
+        'replace',
+      );
+    });
+
+    it('passes no values when settings are deselected', async () => {
+      const onImport = vi.fn();
+      await renderComponent({ onImport });
+      await screen.findByText('Nord Stage 4');
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Settings' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Import' }));
+
+      expect(onImport).toHaveBeenCalledWith(allTables, undefined, 'replace');
+    });
+
+    it('still includes a selected table that is missing from the backup, so replace clears it', async () => {
+      const onImport = vi.fn();
+      await renderComponent({
+        file: createBackupFile({ ...backup, tables: { songs: backup.tables.songs } }),
+        onImport,
+      });
+      await screen.findByRole('group', { name: 'Songs' });
+
+      await userEvent.click(screen.getByRole('button', { name: 'Import' }));
+
+      expect(onImport).toHaveBeenCalledWith(
+        {
+          instruments: {},
+          setlistSets: {},
+          setlistSongs: {},
+          setlists: {},
+          songs: backup.tables.songs,
+        },
+        backup.values,
+        'replace',
+      );
+    });
+
+    it('disables importing when nothing is selected', async () => {
+      await renderComponent();
+      await screen.findByText('Nord Stage 4');
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Songs' }));
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Setlists' }));
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Instruments' }));
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Settings' }));
+
+      expect(screen.getByRole('button', { name: 'Import' })).toBeDisabled();
+    });
+
+    it('hides the names and match label of a deselected section', async () => {
+      await renderComponent();
+      await screen.findByText('Nord Stage 4');
+      await userEvent.click(screen.getByRole('radio', { name: 'Merge' }));
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Instruments' }));
+
+      expect(screen.queryByText('Nord Stage 4')).not.toBeInTheDocument();
+      expect(within(getSection('Instruments')).queryByText(/will be replaced/)).toBeNull();
+      expect(within(getSection('Setlists')).getByText('0 will be replaced')).toBeInTheDocument();
+    });
+
+    it('warns that setlists refer to songs when importing setlists without songs', async () => {
+      await renderComponent();
+      await screen.findByText('Nord Stage 4');
+
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Songs' }));
+
+      expect(screen.getByRole('alert')).toHaveTextContent(/Setlists refer to songs by ID/);
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Setlists' }));
+
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 
   it('calls onClose without importing when cancelled', async () => {

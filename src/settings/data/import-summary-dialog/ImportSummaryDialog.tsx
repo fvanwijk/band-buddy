@@ -26,11 +26,28 @@ type ImportFormData = {
   mode: ImportMode;
 };
 
+type ImportSelection = Record<'instruments' | 'settings' | 'setlists' | 'songs', boolean>;
+
 type ImportSummaryDialogProps = {
   file: File | null;
   onClose: () => void;
-  onImport: (tables: Tables, values: Values, mode: ImportMode) => void;
+  // `values` is undefined when settings are not selected
+  onImport: (tables: Tables, values: Values | undefined, mode: ImportMode) => void;
 };
+
+const allSelected: ImportSelection = {
+  instruments: true,
+  setlists: true,
+  settings: true,
+  songs: true,
+};
+
+// A setlist consists of three tables
+const tablesBySelection = {
+  instruments: ['instruments'],
+  setlists: ['setlists', 'setlistSets', 'setlistSongs'],
+  songs: ['songs'],
+} as const;
 
 const modeOptions = [
   {
@@ -58,6 +75,7 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
   const store = useStore();
   const [error, setError] = useState<string | null>(null);
   const [parsed, setParsed] = useState<{ tables: Tables; values: Values } | null>(null);
+  const [selection, setSelection] = useState<ImportSelection>(allSelected);
   const { register, reset, watch } = useForm<ImportFormData>({
     defaultValues: { mode: 'replace' },
   });
@@ -67,6 +85,7 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
     if (!file) {
       setError(null);
       setParsed(null);
+      setSelection(allSelected);
       reset();
       return;
     }
@@ -110,8 +129,24 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
 
   const handleConfirm = () => {
     if (!parsed) return;
-    onImport(parsed.tables, parsed.values, mode);
+
+    // Selected tables are always included (even if empty) so that replace mode clears them
+    const tables: Tables = {};
+    (['instruments', 'setlists', 'songs'] as const).forEach((key) => {
+      if (!selection[key]) return;
+      tablesBySelection[key].forEach((tableId) => {
+        tables[tableId] = parsed.tables[tableId] ?? {};
+      });
+    });
+
+    onImport(tables, selection.settings ? parsed.values : undefined, mode);
   };
+
+  const handleSelectionChange = (key: keyof ImportSelection) => (checked: boolean) =>
+    setSelection((current) => ({ ...current, [key]: checked }));
+
+  const hasSelection = Object.values(selection).some(Boolean);
+  const hasSettingValues = Object.keys(parsed?.values ?? {}).length > 0;
 
   const songs = Object.values(parsed?.tables.songs ?? {});
   const instruments = Object.values(parsed?.tables.instruments ?? {});
@@ -156,26 +191,47 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
 
           <div className="mb-4 space-y-4 text-sm text-slate-100">
             <ImportSummarySection
+              checked={selection.songs}
               count={songs.length}
               label="Songs"
               matchLabel={getMatchLabel('songs')}
+              onCheckedChange={handleSelectionChange('songs')}
             />
             <ImportSummarySection
+              checked={selection.setlists}
               count={setlists.length}
               items={setlists.map((setlist) => getCellAsString(setlist.title, 'Untitled setlist'))}
               label="Setlists"
               matchLabel={getMatchLabel('setlists')}
+              onCheckedChange={handleSelectionChange('setlists')}
             />
             <ImportSummarySection
+              checked={selection.instruments}
               count={instruments.length}
               items={instruments.map((instrument) =>
                 getCellAsString(instrument.name, 'Unnamed instrument'),
               )}
               label="Instruments"
               matchLabel={getMatchLabel('instruments')}
+              onCheckedChange={handleSelectionChange('instruments')}
             />
-            {settings.length > 0 && <ImportSettingsSection settings={settings} />}
+            {hasSettingValues && (
+              <ImportSettingsSection
+                checked={selection.settings}
+                onCheckedChange={handleSelectionChange('settings')}
+                settings={settings}
+              />
+            )}
           </div>
+
+          {selection.setlists && !selection.songs && (
+            <div className="mb-4">
+              <Alert severity="warning">
+                Setlists refer to songs by ID. Songs that are not in your library will show up as
+                deleted songs.
+              </Alert>
+            </div>
+          )}
 
           <RadioGroup
             className="mb-6"
@@ -193,6 +249,7 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
               autoFocus
               className="flex-1"
               color="primary"
+              disabled={!hasSelection}
               onClick={handleConfirm}
               type="button"
               variant="filled"

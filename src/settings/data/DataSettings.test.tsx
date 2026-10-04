@@ -89,6 +89,24 @@ describe('DataSettings', () => {
     expect(getPersisted().values.theme).toBe('violet');
   });
 
+  it('only replaces the data that is selected', async () => {
+    await renderComponent();
+    await selectBackup(importedBackup());
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Songs' }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Settings' }));
+    await userEvent.click(
+      within(screen.getByRole('dialog', { name: 'Confirm import' })).getByRole('button', {
+        name: 'Import',
+      }),
+    );
+
+    expect(await screen.findByText('Backup imported successfully.')).toBeInTheDocument();
+    expect(Object.keys(getPersisted().tables.songs)).toEqual(['existing', 'shared']);
+    expect(getPersisted().tables.songs.shared.title).toBe('Old title');
+    expect(getPersisted().values.theme).toBe('orange');
+  });
+
   it('merges rows and replaces matching rows entirely', async () => {
     await renderComponent();
     await selectBackup(importedBackup());

@@ -68,13 +68,17 @@ export function DataSettings() {
     URL.revokeObjectURL(url);
   };
 
-  const handleImport = (tables: Tables, values: Values, mode: ImportMode) => {
+  const handleImport = (tables: Tables, values: Values | undefined, mode: ImportMode) => {
     if (!store) return;
 
     store.transaction(() => {
       if (mode === 'replace') {
-        store.setTables(tables);
-        store.setValues(values);
+        // Only touch the selected tables; an empty table can't be set, so delete it first
+        Object.entries(tables).forEach(([tableId, table]) => {
+          store.delTable(tableId);
+          if (Object.keys(table).length > 0) store.setTable(tableId, table);
+        });
+        if (values) store.setValues(values);
       } else {
         Object.entries(tables).forEach(([tableId, table]) => {
           Object.entries(table).forEach(([rowId, row]) => {
@@ -85,7 +89,7 @@ export function DataSettings() {
             }
           });
         });
-        store.setPartialValues(values);
+        if (values) store.setPartialValues(values);
       }
     });
     persistStoreVersion(localStorage);
