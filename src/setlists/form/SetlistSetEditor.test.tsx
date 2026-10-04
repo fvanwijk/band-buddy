@@ -75,10 +75,10 @@ describe('SetlistSetEditor', () => {
     const onSubmitMock = vi.fn();
     await renderComponent(onSubmitMock);
 
-    await user.selectOptions(
-      await screen.findByLabelText('Song 1 of Set 1'),
-      'Michael Jackson - Billie Jean',
-    );
+    const songInput = await screen.findByLabelText('Song 1 of Set 1');
+    await user.clear(songInput);
+    await user.type(songInput, 'Billie');
+    await user.click(await screen.findByRole('option', { name: 'Michael Jackson - Billie Jean' }));
 
     await user.click(await screen.findByRole('button', { name: 'Submit' }));
 

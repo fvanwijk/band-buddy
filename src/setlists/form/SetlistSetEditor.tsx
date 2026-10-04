@@ -1,13 +1,13 @@
 import { IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { useGetSongs } from '../../api/useSong';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { DeleteButton } from '../../ui/DeleteButton';
+import { AutocompleteField } from '../../ui/form/AutocompleteField';
 import { InputField } from '../../ui/form/InputField';
-import { SelectField } from '../../ui/form/SelectField';
 import type { SetlistFormData } from './SetlistForm';
 
 type SetlistSetEditorProps = {
@@ -17,7 +17,7 @@ type SetlistSetEditorProps = {
 };
 
 export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEditorProps) {
-  const { getValues, register, setValue, watch } = useFormContext<SetlistFormData>();
+  const { control, getValues, register, setValue, watch } = useFormContext<SetlistFormData>();
   const setName = watch(`sets.${index}.name`);
   const [editing, setEditing] = useState(false);
   const currentSetSongs = watch(`sets.${index}.songs`);
@@ -26,6 +26,10 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
   const allSetsOfSetlist = watch('sets');
 
   const songMap = useMemo(() => new Map(allSongs.map((song) => [song.id, song])), [allSongs]);
+  const songOptions = useMemo(
+    () => allSongs.map((s) => ({ label: `${s.artist} - ${s.title}`, value: s.id })),
+    [allSongs],
+  );
 
   const handleAddSong = () => {
     const usedSongIds = new Set(
@@ -157,15 +161,22 @@ export function SetlistSetEditor({ index, onRemove, showRemove }: SetlistSetEdit
                   </div>
                 ) : (
                   <div className="flex-1">
-                    <SelectField
-                      hideLabel
-                      label={`Song ${songIndex + 1} of ${setName?.trim() ? setName : `Set ${index + 1}`}`}
-                      options={allSongs.map((s) => ({
-                        label: `${s.artist} - ${s.title}`,
-                        value: s.id,
-                      }))}
-                      size="small"
-                      {...register(`sets.${index}.songs.${songIndex}.songId`)}
+                    <Controller
+                      control={control}
+                      name={`sets.${index}.songs.${songIndex}.songId`}
+                      render={({ field }) => (
+                        <AutocompleteField
+                          hideLabel
+                          label={`Song ${songIndex + 1} of ${setName?.trim() ? setName : `Set ${index + 1}`}`}
+                          name={field.name}
+                          onBlur={field.onBlur}
+                          onChange={field.onChange}
+                          options={songOptions}
+                          placeholder="Search song"
+                          size="small"
+                          value={field.value}
+                        />
+                      )}
                     />
                   </div>
                 )}
