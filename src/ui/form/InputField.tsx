@@ -10,6 +10,7 @@ type InputFieldProps = {
   helperText?: string;
   hideLabel?: boolean;
   id?: string;
+  inline?: boolean;
   label: string;
   rows?: number;
   size?: 'medium' | 'small' | 'xsmall';
@@ -20,6 +21,7 @@ export function InputField({
   error,
   helperText,
   hideLabel,
+  inline,
   label,
   rows,
   size = 'medium',
@@ -35,34 +37,40 @@ export function InputField({
     inputProps.className,
   );
   return (
-    <div>
+    <div className={cn(inline && 'flex items-center gap-3')}>
       {!hideLabel && (
-        <FormLabel className="mb-1.5 block" htmlFor={inputId} required={inputProps.required}>
+        <FormLabel
+          className={inline ? 'w-28 shrink-0' : 'mb-1.5 block'}
+          htmlFor={inputId}
+          required={inputProps.required}
+        >
           {label}
         </FormLabel>
       )}
-      {isTextarea ? (
-        <textarea
-          {...(inputProps as TextareaHTMLAttributes<HTMLTextAreaElement>)}
-          aria-label={hideLabel ? label : undefined}
-          className={inputClass}
-          id={inputId}
-          rows={rows}
-        />
-      ) : (
-        <input
-          {...(inputProps as InputHTMLAttributes<HTMLInputElement>)}
-          aria-label={hideLabel ? label : undefined}
-          className={inputClass}
-          id={inputId}
-        />
-      )}
+      <div className={cn(inline && 'min-w-0 flex-1')}>
+        {isTextarea ? (
+          <textarea
+            {...(inputProps as TextareaHTMLAttributes<HTMLTextAreaElement>)}
+            aria-label={hideLabel ? label : undefined}
+            className={inputClass}
+            id={inputId}
+            rows={rows}
+          />
+        ) : (
+          <input
+            {...(inputProps as InputHTMLAttributes<HTMLInputElement>)}
+            aria-label={hideLabel ? label : undefined}
+            className={inputClass}
+            id={inputId}
+          />
+        )}
 
-      {error ? (
-        <p className="mt-1 text-xs text-red-400">{error.message}</p>
-      ) : helperText ? (
-        <p className="mt-1 text-xs text-slate-400">{helperText}</p>
-      ) : null}
+        {error ? (
+          <p className="mt-1 text-xs text-red-400">{error.message}</p>
+        ) : helperText ? (
+          <p className="mt-1 text-xs text-slate-400">{helperText}</p>
+        ) : null}
+      </div>
     </div>
   );
 }

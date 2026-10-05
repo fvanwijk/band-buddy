@@ -1,17 +1,23 @@
 import type { Song } from '../types';
 
-// '' means any
-export type YesNoFilter = '' | 'no' | 'yes';
+export const hasFilterFields = [
+  'hasLyrics',
+  'hasMidiEvents',
+  'hasSheetMusic',
+  'hasTextNotes',
+] as const;
 
-export type SongFilters = {
+export type HasFilterField = (typeof hasFilterFields)[number];
+
+export type HasFilterValue = 'no' | 'yes';
+
+// A has-filter is only applied when set: 'yes' requires the content, 'no' requires its absence
+export type SongFilters = Partial<Record<HasFilterField, HasFilterValue>> & {
   artist: string;
   durationMax: string;
   durationMin: string;
-  hasLyrics: YesNoFilter;
-  hasMidiEvents: YesNoFilter;
-  hasSheetMusic: YesNoFilter;
-  hasTextNotes: YesNoFilter;
   key: string;
+  search: string;
   setlistId: string;
   title: string;
   transpose: string;
@@ -21,20 +27,14 @@ export const emptySongFilters: SongFilters = {
   artist: '',
   durationMax: '',
   durationMin: '',
-  hasLyrics: '',
-  hasMidiEvents: '',
-  hasSheetMusic: '',
-  hasTextNotes: '',
   key: '',
+  search: '',
   setlistId: '',
   title: '',
   transpose: '',
 };
 
-const hasContent: Record<
-  'hasLyrics' | 'hasMidiEvents' | 'hasSheetMusic' | 'hasTextNotes',
-  (song: Song) => boolean
-> = {
+const hasContent: Record<HasFilterField, (song: Song) => boolean> = {
   hasLyrics: (song) => !!song.lyrics?.trim() || !!song.lyricsCanvasPaths?.length,
   hasMidiEvents: (song) => !!song.midiEvents?.length,
   hasSheetMusic: (song) => !!song.sheetMusicFilename,
@@ -42,9 +42,15 @@ const hasContent: Record<
 };
 
 // The duration range counts as one filter
-export const countActiveFilters = ({ durationMax, durationMin, ...rest }: SongFilters) =>
-  Object.values(rest).filter((value) => value.trim() !== '').length +
-  (durationMin !== '' || durationMax !== '' ? 1 : 0);
+export const isHasValue = (value: unknown): value is HasFilterValue =>
+  value === 'yes' || value === 'no';
+
+export const countActiveFilters = (filters: SongFilters) =>
+  [filters.artist, filters.key, filters.setlistId, filters.title, filters.transpose].filter(
+    (value) => value.trim() !== '',
+  ).length +
+  (filters.durationMin !== '' || filters.durationMax !== '' ? 1 : 0) +
+  hasFilterFields.filter((field) => isHasValue(filters[field])).length;
 
 const parseMinutes = (value: string) => {
   if (value.trim() === '') return null;
@@ -54,26 +60,25 @@ const parseMinutes = (value: string) => {
 
 type FilterSongsOptions = {
   filters: SongFilters;
-  searchQuery?: string;
   // Song IDs per setlist ID
   setlistSongIds?: Record<string, Set<string>>;
 };
 
-/** Filter songs on quick search and all filter fields (AND). Duration range is in minutes. */
+/** Filter songs on the search query and all filter fields (AND). Duration range is in minutes. */
 export function filterSongs(
   songs: Song[],
-  { filters, searchQuery = '', setlistSongIds = {} }: FilterSongsOptions,
+  { filters, setlistSongIds = {} }: FilterSongsOptions,
 ): Song[] {
-  const query = searchQuery.trim().toLowerCase();
+  const query = filters.search.trim().toLowerCase();
   const artist = filters.artist.trim().toLowerCase();
   const title = filters.title.trim().toLowerCase();
   const minSeconds = parseMinutes(filters.durationMin);
   const maxSeconds = parseMinutes(filters.durationMax);
   const setlistSongs = filters.setlistId ? (setlistSongIds[filters.setlistId] ?? new Set()) : null;
   const transpose = filters.transpose.trim() === '' ? null : Number(filters.transpose);
-  const hasFilters = Object.entries(hasContent).flatMap(([name, check]) => {
-    const value = filters[name as keyof typeof hasContent];
-    return value ? [{ check, expected: value === 'yes' }] : [];
+  const hasFilters = hasFilterFields.flatMap((field) => {
+    const value = filters[field];
+    return isHasValue(value) ? [{ expected: value === 'yes', field }] : [];
   });
 
   return songs.filter((song) => {
@@ -89,7 +94,9 @@ export function filterSongs(
     if (filters.key && song.key !== filters.key) return false;
     if (setlistSongs && !setlistSongs.has(song.id)) return false;
     if (transpose !== null && (song.transpose ?? 0) !== transpose) return false;
-    if (hasFilters.some(({ check, expected }) => check(song) !== expected)) return false;
+    if (hasFilters.some(({ expected, field }) => hasContent[field](song) !== expected)) {
+      return false;
+    }
     if (minSeconds !== null && (song.duration === undefined || song.duration < minSeconds)) {
       return false;
     }

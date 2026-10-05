@@ -103,12 +103,13 @@ describe('filterSongs', () => {
     expect(ids({ hasTextNotes: 'yes' })).toEqual(['2']);
     expect(ids({ hasMidiEvents: 'yes' })).toEqual(['2']);
     expect(ids({ hasMidiEvents: 'no' })).toEqual(['1']);
+    expect(ids({ hasLyrics: 'yes', hasSheetMusic: 'yes' })).toEqual([]);
+    expect(ids({})).toEqual(['1', '2']);
   });
 
   it('combines quick search and filters with AND', () => {
     const result = filterSongs(songs, {
-      filters: { ...emptySongFilters, key: 'C' },
-      searchQuery: 'queen',
+      filters: { ...emptySongFilters, key: 'C', search: 'queen' },
     });
     expect(result.map((song) => song.id)).toEqual(['3']);
   });

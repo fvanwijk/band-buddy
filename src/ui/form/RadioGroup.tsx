@@ -16,6 +16,7 @@ type RadioGroupProps = {
   register: UseFormRegisterReturn;
   className?: string;
   children?: React.ReactNode;
+  inline?: boolean;
   required?: boolean;
   vertical?: boolean;
 };
@@ -27,14 +28,15 @@ export function RadioGroup({
   register,
   className = '',
   children,
+  inline = false,
   required = false,
   vertical = false,
 }: RadioGroupProps) {
   const id = useId();
 
   return (
-    <div className={className}>
-      <div className="mb-2 flex items-center justify-between">
+    <div className={cn(inline && 'flex items-center gap-3', className)}>
+      <div className={cn('flex items-center justify-between', inline ? 'w-28 shrink-0' : 'mb-2')}>
         <div className="text-sm font-medium text-slate-300">
           {label}
           {required && <span className="ml-1 text-brand-400/70">*</span>}
@@ -50,7 +52,8 @@ export function RadioGroup({
             <label
               key={option.value}
               className={cn(
-                'flex cursor-pointer gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-300 hover:border-brand-400/50 has-checked:border-brand-400 has-checked:bg-brand-400/10 has-checked:text-brand-200',
+                'flex cursor-pointer gap-2 rounded-lg border border-slate-700 bg-slate-800 text-sm text-slate-300 hover:border-brand-400/50 has-checked:border-brand-400 has-checked:bg-brand-400/10 has-checked:text-brand-200',
+                inline ? 'px-2 py-0.5' : 'px-3 py-2',
                 option.description ? 'items-start' : 'items-center',
               )}
             >

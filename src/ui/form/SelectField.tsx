@@ -13,6 +13,7 @@ type SelectFieldProps = {
   error?: FieldError;
   helperText?: ReactNode;
   hideLabel?: boolean;
+  inline?: boolean;
   label: string;
   options: SelectOption[];
   size?: 'medium' | 'small' | 'xsmall';
@@ -22,6 +23,7 @@ export function SelectField({
   error,
   helperText,
   hideLabel,
+  inline,
   label,
   options,
   size = 'medium',
@@ -36,42 +38,48 @@ export function SelectField({
   );
 
   return (
-    <div>
+    <div className={cn(inline && 'flex items-center gap-3')}>
       {!hideLabel && (
-        <FormLabel className="mb-1.5 block" htmlFor={selectId} required={selectProps.required}>
+        <FormLabel
+          className={inline ? 'w-28 shrink-0' : 'mb-1.5 block'}
+          htmlFor={selectId}
+          required={selectProps.required}
+        >
           {label}
         </FormLabel>
       )}
-      <select
-        {...selectProps}
-        aria-label={hideLabel ? label : undefined}
-        className={selectClass}
-        id={selectId}
-      >
-        {options.map((option) => {
-          if ('value' in option) {
-            return (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            );
-          }
-          return (
-            <optgroup key={option.label} label={option.label}>
-              {option.options.map((groupOption) => (
-                <option key={groupOption.value} value={groupOption.value}>
-                  {groupOption.label}
+      <div className={cn(inline && 'min-w-0 flex-1')}>
+        <select
+          {...selectProps}
+          aria-label={hideLabel ? label : undefined}
+          className={selectClass}
+          id={selectId}
+        >
+          {options.map((option) => {
+            if ('value' in option) {
+              return (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
-              ))}
-            </optgroup>
-          );
-        })}
-      </select>
-      {error ? (
-        <p className="mt-1 text-xs text-red-400">{error.message}</p>
-      ) : helperText ? (
-        <p className="mt-1 text-xs text-slate-400">{helperText}</p>
-      ) : null}
+              );
+            }
+            return (
+              <optgroup key={option.label} label={option.label}>
+                {option.options.map((groupOption) => (
+                  <option key={groupOption.value} value={groupOption.value}>
+                    {groupOption.label}
+                  </option>
+                ))}
+              </optgroup>
+            );
+          })}
+        </select>
+        {error ? (
+          <p className="mt-1 text-xs text-red-400">{error.message}</p>
+        ) : helperText ? (
+          <p className="mt-1 text-xs text-slate-400">{helperText}</p>
+        ) : null}
+      </div>
     </div>
   );
 }

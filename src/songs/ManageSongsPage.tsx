@@ -1,26 +1,25 @@
-import { IconFilter, IconMusic, IconPlus, IconSearch } from '@tabler/icons-react';
+import { IconMusic, IconPlus } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 import { useGetSetlists } from '../api/useSetlist';
 import { useDeleteSong, useGetSongs } from '../api/useSong';
 import { useSortedArray } from '../hooks/useSortedArray';
 import { Grid } from '../settings/Grid';
-import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { EmptyState } from '../ui/EmptyState';
-import { InputField } from '../ui/form/InputField';
 import { Page } from '../ui/Page';
 import { PageHeader } from '../ui/PageHeader';
 import { SortButtonsBar } from '../ui/sorting/SortButtonsBar';
 import { useSortState } from '../ui/sorting/useSortState';
 import { pluralize } from '../utils/pluralize';
-import { countActiveFilters, emptySongFilters, filterSongs } from './filterSongs';
+import { emptySongFilters, filterSongs } from './filterSongs';
 import type { SongFilters } from './filterSongs';
 import { SongCard } from './SongCard';
 import { SongFilterPanel } from './SongFilterPanel';
+import { useActiveSongFilters } from './useActiveSongFilters';
 
 type SortField = 'artist' | 'duration' | 'key' | 'title';
 
@@ -29,10 +28,10 @@ export function ManageSongsPage() {
   const setlists = useGetSetlists();
 
   const [deletingSongId, setDeletingSongId] = useState<string | null>(null);
-  const { control, register, reset } = useForm<SongFilters>({ defaultValues: emptySongFilters });
+  const form = useForm<SongFilters>({ defaultValues: emptySongFilters });
+  const { control } = form;
   const filters: SongFilters = { ...emptySongFilters, ...useWatch({ control }) };
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+  const activeFilters = useActiveSongFilters(form);
   const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(null, 'none');
   const deleteSong = useDeleteSong(() => setDeletingSongId(null));
 
@@ -74,8 +73,7 @@ export function ManageSongsPage() {
     [allSongs],
   );
 
-  const displayedSongs = filterSongs(sortedSongs, { filters, searchQuery, setlistSongIds });
-  const activeFilterCount = countActiveFilters(filters);
+  const displayedSongs = filterSongs(sortedSongs, { filters, setlistSongIds });
 
   return (
     <Page>
@@ -117,46 +115,24 @@ export function ManageSongsPage() {
               onSort={handleSort}
               sortDirection={sortDirection}
             />
-            <span className="text-sm text-slate-100">
+            <span className="hidden text-sm text-slate-100 sm:inline">
               Showing {displayedSongs.length} of {pluralize(sortedSongs.length, 'song')}
             </span>
+            <span className="text-sm text-slate-100 sm:hidden">
+              {displayedSongs.length} of {sortedSongs.length}
+            </span>
           </div>
-          <div className="flex items-start gap-2">
-            <div className="relative flex-1">
-              <IconSearch className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <InputField
-                className="pl-10"
-                hideLabel
-                label="Search"
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by title or artist..."
-                size="small"
-                type="text"
-                value={searchQuery}
-              />
-            </div>
-            <Button
-              aria-expanded={showFilters}
-              color={activeFilterCount > 0 ? 'primary' : 'default'}
-              iconEnd={activeFilterCount > 0 ? <Badge>{activeFilterCount}</Badge> : undefined}
-              iconStart={<IconFilter className="h-4 w-4" />}
-              onClick={() => setShowFilters((visible) => !visible)}
-              variant="outlined"
-            >
-              Filters
-            </Button>
-          </div>
-          {showFilters && (
+          <FormProvider {...form}>
             <SongFilterPanel
-              control={control}
+              activeIds={activeFilters.activeIds}
               keyOptions={keyOptions}
               maxDurationMinutes={maxDurationMinutes}
-              onClear={() => reset(emptySongFilters)}
-              onClose={() => setShowFilters(false)}
-              register={register}
+              onAdd={activeFilters.add}
+              onClear={activeFilters.clear}
+              onRemove={activeFilters.remove}
               setlistOptions={setlistOptions}
             />
-          )}
+          </FormProvider>
           <Grid>
             {displayedSongs.map((song) => (
               <SongCard
