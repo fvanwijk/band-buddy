@@ -1,21 +1,44 @@
 import type { Song } from '../types';
 
+// '' means any
+export type YesNoFilter = '' | 'no' | 'yes';
+
 export type SongFilters = {
   artist: string;
   durationMax: string;
   durationMin: string;
+  hasLyrics: YesNoFilter;
+  hasMidiEvents: YesNoFilter;
+  hasSheetMusic: YesNoFilter;
+  hasTextNotes: YesNoFilter;
   key: string;
   setlistId: string;
   title: string;
+  transpose: string;
 };
 
 export const emptySongFilters: SongFilters = {
   artist: '',
   durationMax: '',
   durationMin: '',
+  hasLyrics: '',
+  hasMidiEvents: '',
+  hasSheetMusic: '',
+  hasTextNotes: '',
   key: '',
   setlistId: '',
   title: '',
+  transpose: '',
+};
+
+const hasContent: Record<
+  'hasLyrics' | 'hasMidiEvents' | 'hasSheetMusic' | 'hasTextNotes',
+  (song: Song) => boolean
+> = {
+  hasLyrics: (song) => !!song.lyrics?.trim() || !!song.lyricsCanvasPaths?.length,
+  hasMidiEvents: (song) => !!song.midiEvents?.length,
+  hasSheetMusic: (song) => !!song.sheetMusicFilename,
+  hasTextNotes: (song) => !!song.notes?.trim() || !!song.textNotesCanvasPaths?.length,
 };
 
 // The duration range counts as one filter
@@ -47,6 +70,11 @@ export function filterSongs(
   const minSeconds = parseMinutes(filters.durationMin);
   const maxSeconds = parseMinutes(filters.durationMax);
   const setlistSongs = filters.setlistId ? (setlistSongIds[filters.setlistId] ?? new Set()) : null;
+  const transpose = filters.transpose.trim() === '' ? null : Number(filters.transpose);
+  const hasFilters = Object.entries(hasContent).flatMap(([name, check]) => {
+    const value = filters[name as keyof typeof hasContent];
+    return value ? [{ check, expected: value === 'yes' }] : [];
+  });
 
   return songs.filter((song) => {
     if (
@@ -60,6 +88,8 @@ export function filterSongs(
     if (title && !song.title.toLowerCase().includes(title)) return false;
     if (filters.key && song.key !== filters.key) return false;
     if (setlistSongs && !setlistSongs.has(song.id)) return false;
+    if (transpose !== null && (song.transpose ?? 0) !== transpose) return false;
+    if (hasFilters.some(({ check, expected }) => check(song) !== expected)) return false;
     if (minSeconds !== null && (song.duration === undefined || song.duration < minSeconds)) {
       return false;
     }

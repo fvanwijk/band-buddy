@@ -10,6 +10,19 @@ import { RangeSlider } from '../ui/RangeSlider';
 import { formatDurationToString } from '../utils/duration';
 import type { SongFilters } from './filterSongs';
 
+const yesNoOptions = [
+  { label: 'Any', value: '' },
+  { label: 'Yes', value: 'yes' },
+  { label: 'No', value: 'no' },
+];
+
+const hasFields = [
+  { label: 'Has lyrics', name: 'hasLyrics' },
+  { label: 'Has sheet music', name: 'hasSheetMusic' },
+  { label: 'Has text notes', name: 'hasTextNotes' },
+  { label: 'Has MIDI events', name: 'hasMidiEvents' },
+] as const;
+
 type SongFilterPanelProps = {
   control: Control<SongFilters>;
   keyOptions: string[];
@@ -87,6 +100,16 @@ export const SongFilterPanel: FC<SongFilterPanelProps> = ({
           ]}
           {...register('key')}
         />
+        <InputField
+          label="Transpose"
+          placeholder="Semitones"
+          step="1"
+          type="number"
+          {...register('transpose')}
+        />
+        {hasFields.map(({ label, name }) => (
+          <SelectField key={name} label={label} options={yesNoOptions} {...register(name)} />
+        ))}
         <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-3">
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-medium text-slate-300">Duration</span>
