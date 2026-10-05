@@ -19,9 +19,9 @@ import { emptySongFilters, filterSongs } from './filterSongs';
 import type { SongFilters } from './filterSongs';
 import { SongCard } from './SongCard';
 import { SongFilterPanel } from './SongFilterPanel';
+import { SongTable } from './SongTable';
+import type { SongSortField } from './SongTable';
 import { useActiveSongFilters } from './useActiveSongFilters';
-
-type SortField = 'artist' | 'duration' | 'key' | 'title';
 
 export function ManageSongsPage() {
   const allSongs = useGetSongs();
@@ -32,7 +32,7 @@ export function ManageSongsPage() {
   const { control } = form;
   const filters: SongFilters = { ...emptySongFilters, ...useWatch({ control }) };
   const activeFilters = useActiveSongFilters(form);
-  const { sortBy, sortDirection, handleSort, isActive } = useSortState<SortField>(null, 'none');
+  const { sortBy, sortDirection, handleSort, isActive } = useSortState<SongSortField>(null, 'none');
   const deleteSong = useDeleteSong(() => setDeletingSongId(null));
 
   const handleDeleteSong = () => {
@@ -108,20 +108,6 @@ export function ManageSongsPage() {
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="flex items-end justify-between">
-            <SortButtonsBar
-              fields={['title', 'artist', 'key', 'duration'] as const}
-              isActive={isActive}
-              onSort={handleSort}
-              sortDirection={sortDirection}
-            />
-            <span className="hidden text-sm text-slate-100 sm:inline">
-              Showing {displayedSongs.length} of {pluralize(sortedSongs.length, 'song')}
-            </span>
-            <span className="text-sm text-slate-100 sm:hidden">
-              {displayedSongs.length} of {sortedSongs.length}
-            </span>
-          </div>
           <FormProvider {...form}>
             <SongFilterPanel
               activeIds={activeFilters.activeIds}
@@ -133,7 +119,23 @@ export function ManageSongsPage() {
               setlistOptions={setlistOptions}
             />
           </FormProvider>
-          <Grid>
+          <div className="flex items-end justify-between md:justify-end">
+            <div className="md:hidden">
+              <SortButtonsBar
+                fields={['title', 'artist', 'key', 'duration'] as const}
+                isActive={isActive}
+                onSort={handleSort}
+                sortDirection={sortDirection}
+              />
+            </div>
+            <span className="hidden text-sm text-slate-100 sm:inline">
+              Showing {displayedSongs.length} of {pluralize(sortedSongs.length, 'song')}
+            </span>
+            <span className="text-sm text-slate-100 sm:hidden">
+              {displayedSongs.length} of {sortedSongs.length}
+            </span>
+          </div>
+          <Grid className="md:hidden">
             {displayedSongs.map((song) => (
               <SongCard
                 key={song.id}
@@ -148,6 +150,14 @@ export function ManageSongsPage() {
               />
             ))}
           </Grid>
+          <SongTable
+            className="hidden md:block"
+            isActive={isActive}
+            onDelete={setDeletingSongId}
+            onSort={handleSort}
+            songs={displayedSongs}
+            sortDirection={sortDirection}
+          />
         </div>
       )}
     </Page>

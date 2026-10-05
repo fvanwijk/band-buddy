@@ -65,6 +65,14 @@ const buttonVariants = cva(
         hasIcons: true,
         isIcon: false,
       },
+
+      // Icon vs non-icon buttons
+      { className: 'px-4 py-2', isIcon: false, size: 'large' },
+      { className: 'px-3 py-1', isIcon: false, size: 'medium' },
+      { className: 'px-2 py-0.5', isIcon: false, size: 'small' },
+      { className: 'p-3', isIcon: true, size: 'large' },
+      { className: 'p-2', isIcon: true, size: 'medium' },
+      { className: 'p-1', isIcon: true, size: 'small' },
     ],
     defaultVariants: {
       color: 'default',
@@ -85,12 +93,13 @@ const buttonVariants = cva(
       },
       isIcon: {
         false: '',
-        true: 'p-2!',
+        // Opt out of flex stretching so the button stays square next to larger siblings
+        true: 'self-center',
       },
       size: {
-        large: 'px-4 py-2 text-base',
-        medium: 'px-3 py-1 text-sm',
-        small: 'px-2 py-0.5 text-xs',
+        large: 'text-base',
+        medium: 'text-sm',
+        small: 'text-xs',
       },
       variant: {
         filled: 'text-xs font-semibold uppercase tracking-[0.25em]',
@@ -103,7 +112,7 @@ const buttonVariants = cva(
 
 type ButtonVariants = VariantProps<typeof buttonVariants>;
 
-type ButtonProps<C extends ElementType> = {
+export type ButtonProps<C extends ElementType> = {
   as?: C;
   iconEnd?: ReactNode;
   iconStart?: ReactNode;
@@ -132,7 +141,8 @@ export function Button<C extends ElementType = 'button'>({
           color,
           hasIcons,
           isIcon,
-          size,
+          // Icon buttons default to medium, which matches their previous fixed padding
+          size: size ?? (isIcon ? 'medium' : undefined),
           variant,
         }),
         className,

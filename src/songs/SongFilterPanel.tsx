@@ -92,7 +92,7 @@ export const SongFilterPanel: FC<SongFilterPanelProps> = ({
                 min={0}
                 minThumbLabel="Minimum duration"
                 onValueChange={handleRangeChange}
-                step={0.5}
+                step={0.25}
                 value={range}
               />
               <span className="text-xs text-slate-400">
@@ -188,9 +188,9 @@ export const SongFilterPanel: FC<SongFilterPanelProps> = ({
           <div className="min-w-0 flex-1">{renderControl(definition.id)}</div>
           <Button
             aria-label={`Remove ${definition.label} filter`}
-            className="p-1!"
             isIcon
             onClick={() => onRemove(definition)}
+            size="small"
             type="button"
             variant="text"
           >

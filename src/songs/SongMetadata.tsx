@@ -7,7 +7,8 @@ type SongMetadataProps = {
   timeSignature?: string;
 };
 
-const formatTranspose = (transpose: number) => (transpose > 0 ? `+${transpose}` : `${transpose}`);
+export const formatTranspose = (transpose: number) =>
+  transpose > 0 ? `+${transpose}` : `${transpose}`;
 
 export function SongMetadata({ duration, keyNote, timeSignature, transpose }: SongMetadataProps) {
   const transposeLabel = transpose ? formatTranspose(transpose) : null;
