@@ -6,12 +6,14 @@ import { useGetTtsVoice } from '../../../api/useSettings';
 import { speakText } from '../../../hooks/speakText';
 import { useSequencerTransport } from '../../../hooks/useSequencerTransport';
 import type { SongLanguage } from '../../../schemas';
+import type { SongEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 
 const PAUSE_AFTER_ANNOUNCEMENT_MS = 500;
 
 type MetronomeControlProps = {
   bpm?: number;
+  events?: SongEvent[];
   isReady: boolean;
   isSupported: boolean;
   metronomeVolume: number;
@@ -26,6 +28,7 @@ type MetronomeControlProps = {
 
 export function MetronomeControl({
   bpm,
+  events,
   isReady,
   isSupported,
   metronomeVolume,
@@ -41,18 +44,20 @@ export function MetronomeControl({
   const [isAnnouncing, setIsAnnouncing] = useState(false);
   const [metronomePulseKey, setMetronomePulseKey] = useState(0);
   const cancelAnnouncementRef = useRef<(() => void) | null>(null);
+  const cancelCueRef = useRef<(() => void) | null>(null);
   const ttsVoiceURI = useGetTtsVoice(songLanguage ?? 'en');
 
-  useEffect(() => () => cancelAnnouncementRef.current?.(), []);
+  useEffect(
+    () => () => {
+      cancelAnnouncementRef.current?.();
+      cancelCueRef.current?.();
+    },
+    [],
+  );
 
   if (!bpm) {
     return null;
   }
-
-  const timeSignatureNumerator = useMemo(() => {
-    const [numerator] = (timeSignature || '4/4').split('/').map(Number);
-    return Number.isFinite(numerator) && numerator > 0 ? numerator : 4;
-  }, [timeSignature]);
 
   const metronomeOutput = useMemo(() => {
     if (!isSupported || !isReady || outputs.length === 0) {
@@ -62,14 +67,25 @@ export function MetronomeControl({
     return outputs[0];
   }, [isReady, isSupported, outputs]);
 
+  const handleCue = (text: string) => {
+    cancelCueRef.current = speakText(text, {
+      language: songLanguage,
+      onDone: () => {},
+      voiceURI: ttsVoiceURI,
+      volume: preCountVolume ?? 0,
+    });
+  };
+
   const { currentBeat, currentMeasure } = useSequencerTransport({
     bpm,
+    events,
     isRunning: isMetronomeRunning,
     metronomeVolume,
     midiOutput: metronomeOutput,
     onBeatChange,
+    onCue: handleCue,
     preCountVolume,
-    timeSignatureNumerator,
+    timeSignature,
   });
 
   const beatDurationSeconds = 60 / bpm;
@@ -86,6 +102,8 @@ export function MetronomeControl({
     if (isMetronomeRunning || isAnnouncing) {
       cancelAnnouncementRef.current?.();
       cancelAnnouncementRef.current = null;
+      cancelCueRef.current?.();
+      cancelCueRef.current = null;
       setIsAnnouncing(false);
       setIsMetronomeRunning(false);
       onStop?.();

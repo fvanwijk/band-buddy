@@ -68,6 +68,15 @@ export class EventScheduler<E extends SchedulableEvent> {
   }
 
   /**
+   * Anchor tick 0 to a wall-clock timestamp. The anchor may lie slightly ahead of the first
+   * readNextEvents call, which makes the first events land exactly on the anchor.
+   */
+  startAt(timestamp: number) {
+    this._currentTick = this._scheduledTick = 0;
+    this._prevTime = timestamp;
+  }
+
+  /**
    * Read events that should be scheduled at the given timestamp
    * Returns events with their scheduled playback times
    */
@@ -87,7 +96,8 @@ export class EventScheduler<E extends SchedulableEvent> {
       this._prevTime = timestamp;
     }
     const delta = timestamp - this._prevTime;
-    const deltaTick = Math.max(0, this.millisecToTick(delta, bpm));
+    // The delta is only negative right after startAt() with an anchor in the future
+    const deltaTick = this.millisecToTick(delta, bpm);
     const nowTick = this._currentTick + deltaTick;
     const lookAheadTick = this.millisecToTick(this.lookAheadTime, bpm);
 

@@ -2,16 +2,21 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Output } from 'webmidi';
 
 import { registerOutboundMidiMessage } from '../midi/midiEventLogBus';
-import { EventScheduler } from '../vendor/signal-player';
-import type { SchedulerEvent, MidiNoteEvent } from '../vendor/signal-player';
-import { getPreCountBeats, getPreCountWord, loadPreCountBuffers } from './preCount';
+import { buildSongMap } from '../song-events/songMap';
+import { createSongTransport, CUE_LEAD_MS, POLL_INTERVAL_MS } from '../song-events/songTransport';
+import type { ClickAccent, TransportOutput } from '../song-events/songTransport';
+import type { SongEvent } from '../types';
+import type { MidiNoteEvent } from '../vendor/signal-player';
+import { loadPreCountBuffers } from './preCount';
 import type { PreCountWord } from './preCount';
 
 export interface UseSequencerTransportProps {
-  /** BPM (beats per minute) */
+  /** BPM (beats per minute) at the start of the song */
   bpm: number;
-  /** Time signature numerator (e.g., 4 for 4/4) */
-  timeSignatureNumerator: number;
+  /** Tempo changes, time signature changes and cues of the song */
+  events?: SongEvent[];
+  /** Time signature at the start of the song (e.g., "4/4") */
+  timeSignature?: string;
   /** Whether playback is running */
   isRunning: boolean;
   /** MIDI output device to send clicks to */
@@ -22,10 +27,15 @@ export interface UseSequencerTransportProps {
   midiNote?: number;
   /** Metronome volume (0-100, default 50) */
   metronomeVolume?: number;
-  /** Volume (0-100) of the spoken two measure count-in before the song starts, 0 disables it */
+  /**
+   * Volume (0-100) of the spoken two measure count-in before the song starts and of the spoken
+   * count-ins and cues during the song, 0 disables them
+   */
   preCountVolume?: number;
   /** Callback when beat changes */
   onBeatChange?: (beat: number, measure: number) => void;
+  /** Callback to speak the text of a cue, called slightly before the cue's beat */
+  onCue?: (text: string) => void;
 }
 
 export interface UseSequencerTransportResult {
@@ -35,45 +45,45 @@ export interface UseSequencerTransportResult {
   currentMeasure: number;
 }
 
-const TIMER_INTERVAL = 50; // 50ms update interval
-const LOOK_AHEAD_TIME = 50; // 50ms lookahead for scheduling
-const TIMEBASE = 480; // Ticks per quarter note
 const DEFAULT_MIDI_CHANNEL = 10; // Channel 10 = drums in MIDI
 const DEFAULT_MIDI_NOTE = 36; // Kick drum
 const DOWNBEAT_VELOCITY = 127;
 const SECONDARY_ACCENT_VELOCITY = 108;
 const REGULAR_BEAT_VELOCITY = 90;
+const CLICK_VELOCITIES: Record<ClickAccent, number> = {
+  downbeat: DOWNBEAT_VELOCITY,
+  regular: REGULAR_BEAT_VELOCITY,
+  secondary: SECONDARY_ACCENT_VELOCITY,
+};
+// Events closer than this are played right away instead of through a timeout
+const IMMEDIATE_THRESHOLD_MS = 10;
 
 /**
- * Sequencer transport hook using EventScheduler for accurate metronome timing
- * Replaces smplr-based sample playback with MIDI note events
+ * Metronome playback: clicks (audio and MIDI), the spoken count-in and cues of a song, including
+ * its tempo and time signature changes. The timing is done by createSongTransport, this hook
+ * plays what it schedules.
  */
 export function useSequencerTransport({
   bpm,
+  events,
   isRunning,
   midiChannel = DEFAULT_MIDI_CHANNEL,
   midiNote = DEFAULT_MIDI_NOTE,
   metronomeVolume = 50,
   midiOutput,
   preCountVolume = 0,
-  timeSignatureNumerator,
+  timeSignature,
   onBeatChange,
+  onCue,
 }: UseSequencerTransportProps): UseSequencerTransportResult {
-  const schedulerRef = useRef<EventScheduler<SchedulerEvent> | null>(null);
-  const intervalRef = useRef<number | null>(null);
   const pendingTimeoutsRef = useRef<number[]>([]);
-  const lastProcessedTickRef = useRef(-1);
   const audioContextRef = useRef<AudioContext | null>(null);
   const preCountBuffersRef = useRef<Record<PreCountWord, AudioBuffer> | null>(null);
-  const preCountBeatsRef = useRef(0);
-  const preCountVolumeRef = useRef(preCountVolume);
-  preCountVolumeRef.current = preCountVolume;
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
 
   // Validate and clamp parameters
   const safeBpm = Math.max(1, Math.min(300, Math.round(bpm)));
-  const safeBeats = Math.max(1, Math.min(16, Math.round(timeSignatureNumerator)));
   const safeChannel = Math.max(1, Math.min(16, Math.round(midiChannel)));
   const safeNote = Math.max(0, Math.min(127, Math.round(midiNote)));
   const safeVolume = Math.max(0, Math.min(100, Math.round(metronomeVolume)));
@@ -86,10 +96,25 @@ export function useSequencerTransport({
     pendingTimeoutsRef.current = [];
   }, []);
 
+  const runAfter = useCallback((callback: () => void, delayMs: number) => {
+    if (delayMs < IMMEDIATE_THRESHOLD_MS) {
+      callback();
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      pendingTimeoutsRef.current = pendingTimeoutsRef.current.filter(
+        (scheduledTimeoutId) => scheduledTimeoutId !== timeoutId,
+      );
+      callback();
+    }, delayMs);
+
+    pendingTimeoutsRef.current.push(timeoutId);
+  }, []);
+
   const playPreCountWord = useCallback(
-    (beat: number, delayMs: number) => {
-      const word = getPreCountWord(beat, safeBeats);
-      const buffer = word && preCountBuffersRef.current?.[word];
+    (word: PreCountWord, delayMs: number) => {
+      const buffer = preCountBuffersRef.current?.[word];
       const ctx = audioContextRef.current;
       if (!buffer || !ctx || safePreCountVolume <= 0) {
         return;
@@ -107,40 +132,7 @@ export function useSequencerTransport({
         console.error('Failed to play pre count word', { error });
       }
     },
-    [safeBeats, safePreCountVolume],
-  );
-
-  // Create event source that repeats metronome pattern
-  const getEventsInRange = useCallback(
-    (startTick: number, endTick: number): SchedulerEvent[] => {
-      const firstBeatTick = Math.ceil(startTick / TIMEBASE) * TIMEBASE;
-      const events: SchedulerEvent[] = [];
-
-      // Generate events aligned to the global beat grid
-      for (let tick = firstBeatTick; tick < endTick; tick += TIMEBASE) {
-        const beatNumber = Math.round(tick / TIMEBASE);
-        const beatInMeasure = beatNumber % safeBeats;
-        const isDownbeat = beatInMeasure === 0;
-        const isSecondaryAccent = safeBeats === 6 && beatInMeasure === 3;
-        const velocity = isDownbeat
-          ? DOWNBEAT_VELOCITY
-          : isSecondaryAccent
-            ? SECONDARY_ACCENT_VELOCITY
-            : REGULAR_BEAT_VELOCITY;
-
-        events.push({
-          channel: safeChannel,
-          duration: 50,
-          note: safeNote,
-          tick,
-          type: 'note',
-          velocity,
-        } as MidiNoteEvent);
-      }
-
-      return events;
-    },
-    [safeBeats, safeChannel, safeNote],
+    [safePreCountVolume],
   );
 
   // Send MIDI note event and play audio click
@@ -252,12 +244,71 @@ export function useSequencerTransport({
     [midiOutput, safeVolume],
   );
 
-  // Fix the pre count length when playback starts so toggling it mid-song has no effect
-  useEffect(() => {
-    preCountBeatsRef.current =
-      isRunning && preCountVolumeRef.current > 0 ? getPreCountBeats(safeBeats) : 0;
-    // oxlint-disable-next-line react-hooks/exhaustive-deps -- only (re)evaluated on start/stop
-  }, [isRunning]);
+  const playClick = useCallback(
+    (accent: ClickAccent) => {
+      sendMidiNote({
+        channel: safeChannel,
+        duration: 50,
+        note: safeNote,
+        tick: 0,
+        type: 'note',
+        velocity: CLICK_VELOCITIES[accent],
+      });
+    },
+    [safeChannel, safeNote, sendMidiNote],
+  );
+
+  // The playback loop lives as long as a run does, so it reads the latest props through a ref.
+  // Settings that only apply when a run starts (like the tempo) aren't picked up while running.
+  const latestRef = useRef({
+    bpm: safeBpm,
+    events,
+    onBeatChange,
+    onCue,
+    playClick,
+    playPreCountWord,
+    preCountVolume: safePreCountVolume,
+    timeSignature,
+  });
+  latestRef.current = {
+    bpm: safeBpm,
+    events,
+    onBeatChange,
+    onCue,
+    playClick,
+    playPreCountWord,
+    preCountVolume: safePreCountVolume,
+    timeSignature,
+  };
+
+  const handleOutput = useCallback(
+    (output: TransportOutput) => {
+      const delayMs = Math.max(0, output.timestamp - performance.now());
+
+      switch (output.type) {
+        case 'click': {
+          runAfter(() => latestRef.current.playClick(output.accent), delayMs);
+
+          if (output.position) {
+            const { beat, measure } = output.position;
+            setCurrentMeasure(measure);
+            setCurrentBeat(beat);
+            latestRef.current.onBeatChange?.(beat, measure);
+          }
+          break;
+        }
+        case 'countWord':
+          latestRef.current.playPreCountWord(output.word, delayMs);
+          break;
+        case 'cue':
+          if (latestRef.current.preCountVolume > 0) {
+            runAfter(() => latestRef.current.onCue?.(output.text), delayMs - CUE_LEAD_MS);
+          }
+          break;
+      }
+    },
+    [runAfter],
+  );
 
   useEffect(() => {
     if (preCountVolume <= 0) {
@@ -278,124 +329,45 @@ export function useSequencerTransport({
       });
   }, [preCountVolume]);
 
-  // Initialize scheduler
+  // One run of the metronome, from start to stop
   useEffect(() => {
     if (!isRunning) {
-      clearPendingTimeouts();
-      schedulerRef.current?.seek(0);
-      lastProcessedTickRef.current = -1;
       setCurrentBeat(0);
       setCurrentMeasure(0);
       return;
     }
 
-    lastProcessedTickRef.current = -1;
+    const latest = latestRef.current;
+    // The spoken parts are fixed when playback starts so toggling them mid-song has no effect
+    const transport = createSongTransport({
+      events: latest.events,
+      isSpokenEnabled: latest.preCountVolume > 0,
+      map: buildSongMap({
+        bpm: latest.bpm,
+        events: latest.events,
+        timeSignature: latest.timeSignature,
+      }),
+      startWall: performance.now(),
+    });
 
-    if (schedulerRef.current === null) {
-      schedulerRef.current = new EventScheduler<SchedulerEvent>(
-        getEventsInRange,
-        () => [], // No loop end events needed for metronome
-        0, // Start at tick 0
-        TIMEBASE,
-        LOOK_AHEAD_TIME,
-      );
-    }
-
-    return () => {
-      // Keep scheduler alive across renders, only clean up on unmount
-    };
-  }, [clearPendingTimeouts, isRunning, getEventsInRange]);
-
-  // Main playback timer
-  useEffect(() => {
-    if (!isRunning || !schedulerRef.current) {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      clearPendingTimeouts();
-      return;
-    }
-
-    const timer = () => {
-      if (!schedulerRef.current) return;
-
+    const poll = () => {
       try {
-        // Read scheduled events
-        const events = schedulerRef.current.readNextEvents(safeBpm, performance.now());
-
-        // Process and send MIDI events
-        for (const { event, timestamp } of events) {
-          if (event.type === 'note') {
-            // Skip if we've already processed this event (deduplication)
-            if (event.tick <= lastProcessedTickRef.current) {
-              continue;
-            }
-
-            // Calculate delay for scheduling
-            const delayMs = Math.max(0, timestamp - performance.now());
-
-            // Send immediately or schedule for later
-            if (delayMs < 10) {
-              sendMidiNote(event);
-            } else {
-              const timeoutId = window.setTimeout(() => {
-                pendingTimeoutsRef.current = pendingTimeoutsRef.current.filter(
-                  (scheduledTimeoutId) => scheduledTimeoutId !== timeoutId,
-                );
-                sendMidiNote(event);
-              }, delayMs);
-
-              pendingTimeoutsRef.current.push(timeoutId);
-            }
-
-            const preCountBeats = preCountBeatsRef.current;
-            const eventBeat = Math.round(event.tick / TIMEBASE);
-
-            // Pre count beats only produce sound, the song position starts after them
-            if (eventBeat < preCountBeats) {
-              playPreCountWord(eventBeat, delayMs);
-              lastProcessedTickRef.current = event.tick;
-              continue;
-            }
-
-            // Update beat/measure tracking
-            const songTick = event.tick - preCountBeats * TIMEBASE;
-            const measureTicks = safeBeats * TIMEBASE;
-            const measureIndex = Math.floor(songTick / measureTicks);
-            const beatIndex = (songTick % measureTicks) / TIMEBASE;
-
-            setCurrentMeasure(measureIndex + 1);
-            setCurrentBeat(Math.floor(beatIndex) + 1);
-
-            onBeatChange?.(Math.floor(beatIndex) + 1, measureIndex + 1);
-
-            // Mark this event as processed
-            lastProcessedTickRef.current = event.tick;
-          }
+        for (const output of transport.poll(performance.now())) {
+          handleOutput(output);
         }
       } catch (error) {
         console.error('Sequencer timer error', error);
       }
     };
 
-    intervalRef.current = window.setInterval(timer, TIMER_INTERVAL);
+    poll();
+    const intervalId = window.setInterval(poll, POLL_INTERVAL_MS);
 
     return () => {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+      clearInterval(intervalId);
+      clearPendingTimeouts();
     };
-  }, [
-    clearPendingTimeouts,
-    isRunning,
-    onBeatChange,
-    playPreCountWord,
-    safeBeats,
-    safeBpm,
-    sendMidiNote,
-  ]);
+  }, [clearPendingTimeouts, handleOutput, isRunning]);
 
   // Initialize audio context
   useEffect(() => {
@@ -418,15 +390,7 @@ export function useSequencerTransport({
   }, []);
 
   // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
-      clearPendingTimeouts();
-      schedulerRef.current = null;
-    };
-  }, [clearPendingTimeouts]);
+  useEffect(() => clearPendingTimeouts, [clearPendingTimeouts]);
 
   return {
     currentBeat,

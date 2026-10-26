@@ -203,6 +203,7 @@ export function SongDetailPage() {
     <div className="flex items-center gap-4">
       <MetronomeControl
         bpm={currentSong.bpm}
+        events={currentSong.events}
         isReady={isReady}
         isSupported={isSupported}
         metronomeVolume={metronomeVolume}
