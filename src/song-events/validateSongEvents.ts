@@ -8,7 +8,8 @@ export type SongEventIssueCode =
   | 'countInBeforeSongStart'
   | 'countInOverlapsPreviousChange'
   | 'cueOverlapsCountIn'
-  | 'duplicateEvent';
+  | 'duplicateEvent'
+  | 'emptyCueText';
 
 export type SongEventIssue = {
   code: SongEventIssueCode;
@@ -42,6 +43,15 @@ export const validateSongEvents = (
   const seenPositions = new Set<string>();
 
   for (const event of events) {
+    if (event.type === 'cue' && !event.text.trim()) {
+      issues.push({
+        code: 'emptyCueText',
+        eventId: event.id,
+        message: 'A cue needs text to speak',
+        severity: 'error',
+      });
+    }
+
     if (isChangeEvent(event) && event.measure === 1) {
       issues.push({
         code: 'changeOnFirstMeasure',

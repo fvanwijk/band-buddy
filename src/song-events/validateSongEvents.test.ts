@@ -38,6 +38,12 @@ describe('validateSongEvents', () => {
     expect(issues).toEqual([]);
   });
 
+  it('rejects a cue without text', () => {
+    const issues = validateSongEvents([createCueEvent({ id: 'empty', text: '  ' })], options);
+
+    expect(issues).toEqual([expect.objectContaining({ code: 'emptyCueText', eventId: 'empty' })]);
+  });
+
   it('rejects a time signature change on the first measure', () => {
     const issues = validateSongEvents(
       [createTimeSignatureChangeEvent({ id: 'time', measure: 1 })],

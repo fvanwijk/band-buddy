@@ -6,13 +6,15 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../api/useInstruments';
 import { useSheetMusic } from '../../hooks/useSheetMusic';
-import type { MidiButtonEvent, MidiEvent, Song } from '../../types';
+import { validateSongEvents } from '../../song-events/validateSongEvents';
+import type { MidiEvent, Song, SongEvent } from '../../types';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
 import { DetailsTab } from './details/DetailsTab';
+import { EventsTab } from './events/EventsTab';
 import { LyricsTab } from './lyrics/LyricsTab';
 import { calculateMeasures } from './measures';
 import { MidiButtonsTab } from './midi/MidiButtonsTab';
@@ -72,14 +74,16 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     control,
     name: 'midiEvents',
   });
-  const {
-    append: appendEvent,
-    remove: removeEvent,
-    replace: replaceEvents,
-    update: updateEvent,
-  } = useFieldArray({
+  const { replace: replaceEvents } = useFieldArray({
     control,
     name: 'events',
+    rules: {
+      validate: (value, formValues) =>
+        !validateSongEvents(value ?? [], {
+          bpm: formValues.bpm || undefined,
+          timeSignature: formValues.timeSignature,
+        }).some((issue) => issue.severity === 'error') || 'Some events have errors',
+    },
   });
 
   const durationMins = watch('durationMinutes');
@@ -87,10 +91,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const totalDurationSeconds = (durationMins || 0) * 60 + (durationSecs || 0);
   const bpm = watch('bpm');
   const lyrics = watch('lyrics');
-  const events = watch('events') || [];
-  const midiButtonTriggers = events.filter(
-    (event): event is MidiButtonEvent => event.type === 'midiButton',
-  );
+  const events: SongEvent[] = watch('events') || [];
   const midiEvents = watch('midiEvents') || [];
   const sheetMusicFiles = watch('sheetMusicFiles');
   const sheetMusicFilename = watch('sheetMusicFilename');
@@ -140,18 +141,15 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const hasDetailsErrors = detailsFields.some((field) => !!errors[field]);
   const hasLyricsErrors = lyricsFields.some((field) => !!errors[field]);
   const hasSettingsErrors = settingsFields.some((field) => !!errors[field]);
+  const hasEventsErrors = !!errors.events;
 
   useEffect(() => {
     const measures = calculateMeasures(totalDurationSeconds, bpm, timeSignature);
     setCalculatedMeasures(measures);
   }, [totalDurationSeconds, bpm, timeSignature]);
 
-  // Remove triggers of MIDI buttons that no longer exist
+  // Remove events of MIDI buttons that no longer exist
   useEffect(() => {
-    if (!midiButtonTriggers.length) {
-      return;
-    }
-
     const midiEventIds = new Set(midiEvents.map((event) => event.id));
     const nextEvents = events.filter(
       (event) => event.type !== 'midiButton' || midiEventIds.has(event.midiEventId),
@@ -160,10 +158,11 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     if (nextEvents.length !== events.length) {
       replaceEvents(nextEvents);
     }
-  }, [events, midiButtonTriggers.length, midiEvents, replaceEvents]);
+  }, [events, midiEvents, replaceEvents]);
 
   const selectedTab =
-    tab && ['details', 'lyrics', 'sheet-music', 'text-notes', 'midi', 'settings'].includes(tab)
+    tab &&
+    ['details', 'lyrics', 'sheet-music', 'text-notes', 'midi', 'events', 'settings'].includes(tab)
       ? tab
       : 'details';
   const songFormBasePath = id ? `/songs/edit/${id}` : '/songs/add';
@@ -177,12 +176,15 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     const hasDetailsErrors = detailsFields.some((field) => !!formErrors[field]);
     const hasLyricsErrors = lyricsFields.some((field) => !!formErrors[field]);
     const hasSettingsErrors = settingsFields.some((field) => !!formErrors[field]);
+    const hasEventsErrors = !!formErrors.events;
 
     // Navigate to the first tab with errors
     if (hasDetailsErrors) {
       handleTabChange('details');
     } else if (hasLyricsErrors) {
       handleTabChange('lyrics');
+    } else if (hasEventsErrors) {
+      handleTabChange('events');
     } else if (hasSettingsErrors) {
       handleTabChange('settings');
     }
@@ -237,35 +239,6 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       update(index, {
         ...event,
         id: eventId,
-      });
-    }
-  };
-
-  const handleAddMidiButtonTrigger = (trigger: Omit<MidiButtonEvent, 'id' | 'type'>) => {
-    appendEvent({
-      ...trigger,
-      id: `midi-trigger-${Date.now()}`,
-      type: 'midiButton',
-    });
-  };
-
-  const handleDeleteMidiButtonTrigger = (triggerId: string) => {
-    const index = events.findIndex((event) => event.id === triggerId);
-    if (index >= 0) {
-      removeEvent(index);
-    }
-  };
-
-  const handleEditMidiButtonTrigger = (
-    triggerId: string,
-    trigger: Omit<MidiButtonEvent, 'id' | 'type'>,
-  ) => {
-    const index = events.findIndex((event) => event.id === triggerId);
-    if (index >= 0) {
-      updateEvent(index, {
-        ...trigger,
-        id: triggerId,
-        type: 'midiButton',
       });
     }
   };
@@ -331,18 +304,28 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               content: (
                 <MidiButtonsTab
                   instruments={instruments}
-                  midiButtonTriggers={midiButtonTriggers}
                   midiEvents={midiEvents}
-                  onAddMidiButtonTrigger={handleAddMidiButtonTrigger}
                   onAddEvent={handleAddMidiEvent}
-                  onDeleteMidiButtonTrigger={handleDeleteMidiButtonTrigger}
                   onDeleteEvent={handleDeleteMidiEvent}
-                  onEditMidiButtonTrigger={handleEditMidiButtonTrigger}
                   onEditEvent={handleEditMidiEvent}
                 />
               ),
               id: 'midi',
-              label: 'MIDI events',
+              label: 'MIDI buttons',
+            },
+            {
+              content: (
+                <EventsTab
+                  bpm={bpm}
+                  events={events}
+                  midiEvents={midiEvents}
+                  onEventsChange={replaceEvents}
+                  timeSignature={timeSignature}
+                />
+              ),
+              hasError: hasEventsErrors,
+              id: 'events',
+              label: 'Events',
             },
             {
               content: <SettingsTab errors={errors} register={register} />,

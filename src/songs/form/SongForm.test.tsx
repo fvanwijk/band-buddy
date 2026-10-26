@@ -4,6 +4,7 @@ import { createRoutesStub } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { seedInstruments } from '../../mocks/seed';
+import { createCueEvent, createTempoChangeEvent } from '../../mocks/songEvents';
 import { createSong } from '../../mocks/songs';
 import { StoreProvider } from '../../store/StoreProvider';
 import { MockQueryClientProvider, getMockStore } from '../../testUtils';
@@ -50,7 +51,7 @@ describe('SongForm', () => {
     const user = userEvent.setup();
     renderComponent();
 
-    await user.click(await screen.findByRole('tab', { name: 'MIDI events' }));
+    await user.click(await screen.findByRole('tab', { name: 'MIDI buttons' }));
 
     expect(screen.getByRole('link', { name: 'Settings → Instruments' })).toHaveAttribute(
       'href',
@@ -106,8 +107,8 @@ describe('SongForm', () => {
       'Act like a rock star while playing this song',
     );
 
-    // MIDI events
-    await user.click(screen.getByRole('tab', { name: 'MIDI events' }));
+    // MIDI buttons
+    await user.click(screen.getByRole('tab', { name: 'MIDI buttons' }));
 
     await user.click(screen.getByRole('button', { name: 'Add MIDI button' }));
 
@@ -131,8 +132,9 @@ describe('SongForm', () => {
     await user.type(await screen.findByLabelText('Button label*'), 'Piano');
     await user.click(screen.getByRole('button', { name: 'Add button' }));
 
-    // Add automatic trigger
-    await user.click(screen.getByRole('button', { name: 'Add MIDI button trigger' }));
+    // Events
+    await user.click(screen.getByRole('tab', { name: 'Events' }));
+    await user.click(screen.getByRole('button', { name: 'Add MIDI button' }));
 
     await user.click(screen.getByRole('button', { name: 'Create song' }));
 
@@ -201,6 +203,54 @@ describe('SongForm', () => {
         ...initialData,
         defaultTab: initialData.defaultTab || 'auto',
       }),
+      undefined,
+    );
+  });
+
+  it('should save edited events', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const { id: _id, ...initialData } = createSong({
+      events: [createTempoChangeEvent({ bpm: 100, id: 'tempo', measure: 3 })],
+    });
+
+    renderComponent({ initialData, onSubmit });
+
+    await user.click(await screen.findByRole('tab', { name: 'Events' }));
+    await user.click(screen.getByRole('button', { name: 'Add cue to measure 3, beat 1' }));
+    await user.type(screen.getByLabelText('Cue text'), 'Faster!');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        events: [
+          createTempoChangeEvent({ bpm: 100, id: 'tempo', measure: 3 }),
+          expect.objectContaining({ beat: 1, measure: 3, text: 'Faster!', type: 'cue' }),
+        ],
+      }),
+      undefined,
+    );
+  });
+
+  it('should not save events with errors and show them on the events tab', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const { id: _id, ...initialData } = createSong({
+      events: [createCueEvent({ id: 'empty', text: '' })],
+    });
+
+    renderComponent({ initialData, onSubmit });
+
+    await user.click(await screen.findByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(await screen.findByText('A cue needs text to speak')).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Cue text'), 'Verse');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ events: [expect.objectContaining({ text: 'Verse' })] }),
       undefined,
     );
   });
