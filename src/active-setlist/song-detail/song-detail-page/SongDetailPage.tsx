@@ -1,9 +1,4 @@
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  IconBrandSpotify,
-  IconMicrophone2Off,
-} from '@tabler/icons-react';
+import { IconArrowLeft, IconArrowRight, IconMicrophone2Off } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
@@ -231,17 +226,7 @@ export function SongDetailPage() {
         <PageHeader
           action={toolbar}
           backPath="/play"
-          title={
-            <div className="flex items-center gap-2">
-              {currentSong.title}{' '}
-              {currentSong.spotifyId && (
-                <IconBrandSpotify
-                  className="inline h-5 w-5 shrink-0 stroke-slate-300"
-                  title="Imported from Spotify. Expect more features soon."
-                />
-              )}
-            </div>
-          }
+          title={<div className="flex items-center gap-2">{currentSong.title}</div>}
           subtitle={currentSong.artist}
         />
 
