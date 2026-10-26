@@ -4,6 +4,8 @@ import type { Output } from 'webmidi';
 import { registerOutboundMidiMessage } from '../midi/midiEventLogBus';
 import { EventScheduler } from '../vendor/signal-player';
 import type { SchedulerEvent, MidiNoteEvent } from '../vendor/signal-player';
+import { getPreCountBeats, getPreCountWord, loadPreCountBuffers } from './preCount';
+import type { PreCountWord } from './preCount';
 
 export interface UseSequencerTransportProps {
   /** BPM (beats per minute) */
@@ -20,6 +22,8 @@ export interface UseSequencerTransportProps {
   midiNote?: number;
   /** Metronome volume (0-100, default 50) */
   metronomeVolume?: number;
+  /** Speak a two measure count-in ("one, two, one two three four") before the song starts */
+  preCount?: boolean;
   /** Callback when beat changes */
   onBeatChange?: (beat: number, measure: number) => void;
 }
@@ -51,6 +55,7 @@ export function useSequencerTransport({
   midiNote = DEFAULT_MIDI_NOTE,
   metronomeVolume = 50,
   midiOutput,
+  preCount = false,
   timeSignatureNumerator,
   onBeatChange,
 }: UseSequencerTransportProps): UseSequencerTransportResult {
@@ -59,6 +64,10 @@ export function useSequencerTransport({
   const pendingTimeoutsRef = useRef<number[]>([]);
   const lastProcessedTickRef = useRef(-1);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const preCountBuffersRef = useRef<Record<PreCountWord, AudioBuffer> | null>(null);
+  const preCountBeatsRef = useRef(0);
+  const preCountRef = useRef(preCount);
+  preCountRef.current = preCount;
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
 
@@ -75,6 +84,30 @@ export function useSequencerTransport({
     }
     pendingTimeoutsRef.current = [];
   }, []);
+
+  const playPreCountWord = useCallback(
+    (beat: number, delayMs: number) => {
+      const word = getPreCountWord(beat, safeBeats);
+      const buffer = word && preCountBuffersRef.current?.[word];
+      const ctx = audioContextRef.current;
+      if (!buffer || !ctx || safeVolume <= 0) {
+        return;
+      }
+
+      try {
+        const source = ctx.createBufferSource();
+        const gain = ctx.createGain();
+        source.buffer = buffer;
+        gain.gain.value = safeVolume / 100;
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        source.start(ctx.currentTime + delayMs / 1000);
+      } catch (error) {
+        console.error('Failed to play pre count word', { error });
+      }
+    },
+    [safeBeats, safeVolume],
+  );
 
   // Create event source that repeats metronome pattern
   const getEventsInRange = useCallback(
@@ -218,6 +251,31 @@ export function useSequencerTransport({
     [midiOutput, safeVolume],
   );
 
+  // Fix the pre count length when playback starts so toggling it mid-song has no effect
+  useEffect(() => {
+    preCountBeatsRef.current = isRunning && preCountRef.current ? getPreCountBeats(safeBeats) : 0;
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- only (re)evaluated on start/stop
+  }, [isRunning]);
+
+  useEffect(() => {
+    if (!preCount) {
+      return;
+    }
+
+    if (!audioContextRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+
+    loadPreCountBuffers(audioContextRef.current)
+      .then((buffers) => {
+        preCountBuffersRef.current = buffers;
+      })
+      .catch((error: unknown) => {
+        console.error('Failed to load pre count samples', { error });
+      });
+  }, [preCount]);
+
   // Initialize scheduler
   useEffect(() => {
     if (!isRunning) {
@@ -289,10 +347,21 @@ export function useSequencerTransport({
               pendingTimeoutsRef.current.push(timeoutId);
             }
 
+            const preCountBeats = preCountBeatsRef.current;
+            const eventBeat = Math.round(event.tick / TIMEBASE);
+
+            // Pre count beats only produce sound, the song position starts after them
+            if (eventBeat < preCountBeats) {
+              playPreCountWord(eventBeat, delayMs);
+              lastProcessedTickRef.current = event.tick;
+              continue;
+            }
+
             // Update beat/measure tracking
+            const songTick = event.tick - preCountBeats * TIMEBASE;
             const measureTicks = safeBeats * TIMEBASE;
-            const measureIndex = Math.floor(event.tick / measureTicks);
-            const beatIndex = (event.tick % measureTicks) / TIMEBASE;
+            const measureIndex = Math.floor(songTick / measureTicks);
+            const beatIndex = (songTick % measureTicks) / TIMEBASE;
 
             setCurrentMeasure(measureIndex + 1);
             setCurrentBeat(Math.floor(beatIndex) + 1);
@@ -316,7 +385,15 @@ export function useSequencerTransport({
         intervalRef.current = null;
       }
     };
-  }, [clearPendingTimeouts, isRunning, safeBpm, safeBeats, sendMidiNote, onBeatChange]);
+  }, [
+    clearPendingTimeouts,
+    isRunning,
+    onBeatChange,
+    playPreCountWord,
+    safeBeats,
+    safeBpm,
+    sendMidiNote,
+  ]);
 
   // Initialize audio context
   useEffect(() => {

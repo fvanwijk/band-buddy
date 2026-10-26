@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { StoreProvider } from '../../../store/StoreProvider';
@@ -31,5 +32,17 @@ describe('MetronomeVolumePanel', () => {
 
     expect(screen.getByText('72%')).toBeInTheDocument();
     expect(localStorage.getItem('band-buddy')).toContain('"metronomeVolume":71.8');
+  });
+
+  it('toggles the pre count', async () => {
+    await renderComponent(40);
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Pre count' });
+    expect(checkbox).not.toBeChecked();
+
+    await userEvent.click(checkbox);
+
+    expect(checkbox).toBeChecked();
+    expect(localStorage.getItem('band-buddy')).toContain('"preCountEnabled":true');
   });
 });

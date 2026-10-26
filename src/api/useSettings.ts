@@ -7,6 +7,7 @@ import {
   hasSeenWelcomeSchema,
   localeSchema,
   metronomeVolumeSchema,
+  preCountEnabledSchema,
   showMidiEventLogPanelSchema,
   showDrawingToolsSchema,
   themeSchema,
@@ -104,6 +105,23 @@ export function useGetMetronomeVolume(): number {
 export function useSetMetronomeVolume() {
   return useSetValueCallback('metronomeVolume', (volume: number) => volume, []);
 }
+
+/**
+ * Hook to get whether the spoken pre count is enabled
+ */
+export function useGetPreCountEnabled(): boolean {
+  const enabled = useValue('preCountEnabled');
+  const result = preCountEnabledSchema.safeParse(enabled);
+  return result.success ? result.data : false;
+}
+
+/**
+ * Hook to set whether the spoken pre count is enabled
+ */
+export function useSetPreCountEnabled() {
+  return useSetValueCallback('preCountEnabled', (enabled: boolean) => enabled, []);
+}
+
 /**
  * Hook to get whether drawing tools are shown
  */

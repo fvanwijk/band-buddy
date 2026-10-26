@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../../api/useInstruments';
 import { useGetSetlist } from '../../../api/useSetlist';
-import { useGetMetronomeVolume } from '../../../api/useSettings';
+import { useGetMetronomeVolume, useGetPreCountEnabled } from '../../../api/useSettings';
 import { useGetSongs } from '../../../api/useSong';
 import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
@@ -37,6 +37,7 @@ export function SongDetailPage() {
   const setlist = useGetSetlist(setlistId!);
   const instruments = useGetInstruments();
   const metronomeVolume = useGetMetronomeVolume();
+  const preCountEnabled = useGetPreCountEnabled();
   const songs = useGetSongs();
   const { isReady, isSupported, outputs } = useMidiDevices();
 
@@ -210,6 +211,7 @@ export function SongDetailPage() {
           lastAutoTriggerPositionRef.current = null;
         }}
         outputs={outputs}
+        preCount={preCountEnabled}
         timeSignature={currentSong.timeSignature}
       />
       <SongStats song={currentSong} />
