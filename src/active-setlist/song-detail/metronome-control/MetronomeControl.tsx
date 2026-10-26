@@ -1,9 +1,12 @@
 import { IconPlayerPlayFilled, IconPlayerStopFilled } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Output } from 'webmidi';
 
+import { speakText } from '../../../hooks/speakText';
 import { useSequencerTransport } from '../../../hooks/useSequencerTransport';
 import { Button } from '../../../ui/Button';
+
+const PAUSE_AFTER_ANNOUNCEMENT_MS = 500;
 
 type MetronomeControlProps = {
   bpm?: number;
@@ -14,6 +17,7 @@ type MetronomeControlProps = {
   onStop?: () => void;
   outputs: Output[];
   preCountVolume?: number;
+  songTitle?: string;
   timeSignature?: string;
 };
 
@@ -26,10 +30,15 @@ export function MetronomeControl({
   onStop,
   outputs,
   preCountVolume,
+  songTitle,
   timeSignature,
 }: MetronomeControlProps) {
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
+  const [isAnnouncing, setIsAnnouncing] = useState(false);
   const [metronomePulseKey, setMetronomePulseKey] = useState(0);
+  const cancelAnnouncementRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => () => cancelAnnouncementRef.current?.(), []);
 
   if (!bpm) {
     return null;
@@ -59,19 +68,37 @@ export function MetronomeControl({
   });
 
   const beatDurationSeconds = 60 / bpm;
+  const isActive = isMetronomeRunning || isAnnouncing;
+
+  const startMetronome = () => {
+    cancelAnnouncementRef.current = null;
+    setIsAnnouncing(false);
+    setIsMetronomeRunning(true);
+    setMetronomePulseKey((key) => key + 1);
+  };
 
   const handleMetronomeToggle = () => {
-    setIsMetronomeRunning((prev) => {
-      const next = !prev;
+    if (isMetronomeRunning || isAnnouncing) {
+      cancelAnnouncementRef.current?.();
+      cancelAnnouncementRef.current = null;
+      setIsAnnouncing(false);
+      setIsMetronomeRunning(false);
+      onStop?.();
+      return;
+    }
 
-      if (next) {
-        setMetronomePulseKey((key) => key + 1);
-      } else {
-        onStop?.();
-      }
+    // The pre count starts after the song title has been announced
+    if (preCountVolume && preCountVolume > 0 && songTitle) {
+      setIsAnnouncing(true);
+      const cancelSpeech = speakText(songTitle, preCountVolume, () => {
+        const timeoutId = window.setTimeout(startMetronome, PAUSE_AFTER_ANNOUNCEMENT_MS);
+        cancelAnnouncementRef.current = () => window.clearTimeout(timeoutId);
+      });
+      cancelAnnouncementRef.current ??= cancelSpeech;
+      return;
+    }
 
-      return next;
-    });
+    startMetronome();
   };
 
   return (
@@ -82,11 +109,11 @@ export function MetronomeControl({
         isIcon
         onClick={handleMetronomeToggle}
         style={{ animationDuration: `${beatDurationSeconds}s` }}
-        title={isMetronomeRunning ? 'Stop metronome' : 'Start metronome'}
+        title={isActive ? 'Stop metronome' : 'Start metronome'}
         type="button"
         variant="outlined"
       >
-        {isMetronomeRunning ? (
+        {isActive ? (
           <IconPlayerStopFilled className="h-4 w-4" />
         ) : (
           <IconPlayerPlayFilled className="h-4 w-4" />

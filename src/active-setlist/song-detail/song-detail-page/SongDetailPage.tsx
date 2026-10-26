@@ -212,6 +212,7 @@ export function SongDetailPage() {
         }}
         outputs={outputs}
         preCountVolume={preCountVolume}
+        songTitle={currentSong.title}
         timeSignature={currentSong.timeSignature}
       />
       <SongStats song={currentSong} />
