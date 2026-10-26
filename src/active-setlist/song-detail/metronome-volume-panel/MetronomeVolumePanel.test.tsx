@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { StoreProvider } from '../../../store/StoreProvider';
@@ -34,15 +33,21 @@ describe('MetronomeVolumePanel', () => {
     expect(localStorage.getItem('band-buddy')).toContain('"metronomeVolume":71.8');
   });
 
-  it('toggles the pre count', async () => {
+  it('shows the pre count as off by default', async () => {
     await renderComponent(40);
 
-    const checkbox = screen.getByRole('checkbox', { name: 'Pre count' });
-    expect(checkbox).not.toBeChecked();
+    expect(screen.getByRole('slider', { name: 'Pre count volume' })).toHaveValue('0');
+    expect(screen.getByText('Off')).toBeInTheDocument();
+  });
 
-    await userEvent.click(checkbox);
+  it('updates the pre count volume when its slider changes', async () => {
+    await renderComponent(40);
 
-    expect(checkbox).toBeChecked();
-    expect(localStorage.getItem('band-buddy')).toContain('"preCountEnabled":true');
+    fireEvent.change(screen.getByRole('slider', { name: 'Pre count volume' }), {
+      target: { value: '30' },
+    });
+
+    expect(screen.getByText('30%')).toBeInTheDocument();
+    expect(localStorage.getItem('band-buddy')).toContain('"preCountVolume":30');
   });
 });

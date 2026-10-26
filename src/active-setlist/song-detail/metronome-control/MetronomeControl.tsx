@@ -13,7 +13,7 @@ type MetronomeControlProps = {
   onBeatChange?: (beat: number, measure: number) => void;
   onStop?: () => void;
   outputs: Output[];
-  preCount?: boolean;
+  preCountVolume?: number;
   timeSignature?: string;
 };
 
@@ -25,7 +25,7 @@ export function MetronomeControl({
   onBeatChange,
   onStop,
   outputs,
-  preCount,
+  preCountVolume,
   timeSignature,
 }: MetronomeControlProps) {
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
@@ -54,7 +54,7 @@ export function MetronomeControl({
     metronomeVolume,
     midiOutput: metronomeOutput,
     onBeatChange,
-    preCount,
+    preCountVolume,
     timeSignatureNumerator,
   });
 

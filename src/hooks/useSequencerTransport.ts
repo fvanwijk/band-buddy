@@ -22,8 +22,8 @@ export interface UseSequencerTransportProps {
   midiNote?: number;
   /** Metronome volume (0-100, default 50) */
   metronomeVolume?: number;
-  /** Speak a two measure count-in ("one, two, one two three four") before the song starts */
-  preCount?: boolean;
+  /** Volume (0-100) of the spoken two measure count-in before the song starts, 0 disables it */
+  preCountVolume?: number;
   /** Callback when beat changes */
   onBeatChange?: (beat: number, measure: number) => void;
 }
@@ -55,7 +55,7 @@ export function useSequencerTransport({
   midiNote = DEFAULT_MIDI_NOTE,
   metronomeVolume = 50,
   midiOutput,
-  preCount = false,
+  preCountVolume = 0,
   timeSignatureNumerator,
   onBeatChange,
 }: UseSequencerTransportProps): UseSequencerTransportResult {
@@ -66,8 +66,8 @@ export function useSequencerTransport({
   const audioContextRef = useRef<AudioContext | null>(null);
   const preCountBuffersRef = useRef<Record<PreCountWord, AudioBuffer> | null>(null);
   const preCountBeatsRef = useRef(0);
-  const preCountRef = useRef(preCount);
-  preCountRef.current = preCount;
+  const preCountVolumeRef = useRef(preCountVolume);
+  preCountVolumeRef.current = preCountVolume;
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
 
@@ -77,6 +77,7 @@ export function useSequencerTransport({
   const safeChannel = Math.max(1, Math.min(16, Math.round(midiChannel)));
   const safeNote = Math.max(0, Math.min(127, Math.round(midiNote)));
   const safeVolume = Math.max(0, Math.min(100, Math.round(metronomeVolume)));
+  const safePreCountVolume = Math.max(0, Math.min(100, Math.round(preCountVolume)));
 
   const clearPendingTimeouts = useCallback(() => {
     for (const timeoutId of pendingTimeoutsRef.current) {
@@ -90,7 +91,7 @@ export function useSequencerTransport({
       const word = getPreCountWord(beat, safeBeats);
       const buffer = word && preCountBuffersRef.current?.[word];
       const ctx = audioContextRef.current;
-      if (!buffer || !ctx || safeVolume <= 0) {
+      if (!buffer || !ctx || safePreCountVolume <= 0) {
         return;
       }
 
@@ -98,7 +99,7 @@ export function useSequencerTransport({
         const source = ctx.createBufferSource();
         const gain = ctx.createGain();
         source.buffer = buffer;
-        gain.gain.value = safeVolume / 100;
+        gain.gain.value = safePreCountVolume / 100;
         source.connect(gain);
         gain.connect(ctx.destination);
         source.start(ctx.currentTime + delayMs / 1000);
@@ -106,7 +107,7 @@ export function useSequencerTransport({
         console.error('Failed to play pre count word', { error });
       }
     },
-    [safeBeats, safeVolume],
+    [safeBeats, safePreCountVolume],
   );
 
   // Create event source that repeats metronome pattern
@@ -253,12 +254,13 @@ export function useSequencerTransport({
 
   // Fix the pre count length when playback starts so toggling it mid-song has no effect
   useEffect(() => {
-    preCountBeatsRef.current = isRunning && preCountRef.current ? getPreCountBeats(safeBeats) : 0;
+    preCountBeatsRef.current =
+      isRunning && preCountVolumeRef.current > 0 ? getPreCountBeats(safeBeats) : 0;
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- only (re)evaluated on start/stop
   }, [isRunning]);
 
   useEffect(() => {
-    if (!preCount) {
+    if (preCountVolume <= 0) {
       return;
     }
 
@@ -274,7 +276,7 @@ export function useSequencerTransport({
       .catch((error: unknown) => {
         console.error('Failed to load pre count samples', { error });
       });
-  }, [preCount]);
+  }, [preCountVolume]);
 
   // Initialize scheduler
   useEffect(() => {

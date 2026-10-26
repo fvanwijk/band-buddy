@@ -7,7 +7,7 @@ import {
   hasSeenWelcomeSchema,
   localeSchema,
   metronomeVolumeSchema,
-  preCountEnabledSchema,
+  preCountVolumeSchema,
   showMidiEventLogPanelSchema,
   showDrawingToolsSchema,
   themeSchema,
@@ -107,19 +107,19 @@ export function useSetMetronomeVolume() {
 }
 
 /**
- * Hook to get whether the spoken pre count is enabled
+ * Hook to get the spoken pre count volume (0-100, 0 disables the pre count)
  */
-export function useGetPreCountEnabled(): boolean {
-  const enabled = useValue('preCountEnabled');
-  const result = preCountEnabledSchema.safeParse(enabled);
-  return result.success ? result.data : false;
+export function useGetPreCountVolume(): number {
+  const volume = useValue('preCountVolume');
+  const result = preCountVolumeSchema.safeParse(volume);
+  return result.success ? result.data : 0;
 }
 
 /**
- * Hook to set whether the spoken pre count is enabled
+ * Hook to set the spoken pre count volume
  */
-export function useSetPreCountEnabled() {
-  return useSetValueCallback('preCountEnabled', (enabled: boolean) => enabled, []);
+export function useSetPreCountVolume() {
+  return useSetValueCallback('preCountVolume', (volume: number) => volume, []);
 }
 
 /**

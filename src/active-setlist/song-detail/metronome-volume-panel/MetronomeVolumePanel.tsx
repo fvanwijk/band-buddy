@@ -1,22 +1,25 @@
 import {
   useGetMetronomeVolume,
-  useGetPreCountEnabled,
+  useGetPreCountVolume,
   useSetMetronomeVolume,
-  useSetPreCountEnabled,
+  useSetPreCountVolume,
 } from '../../../api/useSettings';
 import { GridCell } from '../../../settings/GridCell';
-import { Checkbox } from '../../../ui/Checkbox';
 import { Slider } from '../../../ui/Slider';
 import { SettingHeading } from '../setting-heading/SettingHeading';
 
 export function MetronomeVolumePanel() {
   const volume = useGetMetronomeVolume();
   const setVolume = useSetMetronomeVolume();
-  const preCountEnabled = useGetPreCountEnabled();
-  const setPreCountEnabled = useSetPreCountEnabled();
+  const preCountVolume = useGetPreCountVolume();
+  const setPreCountVolume = useSetPreCountVolume();
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVolume(parseFloat(e.target.value));
+  };
+
+  const handlePreCountVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPreCountVolume(parseFloat(e.target.value));
   };
 
   return (
@@ -33,12 +36,22 @@ export function MetronomeVolumePanel() {
         />
         <p className="text-center text-xs font-semibold text-brand-200">{Math.round(volume)}%</p>
       </div>
-      <Checkbox
-        checked={preCountEnabled}
-        className="mt-3"
-        label="Pre count"
-        onChange={(e) => setPreCountEnabled(e.target.checked)}
-      />
+      <div className="mt-3">
+        <SettingHeading>Pre count volume</SettingHeading>
+        <div className="space-y-2">
+          <Slider
+            ariaLabel="Pre count volume"
+            max={100}
+            min={0}
+            onChange={handlePreCountVolumeChange}
+            step={1}
+            value={preCountVolume}
+          />
+          <p className="text-center text-xs font-semibold text-brand-200">
+            {preCountVolume > 0 ? `${Math.round(preCountVolume)}%` : 'Off'}
+          </p>
+        </div>
+      </div>
     </GridCell>
   );
 }

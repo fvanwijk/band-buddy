@@ -121,6 +121,6 @@ export const themeSchema = z.string().default('emerald');
 export const activeSetlistIdSchema = z.string();
 export const hasSeenWelcomeSchema = z.boolean().default(false);
 export const metronomeVolumeSchema = z.number().min(0).max(100).default(50);
-export const preCountEnabledSchema = z.boolean().default(false);
+export const preCountVolumeSchema = z.number().min(0).max(100).default(0);
 export const showMidiEventLogPanelSchema = z.boolean().default(false);
 export const showDrawingToolsSchema = z.boolean().default(false);
