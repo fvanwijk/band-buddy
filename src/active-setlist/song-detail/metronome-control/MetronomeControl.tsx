@@ -2,8 +2,10 @@ import { IconPlayerPlayFilled, IconPlayerStopFilled } from '@tabler/icons-react'
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Output } from 'webmidi';
 
+import { useGetTtsVoice } from '../../../api/useSettings';
 import { speakText } from '../../../hooks/speakText';
 import { useSequencerTransport } from '../../../hooks/useSequencerTransport';
+import type { SongLanguage } from '../../../schemas';
 import { Button } from '../../../ui/Button';
 
 const PAUSE_AFTER_ANNOUNCEMENT_MS = 500;
@@ -17,6 +19,7 @@ type MetronomeControlProps = {
   onStop?: () => void;
   outputs: Output[];
   preCountVolume?: number;
+  songLanguage?: SongLanguage;
   songTitle?: string;
   timeSignature?: string;
 };
@@ -30,6 +33,7 @@ export function MetronomeControl({
   onStop,
   outputs,
   preCountVolume,
+  songLanguage,
   songTitle,
   timeSignature,
 }: MetronomeControlProps) {
@@ -37,6 +41,7 @@ export function MetronomeControl({
   const [isAnnouncing, setIsAnnouncing] = useState(false);
   const [metronomePulseKey, setMetronomePulseKey] = useState(0);
   const cancelAnnouncementRef = useRef<(() => void) | null>(null);
+  const ttsVoiceURI = useGetTtsVoice(songLanguage ?? 'en');
 
   useEffect(() => () => cancelAnnouncementRef.current?.(), []);
 
@@ -90,9 +95,14 @@ export function MetronomeControl({
     // The pre count starts after the song title has been announced
     if (preCountVolume && preCountVolume > 0 && songTitle) {
       setIsAnnouncing(true);
-      const cancelSpeech = speakText(songTitle, preCountVolume, () => {
-        const timeoutId = window.setTimeout(startMetronome, PAUSE_AFTER_ANNOUNCEMENT_MS);
-        cancelAnnouncementRef.current = () => window.clearTimeout(timeoutId);
+      const cancelSpeech = speakText(songTitle, {
+        language: songLanguage,
+        onDone: () => {
+          const timeoutId = window.setTimeout(startMetronome, PAUSE_AFTER_ANNOUNCEMENT_MS);
+          cancelAnnouncementRef.current = () => window.clearTimeout(timeoutId);
+        },
+        voiceURI: ttsVoiceURI,
+        volume: preCountVolume,
       });
       cancelAnnouncementRef.current ??= cancelSpeech;
       return;

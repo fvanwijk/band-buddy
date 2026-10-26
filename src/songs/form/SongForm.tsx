@@ -126,6 +126,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     'durationSeconds',
     'keyNote',
     'keyQuality',
+    'language',
     'timeSignature',
     'title',
   ];
@@ -188,6 +189,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     durationSeconds,
     keyQuality,
     keyNote,
+    language,
     sheetMusicFiles,
     defaultTab,
     ...data
@@ -201,6 +203,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
         defaultTab,
         duration: totalSeconds || undefined,
         key: (keyNote || existingNote) + (keyQuality || ''),
+        language: language || undefined,
         lyricsCanvasPaths: initialData?.lyricsCanvasPaths || [],
         spotifyId: initialData?.spotifyId,
         textNotesCanvasPaths: initialData?.textNotesCanvasPaths || [],

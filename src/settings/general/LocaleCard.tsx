@@ -2,6 +2,7 @@ import { useGetLocale, useSetLocale } from '../../api/useSettings';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '../../config/locales';
 import { SelectField } from '../../ui/form/SelectField';
 import { GridCell } from '../GridCell';
+import { TtsVoiceSelect } from './TtsVoiceSelect';
 
 export function LocaleCard() {
   const currentLocale = useGetLocale();
@@ -24,6 +25,16 @@ export function LocaleCard() {
           onChange={(event) => setLocale(event.target.value as SupportedLocale)}
           value={currentLocale}
         />
+      </div>
+
+      <h3 className="mt-8 text-base font-semibold text-slate-100">Speech voices</h3>
+      <p className="mt-2 text-sm text-slate-400">
+        Voices used to announce song titles before the pre count. The available voices depend on
+        your browser and device.
+      </p>
+      <div className="mt-4 space-y-4">
+        <TtsVoiceSelect label="English voice" language="en" />
+        <TtsVoiceSelect label="Dutch voice" language="nl" />
       </div>
     </GridCell>
   );

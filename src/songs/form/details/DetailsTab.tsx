@@ -64,6 +64,11 @@ export function DetailsTab({
     { label: '2/4', value: '2/4' },
   ];
 
+  const languageOptions = [
+    { label: '🇺🇸 English', value: 'en' },
+    { label: '🇳🇱 Dutch', value: 'nl' },
+  ];
+
   return (
     <Card>
       <InputField
@@ -163,6 +168,12 @@ export function DetailsTab({
           ±{calculatedMeasures} measure{calculatedMeasures !== 1 ? 's' : ''}
         </p>
       )}
+      <div>
+        <RadioGroup label="Language" options={languageOptions} register={register('language')} />
+        <p className="mt-1 text-xs text-slate-500">
+          Used to announce the song title before the pre count. English when not set.
+        </p>
+      </div>
     </Card>
   );
 }

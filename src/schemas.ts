@@ -60,6 +60,9 @@ export type SongDetailTab = z.infer<typeof songDetailTabSchema>;
 export const songDefaultTabSchema = z.enum(['auto', ...songDetailTabs]);
 export type SongDefaultTab = z.infer<typeof songDefaultTabSchema>;
 
+export const songLanguageSchema = z.enum(['en', 'nl']);
+export type SongLanguage = z.infer<typeof songLanguageSchema>;
+
 // Song
 export const songTableSchema = z.object({
   artist: z.string(),
@@ -69,6 +72,7 @@ export const songTableSchema = z.object({
   duration: z.number().optional(),
   isDeleted: z.boolean().optional(),
   key: z.string().optional(),
+  language: z.string().optional(),
   lyrics: z.string().optional(),
   lyricsCanvasPaths: z.string().optional(), // Stored as JSON string
   midiButtonTriggers: z.string().optional(), // Stored as JSON string
@@ -85,6 +89,7 @@ export const songSchema = songTableSchema.extend({
   canvasPaths: z.array(z.unknown()).optional(),
   defaultTab: songDefaultTabSchema.optional(),
   id: z.string(),
+  language: songLanguageSchema.optional(),
   lyricsCanvasPaths: z.array(z.unknown()).optional(),
   midiButtonTriggers: z.array(midiButtonTriggerSchema).optional(),
   midiEvents: z.array(midiEventSchema).optional(),
@@ -122,5 +127,6 @@ export const activeSetlistIdSchema = z.string();
 export const hasSeenWelcomeSchema = z.boolean().default(false);
 export const metronomeVolumeSchema = z.number().min(0).max(100).default(50);
 export const preCountVolumeSchema = z.number().min(0).max(100).default(0);
+export const ttsVoiceSchema = z.string();
 export const showMidiEventLogPanelSchema = z.boolean().default(false);
 export const showDrawingToolsSchema = z.boolean().default(false);

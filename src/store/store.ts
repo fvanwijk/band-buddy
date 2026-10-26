@@ -17,6 +17,7 @@ import {
   showDrawingToolsSchema,
   songTableSchema,
   themeSchema,
+  ttsVoiceSchema,
 } from '../schemas';
 
 export const STORE_STORAGE_KEY = 'band-buddy';
@@ -56,6 +57,8 @@ export function createAppStore(): Store {
     showDrawingTools: showDrawingToolsSchema,
     showMidiEventLogPanel: showMidiEventLogPanelSchema,
     theme: themeSchema,
+    ttsVoiceEn: ttsVoiceSchema,
+    ttsVoiceNl: ttsVoiceSchema,
   });
 
   return createStore().setTablesSchema(tablesSchema).setValuesSchema(valuesSchema);

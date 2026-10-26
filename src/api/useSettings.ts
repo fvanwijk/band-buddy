@@ -1,8 +1,10 @@
-import { useSetValueCallback, useValue } from 'tinybase/ui-react';
+import { useCallback } from 'react';
+import { useSetValueCallback, useStore, useValue } from 'tinybase/ui-react';
 
 import type { SupportedLocale } from '../config/locales';
 import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
+import type { SpeechLanguage } from '../hooks/speechVoices';
 import {
   hasSeenWelcomeSchema,
   localeSchema,
@@ -11,6 +13,7 @@ import {
   showMidiEventLogPanelSchema,
   showDrawingToolsSchema,
   themeSchema,
+  ttsVoiceSchema,
 } from '../schemas';
 
 /**
@@ -120,6 +123,34 @@ export function useGetPreCountVolume(): number {
  */
 export function useSetPreCountVolume() {
   return useSetValueCallback('preCountVolume', (volume: number) => volume, []);
+}
+
+const ttsVoiceKeys = { en: 'ttsVoiceEn', nl: 'ttsVoiceNl' } as const;
+
+/**
+ * Hook to get the URI of the text-to-speech voice selected for a language
+ */
+export function useGetTtsVoice(language: SpeechLanguage): string | undefined {
+  const voice = useValue(ttsVoiceKeys[language]);
+  const result = ttsVoiceSchema.safeParse(voice);
+  return result.success ? result.data : undefined;
+}
+
+/**
+ * Hook to set the text-to-speech voice for a language, an empty value clears the selection
+ */
+export function useSetTtsVoice(language: SpeechLanguage) {
+  const store = useStore();
+  return useCallback(
+    (voiceURI: string) => {
+      if (voiceURI) {
+        store?.setValue(ttsVoiceKeys[language], voiceURI);
+      } else {
+        store?.delValue(ttsVoiceKeys[language]);
+      }
+    },
+    [language, store],
+  );
 }
 
 /**

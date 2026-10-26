@@ -203,4 +203,36 @@ describe('SongForm', () => {
       undefined,
     );
   });
+
+  it('should have no language selected by default and save the selected language', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const { language: _language, ...initialData } = createSong();
+
+    renderComponent({ initialData, onSubmit }, '0');
+
+    const english = await screen.findByRole('radio', { name: '🇺🇸 English' });
+    const dutch = screen.getByRole('radio', { name: '🇳🇱 Dutch' });
+    expect(english).not.toBeChecked();
+    expect(dutch).not.toBeChecked();
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(onSubmit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ language: undefined }),
+      undefined,
+    );
+
+    await user.click(dutch);
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(onSubmit).toHaveBeenLastCalledWith(
+      expect.objectContaining({ language: 'nl' }),
+      undefined,
+    );
+  });
+
+  it('should preselect the saved language', async () => {
+    renderComponent({ initialData: createSong({ language: 'en' }) }, '0');
+
+    expect(await screen.findByRole('radio', { name: '🇺🇸 English' })).toBeChecked();
+  });
 });
