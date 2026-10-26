@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import { Grid } from '../../../settings/Grid';
-import type { Instrument, MidiButtonTrigger, MidiEvent } from '../../../types';
+import type { Instrument, MidiButtonEvent, MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 import { Card } from '../../../ui/Card';
@@ -12,15 +12,17 @@ import { MidiButtonCard } from './MidiButtonCard';
 import { MidiButtonDialog } from './MidiButtonDialog';
 import { MidiButtonTriggersFormSection } from './MidiButtonTriggersFormSection';
 
+type MidiButtonTriggerInput = Omit<MidiButtonEvent, 'id' | 'type'>;
+
 type MidiButtonsTabProps = {
   instruments: Instrument[];
-  midiButtonTriggers?: MidiButtonTrigger[];
+  midiButtonTriggers?: MidiButtonEvent[];
   midiEvents?: MidiEvent[];
-  onAddMidiButtonTrigger?: (trigger: Omit<MidiButtonTrigger, 'id'>) => void;
+  onAddMidiButtonTrigger?: (trigger: MidiButtonTriggerInput) => void;
   onAddEvent?: (event: Omit<MidiEvent, 'id'>) => void;
   onDeleteMidiButtonTrigger?: (triggerId: string) => void;
   onDeleteEvent?: (eventId: string) => void;
-  onEditMidiButtonTrigger?: (triggerId: string, trigger: Omit<MidiButtonTrigger, 'id'>) => void;
+  onEditMidiButtonTrigger?: (triggerId: string, trigger: MidiButtonTriggerInput) => void;
   onEditEvent?: (eventId: string, event: Omit<MidiEvent, 'id'>) => void;
 };
 

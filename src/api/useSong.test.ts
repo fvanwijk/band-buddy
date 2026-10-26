@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { createCueEvent, createSongEvents, createTempoChangeEvent } from '../mocks/songEvents';
 import { createSongTable } from '../mocks/songs';
 import { StoreProvider } from '../store/StoreProvider';
 import { getMockStore } from '../testUtils';
@@ -117,5 +118,41 @@ describe('useGetSongs', () => {
     );
 
     await waitFor(() => expect(result.current).toHaveLength(3));
+  });
+});
+
+describe('useGetSongs events', () => {
+  it('parses stored song events', async () => {
+    const { store, persister } = getMockStore();
+    store.setRow('songs', '0', createSongTable({ events: JSON.stringify(createSongEvents()) }));
+    await persister.save();
+
+    const { result } = renderHook(() => useGetSongs(), { wrapper: StoreProvider });
+
+    await waitFor(() => expect(result.current).toHaveLength(1));
+
+    expect(result.current[0].events).toEqual(createSongEvents());
+  });
+
+  it('drops invalid events but keeps the song', async () => {
+    const { store, persister } = getMockStore();
+    store.setRow(
+      'songs',
+      '0',
+      createSongTable({
+        events: JSON.stringify([
+          createCueEvent(),
+          { ...createTempoChangeEvent(), beat: 2 },
+          { id: 'unknown', type: 'unknown' },
+        ]),
+      }),
+    );
+    await persister.save();
+
+    const { result } = renderHook(() => useGetSongs(), { wrapper: StoreProvider });
+
+    await waitFor(() => expect(result.current).toHaveLength(1));
+
+    expect(result.current[0].events).toEqual([createCueEvent()]);
   });
 });

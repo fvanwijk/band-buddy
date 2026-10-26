@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../api/useInstruments';
 import { useSheetMusic } from '../../hooks/useSheetMusic';
-import type { MidiButtonTrigger, MidiEvent, Song } from '../../types';
+import type { MidiButtonEvent, MidiEvent, Song } from '../../types';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { Page } from '../../ui/Page';
@@ -73,13 +73,13 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     name: 'midiEvents',
   });
   const {
-    append: appendMidiButtonTrigger,
-    remove: removeMidiButtonTrigger,
-    replace: replaceMidiButtonTriggers,
-    update: updateMidiButtonTrigger,
+    append: appendEvent,
+    remove: removeEvent,
+    replace: replaceEvents,
+    update: updateEvent,
   } = useFieldArray({
     control,
-    name: 'midiButtonTriggers',
+    name: 'events',
   });
 
   const durationMins = watch('durationMinutes');
@@ -87,7 +87,10 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
   const totalDurationSeconds = (durationMins || 0) * 60 + (durationSecs || 0);
   const bpm = watch('bpm');
   const lyrics = watch('lyrics');
-  const midiButtonTriggers = watch('midiButtonTriggers') || [];
+  const events = watch('events') || [];
+  const midiButtonTriggers = events.filter(
+    (event): event is MidiButtonEvent => event.type === 'midiButton',
+  );
   const midiEvents = watch('midiEvents') || [];
   const sheetMusicFiles = watch('sheetMusicFiles');
   const sheetMusicFilename = watch('sheetMusicFilename');
@@ -143,20 +146,21 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     setCalculatedMeasures(measures);
   }, [totalDurationSeconds, bpm, timeSignature]);
 
+  // Remove triggers of MIDI buttons that no longer exist
   useEffect(() => {
     if (!midiButtonTriggers.length) {
       return;
     }
 
     const midiEventIds = new Set(midiEvents.map((event) => event.id));
-    const nextTriggers = midiButtonTriggers.filter((trigger) =>
-      midiEventIds.has(trigger.midiEventId),
+    const nextEvents = events.filter(
+      (event) => event.type !== 'midiButton' || midiEventIds.has(event.midiEventId),
     );
 
-    if (nextTriggers.length !== midiButtonTriggers.length) {
-      replaceMidiButtonTriggers(nextTriggers);
+    if (nextEvents.length !== events.length) {
+      replaceEvents(nextEvents);
     }
-  }, [midiButtonTriggers, midiEvents, replaceMidiButtonTriggers]);
+  }, [events, midiButtonTriggers.length, midiEvents, replaceEvents]);
 
   const selectedTab =
     tab && ['details', 'lyrics', 'sheet-music', 'text-notes', 'midi', 'settings'].includes(tab)
@@ -237,30 +241,31 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     }
   };
 
-  const handleAddMidiButtonTrigger = (trigger: Omit<MidiButtonTrigger, 'id'>) => {
-    const newTrigger: MidiButtonTrigger = {
+  const handleAddMidiButtonTrigger = (trigger: Omit<MidiButtonEvent, 'id' | 'type'>) => {
+    appendEvent({
       ...trigger,
       id: `midi-trigger-${Date.now()}`,
-    };
-    appendMidiButtonTrigger(newTrigger);
+      type: 'midiButton',
+    });
   };
 
   const handleDeleteMidiButtonTrigger = (triggerId: string) => {
-    const index = midiButtonTriggers.findIndex((trigger) => trigger.id === triggerId);
+    const index = events.findIndex((event) => event.id === triggerId);
     if (index >= 0) {
-      removeMidiButtonTrigger(index);
+      removeEvent(index);
     }
   };
 
   const handleEditMidiButtonTrigger = (
     triggerId: string,
-    trigger: Omit<MidiButtonTrigger, 'id'>,
+    trigger: Omit<MidiButtonEvent, 'id' | 'type'>,
   ) => {
-    const index = midiButtonTriggers.findIndex((item) => item.id === triggerId);
+    const index = events.findIndex((event) => event.id === triggerId);
     if (index >= 0) {
-      updateMidiButtonTrigger(index, {
+      updateEvent(index, {
         ...trigger,
         id: triggerId,
+        type: 'midiButton',
       });
     }
   };

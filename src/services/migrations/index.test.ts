@@ -156,6 +156,34 @@ describe('migrateBackup', () => {
     expect(migratedSong.lyricsCanvasPaths).toBe('[{"drawMode":true,"paths":[{"x":1,"y":2}]}]');
   });
 
+  it('should migrate v4 MIDI button triggers to v5 song events', () => {
+    const v4Backup = {
+      tables: {
+        songs: {
+          '1': {
+            artist: 'Artist 1',
+            midiButtonTriggers: JSON.stringify([
+              { beat: 2, id: 'trigger-1', measure: 4, midiEventId: 'midi-1' },
+            ]),
+            title: 'Song 1',
+          },
+        },
+      },
+      values: {},
+      version: 4,
+    };
+
+    const result = migrateBackup(v4Backup, 4);
+
+    expect(result.error).toBeUndefined();
+
+    const migratedSong = result.tables.songs?.['1'] as Record<string, unknown>;
+    expect(migratedSong.midiButtonTriggers).toBeUndefined();
+    expect(JSON.parse(String(migratedSong.events))).toEqual([
+      { beat: 2, id: 'trigger-1', measure: 4, midiEventId: 'midi-1', type: 'midiButton' },
+    ]);
+  });
+
   it('should migrate persisted v1 local data to v2 format', () => {
     const persistedV1 = JSON.stringify([
       {

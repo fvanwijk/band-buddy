@@ -31,12 +31,39 @@ export const midiEventBaseSchema = z.object({
   label: z.string(),
 });
 export const midiEventSchema = midiEventBaseSchema.extend({ id: z.string() });
-export const midiButtonTriggerBaseSchema = z.object({
+
+// Song events happen at a measure and beat while the metronome is running.
+// Tempo and time signature changes are always on the first beat of a measure, because the count-in
+// of one measure leading up to the change ends on the downbeat.
+const songEventPositionSchema = z.object({
   beat: z.number().int().min(1).max(16),
+  id: z.string(),
   measure: z.number().int().min(1),
-  midiEventId: z.string(),
 });
-export const midiButtonTriggerSchema = midiButtonTriggerBaseSchema.extend({ id: z.string() });
+export const cueEventSchema = songEventPositionSchema.extend({
+  text: z.string().min(1),
+  type: z.literal('cue'),
+});
+export const midiButtonEventSchema = songEventPositionSchema.extend({
+  midiEventId: z.string(),
+  type: z.literal('midiButton'),
+});
+export const tempoChangeEventSchema = songEventPositionSchema.extend({
+  beat: z.literal(1),
+  bpm: z.number().min(1).max(300),
+  type: z.literal('tempoChange'),
+});
+export const timeSignatureChangeEventSchema = songEventPositionSchema.extend({
+  beat: z.literal(1),
+  timeSignature: z.string().regex(/^\d+\/\d+$/),
+  type: z.literal('timeSignatureChange'),
+});
+export const songEventSchema = z.discriminatedUnion('type', [
+  cueEventSchema,
+  midiButtonEventSchema,
+  tempoChangeEventSchema,
+  timeSignatureChangeEventSchema,
+]);
 
 // Instrument
 export const instrumentTableSchema = z.object({
@@ -70,12 +97,12 @@ export const songTableSchema = z.object({
   canvasPaths: z.string().optional(), // Stored as JSON string
   defaultTab: z.string().optional(),
   duration: z.number().optional(),
+  events: z.string().optional(), // Stored as JSON string
   isDeleted: z.boolean().optional(),
   key: z.string().optional(),
   language: z.string().optional(),
   lyrics: z.string().optional(),
   lyricsCanvasPaths: z.string().optional(), // Stored as JSON string
-  midiButtonTriggers: z.string().optional(), // Stored as JSON string
   midiEvents: z.string().optional(), // Stored as JSON string
   notes: z.string().optional(),
   sheetMusicFilename: z.string().optional(),
@@ -88,10 +115,10 @@ export const songTableSchema = z.object({
 export const songSchema = songTableSchema.extend({
   canvasPaths: z.array(z.unknown()).optional(),
   defaultTab: songDefaultTabSchema.optional(),
+  events: z.array(songEventSchema).optional(),
   id: z.string(),
   language: songLanguageSchema.optional(),
   lyricsCanvasPaths: z.array(z.unknown()).optional(),
-  midiButtonTriggers: z.array(midiButtonTriggerSchema).optional(),
   midiEvents: z.array(midiEventSchema).optional(),
   textNotesCanvasPaths: z.array(z.unknown()).optional(),
 });

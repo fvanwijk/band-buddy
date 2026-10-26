@@ -9,7 +9,7 @@ import {
   useTable,
 } from 'tinybase/ui-react';
 
-import { songDefaultTabSchema, songSchema } from '../schemas';
+import { songDefaultTabSchema, songEventSchema, songSchema } from '../schemas';
 import type { Song } from '../types';
 
 export type SongCanvasType = 'lyrics' | 'textNotes';
@@ -21,6 +21,27 @@ const parseCanvasPaths = (value: unknown) => {
 
   try {
     return JSON.parse(value);
+  } catch {
+    return undefined;
+  }
+};
+
+// Invalid events are dropped so a single corrupted event doesn't make the whole song unavailable
+const parseSongEvents = (value: unknown) => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!Array.isArray(parsed)) {
+      return undefined;
+    }
+
+    return parsed.flatMap((event) => {
+      const result = songEventSchema.safeParse(event);
+      return result.success ? [result.data] : [];
+    });
   } catch {
     return undefined;
   }
@@ -64,13 +85,9 @@ export function parseSongRow(
     }
   }
 
-  // Parse midiButtonTriggers if stored as JSON string
-  if (typeof songRow.midiButtonTriggers === 'string') {
-    try {
-      parsedData.midiButtonTriggers = JSON.parse(songRow.midiButtonTriggers);
-    } catch {
-      parsedData.midiButtonTriggers = undefined;
-    }
+  // Parse events if stored as JSON string
+  if (typeof songRow.events === 'string') {
+    parsedData.events = parseSongEvents(songRow.events);
   }
 
   parsedData.canvasPaths = parseCanvasPaths(songRow.canvasPaths);
@@ -115,13 +132,9 @@ export function useGetSongs(
           parsedData.midiEvents = undefined;
         }
       }
-      // Parse midiButtonTriggers if stored as JSON string
-      if (typeof songData.midiButtonTriggers === 'string') {
-        try {
-          parsedData.midiButtonTriggers = JSON.parse(songData.midiButtonTriggers);
-        } catch {
-          parsedData.midiButtonTriggers = undefined;
-        }
+      // Parse events if stored as JSON string
+      if (typeof songData.events === 'string') {
+        parsedData.events = parseSongEvents(songData.events);
       }
       parsedData.canvasPaths = parseCanvasPaths(songData.canvasPaths);
       parsedData.lyricsCanvasPaths = parseCanvasPaths(songData.lyricsCanvasPaths);
@@ -183,10 +196,10 @@ export function useAddSong(onSuccess?: (id: string) => void) {
         delete finalData.midiEvents;
       }
 
-      if (data.midiButtonTriggers && data.midiButtonTriggers.length > 0) {
-        finalData.midiButtonTriggers = JSON.stringify(data.midiButtonTriggers);
+      if (data.events && data.events.length > 0) {
+        finalData.events = JSON.stringify(data.events);
       } else {
-        delete finalData.midiButtonTriggers;
+        delete finalData.events;
       }
 
       Object.entries(finalData).forEach(([key, value]) => {
@@ -225,10 +238,10 @@ export function useUpdateSong(id: string, onSuccess?: () => void) {
         delete finalData.midiEvents;
       }
 
-      if (data.midiButtonTriggers && data.midiButtonTriggers.length > 0) {
-        finalData.midiButtonTriggers = JSON.stringify(data.midiButtonTriggers);
+      if (data.events && data.events.length > 0) {
+        finalData.events = JSON.stringify(data.events);
       } else {
-        delete finalData.midiButtonTriggers;
+        delete finalData.events;
       }
 
       if (data.canvasPaths && data.canvasPaths.length > 0) {

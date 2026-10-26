@@ -142,16 +142,17 @@ describe('SongForm', () => {
         bpm: 120,
         canvasPaths: [],
         duration: 83,
-        key: 'Ab',
-        lyrics: 'Is this the real life? Is this just fantasy?',
-        midiButtonTriggers: [
+        events: [
           expect.objectContaining({
             beat: 1,
             id: expect.any(String),
             measure: 1,
             midiEventId: expect.any(String),
+            type: 'midiButton',
           }),
         ],
+        key: 'Ab',
+        lyrics: 'Is this the real life? Is this just fantasy?',
         midiEvents: [
           {
             events: [{ instrumentId: '0', programChange: 0, type: 'programChange' }],

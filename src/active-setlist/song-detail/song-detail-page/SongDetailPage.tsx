@@ -162,7 +162,7 @@ export function SongDetailPage() {
 
       lastAutoTriggerPositionRef.current = triggerPosition;
 
-      const triggers = currentSong.midiButtonTriggers || [];
+      const triggers = (currentSong.events || []).filter((event) => event.type === 'midiButton');
       triggers.forEach((trigger) => {
         if (trigger.beat !== beat || trigger.measure !== measure) {
           return;
@@ -176,7 +176,7 @@ export function SongDetailPage() {
         handleTriggerMidiEvent(midiEvent);
       });
     },
-    [currentSong.midiButtonTriggers, handleTriggerMidiEvent, midiEventsById],
+    [currentSong.events, handleTriggerMidiEvent, midiEventsById],
   );
 
   useEffect(() => {

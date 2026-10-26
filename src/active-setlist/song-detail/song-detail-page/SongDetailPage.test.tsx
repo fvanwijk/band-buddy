@@ -54,12 +54,13 @@ describe('SongDetailPage', () => {
       const targetMidiEvent = midiEvents.find((event) => event.label === 'Organ') ?? midiEvents[0];
 
       store.setPartialRow('songs', '0', {
-        midiButtonTriggers: JSON.stringify([
+        events: JSON.stringify([
           {
             beat: 1,
             id: 'trigger-1',
             measure: 1,
             midiEventId: targetMidiEvent.id,
+            type: 'midiButton',
           },
         ]),
       });

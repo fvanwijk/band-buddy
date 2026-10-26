@@ -1,17 +1,19 @@
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 
-import type { MidiButtonTrigger, MidiEvent } from '../../../types';
+import type { MidiButtonEvent, MidiEvent } from '../../../types';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 import { InputField } from '../../../ui/form/InputField';
 import { SelectField } from '../../../ui/form/SelectField';
 
+type MidiButtonTriggerInput = Omit<MidiButtonEvent, 'id' | 'type'>;
+
 type MidiButtonTriggersFormSectionProps = {
-  midiButtonTriggers?: MidiButtonTrigger[];
+  midiButtonTriggers?: MidiButtonEvent[];
   midiEvents?: MidiEvent[];
-  onAddMidiButtonTrigger?: (trigger: Omit<MidiButtonTrigger, 'id'>) => void;
+  onAddMidiButtonTrigger?: (trigger: MidiButtonTriggerInput) => void;
   onDeleteMidiButtonTrigger?: (triggerId: string) => void;
-  onEditMidiButtonTrigger?: (triggerId: string, trigger: Omit<MidiButtonTrigger, 'id'>) => void;
+  onEditMidiButtonTrigger?: (triggerId: string, trigger: MidiButtonTriggerInput) => void;
 };
 
 export function MidiButtonTriggersFormSection({

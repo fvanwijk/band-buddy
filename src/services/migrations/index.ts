@@ -5,6 +5,7 @@ import { CURRENT_BACKUP_VERSION, resolvePersistedStoreVersion } from './persiste
 import { migrateV1ToV2 } from './v1-to-v2/migration';
 import { migrateV2ToV3 } from './v2-to-v3/migration';
 import { migrateV3ToV4 } from './v3-to-v4/migration';
+import { migrateV4ToV5 } from './v4-to-v5/migration';
 
 const CURRENT_VERSION = CURRENT_BACKUP_VERSION;
 
@@ -136,6 +137,11 @@ export function migrateBackup(
     if (inputVersion <= 3 && CURRENT_VERSION >= 4) {
       const result = migrateV3ToV4(current);
       current = { tables: result.tables, values: result.values, version: 4 };
+    }
+
+    if (inputVersion <= 4 && CURRENT_VERSION >= 5) {
+      const result = migrateV4ToV5(current);
+      current = { tables: result.tables, values: result.values, version: 5 };
     }
 
     // Final parse and normalize
