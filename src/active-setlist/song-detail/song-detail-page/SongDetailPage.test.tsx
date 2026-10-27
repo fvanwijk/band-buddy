@@ -37,7 +37,9 @@ describe('SongDetailPage', () => {
     hideEmptyTabs = false,
     isSupported = true,
     tab,
+    triggerState,
     withAutoMidiButtonTrigger = false,
+    withSongChangeButton = false,
   }: {
     clearedSongCells?: string[];
     defaultTab?: 'lyrics' | 'midi' | 'text-notes' | 'sheet-music';
@@ -45,7 +47,9 @@ describe('SongDetailPage', () => {
     isSupported?: boolean;
     songCells?: Record<string, string>;
     tab?: string;
+    triggerState?: { triggerMidi: boolean };
     withAutoMidiButtonTrigger?: boolean;
+    withSongChangeButton?: boolean;
   } = {}) => {
     const sendProgramChangeMock = vi.fn();
     const { store, persister } = getMockStore();
@@ -78,6 +82,13 @@ describe('SongDetailPage', () => {
         ]),
       });
     }
+    if (withSongChangeButton) {
+      const songRow = store.getRow('songs', '0') as Record<string, unknown>;
+      const midiEvents = (JSON.parse(String(songRow.midiEvents)) as Array<{ label: string }>).map(
+        (event) => (event.label === 'Organ' ? { ...event, triggerOnSongChange: true } : event),
+      );
+      store.setPartialRow('songs', '0', { midiEvents: JSON.stringify(midiEvents) });
+    }
     store.setValue('activeSetlistId', '1');
     await persister.save();
 
@@ -98,7 +109,7 @@ describe('SongDetailPage', () => {
 
     const route = tab ? `/play/0/0/${tab}` : '/play/0/0';
 
-    render(<RoutesStub initialEntries={[route]} />, {
+    render(<RoutesStub initialEntries={[{ pathname: route, state: triggerState }]} />, {
       wrapper: ({ children }) => (
         <StoreProvider>
           <MidiEventLogProvider>{children}</MidiEventLogProvider>
@@ -114,6 +125,25 @@ describe('SongDetailPage', () => {
 
     expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'September' })).toHaveAttribute('href', '/play/0/1');
+  });
+
+  it('sends song change MIDI buttons when the song was selected explicitly', async () => {
+    const { sendProgramChangeMock } = await renderComponent({
+      triggerState: { triggerMidi: true },
+      withSongChangeButton: true,
+    });
+
+    await waitFor(() => {
+      expect(sendProgramChangeMock).toHaveBeenCalledWith(12, { channels: [1] });
+    });
+    expect(sendProgramChangeMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not send song change MIDI buttons without the explicit selection state', async () => {
+    const { sendProgramChangeMock } = await renderComponent({ withSongChangeButton: true });
+
+    expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
+    expect(sendProgramChangeMock).not.toHaveBeenCalled();
   });
 
   it('toggles metronome button title when clicked', async () => {

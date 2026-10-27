@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import type { Song } from '../types';
 import { FormattedDuration } from './FormattedDuration';
+import { songChangeTriggerState } from './song-detail/song-detail-page/songChangeTrigger';
 import { SongContentIndicators } from './SongContentIndicators';
 
 type SongRowProps = {
@@ -21,6 +22,7 @@ export function SongRow({ index, setlistId, setlistSongId, song }: SongRowProps)
     <li>
       <Link
         className="grid cursor-pointer grid-cols-[25px_4fr_75px] gap-4 px-6 py-2 text-sm text-slate-200 transition hover:bg-slate-900/80 sm:grid-cols-[25px_6fr_2fr_2fr_2fr]"
+        state={songChangeTriggerState}
         to={setlistId ? `/play/${setlistId}/${setlistSongId}` : '#'}
       >
         <span className="text-right text-slate-500">{index}</span>

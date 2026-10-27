@@ -29,6 +29,7 @@ export const midiEventActionSchema = z.union([
 export const midiEventBaseSchema = z.object({
   events: z.array(midiEventActionSchema).min(1),
   label: z.string(),
+  triggerOnSongChange: z.boolean().optional(),
 });
 export const midiEventSchema = midiEventBaseSchema.extend({ id: z.string() });
 

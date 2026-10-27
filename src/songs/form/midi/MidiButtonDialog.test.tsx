@@ -64,6 +64,23 @@ describe('MidiButtonDialog', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('submits the trigger on song change option', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+
+    renderComponent({ onSubmit });
+
+    await user.type(screen.getByLabelText('Button label*'), 'Auto');
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Trigger automatically when switching to this song' }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Add button' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ label: 'Auto', triggerOnSongChange: true }),
+    );
+  });
+
   it('renders edit mode and updates an existing MIDI button', async () => {
     const user = userEvent.setup();
 

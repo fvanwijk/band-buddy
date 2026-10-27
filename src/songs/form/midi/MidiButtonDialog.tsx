@@ -4,6 +4,7 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import type { Instrument, MidiEvent, MidiEventAction } from '../../../types';
 import { Button } from '../../../ui/Button';
+import { Checkbox } from '../../../ui/Checkbox';
 import { Dialog } from '../../../ui/Dialog';
 import { InputField } from '../../../ui/form/InputField';
 import { MidiEventRow } from './MidiEventRow';
@@ -79,6 +80,7 @@ export function MidiButtonDialog({
     defaultValues: {
       events: initialData?.events || [getDefaultMidiEvent(instruments[0]?.id || '')],
       label: initialData?.label || '',
+      triggerOnSongChange: initialData?.triggerOnSongChange || false,
     },
     mode: 'all',
   });
@@ -103,13 +105,16 @@ export function MidiButtonDialog({
     reset({
       events: initialData?.events || [getDefaultMidiEvent(instruments[0]?.id || '')],
       label: initialData?.label || '',
+      triggerOnSongChange: initialData?.triggerOnSongChange || false,
     });
   }, [initialData, instruments, isOpen, reset]);
 
   const handleAdd = (data: FormData) => {
+    const { triggerOnSongChange, ...rest } = data;
     onSubmit({
-      ...data,
+      ...rest,
       events: data.events.map((action) => normalizeMidiAction(action)),
+      ...(triggerOnSongChange ? { triggerOnSongChange: true } : {}),
     });
     onClose();
   };
@@ -139,6 +144,11 @@ export function MidiButtonDialog({
             placeholder="e.g., Verse, Chorus, Bridge"
             {...register('label', { required: 'Label is required' })}
             required
+          />
+
+          <Checkbox
+            label="Trigger automatically when switching to this song"
+            {...register('triggerOnSongChange')}
           />
 
           <div className="space-y-3">

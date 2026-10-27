@@ -3,6 +3,7 @@ import { IconPencil, IconPlayerPlay } from '@tabler/icons-react';
 import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import type { Instrument, MidiEvent } from '../../../types';
+import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { DeleteButton } from '../../../ui/DeleteButton';
 import { ListItem } from '../../../ui/ListItem';
@@ -101,7 +102,10 @@ export function MidiButtonCard({
         </>
       }
     >
-      <p className="font-medium text-slate-200">{event.label}</p>
+      <p className="flex items-center gap-2 font-medium text-slate-200">
+        {event.label}
+        {event.triggerOnSongChange && <Badge>On song change</Badge>}
+      </p>
       <div className="space-y-1 text-xs text-slate-500">
         {event.events.map((action, index) => {
           const instrument = instruments.find((inst) => inst.id === action.instrumentId);

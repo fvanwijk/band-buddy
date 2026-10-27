@@ -43,7 +43,5 @@ export async function songDetailIndexLoader({ params }: LoaderFunctionArgs) {
     return redirect('/'); // TODO 404
   }
 
-  const defaultTab = await getDefaultSongTab(setlistId, setlistSongId);
-
-  return redirect(`/play/${setlistId}/${setlistSongId}/${defaultTab}`);
+  return getDefaultSongTab(setlistId, setlistSongId);
 }

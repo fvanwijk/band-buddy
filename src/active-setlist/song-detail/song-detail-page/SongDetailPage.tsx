@@ -1,6 +1,6 @@
 import { IconArrowLeft, IconArrowRight, IconEyeOff, IconMicrophone2Off } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../../api/useInstruments';
 import { useGetSetlist } from '../../../api/useSetlist';
@@ -29,6 +29,7 @@ import { SettingsPanel } from '../settings-panel/SettingsPanel';
 import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
 import { SongStats } from '../song-stats/SongStats';
 import { TextNotesBlock } from '../text-notes/TextNotesBlock';
+import { hasSongChangeTrigger, songChangeTriggerState } from './songChangeTrigger';
 
 export function SongDetailPage() {
   const midiEventHighlightTimeoutRef = useRef<number | null>(null);
@@ -38,6 +39,8 @@ export function SongDetailPage() {
     tab: string;
   }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const shouldTriggerOnSongChange = hasSongChangeTrigger(location.state);
 
   const setlist = useGetSetlist(setlistId!);
   const instruments = useGetInstruments();
@@ -50,6 +53,7 @@ export function SongDetailPage() {
   const [zoom, setZoom] = useState(1);
   const [highlightedMidiEventId, setHighlightedMidiEventId] = useState<string | null>(null);
   const lastAutoTriggerPositionRef = useRef<string | null>(null);
+  const lastSongChangeTriggerRef = useRef<string | null>(null);
 
   // Create songs map
   const songsMap = new Map(songs.map((song) => [song.id, song]));
@@ -185,6 +189,32 @@ export function SongDetailPage() {
     [currentSong.events, handleTriggerMidiEvent, midiEventsById],
   );
 
+  // Send "trigger on song change" buttons when the song was explicitly selected (setlist click,
+  // next/prev), as soon as MIDI is available. Not when returning from editing or reloading.
+  useEffect(() => {
+    if (!shouldTriggerOnSongChange || !isSupported || !isReady) {
+      return;
+    }
+
+    if (lastSongChangeTriggerRef.current !== setlistSongId) {
+      lastSongChangeTriggerRef.current = setlistSongId ?? null;
+      (currentSong.midiEvents || [])
+        .filter((event) => event.triggerOnSongChange)
+        .forEach(handleTriggerMidiEvent);
+    }
+
+    void navigate(location, { replace: true, state: null });
+  }, [
+    currentSong.midiEvents,
+    handleTriggerMidiEvent,
+    isReady,
+    isSupported,
+    location,
+    navigate,
+    setlistSongId,
+    shouldTriggerOnSongChange,
+  ]);
+
   useEffect(() => {
     return () => {
       if (midiEventHighlightTimeoutRef.current !== null) {
@@ -315,6 +345,7 @@ export function SongDetailPage() {
                 className="h-16 flex-1"
                 color="primary"
                 iconStart={<IconArrowLeft className="h-4 w-4" />}
+                state={songChangeTriggerState}
                 to={`/play/${setlistId}/${previousEntry.setlistSongId}`}
                 variant="outlined"
               >
@@ -327,6 +358,7 @@ export function SongDetailPage() {
                 className="col-start-2 h-16 flex-1"
                 color="primary"
                 iconEnd={<IconArrowRight className="h-4 w-4" />}
+                state={songChangeTriggerState}
                 to={`/play/${setlistId}/${nextEntry.setlistSongId}`}
                 variant="outlined"
               >

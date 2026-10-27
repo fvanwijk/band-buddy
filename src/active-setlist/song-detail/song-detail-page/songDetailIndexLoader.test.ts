@@ -11,16 +11,15 @@ const createLoaderArgs = (setlistSongId: string, setlistId = '0') =>
   }) as unknown as LoaderFunctionArgs;
 
 describe('songDetailIndexLoader', () => {
-  it('redirects to lyrics when no default tab is stored', async () => {
+  it('returns lyrics when no default tab is stored', async () => {
     localStorage.removeItem('band-buddy');
 
-    const response = (await songDetailIndexLoader(createLoaderArgs('0_0_3'))) as Response;
+    const tab = await songDetailIndexLoader(createLoaderArgs('0_0_3'));
 
-    expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/play/0/0_0_3/lyrics');
+    expect(tab).toBe('lyrics');
   });
 
-  it('redirects to stored default tab for the song', async () => {
+  it('returns stored default tab for the song', async () => {
     localStorage.setItem(
       'band-buddy',
       JSON.stringify([
@@ -48,10 +47,9 @@ describe('songDetailIndexLoader', () => {
       ]),
     );
 
-    const response = (await songDetailIndexLoader(createLoaderArgs('0_0_3'))) as Response;
+    const tab = await songDetailIndexLoader(createLoaderArgs('0_0_3'));
 
-    expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/play/0/0_0_3/midi');
+    expect(tab).toBe('midi');
   });
 
   it('falls back to lyrics when stored tab is invalid', async () => {
@@ -69,10 +67,9 @@ describe('songDetailIndexLoader', () => {
       ]),
     );
 
-    const response = (await songDetailIndexLoader(createLoaderArgs('0_0_3'))) as Response;
+    const tab = await songDetailIndexLoader(createLoaderArgs('0_0_3'));
 
-    expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/play/0/0_0_3/lyrics');
+    expect(tab).toBe('lyrics');
   });
 
   it('maps legacy details value to lyrics', async () => {
@@ -103,9 +100,8 @@ describe('songDetailIndexLoader', () => {
       ]),
     );
 
-    const response = (await songDetailIndexLoader(createLoaderArgs('0_0_3'))) as Response;
+    const tab = await songDetailIndexLoader(createLoaderArgs('0_0_3'));
 
-    expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/play/0/0_0_3/lyrics');
+    expect(tab).toBe('lyrics');
   });
 });
