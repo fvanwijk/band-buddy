@@ -80,7 +80,7 @@ export function MidiButtonDialog({
     defaultValues: {
       events: initialData?.events || [getDefaultMidiEvent(instruments[0]?.id || '')],
       label: initialData?.label || '',
-      triggerOnSongChange: initialData?.triggerOnSongChange || false,
+      triggerOnSongChange: initialData?.triggerOnSongChange || true,
     },
     mode: 'all',
   });
