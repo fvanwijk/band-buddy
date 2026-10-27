@@ -40,6 +40,7 @@ export function MetronomeControl({
   songTitle,
   timeSignature,
 }: MetronomeControlProps) {
+  const hasBpm = !!bpm;
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
   const [isAnnouncing, setIsAnnouncing] = useState(false);
   const [metronomePulseKey, setMetronomePulseKey] = useState(0);
@@ -55,10 +56,6 @@ export function MetronomeControl({
     },
     [],
   );
-
-  if (!bpm) {
-    return null;
-  }
 
   const metronomeOutput = useMemo(() => {
     if (!isSupported || !isReady || outputs.length === 0) {
@@ -79,16 +76,20 @@ export function MetronomeControl({
   };
 
   const { currentBeat, currentMeasure } = useSequencerTransport({
-    bpm,
+    bpm: bpm ?? 0,
     events,
-    isRunning: isMetronomeRunning,
+    isRunning: hasBpm && isMetronomeRunning,
     metronomeVolume,
     midiOutput: metronomeOutput,
     onBeatChange,
     onCue: handleCue,
-    preCountVolume,
+    preCountVolume: hasBpm ? preCountVolume : 0,
     timeSignature,
   });
+
+  if (!bpm) {
+    return null;
+  }
 
   const beatDurationSeconds = 60 / bpm;
   const isActive = isMetronomeRunning || isAnnouncing;
