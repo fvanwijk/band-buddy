@@ -7,6 +7,7 @@ import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
 import type { SpeechLanguage } from '../hooks/speechVoices';
 import {
   hasSeenWelcomeSchema,
+  hideEmptyTabsSchema,
   localeSchema,
   metronomeVolumeSchema,
   preCountVolumeSchema,
@@ -151,6 +152,22 @@ export function useSetTtsVoice(language: SpeechLanguage) {
     },
     [language, store],
   );
+}
+
+/**
+ * Hook to get whether empty song detail tabs are hidden
+ */
+export function useGetHideEmptyTabs(): boolean {
+  const hide = useValue('hideEmptyTabs');
+  const result = hideEmptyTabsSchema.safeParse(hide);
+  return result.success ? result.data : false;
+}
+
+/**
+ * Hook to set whether empty song detail tabs are hidden
+ */
+export function useSetHideEmptyTabs() {
+  return useSetValueCallback('hideEmptyTabs', (hide: boolean) => hide, []);
 }
 
 /**

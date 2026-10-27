@@ -3,7 +3,12 @@ import { IconAdjustments } from '@tabler/icons-react';
 import { useState } from 'react';
 import { usePopper } from 'react-popper';
 
-import { useGetShowDrawingTools, useSetShowDrawingTools } from '../../../api/useSettings';
+import {
+  useGetHideEmptyTabs,
+  useGetShowDrawingTools,
+  useSetHideEmptyTabs,
+  useSetShowDrawingTools,
+} from '../../../api/useSettings';
 import { useUpdateSong } from '../../../api/useSong';
 import { useMidiEventLogContext } from '../../../contexts/MidiEventLogContext';
 import { Grid } from '../../../settings/Grid';
@@ -28,6 +33,8 @@ type SongDefaultTab = NonNullable<Song['defaultTab']>;
 export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) {
   const updateSong = useUpdateSong(song.id);
   const { isOpen: isMidiEventLogOpen, setIsOpen: setIsMidiEventLogOpen } = useMidiEventLogContext();
+  const hideEmptyTabs = useGetHideEmptyTabs();
+  const setHideEmptyTabs = useSetHideEmptyTabs();
   const showDrawingTools = useGetShowDrawingTools();
   const setShowDrawingTools = useSetShowDrawingTools();
   const transpose = song.transpose ?? 0;
@@ -107,6 +114,12 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               onChange={(event) => handleDefaultTabChange(event.target.value as SongDefaultTab)}
               options={defaultTabOptions}
               value={song.defaultTab || 'auto'}
+            />
+            <Checkbox
+              checked={hideEmptyTabs}
+              className="mt-3"
+              label="Hide empty tabs"
+              onChange={(event) => setHideEmptyTabs(event.target.checked)}
             />
           </GridCell>
           <GridCell className="p-3">

@@ -28,13 +28,19 @@ vi.mock('../../../midi/useMidiDevices', () => ({
 }));
 
 describe('SongDetailPage', () => {
+  const allSongDataCells = ['lyrics', 'midiEvents', 'notes', 'sheetMusicFilename'];
+
   const renderComponent = async ({
+    clearedSongCells = [],
     defaultTab,
+    hideEmptyTabs = false,
     isSupported = true,
     tab,
     withAutoMidiButtonTrigger = false,
   }: {
+    clearedSongCells?: string[];
     defaultTab?: 'lyrics' | 'midi' | 'text-notes' | 'sheet-music';
+    hideEmptyTabs?: boolean;
     isSupported?: boolean;
     tab?: string;
     withAutoMidiButtonTrigger?: boolean;
@@ -45,6 +51,10 @@ describe('SongDetailPage', () => {
     if (defaultTab) {
       store.setPartialRow('songs', '0', { defaultTab });
     }
+    if (hideEmptyTabs) {
+      store.setValue('hideEmptyTabs', true);
+    }
+    clearedSongCells.forEach((cell) => store.delCell('songs', '0', cell));
     if (withAutoMidiButtonTrigger) {
       const songRow = store.getRow('songs', '0') as Record<string, unknown>;
       const midiEvents = JSON.parse(String(songRow.midiEvents)) as Array<{
@@ -136,6 +146,26 @@ describe('SongDetailPage', () => {
     expect(
       await screen.findByRole('tab', { name: 'Text notes', selected: true }),
     ).toBeInTheDocument();
+  });
+
+  it('hides tabs without data when hide empty tabs is enabled', async () => {
+    await renderComponent({ clearedSongCells: ['sheetMusicFilename'], hideEmptyTabs: true });
+
+    expect(await screen.findByRole('tab', { name: 'Lyrics' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Sheet Music' })).not.toBeInTheDocument();
+  });
+
+  it('shows an empty state when hide empty tabs is enabled and no tab has data', async () => {
+    await renderComponent({ clearedSongCells: allSongDataCells, hideEmptyTabs: true });
+
+    expect(await screen.findByText(/No tabs with data/)).toBeInTheDocument();
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+  });
+
+  it('shows all tabs when hide empty tabs is disabled and no tab has data', async () => {
+    await renderComponent({ clearedSongCells: allSongDataCells });
+
+    expect(await screen.findAllByRole('tab')).toHaveLength(4);
   });
 
   it('highlights triggered MIDI button and fades in 1.5 seconds', async () => {

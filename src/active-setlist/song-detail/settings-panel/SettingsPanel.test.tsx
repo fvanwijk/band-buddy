@@ -110,6 +110,19 @@ describe('SettingsPanel', () => {
     });
   });
 
+  it('updates hide empty tabs setting when checkbox is toggled', async () => {
+    const user = userEvent.setup();
+    await renderComponent(songWithAllSettings);
+
+    await user.click(screen.getByTitle('Settings'));
+    expect(screen.getByRole('checkbox', { name: 'Hide empty tabs' })).not.toBeChecked();
+    await user.click(screen.getByRole('checkbox', { name: 'Hide empty tabs' }));
+
+    await waitFor(() => {
+      expect(getPersistedStore()).toContain('"hideEmptyTabs":true');
+    });
+  });
+
   it('updates default tab when select field changes', async () => {
     const user = userEvent.setup();
     await renderComponent(songWithAllSettings);

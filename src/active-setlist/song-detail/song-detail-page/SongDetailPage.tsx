@@ -1,10 +1,14 @@
-import { IconArrowLeft, IconArrowRight, IconMicrophone2Off } from '@tabler/icons-react';
+import { IconArrowLeft, IconArrowRight, IconEyeOff, IconMicrophone2Off } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../../api/useInstruments';
 import { useGetSetlist } from '../../../api/useSetlist';
-import { useGetMetronomeVolume, useGetPreCountVolume } from '../../../api/useSettings';
+import {
+  useGetHideEmptyTabs,
+  useGetMetronomeVolume,
+  useGetPreCountVolume,
+} from '../../../api/useSettings';
 import { useGetSongs } from '../../../api/useSong';
 import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
@@ -36,6 +40,7 @@ export function SongDetailPage() {
 
   const setlist = useGetSetlist(setlistId!);
   const instruments = useGetInstruments();
+  const hideEmptyTabs = useGetHideEmptyTabs();
   const metronomeVolume = useGetMetronomeVolume();
   const preCountVolume = useGetPreCountVolume();
   const songs = useGetSongs();
@@ -199,6 +204,63 @@ export function SongDetailPage() {
     void navigate(`/play/${setlistId}/${setlistSongId}/${tabId}`);
   };
 
+  const hasLyrics = !!currentSong.lyrics && currentSong.lyrics.trim().length > 0;
+  const hasSheetMusic = !!currentSong.sheetMusicFilename;
+  const hasNotes = !!currentSong.notes && currentSong.notes.trim().length > 0;
+  const hasMidiEvents = !!currentSong.midiEvents && currentSong.midiEvents.length > 0;
+
+  const allTabs = [
+    {
+      content:
+        currentSong.lyrics && currentSong.lyrics.trim().length > 0 ? (
+          <DrawingOverlay canvasType="lyrics" songId={currentSongId} zoom={zoom}>
+            <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
+          </DrawingOverlay>
+        ) : (
+          <EmptyStateBlock icon={<IconMicrophone2Off className="h-8 w-8" />}>
+            No lyrics added yet
+          </EmptyStateBlock>
+        ),
+      hasData: hasLyrics,
+      id: 'lyrics',
+      label: 'Lyrics',
+    },
+    {
+      content: (
+        <SheetMusicTab sheetMusicFilename={currentSong.sheetMusicFilename} songId={currentSongId} />
+      ),
+      hasData: hasSheetMusic,
+      id: 'sheet-music',
+      label: 'Sheet Music',
+    },
+    {
+      content: (
+        <div className="flex h-[calc(100dvh-311px)] flex-col">
+          <DrawingOverlay canvasType="textNotes" songId={currentSongId} zoom={zoom}>
+            <TextNotesBlock notes={currentSong.notes} />
+          </DrawingOverlay>
+        </div>
+      ),
+      hasData: hasNotes,
+      id: 'text-notes',
+      label: 'Text notes',
+    },
+    {
+      content: (
+        <MidiButtonsDisplay
+          highlightedMidiEventId={highlightedMidiEventId}
+          isDisabled={isMidiButtonDisabled}
+          midiEvents={currentSong.midiEvents}
+          onTriggerEvent={handleTriggerMidiEvent}
+        />
+      ),
+      hasData: hasMidiEvents,
+      id: 'midi',
+      label: 'MIDI buttons',
+    },
+  ];
+  const visibleTabs = hideEmptyTabs ? allTabs.filter(({ hasData }) => hasData) : allTabs;
+
   const toolbar = (
     <div className="flex items-center gap-4">
       <MetronomeControl
@@ -235,59 +297,14 @@ export function SongDetailPage() {
           subtitle={currentSong.artist}
         />
 
-        <Tabs
-          activeTabId={selectedTab}
-          onTabChange={handleTabChange}
-          tabs={[
-            {
-              content:
-                currentSong.lyrics && currentSong.lyrics.trim().length > 0 ? (
-                  <DrawingOverlay canvasType="lyrics" songId={currentSongId} zoom={zoom}>
-                    <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
-                  </DrawingOverlay>
-                ) : (
-                  <EmptyStateBlock icon={<IconMicrophone2Off className="h-8 w-8" />}>
-                    No lyrics added yet
-                  </EmptyStateBlock>
-                ),
-              id: 'lyrics',
-              label: 'Lyrics',
-            },
-            {
-              content: (
-                <SheetMusicTab
-                  sheetMusicFilename={currentSong.sheetMusicFilename}
-                  songId={currentSongId}
-                />
-              ),
-              id: 'sheet-music',
-              label: 'Sheet Music',
-            },
-            {
-              content: (
-                <div className="flex h-[calc(100dvh-311px)] flex-col">
-                  <DrawingOverlay canvasType="textNotes" songId={currentSongId} zoom={zoom}>
-                    <TextNotesBlock notes={currentSong.notes} />
-                  </DrawingOverlay>
-                </div>
-              ),
-              id: 'text-notes',
-              label: 'Text notes',
-            },
-            {
-              content: (
-                <MidiButtonsDisplay
-                  highlightedMidiEventId={highlightedMidiEventId}
-                  isDisabled={isMidiButtonDisabled}
-                  midiEvents={currentSong.midiEvents}
-                  onTriggerEvent={handleTriggerMidiEvent}
-                />
-              ),
-              id: 'midi',
-              label: 'MIDI buttons',
-            },
-          ]}
-        />
+        {visibleTabs.length > 0 ? (
+          <Tabs activeTabId={selectedTab} onTabChange={handleTabChange} tabs={visibleTabs} />
+        ) : (
+          <EmptyStateBlock icon={<IconEyeOff className="h-8 w-8" />}>
+            No tabs with data. Add lyrics, sheet music, notes or MIDI buttons, or disable "Hide
+            empty tabs" in the settings.
+          </EmptyStateBlock>
+        )}
 
         <nav className="fixed bottom-0 left-0 z-10 w-full bg-slate-950">
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 border-t border-slate-800 p-4">
