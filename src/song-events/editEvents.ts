@@ -107,3 +107,22 @@ export const moveEventGroup = (events: SongEvent[], from: EventPosition, to: Eve
     isAtFrom(event) ? ({ ...event, ...target } as SongEvent) : event,
   );
 };
+
+/**
+ * Moves a single event. A tempo or time signature change snaps to beat 1 of the measure and
+ * can't be moved to the first measure.
+ */
+export const moveSongEvent = (events: SongEvent[], id: string, to: EventPosition): SongEvent[] => {
+  const event = events.find((item) => item.id === id);
+  if (!event) {
+    return events;
+  }
+
+  if (isChangeEvent(event)) {
+    return to.measure === 1
+      ? events
+      : events.map((item) => (item.id === id ? { ...event, beat: 1, measure: to.measure } : item));
+  }
+
+  return events.map((item) => (item.id === id ? { ...event, ...to } : item));
+};

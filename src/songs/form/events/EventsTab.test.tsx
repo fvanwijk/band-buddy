@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import type { FC } from 'react';
@@ -258,5 +258,358 @@ describe('EventsTab', () => {
     render(<EventsTab events={[]} midiEvents={[]} onEventsChange={vi.fn()} timeSignature="4/4" />);
 
     expect(screen.getByText(/Set a BPM on the song details tab/)).toBeInTheDocument();
+  });
+
+  describe('timeline view', () => {
+    const openTimeline = async (props: HarnessProps = {}) => {
+      const user = userEvent.setup();
+      renderComponent(props);
+      await user.click(screen.getByRole('button', { name: 'Timeline' }));
+      return user;
+    };
+
+    const getMeasure = (measure: number) =>
+      within(screen.getByRole('group', { name: `Measure ${measure}` }));
+
+    // jsdom has no drag and drop, so the events are fired with a minimal data transfer
+    const createDataTransfer = () => {
+      const data: Record<string, string> = {};
+      return {
+        effectAllowed: '',
+        getData: (type: string) => data[type],
+        setData: (type: string, value: string) => {
+          data[type] = value;
+        },
+      };
+    };
+
+    const drag = (chip: HTMLElement, target: HTMLElement) => {
+      const dataTransfer = createDataTransfer();
+
+      fireEvent.dragStart(chip, { dataTransfer });
+      fireEvent.dragOver(target, { dataTransfer });
+      fireEvent.drop(target, { dataTransfer });
+    };
+
+    const getMeasureElement = (measure: number) =>
+      screen.getByRole('group', { name: `Measure ${measure}` });
+    const getBeatElement = (measure: number, beat: number) =>
+      screen.getByRole('button', { name: `Select measure ${measure}, beat ${beat}` });
+
+    describe('drop zones', () => {
+      const dragStart = (chip: HTMLElement) =>
+        fireEvent.dragStart(chip, { dataTransfer: createDataTransfer() });
+
+      it('shows the beats as drop zones while dragging a cue or MIDI button', async () => {
+        await openTimeline({
+          initialEvents: [
+            createCueEvent({ beat: 2, id: 'cue', measure: 2, text: 'Verse' }),
+            createMidiButtonEvent({ beat: 1, id: 'midi', measure: 3, midiEventId: '1' }),
+          ],
+        });
+
+        expect(getBeatElement(5, 3)).not.toHaveAttribute('data-drop-zone');
+
+        dragStart(getMeasure(2).getByRole('button', { name: '2 · Verse' }));
+
+        expect(getBeatElement(5, 3)).toHaveAttribute('data-drop-zone', 'true');
+        expect(getBeatElement(1, 1)).toHaveAttribute('data-drop-zone', 'true');
+        expect(getMeasureElement(5)).not.toHaveAttribute('data-drop-zone');
+
+        fireEvent.dragEnd(getMeasure(2).getByRole('button', { name: '2 · Verse' }));
+        expect(getBeatElement(5, 3)).not.toHaveAttribute('data-drop-zone');
+
+        dragStart(getMeasure(3).getByRole('button', { name: '1 · Piano' }));
+        expect(getBeatElement(5, 3)).toHaveAttribute('data-drop-zone', 'true');
+      });
+
+      it('shows the measures as drop zones while dragging a change, except the first', async () => {
+        await openTimeline({
+          initialEvents: [createTempoChangeEvent({ bpm: 100, measure: 3 })],
+        });
+
+        dragStart(getMeasure(3).getByRole('button', { name: '100 BPM' }));
+
+        expect(getMeasureElement(2)).toHaveAttribute('data-drop-zone', 'true');
+        expect(getMeasureElement(8)).toHaveAttribute('data-drop-zone', 'true');
+        expect(getMeasureElement(1)).not.toHaveAttribute('data-drop-zone');
+        expect(getBeatElement(5, 3)).not.toHaveAttribute('data-drop-zone');
+      });
+
+      it('highlights the drop zone under the pointer', async () => {
+        await openTimeline({
+          initialEvents: [
+            createCueEvent({ id: 'cue', measure: 2, text: 'Verse' }),
+            createTempoChangeEvent({ bpm: 100, measure: 3 }),
+          ],
+        });
+        const dataTransfer = createDataTransfer();
+
+        fireEvent.dragStart(getMeasure(2).getByRole('button', { name: '1 · Verse' }), {
+          dataTransfer,
+        });
+        fireEvent.dragOver(getBeatElement(5, 2), { dataTransfer });
+        expect(getBeatElement(5, 2)).toHaveAttribute('data-drop-over', 'true');
+        expect(getBeatElement(5, 3)).not.toHaveAttribute('data-drop-over');
+
+        fireEvent.dragLeave(getBeatElement(5, 2), { dataTransfer });
+        expect(getBeatElement(5, 2)).not.toHaveAttribute('data-drop-over');
+
+        fireEvent.dragEnd(getMeasure(2).getByRole('button', { name: '1 · Verse' }));
+        fireEvent.dragStart(getMeasure(3).getByRole('button', { name: '100 BPM' }), {
+          dataTransfer,
+        });
+        fireEvent.dragOver(getMeasureElement(6), { dataTransfer });
+        expect(getMeasureElement(6)).toHaveAttribute('data-drop-over', 'true');
+
+        fireEvent.dragLeave(getMeasureElement(6), { dataTransfer });
+        expect(getMeasureElement(6)).not.toHaveAttribute('data-drop-over');
+      });
+
+      it('moves a tempo change that is dropped anywhere on a measure', async () => {
+        await openTimeline({
+          initialEvents: [createTempoChangeEvent({ bpm: 100, measure: 3 })],
+        });
+
+        drag(getMeasure(3).getByRole('button', { name: '100 BPM' }), getMeasureElement(6));
+
+        expect(getMeasure(6).getByRole('button', { name: '100 BPM' })).toBeInTheDocument();
+        expect(getMeasure(3).queryByRole('button', { name: '100 BPM' })).not.toBeInTheDocument();
+        expect(getMeasureElement(6)).not.toHaveAttribute('data-drop-zone');
+      });
+
+      it('does not move a change to the first measure', async () => {
+        await openTimeline({
+          initialEvents: [createTimeSignatureChangeEvent({ measure: 3, timeSignature: '3/4' })],
+        });
+
+        drag(getMeasure(3).getByRole('button', { name: '3/4' }), getMeasureElement(1));
+
+        expect(getMeasure(3).getByRole('button', { name: '3/4' })).toBeInTheDocument();
+      });
+
+      it('only drops a cue on a beat, not on the rest of the measure', async () => {
+        await openTimeline({
+          initialEvents: [createCueEvent({ beat: 2, id: 'cue', measure: 2, text: 'Verse' })],
+        });
+
+        drag(getMeasure(2).getByRole('button', { name: '2 · Verse' }), getMeasureElement(5));
+
+        expect(getMeasure(2).getByRole('button', { name: '2 · Verse' })).toBeInTheDocument();
+        expect(getMeasure(5).queryByRole('button', { name: /Verse/ })).not.toBeInTheDocument();
+      });
+
+      it('only drops a change on a measure, a drop on a beat moves it to that measure', async () => {
+        await openTimeline({
+          initialEvents: [createTempoChangeEvent({ bpm: 100, measure: 3 })],
+        });
+
+        drag(getMeasure(3).getByRole('button', { name: '100 BPM' }), getBeatElement(6, 3));
+
+        expect(getMeasure(6).getByRole('button', { name: '100 BPM' })).toBeInTheDocument();
+      });
+    });
+
+    it('shows the measures with their beats and the song tempo on the first one', async () => {
+      await openTimeline({ bpm: 90, timeSignature: '3/4' });
+
+      expect(screen.getByRole('button', { name: 'Timeline' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      expect(getMeasure(1).getByText('90 BPM · 3/4')).toBeInTheDocument();
+      expect(getMeasure(8).getAllByRole('button', { name: /^Select measure 8/ })).toHaveLength(3);
+      expect(screen.queryByRole('group', { name: 'Measure 9' })).not.toBeInTheDocument();
+    });
+
+    it('shows events as chips in their measure', async () => {
+      await openTimeline({
+        initialEvents: [
+          createCueEvent({ beat: 3, measure: 2, text: 'Verse' }),
+          createTempoChangeEvent({ bpm: 100, measure: 3 }),
+          createMidiButtonEvent({ beat: 2, measure: 3, midiEventId: '2' }),
+        ],
+      });
+
+      expect(getMeasure(2).getByRole('button', { name: '3 · Verse' })).toBeInTheDocument();
+      expect(getMeasure(3).getByRole('button', { name: '100 BPM' })).toBeInTheDocument();
+      expect(getMeasure(3).getByRole('button', { name: '2 · EP' })).toBeInTheDocument();
+    });
+
+    it('follows time signature changes in the number of beats', async () => {
+      await openTimeline({
+        initialEvents: [createTimeSignatureChangeEvent({ measure: 3, timeSignature: '3/4' })],
+        timeSignature: '4/4',
+      });
+
+      expect(getMeasure(2).getAllByRole('button', { name: /^Select measure/ })).toHaveLength(4);
+      expect(getMeasure(3).getAllByRole('button', { name: /^Select measure/ })).toHaveLength(3);
+      expect(getMeasure(3).getByRole('button', { name: '3/4' })).toBeInTheDocument();
+    });
+
+    it('shows where the count-in before a tempo change is spoken', async () => {
+      await openTimeline({
+        bpm: 60,
+        initialEvents: [createTempoChangeEvent({ bpm: 100, measure: 3 })],
+      });
+
+      expect(getMeasure(2).getByRole('img', { name: 'Count-in at 100 BPM' })).toBeInTheDocument();
+      expect(getMeasure(1).queryByRole('img')).not.toBeInTheDocument();
+      expect(getMeasure(3).queryByRole('img')).not.toBeInTheDocument();
+    });
+
+    it('opens the editor in a dialog for a selected beat and adds an event', async () => {
+      const user = await openTimeline();
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      await user.click(getMeasure(2).getByRole('button', { name: 'Select measure 2, beat 3' }));
+      const dialog = within(screen.getByRole('dialog'));
+      expect(dialog.getByRole('heading', { name: 'Measure 2, beat 3' })).toBeInTheDocument();
+
+      await user.click(dialog.getByRole('button', { name: 'Add cue to measure 2, beat 3' }));
+      await user.type(dialog.getByLabelText('Cue text'), 'Break');
+
+      expect(getMeasure(2).getByRole('button', { name: '3 · Break' })).toBeInTheDocument();
+      expect(
+        getMeasure(2).getByRole('button', { name: 'Select measure 2, beat 3' }),
+      ).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('closes the dialog with the close button and with Escape', async () => {
+      const user = await openTimeline();
+      const beat = () => screen.getByRole('button', { name: 'Select measure 2, beat 3' });
+
+      await user.click(beat());
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', { name: 'Close dialog' }),
+      );
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      await user.click(beat());
+      await user.keyboard('{Escape}');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closes the dialog when switching to the list', async () => {
+      const user = await openTimeline();
+
+      await user.click(screen.getByRole('button', { name: 'Select measure 2, beat 3' }));
+      await user.click(screen.getByRole('button', { name: 'List' }));
+      await user.click(screen.getByRole('button', { name: 'Timeline' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('edits an event by selecting its chip', async () => {
+      const user = await openTimeline({
+        initialEvents: [createCueEvent({ beat: 2, measure: 4, text: 'Verse' })],
+      });
+
+      await user.click(getMeasure(4).getByRole('button', { name: '2 · Verse' }));
+      const editor = within(screen.getByRole('dialog'));
+      await user.clear(editor.getByLabelText('Cue text'));
+      await user.type(editor.getByLabelText('Cue text'), 'Chorus');
+
+      expect(getMeasure(4).getByRole('button', { name: '2 · Chorus' })).toBeInTheDocument();
+
+      await user.click(editor.getByRole('button', { name: 'Delete cue' }));
+
+      expect(screen.queryByRole('button', { name: '2 · Chorus' })).not.toBeInTheDocument();
+    });
+
+    it('follows the events when the position is changed in the dialog', async () => {
+      const user = await openTimeline({
+        initialEvents: [createCueEvent({ beat: 2, measure: 4, text: 'Verse' })],
+      });
+
+      await user.click(getMeasure(4).getByRole('button', { name: '2 · Verse' }));
+      const measure = within(screen.getByRole('dialog')).getByLabelText('Measure');
+      await user.clear(measure);
+      await user.type(measure, '6');
+      await user.tab();
+
+      expect(
+        within(screen.getByRole('dialog')).getByRole('heading', { name: 'Measure 6, beat 2' }),
+      ).toBeInTheDocument();
+      expect(getMeasure(6).getByRole('button', { name: '2 · Verse' })).toBeInTheDocument();
+    });
+
+    it('does not offer changes on a beat other than 1 in the editor', async () => {
+      const user = await openTimeline();
+
+      await user.click(screen.getByRole('button', { name: 'Select measure 2, beat 2' }));
+
+      expect(
+        screen.getByRole('button', { name: 'Add tempo change to measure 2, beat 2' }),
+      ).toBeDisabled();
+    });
+
+    it('moves an event by dragging its chip to another beat', async () => {
+      await openTimeline({
+        initialEvents: [createCueEvent({ beat: 1, id: 'cue', measure: 2, text: 'Verse' })],
+      });
+
+      drag(
+        getMeasure(2).getByRole('button', { name: '1 · Verse' }),
+        getMeasure(5).getByRole('button', { name: 'Select measure 5, beat 3' }),
+      );
+
+      expect(getMeasure(5).getByRole('button', { name: '3 · Verse' })).toBeInTheDocument();
+      expect(getMeasure(2).queryByRole('button', { name: /Verse/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('snaps a dragged tempo change to beat 1 and keeps it off the first measure', async () => {
+      await openTimeline({
+        initialEvents: [createTempoChangeEvent({ bpm: 100, measure: 3 })],
+      });
+
+      drag(
+        getMeasure(3).getByRole('button', { name: '100 BPM' }),
+        getMeasure(1).getByRole('button', { name: 'Select measure 1, beat 2' }),
+      );
+      expect(getMeasure(3).getByRole('button', { name: '100 BPM' })).toBeInTheDocument();
+
+      drag(
+        getMeasure(3).getByRole('button', { name: '100 BPM' }),
+        getMeasure(6).getByRole('button', { name: 'Select measure 6, beat 4' }),
+      );
+      expect(getMeasure(6).getByRole('button', { name: '100 BPM' })).toBeInTheDocument();
+      expect(getMeasure(3).queryByRole('button', { name: '100 BPM' })).not.toBeInTheDocument();
+    });
+
+    it('marks events with problems', async () => {
+      await openTimeline({ initialEvents: [createCueEvent({ measure: 2, text: '' })] });
+
+      expect(getMeasure(2).getByRole('button', { name: '1 · Empty cue' })).toHaveClass(
+        'border-red-400',
+      );
+    });
+
+    it('adds a row of measures', async () => {
+      const user = await openTimeline();
+
+      await user.click(screen.getByRole('button', { name: 'More measures' }));
+
+      expect(screen.getByRole('group', { name: 'Measure 12' })).toBeInTheDocument();
+      expect(screen.queryByRole('group', { name: 'Measure 13' })).not.toBeInTheDocument();
+    });
+
+    it('covers the estimated length of the song', async () => {
+      const user = userEvent.setup();
+      render(
+        <EventsTab
+          bpm={120}
+          estimatedMeasures={30}
+          events={[]}
+          midiEvents={[]}
+          onEventsChange={vi.fn()}
+        />,
+      );
+      await user.click(screen.getByRole('button', { name: 'Timeline' }));
+
+      expect(screen.getByRole('group', { name: 'Measure 32' })).toBeInTheDocument();
+    });
   });
 });

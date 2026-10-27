@@ -11,6 +11,7 @@ import {
   getEventTypeAvailability,
   getNewEventPosition,
   moveEventGroup,
+  moveSongEvent,
   removeSongEvent,
   updateSongEvent,
 } from './editEvents';
@@ -116,6 +117,42 @@ describe('editEvents', () => {
 
     it('removes the event with the id', () => {
       expect(removeSongEvent(events, 'cue')).toEqual([createMidiButtonEvent()]);
+    });
+  });
+
+  describe('moveSongEvent', () => {
+    it('moves one event and leaves the others at the position', () => {
+      const events = [
+        createCueEvent({ beat: 2, id: 'cue', measure: 4 }),
+        createMidiButtonEvent({ beat: 2, id: 'midi', measure: 4 }),
+      ];
+
+      const moved = moveSongEvent(events, 'cue', { beat: 3, measure: 6 });
+
+      expect(moved.map(({ beat, id, measure }) => ({ beat, id, measure }))).toEqual([
+        { beat: 3, id: 'cue', measure: 6 },
+        { beat: 2, id: 'midi', measure: 4 },
+      ]);
+    });
+
+    it('snaps a change to beat 1 of the measure it is moved to', () => {
+      const events = [createTempoChangeEvent({ id: 'tempo', measure: 3 })];
+
+      expect(moveSongEvent(events, 'tempo', { beat: 3, measure: 5 })).toEqual([
+        createTempoChangeEvent({ beat: 1, id: 'tempo', measure: 5 }),
+      ]);
+    });
+
+    it('does not move a change to the first measure', () => {
+      const events = [createTimeSignatureChangeEvent({ id: 'time', measure: 3 })];
+
+      expect(moveSongEvent(events, 'time', { beat: 1, measure: 1 })).toBe(events);
+    });
+
+    it('ignores unknown events', () => {
+      const events = [createCueEvent()];
+
+      expect(moveSongEvent(events, 'unknown', { beat: 1, measure: 2 })).toBe(events);
     });
   });
 

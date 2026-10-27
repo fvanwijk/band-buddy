@@ -317,6 +317,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               content: (
                 <EventsTab
                   bpm={bpm}
+                  estimatedMeasures={calculatedMeasures}
                   events={events}
                   midiEvents={midiEvents}
                   onEventsChange={replaceEvents}

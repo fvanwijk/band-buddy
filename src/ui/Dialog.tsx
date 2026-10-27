@@ -55,6 +55,7 @@ export function Dialog({
       >
         {onClose && (
           <button
+            aria-label="Close dialog"
             onClick={onClose}
             className="absolute top-4 right-4 rounded-lg p-1 text-slate-400 transition hover:bg-slate-800 hover:text-slate-100"
             type="button"
