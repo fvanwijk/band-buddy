@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { useSpotify } from '../../contexts/SpotifyContext';
+import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { GridCell } from '../GridCell';
 
@@ -58,6 +59,22 @@ export function SpotifyCard() {
             Connected
           </div>
         )}
+      </div>
+
+      <div className="mt-4">
+        <Alert severity="warning">
+          The Spotify integration runs in Spotify's "Development mode", which limits access to the
+          Spotify Web API to 5 users. API calls are also rate limited, so connecting may not be
+          possible and imports may occasionally fail.{' '}
+          <a
+            className="underline hover:text-amber-100"
+            href="https://developer.spotify.com/blog/2026-02-06-update-on-developer-access-and-platform-security"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Read more
+          </a>
+        </Alert>
       </div>
 
       <div className="mt-6">
