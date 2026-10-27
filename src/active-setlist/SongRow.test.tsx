@@ -17,9 +17,9 @@ describe('SongRow', () => {
     expect(screen.getByRole('link')).toHaveAttribute('href', '/play/2/abc');
     expect(screen.getByText('Bohemian Rhapsody')).toBeInTheDocument();
     expect(screen.getByText('Queen')).toBeInTheDocument();
-    expect(screen.getByText('Bb')).toBeInTheDocument();
+    expect(screen.getAllByText('Bb').length).toBeGreaterThan(0);
     expect(screen.getByTestId('song-duration')).toHaveTextContent('5m 55s');
-    expect(screen.getByText('4/4')).toBeInTheDocument();
+    expect(screen.queryByText('4/4')).not.toBeInTheDocument();
   });
 
   it('shows transpose indicator when transpose is non-zero', () => {
@@ -54,5 +54,25 @@ describe('SongRow', () => {
 
     expect(screen.queryByText('+0')).toBeNull();
     expect(screen.queryByText('0')).toBeNull();
+  });
+
+  it('shows which content the song has', () => {
+    render(
+      <ul>
+        <SongRow
+          index={1}
+          setlistId="2"
+          setlistSongId="abc"
+          song={createSong({ events: [], midiEvents: [], notes: '' })}
+        />
+      </ul>,
+      { wrapper: MockRouteProvider },
+    );
+
+    expect(screen.getByRole('img', { name: 'Has lyrics' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Has sheet music' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'No text notes' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'No MIDI buttons' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'No events' })).toBeInTheDocument();
   });
 });

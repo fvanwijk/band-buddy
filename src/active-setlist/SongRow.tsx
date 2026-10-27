@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import type { Song } from '../types';
 import { FormattedDuration } from './FormattedDuration';
+import { SongContentIndicators } from './SongContentIndicators';
 
 type SongRowProps = {
   index: number;
@@ -27,8 +28,8 @@ export function SongRow({ index, setlistId, setlistSongId, song }: SongRowProps)
           <span className="text-base font-semibold text-slate-100">{song.title}</span>
           <span className="text-xs text-slate-400">{song.artist}</span>
         </span>
-        <span className="hidden text-right text-sm font-semibold text-slate-100 sm:block">
-          {song.timeSignature}
+        <span className="hidden items-center sm:flex">
+          <SongContentIndicators song={song} />
         </span>
         <span className="hidden text-right text-sm font-semibold text-slate-100 sm:block">
           {song.key}
@@ -43,7 +44,7 @@ export function SongRow({ index, setlistId, setlistSongId, song }: SongRowProps)
           {song.duration === undefined ? null : <FormattedDuration seconds={song.duration} />}
         </span>
         <span className="flex flex-col gap-0.5 text-right sm:hidden">
-          <span>{[song.timeSignature, keyWithTranspose].filter(Boolean).join(' • ')}</span>
+          <span>{keyWithTranspose}</span>
           <span className="text-xs text-slate-400">
             {song.duration === undefined ? null : <FormattedDuration seconds={song.duration} />}
           </span>

@@ -38,7 +38,7 @@ export function SetCard({ set, setIndex, setlistId, songStartIndex }: SetCardPro
             <div className="hidden grid-cols-[25px_6fr_2fr_2fr_2fr] gap-4 border-b border-slate-700 bg-slate-900/30 px-6 py-3 text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase sm:grid">
               <span className="text-right"></span>
               <span>Song</span>
-              <span className="text-right">Time</span>
+              <span>Content</span>
               <span className="text-right">Key</span>
               <span className="text-right">Duration</span>
             </div>
