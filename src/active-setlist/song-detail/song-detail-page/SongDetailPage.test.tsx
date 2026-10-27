@@ -36,6 +36,7 @@ describe('SongDetailPage', () => {
     songCells = {},
     hideEmptyTabs = false,
     isSupported = true,
+    skipMidiOnSongChange = false,
     tab,
     triggerState,
     withAutoMidiButtonTrigger = false,
@@ -45,6 +46,7 @@ describe('SongDetailPage', () => {
     defaultTab?: 'lyrics' | 'midi' | 'text-notes' | 'sheet-music';
     hideEmptyTabs?: boolean;
     isSupported?: boolean;
+    skipMidiOnSongChange?: boolean;
     songCells?: Record<string, string>;
     tab?: string;
     triggerState?: { triggerMidi: boolean };
@@ -88,6 +90,9 @@ describe('SongDetailPage', () => {
         (event) => (event.label === 'Organ' ? { ...event, triggerOnSongChange: true } : event),
       );
       store.setPartialRow('songs', '0', { midiEvents: JSON.stringify(midiEvents) });
+    }
+    if (skipMidiOnSongChange) {
+      store.setValue('skipMidiOnSongChange', true);
     }
     store.setValue('activeSetlistId', '1');
     await persister.save();
@@ -137,6 +142,17 @@ describe('SongDetailPage', () => {
       expect(sendProgramChangeMock).toHaveBeenCalledWith(12, { channels: [1] });
     });
     expect(sendProgramChangeMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not send song change MIDI buttons when the skip setting is on', async () => {
+    const { sendProgramChangeMock } = await renderComponent({
+      skipMidiOnSongChange: true,
+      triggerState: { triggerMidi: true },
+      withSongChangeButton: true,
+    });
+
+    expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
+    expect(sendProgramChangeMock).not.toHaveBeenCalled();
   });
 
   it('does not send song change MIDI buttons without the explicit selection state', async () => {

@@ -8,6 +8,7 @@ import {
   useGetHideEmptyTabs,
   useGetMetronomeVolume,
   useGetPreCountVolume,
+  useGetSkipMidiOnSongChange,
 } from '../../../api/useSettings';
 import { useGetSongs } from '../../../api/useSong';
 import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
@@ -47,6 +48,7 @@ export function SongDetailPage() {
   const hideEmptyTabs = useGetHideEmptyTabs();
   const metronomeVolume = useGetMetronomeVolume();
   const preCountVolume = useGetPreCountVolume();
+  const skipMidiOnSongChange = useGetSkipMidiOnSongChange();
   const songs = useGetSongs();
   const { isReady, isSupported, outputs } = useMidiDevices();
 
@@ -196,7 +198,7 @@ export function SongDetailPage() {
       return;
     }
 
-    if (lastSongChangeTriggerRef.current !== setlistSongId) {
+    if (!skipMidiOnSongChange && lastSongChangeTriggerRef.current !== setlistSongId) {
       lastSongChangeTriggerRef.current = setlistSongId ?? null;
       (currentSong.midiEvents || [])
         .filter((event) => event.triggerOnSongChange)
@@ -213,6 +215,7 @@ export function SongDetailPage() {
     navigate,
     setlistSongId,
     shouldTriggerOnSongChange,
+    skipMidiOnSongChange,
   ]);
 
   useEffect(() => {

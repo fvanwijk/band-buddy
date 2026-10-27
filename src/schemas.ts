@@ -158,4 +158,5 @@ export const preCountVolumeSchema = z.number().min(0).max(100).default(0);
 export const ttsVoiceSchema = z.string();
 export const showMidiEventLogPanelSchema = z.boolean().default(false);
 export const hideEmptyTabsSchema = z.boolean().default(false);
+export const skipMidiOnSongChangeSchema = z.boolean().default(false);
 export const showDrawingToolsSchema = z.boolean().default(false);

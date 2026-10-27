@@ -112,6 +112,18 @@ describe('SettingsPanel', () => {
     });
   });
 
+  it('updates skip MIDI on song change setting when checkbox is toggled', async () => {
+    const user = userEvent.setup();
+    await renderComponent(songWithAllSettings);
+
+    await user.click(screen.getByTitle('Settings'));
+    await user.click(screen.getByRole('checkbox', { name: 'Skip MIDI on song change' }));
+
+    await waitFor(() => {
+      expect(getPersistedStore()).toContain('"skipMidiOnSongChange":true');
+    });
+  });
+
   it('updates hide empty tabs setting when checkbox is toggled', async () => {
     const user = userEvent.setup();
     await renderComponent(songWithAllSettings);

@@ -6,8 +6,10 @@ import { usePopper } from 'react-popper';
 import {
   useGetHideEmptyTabs,
   useGetShowDrawingTools,
+  useGetSkipMidiOnSongChange,
   useSetHideEmptyTabs,
   useSetShowDrawingTools,
+  useSetSkipMidiOnSongChange,
 } from '../../../api/useSettings';
 import { useUpdateSong } from '../../../api/useSong';
 import { useMidiEventLogContext } from '../../../contexts/MidiEventLogContext';
@@ -37,6 +39,8 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
   const setHideEmptyTabs = useSetHideEmptyTabs();
   const showDrawingTools = useGetShowDrawingTools();
   const setShowDrawingTools = useSetShowDrawingTools();
+  const skipMidiOnSongChange = useGetSkipMidiOnSongChange();
+  const setSkipMidiOnSongChange = useSetSkipMidiOnSongChange();
   const transpose = song.transpose ?? 0;
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
@@ -118,7 +122,12 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               onChange={(event) => setHideEmptyTabs(event.target.checked)}
             />
           </GridCell>
-          <GridCell className="p-3">
+          <GridCell className="flex flex-col gap-2 p-3">
+            <Checkbox
+              checked={skipMidiOnSongChange}
+              label="Skip MIDI on song change"
+              onChange={(event) => setSkipMidiOnSongChange(event.target.checked)}
+            />
             <Checkbox
               checked={isMidiEventLogOpen}
               label="Show MIDI event log"

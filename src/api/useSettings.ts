@@ -13,6 +13,7 @@ import {
   preCountVolumeSchema,
   showMidiEventLogPanelSchema,
   showDrawingToolsSchema,
+  skipMidiOnSongChangeSchema,
   themeSchema,
   ttsVoiceSchema,
 } from '../schemas';
@@ -200,4 +201,20 @@ export function useGetShowMidiEventLogPanel(): boolean {
  */
 export function useSetShowMidiEventLogPanel() {
   return useSetValueCallback('showMidiEventLogPanel', (show: boolean) => show, []);
+}
+
+/**
+ * Hook to get whether MIDI buttons are skipped when switching songs
+ */
+export function useGetSkipMidiOnSongChange(): boolean {
+  const skip = useValue('skipMidiOnSongChange');
+  const result = skipMidiOnSongChangeSchema.safeParse(skip);
+  return result.success ? result.data : false;
+}
+
+/**
+ * Hook to set whether MIDI buttons are skipped when switching songs
+ */
+export function useSetSkipMidiOnSongChange() {
+  return useSetValueCallback('skipMidiOnSongChange', (skip: boolean) => skip, []);
 }
