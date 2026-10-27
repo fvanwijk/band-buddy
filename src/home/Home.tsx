@@ -1,9 +1,12 @@
 import {
   IconBolt,
   IconBrandGithub,
+  IconBrandSpotify,
   IconBrowserCheck,
-  IconDeviceSpeaker,
+  IconMetronome,
   IconMusic,
+  IconNotes,
+  IconPiano,
   IconPlaylist,
 } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
@@ -36,8 +39,8 @@ export const Home = () => {
               Run your setlists, control your MIDI gear, and stay locked in.
             </h1>
             <p className="text-base text-slate-300 sm:text-lg">
-              BandBuddy keeps your songs, setlists, lyrics, and MIDI program changes together so you
-              can focus on the performance and rehearsal.
+              BandBuddy keeps your songs, setlists, lyrics, clicktracks, and MIDI program changes
+              together so you can focus on the performance and rehearsal.
             </p>
 
             <Button
@@ -53,23 +56,32 @@ export const Home = () => {
           <div className="rounded-3xl border border-slate-800 bg-linear-to-br from-slate-900 via-slate-900/50 to-slate-950 p-6 shadow-xl">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <IconPlaylist className="h-6 w-6 text-brand-300" />
+                <IconPlaylist className="h-6 w-6 shrink-0 text-brand-300" />
                 <div>
                   <p className="text-sm font-semibold text-slate-100">Active setlist view</p>
                   <p className="text-xs text-slate-400">Navigate songs hands-free on stage.</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <IconDeviceSpeaker className="h-6 w-6 text-brand-300" />
+                <IconPiano className="h-6 w-6 shrink-0 text-brand-300" />
                 <div>
                   <p className="text-sm font-semibold text-slate-100">Instant MIDI changes</p>
                   <p className="text-xs text-slate-400">
-                    Trigger patches and program changes with a tap.
+                    Trigger patches and program changes with a tap or automatically on song change.
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <IconMusic className="h-6 w-6 text-brand-300" />
+                <IconMetronome className="h-6 w-6 shrink-0 text-brand-300" />
+                <div>
+                  <p className="text-sm font-semibold text-slate-100">Clicktracks</p>
+                  <p className="text-xs text-slate-400">
+                    Metronome with pre-count, spoken cues, and song announcements.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <IconMusic className="h-6 w-6 shrink-0 text-brand-300" />
                 <div>
                   <p className="text-sm font-semibold text-slate-100">Song intelligence</p>
                   <p className="text-xs text-slate-400">Keep your song library in one place.</p>
@@ -79,19 +91,24 @@ export const Home = () => {
           </div>
         </section>
 
-        <section className="grid gap-6 md:grid-cols-3">
+        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <FeatureCard
-            description="Open source and completely free. Your data stays local in your browser—no accounts, no tracking, no cloud required."
+            description="Open source and completely free. Your data stays local in your browser. No accounts, no tracking, no cloud required."
             icon={<IconBolt className="h-6 w-6" />}
             title="Free and privacy-first"
           />
           <FeatureCard
-            description="Build shows around your repertoire and jump between songs in seconds."
-            icon={<IconPlaylist className="h-6 w-6" />}
-            title="Setlist-first workflow"
+            description="Keep lyrics, text notes, and sheet music with every song, and draw on your lyrics."
+            icon={<IconNotes className="h-6 w-6" />}
+            title="Everything per song"
           />
           <FeatureCard
-            description="Runs in any modern browser—desktop, tablet, or phone. Install as a PWA for offline access."
+            description="Import a Spotify playlist to build a setlist in seconds."
+            icon={<IconBrandSpotify className="h-6 w-6" />}
+            title="Import from Spotify"
+          />
+          <FeatureCard
+            description="Runs in any modern browser. Desktop, tablet, or phone. Install as a PWA for offline access."
             icon={<IconBrowserCheck className="h-6 w-6" />}
             title="Works everywhere"
           />
