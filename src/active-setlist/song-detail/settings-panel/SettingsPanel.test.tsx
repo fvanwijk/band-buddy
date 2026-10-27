@@ -48,7 +48,7 @@ describe('SettingsPanel', () => {
     await screen.findByTitle('Settings');
   };
 
-  it('renders message when no settings are available', async () => {
+  it('only renders always-visible settings when song has no configurable fields', async () => {
     const user = userEvent.setup();
 
     await renderComponent(
@@ -66,10 +66,7 @@ describe('SettingsPanel', () => {
 
     await user.click(screen.getByTitle('Settings'));
 
-    expect(screen.getByText('No settings available for this song.')).toBeInTheDocument();
-    expect(
-      screen.getByText('Add more information such as lyrics, key or BPM to enable settings.'),
-    ).toBeInTheDocument();
+    expect(screen.queryByText('No settings available for this song.')).not.toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: 'Show drawing tools' })).toBeInTheDocument();
     expect(screen.queryByRole('slider', { name: 'Zoom' })).not.toBeInTheDocument();
   });

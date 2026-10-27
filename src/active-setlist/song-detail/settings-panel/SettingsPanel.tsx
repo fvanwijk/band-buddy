@@ -56,8 +56,6 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
     });
   };
 
-  const hasSettings = song.key || song.lyrics || song.bpm;
-
   const handleDefaultTabChange = (defaultTab: SongDefaultTab) => {
     updateSong({
       ...song,
@@ -85,22 +83,9 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
         className="z-20 shadow-lg"
       >
         <Grid className="divide-slate-800 border-slate-800 bg-slate-900">
-          {hasSettings ? (
-            <>
-              {song.key && (
-                <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />
-              )}
-              {song.bpm && <MetronomeVolumePanel />}
-              {song.lyrics && <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />}
-            </>
-          ) : (
-            <GridCell className="p-3">
-              <p className="mb-1 text-slate-200">No settings available for this song.</p>
-              <p className="text-slate-400">
-                Add more information such as lyrics, key or BPM to enable settings.
-              </p>
-            </GridCell>
-          )}
+          {song.key && <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />}
+          {song.bpm && <MetronomeVolumePanel />}
+          {song.lyrics && <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />}
           <GridCell className="p-3">
             <Checkbox
               checked={showDrawingTools}
