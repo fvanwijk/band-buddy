@@ -87,18 +87,7 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
                 <TransposePanel onTransposeChange={handleTranspose} transpose={transpose} />
               )}
               {song.bpm && <MetronomeVolumePanel />}
-              {song.lyrics && (
-                <>
-                  <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />
-                  <div className="space-y-3 bg-slate-800/20 p-3">
-                    <Checkbox
-                      checked={showDrawingTools}
-                      label="Show drawing tools"
-                      onChange={(e) => setShowDrawingTools(e.target.checked)}
-                    />
-                  </div>
-                </>
-              )}
+              {song.lyrics && <ZoomPanel onZoomChange={onZoomChange} zoom={zoom} />}
             </>
           ) : (
             <GridCell className="p-3">
@@ -108,6 +97,13 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               </p>
             </GridCell>
           )}
+          <GridCell className="p-3">
+            <Checkbox
+              checked={showDrawingTools}
+              label="Show drawing tools"
+              onChange={(event) => setShowDrawingTools(event.target.checked)}
+            />
+          </GridCell>
           <GridCell className="p-3">
             <SelectField
               label="Default tab"

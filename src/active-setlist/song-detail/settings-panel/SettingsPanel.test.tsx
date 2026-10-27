@@ -70,6 +70,8 @@ describe('SettingsPanel', () => {
     expect(
       screen.getByText('Add more information such as lyrics, key or BPM to enable settings.'),
     ).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: 'Show drawing tools' })).toBeInTheDocument();
+    expect(screen.queryByRole('slider', { name: 'Zoom' })).not.toBeInTheDocument();
   });
 
   it('renders settings panels when song has configurable fields', async () => {
