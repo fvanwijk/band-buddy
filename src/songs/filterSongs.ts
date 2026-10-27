@@ -1,8 +1,10 @@
 import type { Song } from '../types';
+import { songHasLyrics, songHasTextNotes } from './songContent';
 
 export const hasFilterFields = [
+  'hasEvents',
   'hasLyrics',
-  'hasMidiEvents',
+  'hasMidiButtons',
   'hasSheetMusic',
   'hasTextNotes',
 ] as const;
@@ -35,10 +37,11 @@ export const emptySongFilters: SongFilters = {
 };
 
 const hasContent: Record<HasFilterField, (song: Song) => boolean> = {
-  hasLyrics: (song) => !!song.lyrics?.trim() || !!song.lyricsCanvasPaths?.length,
-  hasMidiEvents: (song) => !!song.midiEvents?.length,
+  hasEvents: (song) => !!song.events?.length,
+  hasLyrics: songHasLyrics,
+  hasMidiButtons: (song) => !!song.midiEvents?.length,
   hasSheetMusic: (song) => !!song.sheetMusicFilename,
-  hasTextNotes: (song) => !!song.notes?.trim() || !!song.textNotesCanvasPaths?.length,
+  hasTextNotes: songHasTextNotes,
 };
 
 // The duration range counts as one filter

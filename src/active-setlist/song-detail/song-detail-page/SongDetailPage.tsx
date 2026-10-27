@@ -13,6 +13,7 @@ import { useGetSongs } from '../../../api/useSong';
 import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import { songDetailTabSchema } from '../../../schemas';
+import { songHasTextNotes } from '../../../songs/songContent';
 import type { MidiEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
 import { EditButton } from '../../../ui/EditButton';
@@ -206,7 +207,7 @@ export function SongDetailPage() {
 
   const hasLyrics = !!currentSong.lyrics && currentSong.lyrics.trim().length > 0;
   const hasSheetMusic = !!currentSong.sheetMusicFilename;
-  const hasNotes = !!currentSong.notes && currentSong.notes.trim().length > 0;
+  const hasNotes = songHasTextNotes(currentSong);
   const hasMidiEvents = !!currentSong.midiEvents && currentSong.midiEvents.length > 0;
 
   const allTabs = [

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
+import { createCueEvent } from '../mocks/songEvents';
 import { createSong } from '../mocks/songs';
 import { countActiveFilters, emptySongFilters, filterSongs } from './filterSongs';
 
@@ -78,9 +79,10 @@ describe('filterSongs', () => {
     ).toEqual(['2']);
   });
 
-  it('filters on the presence of lyrics, sheet music, text notes and MIDI events', () => {
+  it('filters on the presence of lyrics, sheet music, text notes, events and MIDI buttons', () => {
     const content = [
       createSong({
+        events: [],
         id: '1',
         lyrics: 'La la',
         midiEvents: [],
@@ -88,6 +90,7 @@ describe('filterSongs', () => {
         sheetMusicFilename: undefined,
       }),
       createSong({
+        events: [createCueEvent()],
         id: '2',
         lyrics: undefined,
         notes: 'Capo 2',
@@ -101,10 +104,41 @@ describe('filterSongs', () => {
     expect(ids({ hasLyrics: 'no' })).toEqual(['2']);
     expect(ids({ hasSheetMusic: 'yes' })).toEqual(['2']);
     expect(ids({ hasTextNotes: 'yes' })).toEqual(['2']);
-    expect(ids({ hasMidiEvents: 'yes' })).toEqual(['2']);
-    expect(ids({ hasMidiEvents: 'no' })).toEqual(['1']);
+    expect(ids({ hasEvents: 'yes' })).toEqual(['2']);
+    expect(ids({ hasEvents: 'no' })).toEqual(['1']);
+    expect(ids({ hasMidiButtons: 'yes' })).toEqual(['2']);
+    expect(ids({ hasMidiButtons: 'no' })).toEqual(['1']);
     expect(ids({ hasLyrics: 'yes', hasSheetMusic: 'yes' })).toEqual([]);
     expect(ids({})).toEqual(['1', '2']);
+  });
+
+  it('counts text note drawings but ignores lyrics drawings and erased strokes', () => {
+    const stroke = { drawMode: true, paths: [{ x: 1, y: 1 }], strokeColor: '#fff', strokeWidth: 2 };
+    const content = [
+      createSong({
+        id: '1',
+        lyrics: '  ',
+        lyricsCanvasPaths: [{ ...stroke, drawMode: false }],
+        notes: ' ',
+        textNotesCanvasPaths: [
+          { ...stroke, drawMode: false },
+          { ...stroke, paths: [] },
+        ],
+      }),
+      createSong({
+        id: '2',
+        lyrics: '',
+        lyricsCanvasPaths: [stroke],
+        notes: '',
+        textNotesCanvasPaths: [stroke],
+      }),
+    ];
+    const ids = (filters: Partial<typeof emptySongFilters>) =>
+      filterSongs(content, { filters: { ...emptySongFilters, ...filters } }).map((song) => song.id);
+
+    expect(ids({ hasTextNotes: 'yes' })).toEqual(['2']);
+    expect(ids({ hasTextNotes: 'no' })).toEqual(['1']);
+    expect(ids({ hasLyrics: 'yes' })).toEqual([]);
   });
 
   it('combines quick search and filters with AND', () => {

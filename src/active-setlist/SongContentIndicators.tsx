@@ -7,6 +7,7 @@ import {
 } from '@tabler/icons-react';
 import type { FC, ReactNode } from 'react';
 
+import { songHasLyrics, songHasTextNotes } from '../songs/songContent';
 import type { Song } from '../types';
 import { cn } from '../utils/cn';
 
@@ -24,7 +25,7 @@ export const SongContentIndicators: FC<SongContentIndicatorsProps> = ({ song }) 
   const indicators: Indicator[] = [
     {
       icon: <IconMicrophone2 className="h-4 w-4" />,
-      isPresent: !!song.lyrics?.trim(),
+      isPresent: songHasLyrics(song),
       label: 'lyrics',
     },
     {
@@ -34,7 +35,7 @@ export const SongContentIndicators: FC<SongContentIndicatorsProps> = ({ song }) 
     },
     {
       icon: <IconNotes className="h-4 w-4" />,
-      isPresent: !!song.notes?.trim(),
+      isPresent: songHasTextNotes(song),
       label: 'text notes',
     },
     {

@@ -75,4 +75,27 @@ describe('SongRow', () => {
     expect(screen.getByRole('img', { name: 'No MIDI buttons' })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'No events' })).toBeInTheDocument();
   });
+
+  it('highlights the text notes indicator when there are only text note drawings', () => {
+    const stroke = { drawMode: true, paths: [{ x: 1, y: 1 }], strokeColor: '#fff', strokeWidth: 2 };
+    render(
+      <ul>
+        <SongRow
+          index={1}
+          setlistId="2"
+          setlistSongId="abc"
+          song={createSong({
+            lyrics: '',
+            lyricsCanvasPaths: [stroke],
+            notes: '',
+            textNotesCanvasPaths: [stroke],
+          })}
+        />
+      </ul>,
+      { wrapper: MockRouteProvider },
+    );
+
+    expect(screen.getByRole('img', { name: 'Has text notes' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'No lyrics' })).toBeInTheDocument();
+  });
 });

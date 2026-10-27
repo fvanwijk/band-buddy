@@ -27,7 +27,8 @@ export const filterDefinitions: FilterDefinition[] = [
   { fields: ['hasLyrics'], id: 'hasLyrics', label: 'Has lyrics' },
   { fields: ['hasSheetMusic'], id: 'hasSheetMusic', label: 'Has sheet music' },
   { fields: ['hasTextNotes'], id: 'hasTextNotes', label: 'Has text notes' },
-  { fields: ['hasMidiEvents'], id: 'hasMidiEvents', label: 'Has MIDI events' },
+  { fields: ['hasEvents'], id: 'hasEvents', label: 'Has events' },
+  { fields: ['hasMidiButtons'], id: 'hasMidiButtons', label: 'Has MIDI buttons' },
 ];
 
 export const isHasField = (field: string): field is HasFilterField =>

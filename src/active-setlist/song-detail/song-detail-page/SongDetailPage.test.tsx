@@ -33,6 +33,7 @@ describe('SongDetailPage', () => {
   const renderComponent = async ({
     clearedSongCells = [],
     defaultTab,
+    songCells = {},
     hideEmptyTabs = false,
     isSupported = true,
     tab,
@@ -42,6 +43,7 @@ describe('SongDetailPage', () => {
     defaultTab?: 'lyrics' | 'midi' | 'text-notes' | 'sheet-music';
     hideEmptyTabs?: boolean;
     isSupported?: boolean;
+    songCells?: Record<string, string>;
     tab?: string;
     withAutoMidiButtonTrigger?: boolean;
   } = {}) => {
@@ -55,6 +57,7 @@ describe('SongDetailPage', () => {
       store.setValue('hideEmptyTabs', true);
     }
     clearedSongCells.forEach((cell) => store.delCell('songs', '0', cell));
+    store.setPartialRow('songs', '0', songCells);
     if (withAutoMidiButtonTrigger) {
       const songRow = store.getRow('songs', '0') as Record<string, unknown>;
       const midiEvents = JSON.parse(String(songRow.midiEvents)) as Array<{
@@ -153,6 +156,18 @@ describe('SongDetailPage', () => {
 
     expect(await screen.findByRole('tab', { name: 'Lyrics' })).toBeInTheDocument();
     expect(screen.queryByRole('tab', { name: 'Sheet Music' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the text notes tab when hide empty tabs is enabled and there are only drawings', async () => {
+    const stroke = { drawMode: true, paths: [{ x: 1, y: 1 }], strokeColor: '#fff', strokeWidth: 2 };
+    await renderComponent({
+      clearedSongCells: allSongDataCells,
+      hideEmptyTabs: true,
+      songCells: { textNotesCanvasPaths: JSON.stringify([stroke]) },
+    });
+
+    expect(await screen.findByRole('tab', { name: 'Text notes' })).toBeInTheDocument();
+    expect(screen.getAllByRole('tab')).toHaveLength(1);
   });
 
   it('shows an empty state when hide empty tabs is enabled and no tab has data', async () => {

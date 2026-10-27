@@ -58,8 +58,9 @@ export const SongFilterPanel: FC<SongFilterPanelProps> = ({
 
   const renderControl = (id: FilterId): ReactNode => {
     switch (id) {
+      case 'hasEvents':
       case 'hasLyrics':
-      case 'hasMidiEvents':
+      case 'hasMidiButtons':
       case 'hasSheetMusic':
       case 'hasTextNotes':
         return (
