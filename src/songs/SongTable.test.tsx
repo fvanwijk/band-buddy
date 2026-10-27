@@ -50,6 +50,14 @@ describe('SongTable', () => {
     expect(screen.queryByRole('columnheader', { name: 'Transpose' })).not.toBeInTheDocument();
   });
 
+  it('shows a non-sortable content column with content indicators', () => {
+    renderComponent();
+
+    expect(screen.getByRole('columnheader', { name: 'Content' })).not.toHaveAttribute('aria-sort');
+    expect(screen.queryByRole('button', { name: 'Content' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('img', { name: 'Has lyrics' })).toHaveLength(2);
+  });
+
   it.each([
     ['Title', 'title'],
     ['Artist', 'artist'],

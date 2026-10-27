@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
 import { FormattedDuration } from '../active-setlist/FormattedDuration';
+import { SongContentIndicators } from '../active-setlist/SongContentIndicators';
 import type { Song } from '../types';
 import { DeleteButton } from '../ui/DeleteButton';
 import { EditButton } from '../ui/EditButton';
@@ -48,6 +49,7 @@ export const SongTable: FC<SongTableProps> = ({
           {sortableHeader('key', 'Key')}
           <TableHeaderCell>Time</TableHeaderCell>
           {sortableHeader('duration', 'Duration')}
+          <TableHeaderCell>Content</TableHeaderCell>
           <TableHeaderCell align="right">
             <span className="sr-only">Actions</span>
           </TableHeaderCell>
@@ -69,6 +71,9 @@ export const SongTable: FC<SongTableProps> = ({
           <TableCell>{song.timeSignature}</TableCell>
           <TableCell>
             {song.duration !== undefined && <FormattedDuration seconds={song.duration} />}
+          </TableCell>
+          <TableCell>
+            <SongContentIndicators song={song} />
           </TableCell>
           <TableCell align="right">
             <div className="flex justify-end gap-2">
