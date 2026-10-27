@@ -73,8 +73,8 @@ export const EventsTab: FC<EventsTabProps> = ({
     <Card>
       <p className="text-xs text-slate-500">
         Events happen at a measure and beat while the metronome is running. Cues and the count-in
-        before a tempo change are spoken when the pre count volume is above 0. A tempo or time
-        signature change always starts on beat 1 of a measure.
+        before a tempo change are spoken when the cue/pre count volume is above 0. Cues are always
+        spoken in English. A tempo or time signature change always starts on beat 1 of a measure.
       </p>
 
       {!bpm && (

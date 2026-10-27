@@ -33,17 +33,17 @@ describe('MetronomeVolumePanel', () => {
     expect(localStorage.getItem('band-buddy')).toContain('"metronomeVolume":71.8');
   });
 
-  it('shows the pre count as off by default', async () => {
+  it('shows the cue/pre count as off by default', async () => {
     await renderComponent(40);
 
-    expect(screen.getByRole('slider', { name: 'Pre count volume' })).toHaveValue('0');
+    expect(screen.getByRole('slider', { name: 'Cue/pre count volume' })).toHaveValue('0');
     expect(screen.getByText('Off')).toBeInTheDocument();
   });
 
-  it('updates the pre count volume when its slider changes', async () => {
+  it('updates the cue/pre count volume when its slider changes', async () => {
     await renderComponent(40);
 
-    fireEvent.change(screen.getByRole('slider', { name: 'Pre count volume' }), {
+    fireEvent.change(screen.getByRole('slider', { name: 'Cue/pre count volume' }), {
       target: { value: '30' },
     });
 

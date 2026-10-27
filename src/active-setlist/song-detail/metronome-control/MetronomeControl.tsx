@@ -46,6 +46,7 @@ export function MetronomeControl({
   const cancelAnnouncementRef = useRef<(() => void) | null>(null);
   const cancelCueRef = useRef<(() => void) | null>(null);
   const ttsVoiceURI = useGetTtsVoice(songLanguage ?? 'en');
+  const cueVoiceURI = useGetTtsVoice('en');
 
   useEffect(
     () => () => {
@@ -67,11 +68,12 @@ export function MetronomeControl({
     return outputs[0];
   }, [isReady, isSupported, outputs]);
 
+  // Cues are always English, like the spoken count
   const handleCue = (text: string) => {
     cancelCueRef.current = speakText(text, {
-      language: songLanguage,
+      language: 'en',
       onDone: () => {},
-      voiceURI: ttsVoiceURI,
+      voiceURI: cueVoiceURI,
       volume: preCountVolume ?? 0,
     });
   };

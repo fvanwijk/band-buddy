@@ -37,10 +37,10 @@ export function MetronomeVolumePanel() {
         <p className="text-center text-xs font-semibold text-brand-200">{Math.round(volume)}%</p>
       </div>
       <div className="mt-3">
-        <SettingHeading>Pre count volume</SettingHeading>
+        <SettingHeading>Cue/pre count volume</SettingHeading>
         <div className="space-y-2">
           <Slider
-            ariaLabel="Pre count volume"
+            ariaLabel="Cue/pre count volume"
             max={100}
             min={0}
             onChange={handlePreCountVolumeChange}
