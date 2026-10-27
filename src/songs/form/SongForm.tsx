@@ -260,7 +260,6 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
                 <DetailsTab
                   calculatedMeasures={calculatedMeasures}
                   errors={errors}
-                  existingNote={existingNote}
                   register={register}
                 />
               ),

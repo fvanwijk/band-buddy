@@ -4,6 +4,7 @@ import type { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 import { cn } from '../../utils/cn';
 
 type RadioOption = {
+  className?: string;
   description?: string;
   value: string;
   label: string;
@@ -17,6 +18,7 @@ type RadioGroupProps = {
   className?: string;
   children?: React.ReactNode;
   inline?: boolean;
+  listClassName?: string;
   required?: boolean;
   vertical?: boolean;
 };
@@ -29,6 +31,7 @@ export function RadioGroup({
   className = '',
   children,
   inline = false,
+  listClassName,
   required = false,
   vertical = false,
 }: RadioGroupProps) {
@@ -43,7 +46,7 @@ export function RadioGroup({
         </div>
         {children}
       </div>
-      <div className={cn('flex gap-2', vertical ? 'flex-col' : 'flex-wrap')}>
+      <div className={cn('flex gap-2', vertical ? 'flex-col' : 'flex-wrap', listClassName)}>
         {options.map((option) => {
           const labelId = `${id}-${option.value}-label`;
           const descriptionId = `${id}-${option.value}-description`;
@@ -55,6 +58,7 @@ export function RadioGroup({
                 'flex cursor-pointer gap-2 rounded-lg border border-slate-700 bg-slate-800 text-sm text-slate-300 hover:border-brand-400/50 has-checked:border-brand-400 has-checked:bg-brand-400/10 has-checked:text-brand-200',
                 inline ? 'px-2 py-0.5' : 'px-3 py-2',
                 option.description ? 'items-start' : 'items-center',
+                option.className,
               )}
             >
               <input

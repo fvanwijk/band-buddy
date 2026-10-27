@@ -1,57 +1,38 @@
-import { useState } from 'react';
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
 
 import { Card } from '../../../ui/Card';
 import { InputField } from '../../../ui/form/InputField';
 import { RadioGroup } from '../../../ui/form/RadioGroup';
-import { Switch } from '../../../ui/Switch';
 import type { SongFormData } from '../SongForm';
 import { timeSignatureOptions } from '../timeSignatureOptions';
 
 type DetailsTabProps = {
   calculatedMeasures: number | null;
   errors: FieldErrors<SongFormData>;
-  existingNote: string;
   register: UseFormRegister<SongFormData>;
 };
 
-export function DetailsTab({
-  calculatedMeasures,
-  errors,
-  existingNote,
-  register,
-}: DetailsTabProps) {
-  const [useFlats, setUseFlats] = useState(existingNote.includes('b'));
-
-  const noteOptions = useFlats
-    ? [
-        { label: 'C', value: 'C' },
-        { label: 'D♭', value: 'Db' },
-        { label: 'D', value: 'D' },
-        { label: 'E♭', value: 'Eb' },
-        { label: 'E', value: 'E' },
-        { label: 'F', value: 'F' },
-        { label: 'G♭', value: 'Gb' },
-        { label: 'G', value: 'G' },
-        { label: 'A♭', value: 'Ab' },
-        { label: 'A', value: 'A' },
-        { label: 'B♭', value: 'Bb' },
-        { label: 'B', value: 'B' },
-      ]
-    : [
-        { label: 'C', value: 'C' },
-        { label: 'C♯', value: 'C#' },
-        { label: 'D', value: 'D' },
-        { label: 'D♯', value: 'D#' },
-        { label: 'E', value: 'E' },
-        { label: 'F', value: 'F' },
-        { label: 'F♯', value: 'F#' },
-        { label: 'G', value: 'G' },
-        { label: 'G♯', value: 'G#' },
-        { label: 'A', value: 'A' },
-        { label: 'A♯', value: 'A#' },
-        { label: 'B', value: 'B' },
-      ];
+export function DetailsTab({ calculatedMeasures, errors, register }: DetailsTabProps) {
+  const natural = 'row-span-2 self-center';
+  const noteOptions = [
+    { className: natural, label: 'C', value: 'C' },
+    { label: 'C♯', value: 'C#' },
+    { label: 'D♭', value: 'Db' },
+    { className: natural, label: 'D', value: 'D' },
+    { label: 'D♯', value: 'D#' },
+    { label: 'E♭', value: 'Eb' },
+    { className: natural, label: 'E', value: 'E' },
+    { className: natural, label: 'F', value: 'F' },
+    { label: 'F♯', value: 'F#' },
+    { label: 'G♭', value: 'Gb' },
+    { className: natural, label: 'G', value: 'G' },
+    { label: 'G♯', value: 'G#' },
+    { label: 'A♭', value: 'Ab' },
+    { className: natural, label: 'A', value: 'A' },
+    { label: 'A♯', value: 'A#' },
+    { label: 'B♭', value: 'Bb' },
+    { className: natural, label: 'B', value: 'B' },
+  ];
 
   const qualityOptions = [
     { label: 'Major', value: '' },
@@ -82,15 +63,11 @@ export function DetailsTab({
       <RadioGroup
         error={errors.keyNote}
         label="Key (note)"
+        listClassName="grid grid-flow-col grid-rows-2 gap-1.5 overflow-x-auto"
         options={noteOptions}
         register={register('keyNote', { required: 'Key note is required' })}
         required
-      >
-        <div className="flex items-center gap-2">
-          <Switch checked={useFlats} label={useFlats ? '♭' : '♯'} onCheckedChange={setUseFlats} />
-          {/* <span className="text-xs font-medium text-slate-400">{useFlats ? '♭' : '♯'}</span> */}
-        </div>
-      </RadioGroup>
+      />
       <RadioGroup
         error={errors.keyQuality}
         label="Key (quality)"

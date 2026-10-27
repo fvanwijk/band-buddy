@@ -82,7 +82,6 @@ describe('SongForm', () => {
     await user.type(screen.getByLabelText('Title*'), 'Test Title');
     expect(screen.queryByLabelText('Ab')).not.toBeInTheDocument();
 
-    await user.click(screen.getByLabelText('♯'));
     await user.click(screen.getByLabelText('A♭'));
     await user.click(screen.getByLabelText('Major'));
     await user.click(screen.getByLabelText('4/4'));
