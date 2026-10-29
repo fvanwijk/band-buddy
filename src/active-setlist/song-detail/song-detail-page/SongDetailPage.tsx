@@ -65,6 +65,16 @@ export function SongDetailPage() {
     [instruments],
   );
 
+  const isInstrumentOnline = useCallback(
+    (instrumentId: string) => {
+      const instrument = instrumentsById.get(instrumentId);
+      return (
+        isSupported && isReady && !!instrument && outputs.some((o) => o.id === instrument.midiInId)
+      );
+    },
+    [instrumentsById, isReady, isSupported, outputs],
+  );
+
   const isMidiButtonDisabled = useCallback(
     (event: MidiEvent) => {
       if (!isSupported || !isReady) {
@@ -287,7 +297,9 @@ export function SongDetailPage() {
       content: (
         <MidiButtonsDisplay
           highlightedMidiEventId={highlightedMidiEventId}
+          instruments={instruments}
           isDisabled={isMidiButtonDisabled}
+          isInstrumentOnline={isInstrumentOnline}
           midiEvents={currentSong.midiEvents}
           onTriggerEvent={handleTriggerMidiEvent}
         />

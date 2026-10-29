@@ -15,6 +15,12 @@ export function MidiDeviceStatus({
     <div>
       <p className="text-xs text-slate-500">{label}</p>
       <div className="flex items-center gap-2">
+        {!isOptional && (
+          <span
+            aria-hidden="true"
+            className={`h-2 w-2 shrink-0 rounded-full ${isAvailable ? 'bg-green-500' : 'bg-red-500'}`}
+          />
+        )}
         <p
           className={
             isAvailable || isOptional

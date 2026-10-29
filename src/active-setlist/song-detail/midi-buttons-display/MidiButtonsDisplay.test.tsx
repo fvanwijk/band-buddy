@@ -2,7 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vite-plus/test';
 
-import { createMidiEvents } from '../../../mocks/songs';
+import { createInstruments } from '../../../mocks/instruments';
+import { createMidiEvent, createMidiEvents } from '../../../mocks/songs';
 import type { MidiEvent } from '../../../types';
 import { MidiButtonsDisplay, type MidiButtonsDisplayProps } from './MidiButtonsDisplay';
 
@@ -110,6 +111,30 @@ describe('MidiButtonsDisplay', () => {
         'Some MIDI buttons are disabled because their MIDI device is not available.',
       ),
     ).not.toBeInTheDocument();
+  });
+
+  it('shows an online/offline indicator with the instrument name per button', () => {
+    renderComponent({
+      instruments: createInstruments(),
+      isInstrumentOnline: (instrumentId) => instrumentId === '0',
+      midiEvents: [
+        createMidiEvent({
+          events: [
+            { instrumentId: '0', programChange: 1 },
+            { instrumentId: '1', programChange: 2 },
+          ],
+        }),
+      ],
+    });
+
+    expect(screen.getByLabelText('Nord Stage 4 (online)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Yamaha Montage (offline)')).toBeInTheDocument();
+  });
+
+  it('does not show indicators when isInstrumentOnline is not provided', () => {
+    renderComponent({ instruments: createInstruments(), midiEvents: createMidiEvents() });
+
+    expect(screen.queryByLabelText(/\((online|offline)\)/)).not.toBeInTheDocument();
   });
 
   it('renders help text explaining MIDI button functionality', () => {
