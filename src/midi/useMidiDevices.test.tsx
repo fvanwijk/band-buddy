@@ -49,7 +49,23 @@ describe('useMidiDevices', () => {
       'disconnected',
       expect.any(Function),
     );
+  });
 
-    // Testing the listeners would be very contrived
+  it('re-renders when WebMidi mutates its device arrays in place', async () => {
+    vi.mocked(WebMidi.enable).mockResolvedValueOnce(WebMidi);
+    vi.mocked(WebMidi.addListener).mockClear();
+    const { result } = renderHook(() => useMidiDevices());
+    await act(async () => Promise.resolve());
+
+    const disconnected = vi
+      .mocked(WebMidi.addListener)
+      .mock.calls.find(([type]) => type === 'disconnected')?.[1] as () => void;
+
+    act(() => {
+      (WebMidi.outputs as unknown[]).splice(0, 1);
+      disconnected();
+    });
+
+    expect(result.current.outputs).toEqual([{ id: 'output2' }]);
   });
 });

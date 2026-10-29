@@ -19,30 +19,26 @@ export function useMidiDevices(): MidiDevicesState {
   useEffect(() => {
     let isMounted = true;
 
+    // WebMidi mutates its inputs/outputs arrays in place, so copy them to make React see a change.
+    const syncDevices = () => {
+      if (!isMounted) return;
+
+      setInputs([...WebMidi.inputs]);
+      setOutputs([...WebMidi.outputs]);
+    };
+
     const initMidi = async () => {
       try {
         await WebMidi.enable({ sysex: true });
         if (!isMounted) return;
 
-        setInputs(WebMidi.inputs);
-        setOutputs(WebMidi.outputs);
+        syncDevices();
         setIsSupported(true);
         setIsReady(true);
         setError(null);
 
-        WebMidi.addListener('connected', () => {
-          if (!isMounted) return;
-
-          setInputs(WebMidi.inputs);
-          setOutputs(WebMidi.outputs);
-        });
-
-        WebMidi.addListener('disconnected', () => {
-          if (!isMounted) return;
-
-          setInputs(WebMidi.inputs);
-          setOutputs(WebMidi.outputs);
-        });
+        WebMidi.addListener('connected', syncDevices);
+        WebMidi.addListener('disconnected', syncDevices);
       } catch (err) {
         if (!isMounted) return;
 
@@ -56,8 +52,8 @@ export function useMidiDevices(): MidiDevicesState {
 
     return () => {
       isMounted = false;
-      WebMidi.removeListener('connected');
-      WebMidi.removeListener('disconnected');
+      WebMidi.removeListener('connected', syncDevices);
+      WebMidi.removeListener('disconnected', syncDevices);
     };
   }, []);
 
