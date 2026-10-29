@@ -1,6 +1,7 @@
 import { DeleteButton } from '../ui/DeleteButton';
 import { EditButton } from '../ui/EditButton';
 import { ListItem } from '../ui/ListItem';
+import { StretchedLink } from '../ui/StretchedLink';
 import { SongMetadata } from './SongMetadata';
 
 type SongCardProps = {
@@ -33,7 +34,9 @@ export function SongCard({
         </>
       }
     >
-      <h2 className="truncate text-sm font-semibold text-slate-100">{title}</h2>
+      <h2 className="truncate text-sm font-semibold text-slate-100">
+        <StretchedLink to={`/songs/edit/${songId}`}>{title}</StretchedLink>
+      </h2>
       <p className="truncate text-xs text-slate-500">{artist}</p>
       <SongMetadata
         duration={duration}

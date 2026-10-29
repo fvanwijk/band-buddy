@@ -42,6 +42,15 @@ describe('SongTable', () => {
     expect(screen.getByRole('cell', { name: '5m 55s' })).toBeInTheDocument();
   });
 
+  it('links the title to the edit page', () => {
+    renderComponent();
+
+    expect(screen.getByRole('link', { name: 'Bohemian Rhapsody' })).toHaveAttribute(
+      'href',
+      '/songs/edit/1',
+    );
+  });
+
   it('shows the transpose in the key column instead of a separate column', () => {
     renderComponent();
 

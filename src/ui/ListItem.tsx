@@ -13,12 +13,12 @@ export function ListItem({ actions, children, className, contentClassName }: Lis
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-4 overflow-hidden p-4 shadow-sm transition-shadow hover:shadow-md',
+        'relative flex items-center justify-between gap-4 overflow-hidden p-4 shadow-sm transition-shadow hover:shadow-md',
         className,
       )}
     >
       <div className={cn('min-w-0 flex-1', contentClassName)}>{children}</div>
-      {actions && <div className="ml-4 flex gap-2">{actions}</div>}
+      {actions && <div className="relative z-10 ml-4 flex gap-2">{actions}</div>}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { SongContentIndicators } from '../active-setlist/SongContentIndicators';
 import type { Song } from '../types';
 import { DeleteButton } from '../ui/DeleteButton';
 import { EditButton } from '../ui/EditButton';
+import { StretchedLink } from '../ui/StretchedLink';
 import { Table } from '../ui/table/Table';
 import { TableCell } from '../ui/table/TableCell';
 import { TableHeaderCell } from '../ui/table/TableHeaderCell';
@@ -58,7 +59,9 @@ export const SongTable: FC<SongTableProps> = ({
     >
       {songs.map((song) => (
         <TableRow key={song.id}>
-          <TableCell className="font-semibold text-slate-100">{song.title}</TableCell>
+          <TableCell className="font-semibold text-slate-100">
+            <StretchedLink to={`/songs/edit/${song.id}`}>{song.title}</StretchedLink>
+          </TableCell>
           <TableCell>{song.artist}</TableCell>
           <TableCell>
             {song.key}
@@ -76,7 +79,7 @@ export const SongTable: FC<SongTableProps> = ({
             <SongContentIndicators song={song} />
           </TableCell>
           <TableCell align="right">
-            <div className="flex justify-end gap-2">
+            <div className="relative z-10 flex justify-end gap-2">
               <EditButton size="small" title="Edit song" to={`/songs/edit/${song.id}`} />
               <DeleteButton onClick={() => onDelete(song.id)} size="small" />
             </div>
