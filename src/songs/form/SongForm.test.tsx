@@ -74,16 +74,12 @@ describe('SongForm', () => {
 
     expect(screen.getByText('Artist is required')).toBeInTheDocument();
     expect(screen.getByText('Title is required')).toBeInTheDocument();
-    expect(screen.getByText('Key note is required')).toBeInTheDocument();
-    expect(screen.getByText('Key quality is required')).toBeInTheDocument();
+    expect(screen.getByText('Key is required')).toBeInTheDocument();
 
     // Details
     await user.type(screen.getByLabelText('Artist*'), 'Test Artist');
     await user.type(screen.getByLabelText('Title*'), 'Test Title');
-    expect(screen.queryByLabelText('Ab')).not.toBeInTheDocument();
-
-    await user.click(screen.getByLabelText('A♭'));
-    await user.click(screen.getByLabelText('Major'));
+    await user.click(screen.getByRole('radio', { name: 'A♭ major' }));
     await user.click(screen.getByLabelText('4/4'));
     await user.type(screen.getByLabelText('BPM'), '120');
     await user.type(screen.getByLabelText('Minutes'), '1');
@@ -188,8 +184,7 @@ describe('SongForm', () => {
     // Details
     expect(screen.getByLabelText('Artist*')).toHaveValue(initialData.artist);
     expect(screen.getByLabelText('Title*')).toHaveValue(initialData.title);
-    expect(screen.getByLabelText('Major')).toBeChecked();
-    expect(screen.getByLabelText('B♭')).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'B♭ major' })).toBeChecked();
     expect(screen.getByLabelText('4/4')).toBeChecked();
     expect(screen.getByLabelText('BPM')).toHaveValue(72);
     expect(screen.getByLabelText('Minutes')).toHaveValue(5);

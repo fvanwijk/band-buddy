@@ -66,7 +66,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
       durationMinutes: initialData?.duration ? Math.floor(initialData.duration / 60) : undefined,
       durationSeconds: initialData?.duration ? initialData.duration % 60 : undefined,
       keyNote: existingNote || undefined,
-      keyQuality: existingQuality || existingNote ? '' : undefined,
+      keyQuality: existingNote ? existingQuality : undefined,
     },
   });
 
@@ -259,6 +259,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
               content: (
                 <DetailsTab
                   calculatedMeasures={calculatedMeasures}
+                  control={control}
                   errors={errors}
                   register={register}
                 />

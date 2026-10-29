@@ -1,43 +1,37 @@
-import type { FieldErrors, UseFormRegister } from 'react-hook-form';
+import type { FC } from 'react';
+import {
+  useController,
+  type Control,
+  type FieldErrors,
+  type UseFormRegister,
+} from 'react-hook-form';
 
 import { Card } from '../../../ui/Card';
 import { InputField } from '../../../ui/form/InputField';
 import { RadioGroup } from '../../../ui/form/RadioGroup';
 import type { SongFormData } from '../SongForm';
 import { timeSignatureOptions } from '../timeSignatureOptions';
+import { KeyPicker } from './key-picker/KeyPicker';
 
 type DetailsTabProps = {
   calculatedMeasures: number | null;
+  control: Control<SongFormData>;
   errors: FieldErrors<SongFormData>;
   register: UseFormRegister<SongFormData>;
 };
 
-export function DetailsTab({ calculatedMeasures, errors, register }: DetailsTabProps) {
-  const natural = 'row-span-2 self-center';
-  const noteOptions = [
-    { className: natural, label: 'C', value: 'C' },
-    { label: 'C♯', value: 'C#' },
-    { label: 'D♭', value: 'Db' },
-    { className: natural, label: 'D', value: 'D' },
-    { label: 'D♯', value: 'D#' },
-    { label: 'E♭', value: 'Eb' },
-    { className: natural, label: 'E', value: 'E' },
-    { className: natural, label: 'F', value: 'F' },
-    { label: 'F♯', value: 'F#' },
-    { label: 'G♭', value: 'Gb' },
-    { className: natural, label: 'G', value: 'G' },
-    { label: 'G♯', value: 'G#' },
-    { label: 'A♭', value: 'Ab' },
-    { className: natural, label: 'A', value: 'A' },
-    { label: 'A♯', value: 'A#' },
-    { label: 'B♭', value: 'Bb' },
-    { className: natural, label: 'B', value: 'B' },
-  ];
-
-  const qualityOptions = [
-    { label: 'Major', value: '' },
-    { label: 'Minor', value: 'm' },
-  ];
+export const DetailsTab: FC<DetailsTabProps> = ({
+  calculatedMeasures,
+  control,
+  errors,
+  register,
+}) => {
+  const { field: keyNote, fieldState: keyNoteState } = useController({
+    control,
+    name: 'keyNote',
+    rules: { required: 'Key is required' },
+  });
+  const { field: keyQuality } = useController({ control, name: 'keyQuality' });
 
   const languageOptions = [
     { label: '🇺🇸 English', value: 'en' },
@@ -60,21 +54,15 @@ export function DetailsTab({ calculatedMeasures, errors, register }: DetailsTabP
         {...register('title', { required: 'Title is required' })}
         required
       />
-      <RadioGroup
-        error={errors.keyNote}
-        label="Key (note)"
-        listClassName="grid grid-flow-col grid-rows-2 gap-1.5 overflow-x-auto"
-        options={noteOptions}
-        register={register('keyNote', { required: 'Key note is required' })}
-        required
-      />
-      <RadioGroup
-        error={errors.keyQuality}
-        label="Key (quality)"
-        options={qualityOptions}
-        register={register('keyQuality', {
-          required: 'Key quality is required',
-        })}
+      <KeyPicker
+        error={keyNoteState.error}
+        label="Key"
+        note={keyNote.value}
+        onChange={(note, quality) => {
+          keyNote.onChange(note);
+          keyQuality.onChange(quality);
+        }}
+        quality={keyQuality.value}
         required
       />
       <RadioGroup
@@ -147,4 +135,4 @@ export function DetailsTab({ calculatedMeasures, errors, register }: DetailsTabP
       </div>
     </Card>
   );
-}
+};
