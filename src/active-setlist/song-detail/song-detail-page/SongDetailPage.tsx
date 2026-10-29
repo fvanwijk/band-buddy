@@ -71,21 +71,25 @@ export function SongDetailPage() {
         return true;
       }
 
-      return event.events.some((action) => {
-        const instrument = instrumentsById.get(action.instrumentId);
-        if (!instrument) {
-          console.warn('Instrument not found for MIDI button');
-          return true;
-        }
+      // Only disabled when every targeted instrument is offline
+      return (
+        event.events.length > 0 &&
+        event.events.every((action) => {
+          const instrument = instrumentsById.get(action.instrumentId);
+          if (!instrument) {
+            console.warn('Instrument not found for MIDI button');
+            return true;
+          }
 
-        const output = outputs.find((o) => o.id === instrument.midiInId);
-        if (!output) {
-          console.warn('The MIDI input that is configured for the instrument is not available');
-        }
-        return !output;
-      });
+          const output = outputs.find((o) => o.id === instrument.midiInId);
+          if (!output) {
+            console.warn('The MIDI input that is configured for the instrument is not available');
+          }
+          return !output;
+        })
+      );
     },
-    [instrumentsById, outputs],
+    [instrumentsById, isReady, isSupported, outputs],
   );
 
   // Find the current song's details from the setlist structure
