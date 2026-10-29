@@ -118,6 +118,8 @@ export default defineConfig({
       reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
     },
     environment: 'jsdom',
+    // Node 25+ ships its own localStorage that is unusable without --localstorage-file and shadows jsdom's
+    execArgv: ['--no-experimental-webstorage'],
     globals: false,
     mockReset: true,
     setupFiles: './src/test-setup.ts',
