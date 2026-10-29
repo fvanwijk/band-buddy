@@ -5,6 +5,7 @@ import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
 import { cn } from '../../../utils/cn';
+import { useMidiButtonFadeOut } from './useMidiButtonFadeOut';
 
 export type MidiButtonsDisplayProps = {
   highlightedMidiEventId?: string | null;
@@ -19,6 +20,8 @@ export function MidiButtonsDisplay({
   midiEvents,
   onTriggerEvent,
 }: MidiButtonsDisplayProps) {
+  const getFadeOutStyle = useMidiButtonFadeOut(highlightedMidiEventId);
+
   if (!midiEvents || midiEvents.length === 0) {
     return (
       <EmptyStateBlock icon={<IconBinary className="h-8 w-8" />}>
@@ -48,7 +51,7 @@ export function MidiButtonsDisplay({
             color="primary"
             disabled={isDisabled?.(event)}
             onClick={() => onTriggerEvent?.(event)}
-            style={{ transitionDuration: highlightedMidiEventId === event.id ? '150ms' : '1500ms' }}
+            style={getFadeOutStyle(event.id)}
             variant="outlined"
           >
             {event.label}
