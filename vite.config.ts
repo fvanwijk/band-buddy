@@ -100,7 +100,7 @@ export default defineConfig({
       },
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,wav,woff,woff2}'],
+        globPatterns: ['**/*.{js,mjs,css,html,ico,png,svg,wav,woff,woff2}'],
       },
     }),
   ],
