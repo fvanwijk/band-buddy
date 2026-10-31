@@ -92,3 +92,39 @@ export async function deleteSheetMusic(songId: string): Promise<void> {
     };
   });
 }
+
+/**
+ * List the song IDs that have sheet music stored in IndexedDB
+ */
+export async function getAllSheetMusicKeys(): Promise<string[]> {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const request = db.transaction([STORE_NAME], 'readonly').objectStore(STORE_NAME).getAllKeys();
+
+    request.onerror = () => {
+      reject(new Error('Failed to list sheet music'));
+    };
+
+    request.onsuccess = () => {
+      resolve(request.result.map(String));
+    };
+  });
+}
+
+/**
+ * Delete all sheet music PDFs from IndexedDB
+ */
+export async function clearSheetMusic(): Promise<void> {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const request = db.transaction([STORE_NAME], 'readwrite').objectStore(STORE_NAME).clear();
+
+    request.onerror = () => {
+      reject(new Error('Failed to clear sheet music'));
+    };
+
+    request.onsuccess = () => {
+      resolve();
+    };
+  });
+}

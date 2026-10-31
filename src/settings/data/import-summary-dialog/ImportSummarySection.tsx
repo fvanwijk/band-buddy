@@ -8,6 +8,7 @@ type ImportSummarySectionProps = {
   items?: string[];
   label: string;
   matchLabel?: string;
+  note?: string;
   onCheckedChange: (checked: boolean) => void;
 };
 
@@ -18,6 +19,7 @@ export const ImportSummarySection: FC<ImportSummarySectionProps> = ({
   items,
   label,
   matchLabel,
+  note,
   onCheckedChange,
 }) => (
   <div aria-label={label} role="group">
@@ -34,6 +36,7 @@ export const ImportSummarySection: FC<ImportSummarySectionProps> = ({
         {count}
       </span>
     </div>
+    {checked && note && <p className="pl-6 text-xs text-slate-500">{note}</p>}
     {checked && items && items.length > 0 && (
       <ul className="space-y-1 pl-6 text-slate-400">
         {items.map((item, index) => (

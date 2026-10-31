@@ -168,7 +168,7 @@ describe('ImportSummaryDialog', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'replace');
+    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'replace', new Map());
   });
 
   it('imports with a merge', async () => {
@@ -179,7 +179,7 @@ describe('ImportSummaryDialog', () => {
     await userEvent.click(screen.getByRole('radio', { name: 'Merge' }));
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'merge');
+    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'merge', new Map());
   });
 
   it('imports with a deep merge', async () => {
@@ -190,7 +190,7 @@ describe('ImportSummaryDialog', () => {
     await userEvent.click(screen.getByRole('radio', { name: 'Deep merge' }));
     await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'deepMerge');
+    expect(onImport).toHaveBeenCalledWith(allTables, backup.values, 'deepMerge', new Map());
   });
 
   describe('selecting what to import', () => {
@@ -211,7 +211,12 @@ describe('ImportSummaryDialog', () => {
       await userEvent.click(screen.getByRole('checkbox', { name: 'Songs' }));
       await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-      expect(onImport).toHaveBeenCalledWith(without(allTables, 'songs'), backup.values, 'replace');
+      expect(onImport).toHaveBeenCalledWith(
+        without(allTables, 'songs'),
+        backup.values,
+        'replace',
+        new Map(),
+      );
     });
 
     it('leaves out all three setlist tables when setlists are deselected', async () => {
@@ -226,6 +231,7 @@ describe('ImportSummaryDialog', () => {
         { instruments: backup.tables.instruments, songs: backup.tables.songs },
         backup.values,
         'replace',
+        new Map(),
       );
     });
 
@@ -241,6 +247,7 @@ describe('ImportSummaryDialog', () => {
         without(allTables, 'instruments'),
         backup.values,
         'replace',
+        new Map(),
       );
     });
 
@@ -252,7 +259,7 @@ describe('ImportSummaryDialog', () => {
       await userEvent.click(screen.getByRole('checkbox', { name: 'Settings' }));
       await userEvent.click(screen.getByRole('button', { name: 'Import' }));
 
-      expect(onImport).toHaveBeenCalledWith(allTables, undefined, 'replace');
+      expect(onImport).toHaveBeenCalledWith(allTables, undefined, 'replace', new Map());
     });
 
     it('still includes a selected table that is missing from the backup, so replace clears it', async () => {
@@ -275,6 +282,7 @@ describe('ImportSummaryDialog', () => {
         },
         backup.values,
         'replace',
+        new Map(),
       );
     });
 

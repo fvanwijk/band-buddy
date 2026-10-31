@@ -1,24 +1,31 @@
 import { IconDownload, IconTrash, IconUpload } from '@tabler/icons-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { Tables, Values } from 'tinybase';
 import { useStore } from 'tinybase/ui-react';
 
 import {
+  createBackupFile,
+  type BackupPayload,
+  type SheetMusicFiles,
+} from '../../services/backupFile';
+import {
   CURRENT_BACKUP_VERSION,
   persistStoreVersion,
 } from '../../services/migrations/persistedStoreVersion';
+import {
+  clearSheetMusic,
+  deleteSheetMusic,
+  getAllSheetMusicKeys,
+  getSheetMusic,
+  storeSheetMusic,
+} from '../../services/sheetMusicStorage';
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
 import { Grid } from '../Grid';
 import { GridCell } from '../GridCell';
 import { ImportSummaryDialog, type ImportMode } from './import-summary-dialog/ImportSummaryDialog';
-
-type BackupPayload = {
-  tables: Tables;
-  version: number;
-  values: Values;
-};
 
 type StatusState = {
   message: string;
@@ -27,13 +34,22 @@ type StatusState = {
 
 export function DataSettings() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const queryClient = useQueryClient();
   const store = useStore();
   const [status, setStatus] = useState<StatusState>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
 
-  const handleClearDatabase = () => {
+  const handleClearDatabase = async () => {
     if (!store) return;
+
+    try {
+      await clearSheetMusic();
+    } catch {
+      setStatus({ message: 'Failed to clear sheet music.', severity: 'error' });
+      return;
+    }
+    void queryClient.invalidateQueries({ queryKey: ['sheetMusic'] });
 
     store.transaction(() => {
       store.delTables();
@@ -47,29 +63,84 @@ export function DataSettings() {
     });
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!store) return;
 
-    const payload: BackupPayload = {
-      tables: store.getTables(),
-      values: store.getValues(),
-      version: CURRENT_BACKUP_VERSION,
-    };
+    try {
+      const payload: BackupPayload = {
+        tables: store.getTables(),
+        values: store.getValues(),
+        version: CURRENT_BACKUP_VERSION,
+      };
 
-    const blob = new Blob([JSON.stringify(payload)], {
-      type: 'application/json',
-    });
+      // Only sheet music of songs that still exist is exported
+      const sheetMusic = new Map<string, Blob>();
+      for (const songId of await getAllSheetMusicKeys()) {
+        if (!store.hasRow('songs', songId)) continue;
+        const file = await getSheetMusic(songId);
+        if (file) sheetMusic.set(songId, file);
+      }
 
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `band-buddy-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    link.href = url;
-    link.click();
-    URL.revokeObjectURL(url);
+      const file = await createBackupFile(
+        payload,
+        sheetMusic,
+        new Date().toISOString().slice(0, 10),
+      );
+
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.download = file.name;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setStatus({ message: 'Failed to export backup.', severity: 'error' });
+    }
   };
 
-  const handleImport = (tables: Tables, values: Values | undefined, mode: ImportMode) => {
+  const importSheetMusic = async (
+    tables: Tables,
+    mode: ImportMode,
+    sheetMusic: SheetMusicFiles,
+  ) => {
+    const importedSongs = tables.songs;
+    if (!importedSongs) return;
+
+    // Replacing the songs removes the sheet music of songs that are no longer in the library
+    if (mode === 'replace') {
+      const orphanIds = (await getAllSheetMusicKeys()).filter(
+        (songId) => !(songId in importedSongs),
+      );
+      await Promise.all(orphanIds.map(deleteSheetMusic));
+    }
+
+    for (const [songId, data] of sheetMusic) {
+      const filename = importedSongs[songId]?.sheetMusicFilename;
+      const name = typeof filename === 'string' && filename ? filename : `${songId}.pdf`;
+      await storeSheetMusic(
+        songId,
+        new File([data as Uint8Array<ArrayBuffer>], name, { type: 'application/pdf' }),
+      );
+    }
+    void queryClient.invalidateQueries({ queryKey: ['sheetMusic'] });
+  };
+
+  const handleImport = async (
+    tables: Tables,
+    values: Values | undefined,
+    mode: ImportMode,
+    sheetMusic: SheetMusicFiles,
+  ) => {
     if (!store) return;
+
+    // Sheet music goes first so a storage failure leaves the store untouched
+    try {
+      await importSheetMusic(tables, mode, sheetMusic);
+    } catch {
+      setStatus({ message: 'Failed to import sheet music.', severity: 'error' });
+      setImportFile(null);
+      return;
+    }
 
     store.transaction(() => {
       if (mode === 'replace') {
@@ -130,8 +201,9 @@ export function DataSettings() {
               members to sync your data.
             </p>
             <p className="text-sm text-slate-400">
-              Importing a backup lets you choose to replace or merge it with your current data on
-              this device.
+              Backups that include uploaded sheet music are exported as a zip file; otherwise a
+              plain JSON file is used. Importing a backup lets you choose to replace or merge it
+              with your current data on this device.
             </p>
           </div>
 
@@ -166,7 +238,7 @@ export function DataSettings() {
           </div>
 
           <input
-            accept="application/json"
+            accept="application/json,application/zip,.json,.zip"
             aria-label="Backup file"
             className="hidden"
             onChange={handleFileChange}

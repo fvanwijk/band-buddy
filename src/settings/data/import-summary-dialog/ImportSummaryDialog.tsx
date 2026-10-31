@@ -6,6 +6,7 @@ import { useStore } from 'tinybase/ui-react';
 
 import { SUPPORTED_LOCALES } from '../../../config/locales';
 import { THEMES, type ThemeName } from '../../../config/themes';
+import { parseBackupFile, type SheetMusicFiles } from '../../../services/backupFile';
 import { migrateBackup } from '../../../services/migrations';
 import { Alert } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
@@ -13,12 +14,6 @@ import { Dialog } from '../../../ui/Dialog';
 import { RadioGroup } from '../../../ui/form/RadioGroup';
 import { ImportSettingsSection } from './ImportSettingsSection';
 import { ImportSummarySection } from './ImportSummarySection';
-
-type BackupPayload = {
-  tables: Tables;
-  version: number;
-  values: Values;
-};
 
 export type ImportMode = 'deepMerge' | 'merge' | 'replace';
 
@@ -31,8 +26,13 @@ type ImportSelection = Record<'instruments' | 'settings' | 'setlists' | 'songs',
 type ImportSummaryDialogProps = {
   file: File | null;
   onClose: () => void;
-  // `values` is undefined when settings are not selected
-  onImport: (tables: Tables, values: Values | undefined, mode: ImportMode) => void;
+  // `values` is undefined when settings are not selected; `sheetMusic` is empty when songs are not selected
+  onImport: (
+    tables: Tables,
+    values: Values | undefined,
+    mode: ImportMode,
+    sheetMusic: SheetMusicFiles,
+  ) => void;
 };
 
 const allSelected: ImportSelection = {
@@ -74,7 +74,11 @@ const getCellAsString = (value: unknown, fallback: string): string =>
 export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClose, onImport }) => {
   const store = useStore();
   const [error, setError] = useState<string | null>(null);
-  const [parsed, setParsed] = useState<{ tables: Tables; values: Values } | null>(null);
+  const [parsed, setParsed] = useState<{
+    sheetMusic: SheetMusicFiles;
+    tables: Tables;
+    values: Values;
+  } | null>(null);
   const [selection, setSelection] = useState<ImportSelection>(allSelected);
   const { register, reset, watch } = useForm<ImportFormData>({
     defaultValues: { mode: 'replace' },
@@ -94,8 +98,7 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
 
     const parseFile = async () => {
       try {
-        const text = await file.text();
-        const payload = JSON.parse(text) as Partial<BackupPayload>;
+        const { payload, sheetMusic } = await parseBackupFile(file);
 
         if (!payload.tables || !payload.values || typeof payload.version !== 'number') {
           throw new Error('Invalid backup format.');
@@ -110,7 +113,11 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
           return;
         }
 
-        setParsed({ tables: migrationResult.tables, values: migrationResult.values });
+        setParsed({
+          sheetMusic,
+          tables: migrationResult.tables,
+          values: migrationResult.values,
+        });
       } catch (parseError) {
         if (cancelled) return;
 
@@ -127,6 +134,11 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
     };
   }, [file]);
 
+  // Only keep PDFs that belong to a song in the backup
+  const includedSheetMusic: SheetMusicFiles = new Map(
+    [...(parsed?.sheetMusic ?? [])].filter(([songId]) => !!parsed?.tables.songs?.[songId]),
+  );
+
   const handleConfirm = () => {
     if (!parsed) return;
 
@@ -139,7 +151,12 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
       });
     });
 
-    onImport(tables, selection.settings ? parsed.values : undefined, mode);
+    onImport(
+      tables,
+      selection.settings ? parsed.values : undefined,
+      mode,
+      selection.songs ? includedSheetMusic : new Map(),
+    );
   };
 
   const handleSelectionChange = (key: keyof ImportSelection) => (checked: boolean) =>
@@ -149,6 +166,13 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
   const hasSettingValues = Object.keys(parsed?.values ?? {}).length > 0;
 
   const songs = Object.values(parsed?.tables.songs ?? {});
+  // A backup without any PDFs is a plain JSON backup, so only warn about gaps in backups that do include PDFs
+  const songsWithoutSheetMusic =
+    includedSheetMusic.size === 0
+      ? 0
+      : Object.entries(parsed?.tables.songs ?? {}).filter(
+          ([songId, song]) => !!song.sheetMusicFilename && !includedSheetMusic.has(songId),
+        ).length;
   const instruments = Object.values(parsed?.tables.instruments ?? {});
   const setlists = Object.values(parsed?.tables.setlists ?? {});
 
@@ -195,6 +219,11 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
               count={songs.length}
               label="Songs"
               matchLabel={getMatchLabel('songs')}
+              note={
+                includedSheetMusic.size > 0
+                  ? `${includedSheetMusic.size} sheet music PDF${includedSheetMusic.size === 1 ? '' : 's'} included`
+                  : undefined
+              }
               onCheckedChange={handleSelectionChange('songs')}
             />
             <ImportSummarySection
@@ -223,6 +252,16 @@ export const ImportSummaryDialog: FC<ImportSummaryDialogProps> = ({ file, onClos
               />
             )}
           </div>
+
+          {selection.songs && songsWithoutSheetMusic > 0 && (
+            <div className="mb-4">
+              <Alert severity="warning">
+                {songsWithoutSheetMusic}{' '}
+                {songsWithoutSheetMusic === 1 ? 'song refers' : 'songs refer'} to sheet music that
+                is not included in this backup.
+              </Alert>
+            </div>
+          )}
 
           {selection.setlists && !selection.songs && (
             <div className="mb-4">
