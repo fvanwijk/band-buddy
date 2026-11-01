@@ -159,4 +159,5 @@ export const ttsVoiceSchema = z.string();
 export const showMidiEventLogPanelSchema = z.boolean().default(false);
 export const hideEmptyTabsSchema = z.boolean().default(false);
 export const skipMidiOnSongChangeSchema = z.boolean().default(false);
+export const showSpotifyPlayerSchema = z.boolean().default(false);
 export const showDrawingToolsSchema = z.boolean().default(false);

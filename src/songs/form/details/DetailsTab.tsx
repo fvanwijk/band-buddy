@@ -9,6 +9,7 @@ import {
 import { Card } from '../../../ui/Card';
 import { InputField } from '../../../ui/form/InputField';
 import { RadioGroup } from '../../../ui/form/RadioGroup';
+import { parseSpotifyTrackId } from '../../parseSpotifyTrackId';
 import type { SongFormData } from '../SongForm';
 import { timeSignatureOptions } from '../timeSignatureOptions';
 import { KeyPicker } from './key-picker/KeyPicker';
@@ -133,6 +134,20 @@ export const DetailsTab: FC<DetailsTabProps> = ({
           Used to announce the song title before the pre count. English when not set.
         </p>
       </div>
+      <InputField
+        error={errors.spotifyId}
+        helperText="Paste a Spotify track link, URI or ID to play this song from Spotify."
+        label="Spotify track"
+        placeholder="https://open.spotify.com/track/..."
+        {...register('spotifyId', {
+          setValueAs: (value: string) =>
+            value ? (parseSpotifyTrackId(value) ?? value) : undefined,
+          validate: (value) =>
+            !value ||
+            parseSpotifyTrackId(value) !== undefined ||
+            'Enter a valid Spotify track link',
+        })}
+      />
     </Card>
   );
 };

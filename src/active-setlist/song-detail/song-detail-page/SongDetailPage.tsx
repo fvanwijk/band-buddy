@@ -8,9 +8,11 @@ import {
   useGetHideEmptyTabs,
   useGetMetronomeVolume,
   useGetPreCountVolume,
+  useGetShowSpotifyPlayer,
   useGetSkipMidiOnSongChange,
 } from '../../../api/useSettings';
 import { useGetSongs } from '../../../api/useSong';
+import { useSpotify } from '../../../contexts/SpotifyContext';
 import { sendMidiActionToInstrument } from '../../../midi/sendProgramChangeToInstrument';
 import { useMidiDevices } from '../../../midi/useMidiDevices';
 import { songDetailTabSchema } from '../../../schemas';
@@ -22,6 +24,7 @@ import { EmptyStateBlock } from '../../../ui/empty-state-block/EmptyStateBlock';
 import { Page } from '../../../ui/Page';
 import { PageHeader } from '../../../ui/PageHeader';
 import { Tabs } from '../../../ui/Tabs';
+import { cn } from '../../../utils/cn';
 import { DrawingOverlay } from '../lyrics/DrawingOverlay';
 import { LyricsBlock } from '../lyrics/LyricsBlock';
 import { MetronomeControl } from '../metronome-control/MetronomeControl';
@@ -29,6 +32,7 @@ import { MidiButtonsDisplay } from '../midi-buttons-display/MidiButtonsDisplay';
 import { SettingsPanel } from '../settings-panel/SettingsPanel';
 import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
 import { SongStats } from '../song-stats/SongStats';
+import { SpotifyPlayer } from '../spotify-player/SpotifyPlayer';
 import { TextNotesBlock } from '../text-notes/TextNotesBlock';
 import { hasSongChangeTrigger, songChangeTriggerState } from './songChangeTrigger';
 
@@ -48,7 +52,9 @@ export function SongDetailPage() {
   const hideEmptyTabs = useGetHideEmptyTabs();
   const metronomeVolume = useGetMetronomeVolume();
   const preCountVolume = useGetPreCountVolume();
+  const showSpotifyPlayer = useGetShowSpotifyPlayer();
   const skipMidiOnSongChange = useGetSkipMidiOnSongChange();
+  const { isAuthenticated: isSpotifyConnected } = useSpotify();
   const songs = useGetSongs();
   const { isReady, isSupported, outputs } = useMidiDevices();
 
@@ -252,6 +258,9 @@ export function SongDetailPage() {
     void navigate(`/play/${setlistId}/${setlistSongId}/${tabId}`);
   };
 
+  const spotifyId = currentSong.spotifyId;
+  const isSpotifyPlayerVisible = showSpotifyPlayer && isSpotifyConnected && !!spotifyId;
+
   const hasLyrics = !!currentSong.lyrics && currentSong.lyrics.trim().length > 0;
   const hasSheetMusic = !!currentSong.sheetMusicFilename;
   const hasNotes = songHasTextNotes(currentSong);
@@ -283,7 +292,12 @@ export function SongDetailPage() {
     },
     {
       content: (
-        <div className="flex h-[calc(100dvh-311px)] flex-col">
+        <div
+          className={cn(
+            'flex flex-col',
+            isSpotifyPlayerVisible ? 'h-[calc(100dvh-363px)]' : 'h-[calc(100dvh-311px)]',
+          )}
+        >
           <DrawingOverlay canvasType="textNotes" songId={currentSongId} zoom={zoom}>
             <TextNotesBlock notes={currentSong.notes} />
           </DrawingOverlay>
@@ -339,7 +353,7 @@ export function SongDetailPage() {
 
   return (
     <>
-      <Page className="pb-24.25">
+      <Page className={isSpotifyPlayerVisible ? 'pb-37.25' : 'pb-24.25'}>
         <PageHeader
           action={toolbar}
           backPath="/play"
@@ -385,6 +399,9 @@ export function SongDetailPage() {
               </Button>
             )}
           </div>
+          {isSpotifyPlayerVisible && (
+            <SpotifyPlayer durationSeconds={currentSong.duration} spotifyId={spotifyId} />
+          )}
         </nav>
       </Page>
     </>

@@ -6,13 +6,16 @@ import { usePopper } from 'react-popper';
 import {
   useGetHideEmptyTabs,
   useGetShowDrawingTools,
+  useGetShowSpotifyPlayer,
   useGetSkipMidiOnSongChange,
   useSetHideEmptyTabs,
   useSetShowDrawingTools,
+  useSetShowSpotifyPlayer,
   useSetSkipMidiOnSongChange,
 } from '../../../api/useSettings';
 import { useUpdateSong } from '../../../api/useSong';
 import { useMidiEventLogContext } from '../../../contexts/MidiEventLogContext';
+import { useSpotify } from '../../../contexts/SpotifyContext';
 import { Grid } from '../../../settings/Grid';
 import { GridCell } from '../../../settings/GridCell';
 import { defaultTabOptions } from '../../../songs/form/settings/SettingsTab';
@@ -39,6 +42,9 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
   const setHideEmptyTabs = useSetHideEmptyTabs();
   const showDrawingTools = useGetShowDrawingTools();
   const setShowDrawingTools = useSetShowDrawingTools();
+  const showSpotifyPlayer = useGetShowSpotifyPlayer();
+  const setShowSpotifyPlayer = useSetShowSpotifyPlayer();
+  const { isAuthenticated: isSpotifyConnected } = useSpotify();
   const skipMidiOnSongChange = useGetSkipMidiOnSongChange();
   const setSkipMidiOnSongChange = useSetSkipMidiOnSongChange();
   const transpose = song.transpose ?? 0;
@@ -118,6 +124,13 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
               label="Show MIDI event log"
               onChange={(event) => setIsMidiEventLogOpen(event.target.checked)}
             />
+            {isSpotifyConnected && (
+              <Checkbox
+                checked={showSpotifyPlayer}
+                label="Show Spotify player"
+                onChange={(event) => setShowSpotifyPlayer(event.target.checked)}
+              />
+            )}
           </GridCell>
         </Grid>
       </PopoverPanel>

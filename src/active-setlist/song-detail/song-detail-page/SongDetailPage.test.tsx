@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 import { MidiEventLogProvider } from '../../../contexts/MidiEventLogContext';
 import { seedStore } from '../../../mocks/seed';
 import { StoreProvider } from '../../../store/StoreProvider';
-import { getMockStore } from '../../../testUtils';
+import { MockSpotifyProvider, getMockStore } from '../../../testUtils';
 import { SongDetailPage } from './SongDetailPage';
 
 const useSequencerTransportMock = vi.fn();
@@ -36,6 +36,7 @@ describe('SongDetailPage', () => {
     songCells = {},
     hideEmptyTabs = false,
     isSupported = true,
+    showSpotifyPlayer = false,
     skipMidiOnSongChange = false,
     tab,
     triggerState,
@@ -46,6 +47,7 @@ describe('SongDetailPage', () => {
     defaultTab?: 'lyrics' | 'midi' | 'text-notes' | 'sheet-music';
     hideEmptyTabs?: boolean;
     isSupported?: boolean;
+    showSpotifyPlayer?: boolean;
     skipMidiOnSongChange?: boolean;
     songCells?: Record<string, string>;
     tab?: string;
@@ -91,6 +93,9 @@ describe('SongDetailPage', () => {
       );
       store.setPartialRow('songs', '0', { midiEvents: JSON.stringify(midiEvents) });
     }
+    if (showSpotifyPlayer) {
+      store.setValue('showSpotifyPlayer', true);
+    }
     if (skipMidiOnSongChange) {
       store.setValue('skipMidiOnSongChange', true);
     }
@@ -117,7 +122,9 @@ describe('SongDetailPage', () => {
     render(<RoutesStub initialEntries={[{ pathname: route, state: triggerState }]} />, {
       wrapper: ({ children }) => (
         <StoreProvider>
-          <MidiEventLogProvider>{children}</MidiEventLogProvider>
+          <MockSpotifyProvider>
+            <MidiEventLogProvider>{children}</MidiEventLogProvider>
+          </MockSpotifyProvider>
         </StoreProvider>
       ),
     });
@@ -130,6 +137,26 @@ describe('SongDetailPage', () => {
 
     expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'September' })).toHaveAttribute('href', '/play/0/1');
+  });
+
+  it('does not render the Spotify player by default', async () => {
+    await renderComponent();
+
+    expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
+    expect(screen.queryByRole('slider', { name: 'Song progress' })).not.toBeInTheDocument();
+  });
+
+  it('renders the Spotify player when enabled and the song has a Spotify ID', async () => {
+    await renderComponent({ showSpotifyPlayer: true });
+
+    expect(await screen.findByRole('slider', { name: 'Song progress' })).toBeInTheDocument();
+  });
+
+  it('does not render the Spotify player for a song without a Spotify ID', async () => {
+    await renderComponent({ clearedSongCells: ['spotifyId'], showSpotifyPlayer: true });
+
+    expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
+    expect(screen.queryByRole('slider', { name: 'Song progress' })).not.toBeInTheDocument();
   });
 
   it('sends song change MIDI buttons when the song was selected explicitly', async () => {

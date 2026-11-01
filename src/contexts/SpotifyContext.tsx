@@ -35,6 +35,11 @@ export function SpotifyProvider({ children }: SpotifyProviderProps) {
         const spotifyApi = SpotifyApi.withUserAuthorization(clientId, redirectUri, [
           'playlist-read-private',
           'playlist-read-collaborative',
+          'streaming',
+          'user-modify-playback-state',
+          'user-read-email',
+          'user-read-playback-state',
+          'user-read-private',
         ]);
 
         // Check if we have authorization code in URL (OAuth callback)

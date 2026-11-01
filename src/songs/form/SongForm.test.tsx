@@ -24,7 +24,7 @@ describe('SongForm', () => {
           const RoutesStub = createRoutesStub([
             {
               children: [{ Component: () => children, path: ':tab' }],
-              path: id ? `songs/edit/${id}` : '/songs/add',
+              path: id ? 'songs/edit/:id' : '/songs/add',
             },
           ]);
 
@@ -199,6 +199,39 @@ describe('SongForm', () => {
       }),
       undefined,
     );
+  });
+
+  it('should show the saved Spotify ID and save a pasted track link as ID', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const { id, ...initialData } = createSong({ spotifyId: undefined });
+
+    renderComponent({ initialData, onSubmit }, id);
+
+    await user.type(
+      await screen.findByLabelText('Spotify track'),
+      'https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC?si=abc',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ spotifyId: '4uLU6hMCjMI75M1A2tKUQC' }),
+      undefined,
+    );
+  });
+
+  it('should reject an invalid Spotify link', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const { id, ...initialData } = createSong({ spotifyId: undefined });
+
+    renderComponent({ initialData, onSubmit }, id);
+
+    await user.type(await screen.findByLabelText('Spotify track'), 'not a link');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(await screen.findByText('Enter a valid Spotify track link')).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it('should save edited events', async () => {

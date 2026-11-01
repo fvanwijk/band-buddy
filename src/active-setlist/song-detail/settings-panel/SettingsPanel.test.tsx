@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { MidiEventLogProvider } from '../../../contexts/MidiEventLogContext';
 import { createSong, createSongTable } from '../../../mocks/songs';
 import { StoreProvider } from '../../../store/StoreProvider';
-import { getMockStore } from '../../../testUtils';
+import { MockSpotifyProvider, getMockStore } from '../../../testUtils';
 import type { Song } from '../../../types';
 import { SettingsPanel } from './SettingsPanel';
 
@@ -18,7 +18,7 @@ describe('SettingsPanel', () => {
     transpose: 2,
   });
 
-  const renderComponent = async (song: Song) => {
+  const renderComponent = async (song: Song, { isSpotifyConnected = false } = {}) => {
     const { store, persister } = getMockStore();
     store.setValue('metronomeVolume', 50);
     store.setValue('showDrawingTools', true);
@@ -41,7 +41,9 @@ describe('SettingsPanel', () => {
     render(<SettingsPanel onZoomChange={() => {}} song={song} zoom={1} />, {
       wrapper: ({ children }) => (
         <StoreProvider>
-          <MidiEventLogProvider>{children}</MidiEventLogProvider>
+          <MockSpotifyProvider isAuthenticated={isSpotifyConnected}>
+            <MidiEventLogProvider>{children}</MidiEventLogProvider>
+          </MockSpotifyProvider>
         </StoreProvider>
       ),
     });
@@ -155,5 +157,29 @@ describe('SettingsPanel', () => {
     await user.click(screen.getByTitle('Settings'));
 
     expect(screen.getByRole('combobox', { name: 'Default tab' })).toHaveValue('auto');
+  });
+
+  it('hides the Spotify player setting without a Spotify connection', async () => {
+    const user = userEvent.setup();
+    await renderComponent(songWithAllSettings);
+
+    await user.click(screen.getByTitle('Settings'));
+
+    expect(screen.queryByRole('checkbox', { name: 'Show Spotify player' })).not.toBeInTheDocument();
+  });
+
+  it('toggles the Spotify player setting with a Spotify connection', async () => {
+    const user = userEvent.setup();
+    await renderComponent(songWithAllSettings, { isSpotifyConnected: true });
+
+    await user.click(screen.getByTitle('Settings'));
+    const checkbox = screen.getByRole('checkbox', { name: 'Show Spotify player' });
+    expect(checkbox).not.toBeChecked();
+
+    await user.click(checkbox);
+
+    await waitFor(() => {
+      expect(getPersistedStore()).toContain('"showSpotifyPlayer":true');
+    });
   });
 });

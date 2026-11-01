@@ -13,6 +13,7 @@ import {
   preCountVolumeSchema,
   showMidiEventLogPanelSchema,
   showDrawingToolsSchema,
+  showSpotifyPlayerSchema,
   skipMidiOnSongChangeSchema,
   themeSchema,
   ttsVoiceSchema,
@@ -185,6 +186,22 @@ export function useGetShowDrawingTools(): boolean {
  */
 export function useSetShowDrawingTools() {
   return useSetValueCallback('showDrawingTools', (show: boolean) => show, []);
+}
+
+/**
+ * Hook to get whether the Spotify player is shown on the song detail page
+ */
+export function useGetShowSpotifyPlayer(): boolean {
+  const show = useValue('showSpotifyPlayer');
+  const result = showSpotifyPlayerSchema.safeParse(show);
+  return result.success ? result.data : false;
+}
+
+/**
+ * Hook to set whether the Spotify player is shown on the song detail page
+ */
+export function useSetShowSpotifyPlayer() {
+  return useSetValueCallback('showSpotifyPlayer', (show: boolean) => show, []);
 }
 
 /**

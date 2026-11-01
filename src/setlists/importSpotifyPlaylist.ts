@@ -40,6 +40,10 @@ export function useProcessSpotifyPlaylist() {
         const existingSongId = existingSongIdsByKey.get(songKey);
 
         if (existingSongId) {
+          // Link already existing songs to Spotify so they can be played
+          if (!store.getCell('songs', existingSongId, 'spotifyId')) {
+            store.setCell('songs', existingSongId, 'spotifyId', track.id);
+          }
           songIds.push(existingSongId);
           return;
         }
