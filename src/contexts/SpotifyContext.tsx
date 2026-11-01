@@ -1,5 +1,22 @@
-import { SpotifyApi } from '@spotify/web-api-ts-sdk';
+import { SpotifyApi, type IResponseDeserializer } from '@spotify/web-api-ts-sdk';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+
+// Spotify's player endpoints answer with a plain text body, which the SDK's default
+// deserializer fails on even though the request succeeded.
+export const tolerantDeserializer: IResponseDeserializer = {
+  async deserialize<T>(response: Response) {
+    const text = await response.text();
+    if (!text) {
+      return null as T;
+    }
+
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      return null as T;
+    }
+  },
+};
 
 export type SpotifyContextType = {
   isAuthenticated: boolean;
@@ -32,15 +49,20 @@ export function SpotifyProvider({ children }: SpotifyProviderProps) {
     const initializeSpotify = async () => {
       try {
         // Create SDK instance
-        const spotifyApi = SpotifyApi.withUserAuthorization(clientId, redirectUri, [
-          'playlist-read-private',
-          'playlist-read-collaborative',
-          'streaming',
-          'user-modify-playback-state',
-          'user-read-email',
-          'user-read-playback-state',
-          'user-read-private',
-        ]);
+        const spotifyApi = SpotifyApi.withUserAuthorization(
+          clientId,
+          redirectUri,
+          [
+            'playlist-read-private',
+            'playlist-read-collaborative',
+            'streaming',
+            'user-modify-playback-state',
+            'user-read-email',
+            'user-read-playback-state',
+            'user-read-private',
+          ],
+          { deserializer: tolerantDeserializer },
+        );
 
         // Check if we have authorization code in URL (OAuth callback)
         if (new URLSearchParams(window.location.search).has('code')) {

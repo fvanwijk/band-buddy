@@ -20,6 +20,7 @@ A musician companion app for managing songs, setlists, and MIDI instruments. Bui
 
 - **Data Portability** - Import and export your entire library (songs, setlists, instruments) as JSON
 - **Spotify Integration** - Import playlists from Spotify to quickly build your song library
+- **Spotify Player** - Play the current song from Spotify on the song page, in the browser or by controlling the Spotify app on your phone ([details](src/active-setlist/song-detail/spotify-player/README.md))
 - **Share with band members** - Easily sync your data across devices or share with your band
 
 ### Additional Features
@@ -42,4 +43,4 @@ A musician companion app for managing songs, setlists, and MIDI instruments. Bui
 - TinyBase for state management with localStorage persistence
 - Tailwind CSS 4 (dark mode only)
 - Web MIDI API for MIDI device control
-- Spotify Web API SDK for playlist import
+- Spotify Web API SDK for playlist import and Spotify Web Playback SDK for playing songs

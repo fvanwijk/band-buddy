@@ -135,6 +135,26 @@ describe('DataSettings', () => {
     expect(getPersisted().values.theme).toBe('violet');
   });
 
+  it('ignores the Spotify device in backups made before it was kept out of the store', async () => {
+    await renderComponent();
+
+    await selectBackup(
+      createBackupFile(
+        { songs: { imported: createSongTable({ title: 'Imported song' }) } },
+        { spotifyDeviceId: 'other-device', theme: 'violet' },
+      ),
+    );
+    await userEvent.click(
+      within(screen.getByRole('dialog', { name: 'Confirm import' })).getByRole('button', {
+        name: 'Import',
+      }),
+    );
+
+    expect(await screen.findByText('Backup imported successfully.')).toBeInTheDocument();
+    await waitFor(() => expect(getPersisted().values.theme).toBe('violet'));
+    expect(getPersisted().values.spotifyDeviceId).toBeUndefined();
+  });
+
   it('only replaces the data that is selected', async () => {
     await renderComponent();
     await selectBackup(importedBackup());
