@@ -18,6 +18,10 @@ export const emptySnapshot = (): PlaybackSnapshot => ({
   receivedAt: Date.now(),
 });
 
+// Spotify forgets a device that was idle for a moment, after which commands fail with a 404
+export const isDeviceNotFoundError = (error: unknown) =>
+  error instanceof Error && /device not found|no active device/i.test(error.message);
+
 export const getPlaybackErrorMessage = (error: unknown) => {
   const message = error instanceof Error ? error.message : '';
   if (/track unavailable/i.test(message)) {
@@ -26,7 +30,10 @@ export const getPlaybackErrorMessage = (error: unknown) => {
   if (/403|forbidden|premium/i.test(message)) {
     return 'Spotify playback is not permitted. Reconnect Spotify in the settings (Premium required).';
   }
-  if (/404|no active device|device not found/i.test(message)) {
+  if (/non existing id|invalid base62 id/i.test(message)) {
+    return "Spotify doesn't know the track ID of this song.";
+  }
+  if (isDeviceNotFoundError(error)) {
     return 'Spotify device not found. Open Spotify on that device and try again.';
   }
   return 'Could not control Spotify playback';

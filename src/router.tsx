@@ -1,6 +1,7 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 
 import { ActiveSetlistPage } from './active-setlist/ActiveSetlistPage';
+import { PlayLayout } from './active-setlist/PlayLayout';
 import { songDetailIndexLoader } from './active-setlist/song-detail/song-detail-page/songDetailIndexLoader';
 import { SongDetailIndexRedirect } from './active-setlist/song-detail/song-detail-page/SongDetailIndexRedirect';
 import { SongDetailPage } from './active-setlist/song-detail/song-detail-page/SongDetailPage';
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
             path: ':setlistId/:setlistSongId',
           },
         ],
+        element: <PlayLayout />,
         path: 'play',
       },
       {

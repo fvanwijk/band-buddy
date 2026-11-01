@@ -19,10 +19,12 @@ There are two ways to play, chosen automatically. Both are exposed through `useS
 which `SpotifyPlayer` uses, so the UI is the same for both.
 
 ```
-SpotifyPlayer
-└── useSpotifyPlayback          chooses between the two players and merges their state
-    ├── useSpotifyBrowserPlayback   first-class player: this browser is the Spotify device
-    └── useSpotifyRemotePlayback    fallback player: remote controls the Spotify app on a device
+PlayLayout (route /play)
+└── SpotifyWebPlayerProvider    owns the Web Playback SDK player for the whole /play section
+    └── SpotifyPlayer
+        └── useSpotifyPlayback              chooses between the two players, merges their state
+            ├── useSpotifyBrowserPlayback   first-class player: this browser is the Spotify device
+            └── useSpotifyRemotePlayback    fallback player: remote controls the Spotify app
 ```
 
 ## First-class player: this browser
@@ -38,8 +40,14 @@ BandBuddy runs on.
   straight to the SDK player.
 - Browsers only allow audio after a user gesture, so `activateElement()` is called from the click
   handler.
-- The player connects while the Spotify player is visible and disconnects when it is hidden or the
-  page is left, which stops the music.
+- The SDK player is owned by `SpotifyWebPlayerProvider`, which `PlayLayout` (the `/play` route)
+  mounts. The song detail page is remounted for every song, so the player must not live in it:
+  disconnecting and reconnecting on each song stops the music and registers the browser as a
+  device again, after which commands were seen to fail with `Device not found`. The player connects
+  when the setting is on and Spotify is connected, and disconnects when the setting is turned off or
+  `/play` is left.
+- When Spotify answers `Device not found` to a command (the browser device went idle), the device
+  is made the active one again with a playback transfer and the command is retried once.
 
 The SDK needs DRM (Encrypted Media Extensions) support. It does not work in mobile browsers
 (`EMEError: No supported keysystem was found`, reported as `initialization_error`). The player falls

@@ -3,7 +3,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useSpotify } from '../../../contexts/SpotifyContext';
 import { getPlayableTrack } from './getPlayableTrack';
-import { type PlaybackSnapshot, emptySnapshot, getPlaybackErrorMessage } from './playbackSnapshot';
+import {
+  type PlaybackSnapshot,
+  emptySnapshot,
+  getPlaybackErrorMessage,
+  isDeviceNotFoundError,
+} from './playbackSnapshot';
 import { useSpotifyDeviceId } from './useSpotifyDeviceId';
 
 const POLL_INTERVAL_MS = 3000;
@@ -203,11 +208,23 @@ export const useSpotifyRemotePlayback = (spotifyId: string, isEnabled: boolean) 
 
       try {
         // A device that is not active yet, like a sleeping app, must be woken up first
-        if (!targetDevice?.is_active) {
+        const wakeUp = async () => {
           await sdk?.player.transferPlayback([targetDeviceId], false);
           await sleep(WAKE_UP_DELAY_MS);
+        };
+        if (!targetDevice?.is_active) {
+          await wakeUp();
         }
-        await command(targetDeviceId);
+        try {
+          await command(targetDeviceId);
+        } catch (error) {
+          // The device list can be outdated, so wake the device and try once more
+          if (!isDeviceNotFoundError(error)) {
+            throw error;
+          }
+          await wakeUp();
+          await command(targetDeviceId);
+        }
         ignorePollsUntilRef.current = Date.now() + SETTLE_TIME_MS;
         setSnapshot((current) => ({ ...current, ...next, receivedAt: Date.now() }));
 

@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { StoreProvider } from '../../../store/StoreProvider';
 import { MockSpotifyProvider } from '../../../testUtils';
 import { SpotifyPlayer } from './SpotifyPlayer';
+import { SpotifyWebPlayerProvider } from './SpotifyWebPlayerProvider';
 
 type Listener = (payload: unknown) => void;
 
@@ -27,6 +28,7 @@ describe('SpotifyPlayer', () => {
     const player = {
       seekToPosition: vi.fn().mockResolvedValue(undefined),
       startResumePlayback: vi.fn().mockResolvedValue(undefined),
+      transferPlayback: vi.fn().mockResolvedValue(undefined),
     };
 
     render(
@@ -45,7 +47,9 @@ describe('SpotifyPlayer', () => {
           } as unknown as SpotifyApi
         }
       >
-        <SpotifyPlayer durationSeconds={200} spotifyId="abc123" />
+        <SpotifyWebPlayerProvider isEnabled>
+          <SpotifyPlayer durationSeconds={200} spotifyId="abc123" />
+        </SpotifyWebPlayerProvider>
       </MockSpotifyProvider>,
     );
 
@@ -63,6 +67,7 @@ describe('SpotifyPlayer', () => {
       disconnect: vi.fn(),
       getCurrentState: vi.fn().mockResolvedValue(null),
       pause: vi.fn().mockResolvedValue(undefined),
+      removeListener: vi.fn(),
       resume: vi.fn().mockResolvedValue(undefined),
       seek: vi.fn().mockResolvedValue(undefined),
     };
@@ -85,7 +90,9 @@ describe('SpotifyPlayer', () => {
   it('is disabled until the browser device is ready', async () => {
     render(
       <MockSpotifyProvider sdk={{ getAccessToken: vi.fn() } as unknown as SpotifyApi}>
-        <SpotifyPlayer durationSeconds={200} spotifyId="abc123" />
+        <SpotifyWebPlayerProvider isEnabled>
+          <SpotifyPlayer durationSeconds={200} spotifyId="abc123" />
+        </SpotifyWebPlayerProvider>
       </MockSpotifyProvider>,
     );
 
@@ -110,6 +117,20 @@ describe('SpotifyPlayer', () => {
     expect(player.startResumePlayback).toHaveBeenCalledWith('browser-device', undefined, [
       'spotify:track:abc123',
     ]);
+  });
+
+  it('makes this browser the active device again when Spotify forgot it', async () => {
+    const user = userEvent.setup();
+    const player = await renderComponent();
+    player.startResumePlayback.mockRejectedValueOnce(
+      new Error('404 Player command failed: Device not found'),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Play on Spotify' }));
+
+    await vi.waitFor(() => expect(player.startResumePlayback).toHaveBeenCalledTimes(2));
+    expect(player.transferPlayback).toHaveBeenCalledWith(['browser-device'], false);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('shows the progress of the playing track and pauses it', async () => {
@@ -180,6 +201,40 @@ describe('SpotifyPlayer', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Premium is required');
   });
 
+  it('keeps the same player and device when the player is remounted for another song', async () => {
+    const user = userEvent.setup();
+    const sdk = {
+      getAccessToken: vi.fn().mockResolvedValue({ access_token: 'token' }),
+      player: { startResumePlayback: vi.fn().mockResolvedValue(undefined) },
+      tracks: {
+        get: vi.fn().mockResolvedValue({
+          album: { uri: 'spotify:album:album1' },
+          is_playable: true,
+          uri: 'spotify:track:next',
+        }),
+      },
+    } as unknown as SpotifyApi;
+    const renderTree = (spotifyId: string) => (
+      <MockSpotifyProvider sdk={sdk}>
+        <SpotifyWebPlayerProvider isEnabled>
+          <SpotifyPlayer durationSeconds={200} key={spotifyId} spotifyId={spotifyId} />
+        </SpotifyWebPlayerProvider>
+      </MockSpotifyProvider>
+    );
+    const { rerender } = render(renderTree('abc123'));
+    await vi.waitFor(() => expect(listeners.ready).toBeDefined());
+    emit('ready', { device_id: 'browser-device' });
+
+    rerender(renderTree('next'));
+    await user.click(await screen.findByRole('button', { name: 'Play on Spotify' }));
+
+    expect(window.Spotify.Player).toHaveBeenCalledTimes(1);
+    expect(fakePlayer.disconnect).not.toHaveBeenCalled();
+    expect(sdk.player.startResumePlayback).toHaveBeenCalledWith('browser-device', undefined, [
+      'spotify:track:next',
+    ]);
+  });
+
   it('disconnects the player when unmounted', async () => {
     await renderComponent();
 
@@ -236,7 +291,9 @@ describe('SpotifyPlayer', () => {
               } as unknown as SpotifyApi
             }
           >
-            <SpotifyPlayer durationSeconds={200} spotifyId="abc123" />
+            <SpotifyWebPlayerProvider isEnabled>
+              <SpotifyPlayer durationSeconds={200} spotifyId="abc123" />
+            </SpotifyWebPlayerProvider>
           </MockSpotifyProvider>
         </StoreProvider>,
       );
@@ -477,6 +534,26 @@ describe('SpotifyPlayer', () => {
       await vi.waitFor(() => expect(player.pausePlayback).toHaveBeenCalledWith('phone'), {
         timeout: 5000,
       });
+    });
+
+    it('wakes the device and retries when Spotify reports it as not found', async () => {
+      const user = userEvent.setup();
+      const player = await renderRemote({
+        devices: [{ ...phone, is_active: true }],
+        selectedDeviceId: 'phone',
+      });
+      player.startResumePlayback.mockRejectedValueOnce(
+        new Error('404 Player command failed: Device not found'),
+      );
+
+      await vi.waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Play on Spotify' })).toBeEnabled(),
+      );
+      await user.click(screen.getByRole('button', { name: 'Play on Spotify' }));
+
+      await vi.waitFor(() => expect(player.startResumePlayback).toHaveBeenCalledTimes(2));
+      expect(player.transferPlayback).toHaveBeenCalledWith(['phone'], false);
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
 
     it('plays the URI Spotify relinks the track to in the user market', async () => {

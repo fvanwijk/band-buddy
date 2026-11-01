@@ -12,7 +12,7 @@ import { useSpotifyRemotePlayback } from './useSpotifyRemotePlayback';
  */
 export const useSpotifyPlayback = (spotifyId: string, fallbackDurationMs?: number) => {
   const [isMobile] = useState(isMobileBrowser);
-  const browser = useSpotifyBrowserPlayback(spotifyId, !isMobile);
+  const browser = useSpotifyBrowserPlayback(spotifyId);
   const isRemote = isMobile || browser.isUnsupported;
   const remote = useSpotifyRemotePlayback(spotifyId, isRemote);
   const active = isRemote ? remote : browser;
