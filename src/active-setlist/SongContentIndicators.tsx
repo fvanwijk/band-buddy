@@ -1,5 +1,6 @@
 import {
   IconBinary,
+  IconBrandSpotify,
   IconFileMusic,
   IconMicrophone2,
   IconNotes,
@@ -47,6 +48,11 @@ export const SongContentIndicators: FC<SongContentIndicatorsProps> = ({ song }) 
       icon: <IconTimeline className="h-4 w-4" />,
       isPresent: !!song.events?.length,
       label: 'events',
+    },
+    {
+      icon: <IconBrandSpotify className="h-4 w-4" />,
+      isPresent: !!song.spotifyId,
+      label: 'Spotify track',
     },
   ];
 

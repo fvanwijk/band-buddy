@@ -76,6 +76,20 @@ describe('SongRow', () => {
     expect(screen.getByRole('img', { name: 'No events' })).toBeInTheDocument();
   });
 
+  it.each([
+    ['Has Spotify track', '3n3Ppam7vgaVa1iaRUc9Lp'],
+    ['No Spotify track', undefined],
+  ])('shows "%s" indicator', (name, spotifyId) => {
+    render(
+      <ul>
+        <SongRow index={1} setlistId="2" setlistSongId="abc" song={createSong({ spotifyId })} />
+      </ul>,
+      { wrapper: MockRouteProvider },
+    );
+
+    expect(screen.getByRole('img', { name })).toBeInTheDocument();
+  });
+
   it('highlights the text notes indicator when there are only text note drawings', () => {
     const stroke = { drawMode: true, paths: [{ x: 1, y: 1 }], strokeColor: '#fff', strokeWidth: 2 };
     render(
