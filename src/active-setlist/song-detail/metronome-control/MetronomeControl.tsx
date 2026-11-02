@@ -1,5 +1,6 @@
 import { IconPlayerPlayFilled, IconPlayerStopFilled } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { Output } from 'webmidi';
 
 import { useGetCueOffsetBeats, useGetTtsVoice } from '../../../api/useSettings';
@@ -12,10 +13,14 @@ import { Button } from '../../../ui/Button';
 import { CueMenu } from './CueMenu';
 
 const PAUSE_AFTER_ANNOUNCEMENT_MS = 500;
+const TOP_NAV_HEIGHT_PX = 56;
+const VISIBILITY_THRESHOLDS = Array.from({ length: 101 }, (_, index) => index / 100);
 
 export type MetronomeControlProps = {
   bpm?: number;
   events?: SongEvent[];
+  /** Element to render the play/pause button in while the inline button is scrolled out of view */
+  floatingSlot?: HTMLElement | null;
   isReady: boolean;
   isSupported: boolean;
   metronomeVolume: number;
@@ -31,6 +36,7 @@ export type MetronomeControlProps = {
 export function MetronomeControl({
   bpm,
   events,
+  floatingSlot,
   isReady,
   isSupported,
   metronomeVolume,
@@ -45,9 +51,11 @@ export function MetronomeControl({
   const hasBpm = !!bpm;
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
   const [isAnnouncing, setIsAnnouncing] = useState(false);
+  const [inlineButtonVisibility, setInlineButtonVisibility] = useState(1);
   const [isCueMenuOpen, setIsCueMenuOpen] = useState(false);
   const [metronomePulseKey, setMetronomePulseKey] = useState(0);
   const [startPosition, setStartPosition] = useState<{ beat: number; measure: number }>();
+  const inlineButtonRef = useRef<HTMLDivElement>(null);
   const cancelAnnouncementRef = useRef<(() => void) | null>(null);
   const cancelCueRef = useRef<(() => void) | null>(null);
   const ttsVoiceURI = useGetTtsVoice(songLanguage ?? 'en');
@@ -61,6 +69,23 @@ export function MetronomeControl({
     },
     [],
   );
+
+  useEffect(() => {
+    const element = inlineButtonRef.current;
+    if (!element || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    // The sticky top navigation covers the top of the viewport. The floating button fades in at the
+    // same rate as the inline button disappears behind it.
+    const observer = new IntersectionObserver(
+      ([entry]) => setInlineButtonVisibility(entry.intersectionRatio),
+      { rootMargin: `-${TOP_NAV_HEIGHT_PX}px 0px 0px 0px`, threshold: VISIBILITY_THRESHOLDS },
+    );
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [hasBpm]);
 
   const cues = useMemo(
     () =>
@@ -184,30 +209,51 @@ export function MetronomeControl({
     startMetronome();
   };
 
+  const isFloating = inlineButtonVisibility < 1 && !!floatingSlot;
+
+  const renderToggleButton = () => (
+    <Button
+      key={metronomePulseKey}
+      className="metronome-pulse select-none"
+      isIcon
+      onClick={handleMetronomeToggle}
+      style={{ animationDuration: `${beatDurationSeconds}s` }}
+      title={isActive ? 'Stop metronome' : 'Start metronome, long press to start from cue'}
+      type="button"
+      variant="outlined"
+      {...longPressHandlers}
+    >
+      {isActive ? (
+        <IconPlayerStopFilled className="h-4 w-4" />
+      ) : (
+        <IconPlayerPlayFilled className="h-4 w-4" />
+      )}
+    </Button>
+  );
+
   return (
     <div className="flex items-center gap-2">
-      <div className="relative">
-        <Button
-          key={metronomePulseKey}
-          className="metronome-pulse select-none"
-          isIcon
-          onClick={handleMetronomeToggle}
-          style={{ animationDuration: `${beatDurationSeconds}s` }}
-          title={isActive ? 'Stop metronome' : 'Start metronome, long press to start from cue'}
-          type="button"
-          variant="outlined"
-          {...longPressHandlers}
-        >
-          {isActive ? (
-            <IconPlayerStopFilled className="h-4 w-4" />
-          ) : (
-            <IconPlayerPlayFilled className="h-4 w-4" />
-          )}
-        </Button>
-        {isCueMenuOpen && !isActive && (
+      <div ref={inlineButtonRef} className="relative">
+        {renderToggleButton()}
+        {isCueMenuOpen && !isActive && !isFloating && (
           <CueMenu cues={cues} onClose={closeCueMenu} onSelect={handleCueSelect} />
         )}
       </div>
+      {isFloating &&
+        createPortal(
+          <div className="relative" style={{ opacity: 1 - inlineButtonVisibility }}>
+            {renderToggleButton()}
+            {isCueMenuOpen && !isActive && (
+              <CueMenu
+                className="right-0 left-auto"
+                cues={cues}
+                onClose={closeCueMenu}
+                onSelect={handleCueSelect}
+              />
+            )}
+          </div>,
+          floatingSlot,
+        )}
       <span className="min-w-16 text-xs font-medium text-slate-300" title="Metronome counter">
         M{currentMeasure}:B{currentBeat}
       </span>

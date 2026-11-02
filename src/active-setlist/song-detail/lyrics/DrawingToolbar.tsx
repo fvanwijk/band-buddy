@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 
 import { Button } from '../../../ui/Button';
 import { cn } from '../../../utils/cn';
+import { useFloatingMetronomeSlot } from '../metronome-control/floatingMetronomeSlot';
 
 type ColorOption = {
   label: string;
@@ -38,6 +39,7 @@ export function DrawingToolbar({
   onModeChange,
   selectedColor,
 }: DrawingToolbarProps) {
+  const { setToolbarSlot } = useFloatingMetronomeSlot();
   const selectedOption = useMemo(
     () => colorOptions.find((option) => option.value === selectedColor),
     [selectedColor],
@@ -46,6 +48,7 @@ export function DrawingToolbar({
   return (
     // 52px + 2rem negative margin
     <div className="sticky top-14 z-10 mb-2 flex items-center gap-2 self-end pr-2 sm:-mt-21 sm:mb-8">
+      <div ref={setToolbarSlot} className="contents" />
       <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 p-2">
         <Button
           color={mode === 'idle' ? 'primary' : 'default'}

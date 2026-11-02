@@ -2,14 +2,16 @@ import type { FC } from 'react';
 import { useEffect, useRef } from 'react';
 
 import type { CueEvent } from '../../../types';
+import { cn } from '../../../utils/cn';
 
 type CueMenuProps = {
+  className?: string;
   cues: CueEvent[];
   onClose: () => void;
   onSelect: (cue: CueEvent) => void;
 };
 
-export const CueMenu: FC<CueMenuProps> = ({ cues, onClose, onSelect }) => {
+export const CueMenu: FC<CueMenuProps> = ({ className, cues, onClose, onSelect }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,7 +41,10 @@ export const CueMenu: FC<CueMenuProps> = ({ cues, onClose, onSelect }) => {
     <div
       ref={menuRef}
       aria-label="Start from cue"
-      className="absolute top-full left-0 z-60 mt-2 max-h-72 w-56 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 p-1 shadow-lg"
+      className={cn(
+        'absolute top-full left-0 z-60 mt-2 max-h-72 w-56 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950 p-1 shadow-lg',
+        className,
+      )}
       role="menu"
     >
       {cues.map((cue) => (

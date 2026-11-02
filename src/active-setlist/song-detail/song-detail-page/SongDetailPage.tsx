@@ -27,6 +27,7 @@ import { Tabs } from '../../../ui/Tabs';
 import { cn } from '../../../utils/cn';
 import { DrawingOverlay } from '../lyrics/DrawingOverlay';
 import { LyricsBlock } from '../lyrics/LyricsBlock';
+import { FloatingMetronomeSlotContext } from '../metronome-control/floatingMetronomeSlot';
 import { MetronomeControl } from '../metronome-control/MetronomeControl';
 import { MidiButtonsDisplay } from '../midi-buttons-display/MidiButtonsDisplay';
 import { SettingsPanel } from '../settings-panel/SettingsPanel';
@@ -59,6 +60,9 @@ export function SongDetailPage() {
   const { isReady, isSupported, outputs } = useMidiDevices();
 
   const [zoom, setZoom] = useState(1);
+  const [fallbackSlot, setFallbackSlot] = useState<HTMLElement | null>(null);
+  const [toolbarSlot, setToolbarSlot] = useState<HTMLElement | null>(null);
+  const floatingSlotContext = useMemo(() => ({ setToolbarSlot }), []);
   const [highlightedMidiEventId, setHighlightedMidiEventId] = useState<string | null>(null);
   const lastAutoTriggerPositionRef = useRef<string | null>(null);
   const lastSongChangeTriggerRef = useRef<string | null>(null);
@@ -334,6 +338,7 @@ export function SongDetailPage() {
       <MetronomeControl
         bpm={currentSong.bpm}
         events={currentSong.events}
+        floatingSlot={toolbarSlot ?? fallbackSlot}
         isReady={isReady}
         isSupported={isSupported}
         metronomeVolume={metronomeVolume}
@@ -356,13 +361,19 @@ export function SongDetailPage() {
   );
 
   return (
-    <>
+    <FloatingMetronomeSlotContext value={floatingSlotContext}>
       <Page className={isSpotifyPlayerVisible ? 'pb-37.25' : 'pb-24.25'}>
         <PageHeader
           action={toolbar}
           backPath="/play"
           title={<div className="flex items-center gap-2">{currentSong.title}</div>}
           subtitle={currentSong.artist}
+        />
+
+        {/* Without drawing tools the floating metronome button sticks to the right; -mb-6 cancels the page gap */}
+        <div
+          ref={setFallbackSlot}
+          className="sticky top-14 z-10 -mb-6 flex h-0 justify-end pt-2 pr-2"
         />
 
         {visibleTabs.length > 0 ? (
@@ -408,6 +419,6 @@ export function SongDetailPage() {
           )}
         </nav>
       </Page>
-    </>
+    </FloatingMetronomeSlotContext>
   );
 }
