@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { transposeChord } from './Chord';
 import { LyricsBlock } from './LyricsBlock';
+import { transposeChord } from './transposeChord';
 
 describe('LyricsBlock', () => {
   it('renders nothing when lyrics is undefined', () => {
@@ -76,7 +76,7 @@ describe('LyricsBlock', () => {
   it('removes whitespace when a transposed chord is longer', () => {
     const transpose = 1;
     const first = 'C';
-    const second = 'Db';
+    const second = 'G';
     const { container } = render(
       <LyricsBlock lyrics={`${first} ${second}`} transpose={transpose} />,
     );
@@ -87,17 +87,17 @@ describe('LyricsBlock', () => {
   });
 
   it('does not remove whitespace between regular lyric words after compensation', () => {
-    const { container } = render(<LyricsBlock lyrics={`Db Don't make`} transpose={1} />);
+    const { container } = render(<LyricsBlock lyrics={`C Don't make`} transpose={1} />);
     const pre = container.querySelector('pre');
 
-    expect(pre?.textContent).toBe(`${transposeChord('Db', 1)}Don't make`);
+    expect(pre?.textContent).toBe(`${transposeChord('C', 1)}Don't make`);
   });
 
   it('does not carry whitespace compensation across a line break', () => {
-    const { container } = render(<LyricsBlock lyrics={`Db\nFor all`} transpose={1} />);
+    const { container } = render(<LyricsBlock lyrics={`C\nFor all`} transpose={1} />);
     const pre = container.querySelector('pre');
 
-    expect(pre?.textContent).toBe(`${transposeChord('Db', 1)}\nFor all`);
+    expect(pre?.textContent).toBe(`${transposeChord('C', 1)}\nFor all`);
   });
 
   it('preserves whitespace between tokens', () => {

@@ -1,9 +1,11 @@
 import { Chord as TonalChord } from 'tonal';
 
-import { Chord, transposeChord } from './Chord';
+import { Chord } from './Chord';
+import { transposeChord } from './transposeChord';
 
 type LyricsBlockProps = {
   lyrics?: string;
+  songKey?: string;
   transpose?: number;
 };
 
@@ -19,7 +21,7 @@ const isChordToken = (token: string) => {
   return !TonalChord.get(normalized).empty;
 };
 
-export function LyricsBlock({ lyrics, transpose = 0 }: LyricsBlockProps) {
+export function LyricsBlock({ lyrics, songKey, transpose = 0 }: LyricsBlockProps) {
   let spacesToConsume = 0;
 
   return (
@@ -46,7 +48,7 @@ export function LyricsBlock({ lyrics, transpose = 0 }: LyricsBlockProps) {
             return token;
           }
 
-          const transposed = transposeChord(token, transpose);
+          const transposed = transposeChord(token, transpose, songKey);
           const widthDiff = token.length - transposed.length;
 
           if (widthDiff < 0) {
@@ -57,7 +59,9 @@ export function LyricsBlock({ lyrics, transpose = 0 }: LyricsBlockProps) {
 
           return (
             <span key={`chord-${index}`}>
-              <Chord transpose={transpose}>{token}</Chord>
+              <Chord songKey={songKey} transpose={transpose}>
+                {token}
+              </Chord>
               {trailingPadding}
             </span>
           );

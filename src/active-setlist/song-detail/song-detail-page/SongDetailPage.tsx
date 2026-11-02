@@ -271,7 +271,11 @@ export function SongDetailPage() {
       content:
         currentSong.lyrics && currentSong.lyrics.trim().length > 0 ? (
           <DrawingOverlay canvasType="lyrics" songId={currentSongId} zoom={zoom}>
-            <LyricsBlock lyrics={currentSong.lyrics} transpose={currentSong.transpose} />
+            <LyricsBlock
+              lyrics={currentSong.lyrics}
+              songKey={currentSong.key}
+              transpose={currentSong.transpose}
+            />
           </DrawingOverlay>
         ) : (
           <EmptyStateBlock icon={<IconMicrophone2Off className="h-8 w-8" />}>
