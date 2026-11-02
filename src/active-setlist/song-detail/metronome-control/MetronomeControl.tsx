@@ -2,7 +2,7 @@ import { IconPlayerPlayFilled, IconPlayerStopFilled } from '@tabler/icons-react'
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Output } from 'webmidi';
 
-import { useGetTtsVoice } from '../../../api/useSettings';
+import { useGetCueOffsetBeats, useGetTtsVoice } from '../../../api/useSettings';
 import { speakText } from '../../../hooks/speakText';
 import { useSequencerTransport } from '../../../hooks/useSequencerTransport';
 import type { SongLanguage } from '../../../schemas';
@@ -48,6 +48,7 @@ export function MetronomeControl({
   const cancelCueRef = useRef<(() => void) | null>(null);
   const ttsVoiceURI = useGetTtsVoice(songLanguage ?? 'en');
   const cueVoiceURI = useGetTtsVoice('en');
+  const cueOffsetBeats = useGetCueOffsetBeats();
 
   useEffect(
     () => () => {
@@ -77,6 +78,7 @@ export function MetronomeControl({
 
   const { currentBeat, currentMeasure } = useSequencerTransport({
     bpm: bpm ?? 0,
+    cueOffsetBeats,
     events,
     isRunning: hasBpm && isMetronomeRunning,
     metronomeVolume,

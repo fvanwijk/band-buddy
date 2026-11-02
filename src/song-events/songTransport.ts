@@ -3,7 +3,7 @@ import type { PreCountWord } from '../hooks/preCount';
 import type { SongEvent } from '../types';
 import { EventScheduler } from '../vendor/signal-player';
 import type { SchedulableEvent } from '../vendor/signal-player';
-import { findSegmentByMeasure, getCountIns, positionToBeat } from './songMap';
+import { findSegmentByBeat, getCountIns, positionToBeat } from './songMap';
 import type { SongMap, SongPosition, SongSegment } from './songMap';
 
 export const TIMEBASE = 480; // Ticks per beat
@@ -60,6 +60,8 @@ type CreateTrackOptions = {
 };
 
 export type SongTransportOptions = {
+  /** Beats to shift cues by, negative to play them earlier than their configured position */
+  cueOffsetBeats?: number;
   events?: SongEvent[];
   /**
    * Whether the song starts with a spoken pre count and has spoken count-ins before tempo
@@ -145,6 +147,7 @@ const getSegmentBeatCount = (map: SongMap, segment: SongSegment) => {
  * Tracks are anchored on the wall clock, so they stay in sync without knowing about each other.
  */
 export const createSongTransport = ({
+  cueOffsetBeats = 0,
   events = [],
   isSpokenEnabled,
   map,
@@ -184,8 +187,10 @@ export const createSongTransport = ({
         continue;
       }
 
-      const segment = findSegmentByMeasure(map, event.measure);
-      const beatsIntoSegment = positionToBeat(map, event.measure, event.beat) - segment.startBeat;
+      // The offset can move a cue into an earlier segment, but not before the start of the song
+      const cueBeat = Math.max(0, positionToBeat(map, event.measure, event.beat) + cueOffsetBeats);
+      const segment = findSegmentByBeat(map, cueBeat);
+      const beatsIntoSegment = cueBeat - segment.startBeat;
       cueEventsBySegment.set(segment, [
         ...(cueEventsBySegment.get(segment) ?? []),
         {

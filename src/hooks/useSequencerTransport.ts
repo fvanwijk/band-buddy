@@ -11,6 +11,8 @@ import { loadPreCountBuffers } from './preCount';
 import type { PreCountWord } from './preCount';
 
 export interface UseSequencerTransportProps {
+  /** Beats to shift cues by, negative to speak them earlier than their configured position */
+  cueOffsetBeats?: number;
   /** BPM (beats per minute) at the start of the song */
   bpm: number;
   /** Tempo changes, time signature changes and cues of the song */
@@ -65,6 +67,7 @@ const IMMEDIATE_THRESHOLD_MS = 10;
  */
 export function useSequencerTransport({
   bpm,
+  cueOffsetBeats = 0,
   events,
   isRunning,
   midiChannel = DEFAULT_MIDI_CHANNEL,
@@ -262,6 +265,7 @@ export function useSequencerTransport({
   // Settings that only apply when a run starts (like the tempo) aren't picked up while running.
   const latestRef = useRef({
     bpm: safeBpm,
+    cueOffsetBeats,
     events,
     onBeatChange,
     onCue,
@@ -272,6 +276,7 @@ export function useSequencerTransport({
   });
   latestRef.current = {
     bpm: safeBpm,
+    cueOffsetBeats,
     events,
     onBeatChange,
     onCue,
@@ -340,6 +345,7 @@ export function useSequencerTransport({
     const latest = latestRef.current;
     // The spoken parts are fixed when playback starts so toggling them mid-song has no effect
     const transport = createSongTransport({
+      cueOffsetBeats: latest.cueOffsetBeats,
       events: latest.events,
       isSpokenEnabled: latest.preCountVolume > 0,
       map: buildSongMap({

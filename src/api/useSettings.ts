@@ -6,6 +6,7 @@ import { detectLocale } from '../config/locales';
 import { DEFAULT_THEME, type ThemeName, applyTheme } from '../config/themes';
 import type { SpeechLanguage } from '../hooks/speechVoices';
 import {
+  cueOffsetBeatsSchema,
   hasSeenWelcomeSchema,
   hideEmptyTabsSchema,
   localeSchema,
@@ -126,6 +127,22 @@ export function useGetPreCountVolume(): number {
  */
 export function useSetPreCountVolume() {
   return useSetValueCallback('preCountVolume', (volume: number) => volume, []);
+}
+
+/**
+ * Hook to get how many beats a cue is played earlier (0 to -8)
+ */
+export function useGetCueOffsetBeats(): number {
+  const offset = useValue('cueOffsetBeats');
+  const result = cueOffsetBeatsSchema.safeParse(offset);
+  return result.success ? result.data : 0;
+}
+
+/**
+ * Hook to set how many beats a cue is played earlier
+ */
+export function useSetCueOffsetBeats() {
+  return useSetValueCallback('cueOffsetBeats', (offset: number) => offset, []);
 }
 
 const ttsVoiceKeys = { en: 'ttsVoiceEn', nl: 'ttsVoiceNl' } as const;

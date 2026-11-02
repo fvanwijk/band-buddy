@@ -1,6 +1,7 @@
 import { Grid } from '../Grid';
 import { AboutCard } from './AboutCard';
 import { ColorThemeCard } from './ColorThemeCard';
+import { CueCard } from './CueCard';
 import { LocaleCard } from './LocaleCard';
 import { SpotifyCard } from './SpotifyCard';
 
@@ -13,6 +14,7 @@ export function GeneralSettings({ onShowWelcome }: GeneralSettingsProps) {
     <Grid>
       <ColorThemeCard />
       <LocaleCard />
+      <CueCard />
       <SpotifyCard />
       <AboutCard onShowWelcome={onShowWelcome} />
     </Grid>

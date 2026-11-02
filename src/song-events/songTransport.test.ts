@@ -12,6 +12,7 @@ import type { TransportOutput } from './songTransport';
 
 type RunOptions = {
   bpm?: number;
+  cueOffsetBeats?: number;
   durationMs?: number;
   events?: SongEvent[];
   isSpokenEnabled?: boolean;
@@ -25,6 +26,7 @@ const START_WALL = 1000;
 // Simulates the timer of the hook and collects everything the transport asks to play
 const run = ({
   bpm = 60,
+  cueOffsetBeats,
   durationMs = 30_000,
   events = [],
   isSpokenEnabled = true,
@@ -32,6 +34,7 @@ const run = ({
   timeSignature = '4/4',
 }: RunOptions = {}) => {
   const transport = createSongTransport({
+    cueOffsetBeats,
     events,
     isSpokenEnabled,
     map: buildSongMap({ bpm, events, timeSignature }),
@@ -186,6 +189,41 @@ describe('createSongTransport', () => {
       [8000 + 6000, 'Verse'],
       [8000 + 8600, 'Faster'],
     ]);
+  });
+
+  describe('cue offset', () => {
+    const getCues = (outputs: ReturnType<typeof run>) =>
+      outputs.flatMap((output) =>
+        output.type === 'cue' ? [[Math.round(output.timestamp), output.text]] : [],
+      );
+
+    it('plays cues the given number of beats earlier, also across a measure', () => {
+      const outputs = run({
+        cueOffsetBeats: -2,
+        events: [createCueEvent({ beat: 1, measure: 3, text: 'Chorus' })],
+      });
+
+      // Measure 3 beat 1 is at 8 s + 8 s, the cue is on measure 2 beat 3
+      expect(getCues(outputs)).toEqual([[8000 + 6000, 'Chorus']]);
+    });
+
+    it('plays cues in the tempo of the segment they end up in', () => {
+      const outputs = run({
+        cueOffsetBeats: -2,
+        events: [...sixtyToHundred, createCueEvent({ beat: 1, measure: 3, text: 'Chorus' })],
+      });
+
+      expect(getCues(outputs)).toEqual([[8000 + 6000, 'Chorus']]);
+    });
+
+    it('plays cues that would be before the song at the start of the song', () => {
+      const outputs = run({
+        cueOffsetBeats: -2,
+        events: [createCueEvent({ beat: 2, measure: 1, text: 'Go' })],
+      });
+
+      expect(getCues(outputs)).toEqual([[8000, 'Go']]);
+    });
   });
 
   it('follows a time signature change without counting in', () => {

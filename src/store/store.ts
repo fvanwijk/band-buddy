@@ -5,6 +5,7 @@ import { createZodSchematizer } from 'tinybase/schematizers/schematizer-zod';
 
 import {
   activeSetlistIdSchema,
+  cueOffsetBeatsSchema,
   hasSeenWelcomeSchema,
   hideEmptyTabsSchema,
   instrumentTableSchema,
@@ -53,6 +54,7 @@ export function createAppStore(): Store {
 
   const valuesSchema = schematizer.toValuesSchema({
     activeSetlistId: activeSetlistIdSchema,
+    cueOffsetBeats: cueOffsetBeatsSchema,
     hasSeenWelcome: hasSeenWelcomeSchema,
     hideEmptyTabs: hideEmptyTabsSchema,
     locale: localeSchema,
