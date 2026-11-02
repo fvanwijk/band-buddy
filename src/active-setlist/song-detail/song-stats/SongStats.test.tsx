@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { StoreProvider } from '../../../store/StoreProvider';
 import type { Song } from '../../../types';
 import { SongStats } from './SongStats';
 
@@ -11,7 +12,17 @@ const baseSong: Song = {
 };
 
 describe('SongStats', () => {
-  it('renders all stats when all fields are present', () => {
+  const renderComponent = async (song: Song) => {
+    const result = render(
+      <StoreProvider>
+        <SongStats song={song} />
+      </StoreProvider>,
+    );
+    await screen.findByTestId('song-stats');
+    return result;
+  };
+
+  it('renders all stats when all fields are present', async () => {
     const song: Song = {
       ...baseSong,
       bpm: 72,
@@ -20,7 +31,7 @@ describe('SongStats', () => {
       timeSignature: '4/4',
     };
 
-    render(<SongStats song={song} />);
+    await renderComponent(song);
 
     expect(screen.getByText('Key')).toBeInTheDocument();
     expect(screen.getByText('Bb')).toBeInTheDocument();
@@ -32,13 +43,13 @@ describe('SongStats', () => {
     expect(screen.getByText('5m 54s')).toBeInTheDocument();
   });
 
-  it('renders only key when only key is present', () => {
+  it('renders only key when only key is present', async () => {
     const song: Song = {
       ...baseSong,
       key: 'C',
     };
 
-    render(<SongStats song={song} />);
+    await renderComponent(song);
 
     expect(screen.getByText('Key')).toBeInTheDocument();
     expect(screen.getByText('C')).toBeInTheDocument();
@@ -47,62 +58,62 @@ describe('SongStats', () => {
     expect(screen.queryByText('Duration')).not.toBeInTheDocument();
   });
 
-  it('renders empty when no optional fields are present', () => {
+  it('renders empty when no optional fields are present', async () => {
     const song: Song = { ...baseSong };
 
-    const { container } = render(<SongStats song={song} />);
+    await renderComponent(song);
 
-    expect(container.querySelector('div')?.textContent).toBe('');
+    expect(screen.getByTestId('song-stats')).toBeEmptyDOMElement();
   });
 
-  it('renders key with positive transpose', () => {
+  it('renders key with positive transpose', async () => {
     const song: Song = {
       ...baseSong,
       key: 'C',
       transpose: 2,
     };
 
-    render(<SongStats song={song} />);
+    await renderComponent(song);
 
     expect(screen.getByText('C')).toBeInTheDocument();
     expect(screen.getByText('+2')).toBeInTheDocument();
   });
 
-  it('renders key with negative transpose', () => {
+  it('renders key with negative transpose', async () => {
     const song: Song = {
       ...baseSong,
       key: 'D',
       transpose: -3,
     };
 
-    render(<SongStats song={song} />);
+    await renderComponent(song);
 
     expect(screen.getByText('D')).toBeInTheDocument();
     expect(screen.getByText('-3')).toBeInTheDocument();
   });
 
-  it('renders key without transpose when transpose is zero', () => {
+  it('renders key without transpose when transpose is zero', async () => {
     const song: Song = {
       ...baseSong,
       key: 'E',
       transpose: 0,
     };
 
-    render(<SongStats song={song} />);
+    await renderComponent(song);
 
     expect(screen.getByText('E')).toBeInTheDocument();
     expect(screen.queryByText('0')).not.toBeInTheDocument();
     expect(screen.queryByText('+0')).not.toBeInTheDocument();
   });
 
-  it('renders time signature and BPM only', () => {
+  it('renders time signature and BPM only', async () => {
     const song: Song = {
       ...baseSong,
       bpm: 120,
       timeSignature: '3/4',
     };
 
-    render(<SongStats song={song} />);
+    await renderComponent(song);
 
     expect(screen.getByText('Time')).toBeInTheDocument();
     expect(screen.getByText('3/4')).toBeInTheDocument();
@@ -112,13 +123,13 @@ describe('SongStats', () => {
     expect(screen.queryByText('Duration')).not.toBeInTheDocument();
   });
 
-  it('renders duration only', () => {
+  it('renders duration only', async () => {
     const song: Song = {
       ...baseSong,
       duration: 180,
     };
 
-    render(<SongStats song={song} />);
+    await renderComponent(song);
 
     expect(screen.getByText('Duration')).toBeInTheDocument();
     expect(screen.getByText('3m 0s')).toBeInTheDocument();
