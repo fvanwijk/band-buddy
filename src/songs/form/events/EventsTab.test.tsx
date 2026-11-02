@@ -47,12 +47,16 @@ const Harness: FC<HarnessProps> = ({
 };
 
 describe('EventsTab', () => {
-  const renderComponent = (props: HarnessProps = {}) => render(<Harness {...props} />);
+  // The timeline is the default view; most tests work with the list
+  const renderComponent = async (props: HarnessProps = {}) => {
+    render(<Harness {...props} />);
+    await userEvent.click(screen.getByRole('button', { name: 'List' }));
+  };
 
   const getGroup = (name: string) => within(screen.getByRole('region', { name }));
 
-  it('shows an empty state', () => {
-    renderComponent();
+  it('shows an empty state', async () => {
+    await renderComponent();
 
     expect(screen.getByText('No events yet.')).toBeInTheDocument();
   });
@@ -60,7 +64,7 @@ describe('EventsTab', () => {
   it('adds a cue on the first measure and edits its text', async () => {
     const user = userEvent.setup();
     const onEventsChange = vi.fn();
-    renderComponent({ onEventsChange });
+    await renderComponent({ onEventsChange });
 
     await user.click(screen.getByRole('button', { name: 'Add cue' }));
     const group = getGroup('Measure 1, beat 1');
@@ -74,7 +78,7 @@ describe('EventsTab', () => {
 
   it('adds a tempo change on beat 1 of the second measure with the song tempo', async () => {
     const user = userEvent.setup();
-    renderComponent({ bpm: 90 });
+    await renderComponent({ bpm: 90 });
 
     await user.click(screen.getByRole('button', { name: 'Add tempo change' }));
     const group = getGroup('Measure 2, beat 1');
@@ -86,7 +90,7 @@ describe('EventsTab', () => {
 
   it('adds a time signature change with another signature than the song', async () => {
     const user = userEvent.setup();
-    renderComponent({ timeSignature: '4/4' });
+    await renderComponent({ timeSignature: '4/4' });
 
     await user.click(screen.getByRole('button', { name: 'Add time signature change' }));
 
@@ -97,7 +101,7 @@ describe('EventsTab', () => {
 
   it('adds a new position after the last event', async () => {
     const user = userEvent.setup();
-    renderComponent({ initialEvents: [createCueEvent({ measure: 6 })] });
+    await renderComponent({ initialEvents: [createCueEvent({ measure: 6 })] });
 
     await user.click(screen.getByRole('button', { name: 'Add MIDI button' }));
 
@@ -106,7 +110,7 @@ describe('EventsTab', () => {
 
   it('adds several events to one position', async () => {
     const user = userEvent.setup();
-    renderComponent({ initialEvents: [createTempoChangeEvent({ measure: 3 })] });
+    await renderComponent({ initialEvents: [createTempoChangeEvent({ measure: 3 })] });
     const group = getGroup('Measure 3, beat 1');
 
     await user.click(group.getByRole('button', { name: 'Add cue to measure 3, beat 1' }));
@@ -119,7 +123,7 @@ describe('EventsTab', () => {
   });
 
   it('disables types that are not possible at a position', async () => {
-    renderComponent({
+    await renderComponent({
       initialEvents: [
         createTempoChangeEvent({ measure: 3 }),
         createCueEvent({ beat: 1, id: 'cue', measure: 3 }),
@@ -144,8 +148,8 @@ describe('EventsTab', () => {
     expect(firstMeasure.getByRole('button', { name: /Add time signature change/ })).toBeDisabled();
   });
 
-  it('needs a MIDI button to add a MIDI button event', () => {
-    renderComponent({ midiEvents: [] });
+  it('needs a MIDI button to add a MIDI button event', async () => {
+    await renderComponent({ midiEvents: [] });
 
     expect(screen.getByRole('button', { name: 'Add MIDI button' })).toBeDisabled();
     expect(screen.getByText(/Create a MIDI button on the MIDI buttons tab/)).toBeInTheDocument();
@@ -153,7 +157,7 @@ describe('EventsTab', () => {
 
   it('moves all events of a position to another measure', async () => {
     const user = userEvent.setup();
-    renderComponent({
+    await renderComponent({
       initialEvents: [
         createCueEvent({ beat: 1, id: 'cue', measure: 3, text: 'Chorus' }),
         createMidiButtonEvent({ beat: 1, id: 'midi', measure: 3 }),
@@ -175,7 +179,7 @@ describe('EventsTab', () => {
 
   it('keeps the position when the measure is emptied', async () => {
     const user = userEvent.setup();
-    renderComponent({ initialEvents: [createCueEvent({ measure: 3 })] });
+    await renderComponent({ initialEvents: [createCueEvent({ measure: 3 })] });
 
     const measure = getGroup('Measure 3, beat 1').getByLabelText('Measure');
     await user.clear(measure);
@@ -187,7 +191,7 @@ describe('EventsTab', () => {
 
   it('moves a group without changes to another beat', async () => {
     const user = userEvent.setup();
-    renderComponent({ initialEvents: [createMidiButtonEvent({ beat: 1, measure: 2 })] });
+    await renderComponent({ initialEvents: [createMidiButtonEvent({ beat: 1, measure: 2 })] });
 
     const beat = getGroup('Measure 2, beat 1').getByLabelText('Beat');
     await user.clear(beat);
@@ -200,7 +204,7 @@ describe('EventsTab', () => {
   it('limits the tempo to 300 BPM', async () => {
     const user = userEvent.setup();
     const onEventsChange = vi.fn();
-    renderComponent({ initialEvents: [createTempoChangeEvent()], onEventsChange });
+    await renderComponent({ initialEvents: [createTempoChangeEvent()], onEventsChange });
 
     const bpm = screen.getByLabelText('Tempo (BPM)');
     await user.clear(bpm);
@@ -214,7 +218,7 @@ describe('EventsTab', () => {
   it('changes the time signature and the MIDI button of events', async () => {
     const user = userEvent.setup();
     const onEventsChange = vi.fn();
-    renderComponent({
+    await renderComponent({
       initialEvents: [
         createTimeSignatureChangeEvent({ measure: 2, timeSignature: '3/4' }),
         createMidiButtonEvent({ beat: 2, measure: 4, midiEventId: '1' }),
@@ -233,7 +237,7 @@ describe('EventsTab', () => {
 
   it('deletes an event and the position when it is empty', async () => {
     const user = userEvent.setup();
-    renderComponent({ initialEvents: [createCueEvent({ measure: 3, text: 'Verse' })] });
+    await renderComponent({ initialEvents: [createCueEvent({ measure: 3, text: 'Verse' })] });
 
     await user.click(screen.getByRole('button', { name: 'Delete cue' }));
 
@@ -241,8 +245,8 @@ describe('EventsTab', () => {
     expect(screen.getByText('No events yet.')).toBeInTheDocument();
   });
 
-  it('shows problems with events', () => {
-    renderComponent({
+  it('shows problems with events', async () => {
+    await renderComponent({
       initialEvents: [
         createCueEvent({ id: 'empty', text: '' }),
         createTempoChangeEvent({ bpm: 100, measure: 3 }),
@@ -254,7 +258,7 @@ describe('EventsTab', () => {
     expect(screen.getByText('This cue is spoken during a count-in')).toBeInTheDocument();
   });
 
-  it('asks for a BPM when the song has none', () => {
+  it('asks for a BPM when the song has none', async () => {
     render(<EventsTab events={[]} midiEvents={[]} onEventsChange={vi.fn()} timeSignature="4/4" />);
 
     expect(screen.getByText(/Set a BPM on the song details tab/)).toBeInTheDocument();
@@ -263,7 +267,7 @@ describe('EventsTab', () => {
   describe('timeline view', () => {
     const openTimeline = async (props: HarnessProps = {}) => {
       const user = userEvent.setup();
-      renderComponent(props);
+      await renderComponent(props);
       await user.click(screen.getByRole('button', { name: 'Timeline' }));
       return user;
     };

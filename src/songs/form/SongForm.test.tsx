@@ -244,6 +244,7 @@ describe('SongForm', () => {
     renderComponent({ initialData, onSubmit });
 
     await user.click(await screen.findByRole('tab', { name: 'Events' }));
+    await user.click(screen.getByRole('button', { name: 'List' }));
     await user.click(screen.getByRole('button', { name: 'Add cue to measure 3, beat 1' }));
     await user.type(screen.getByLabelText('Cue text'), 'Faster!');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -271,6 +272,7 @@ describe('SongForm', () => {
     await user.click(await screen.findByRole('button', { name: 'Save changes' }));
 
     expect(onSubmit).not.toHaveBeenCalled();
+    await user.click(await screen.findByRole('button', { name: 'List' }));
     expect(await screen.findByText('A cue needs text to speak')).toBeInTheDocument();
 
     await user.type(screen.getByLabelText('Cue text'), 'Verse');

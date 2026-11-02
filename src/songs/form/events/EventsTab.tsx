@@ -46,7 +46,7 @@ export const EventsTab: FC<EventsTabProps> = ({
   onEventsChange,
   timeSignature,
 }) => {
-  const [view, setView] = useState<'list' | 'timeline'>('list');
+  const [view, setView] = useState<'list' | 'timeline'>('timeline');
   const [selected, setSelected] = useState<EventPosition | null>(null);
 
   const groups = useMemo(() => groupEventsByPosition(events), [events]);
@@ -183,17 +183,6 @@ export const EventsTab: FC<EventsTabProps> = ({
         ))}
         <div aria-label="View" className="ml-auto flex gap-1" role="group">
           <Button
-            aria-pressed={view === 'list'}
-            color={view === 'list' ? 'primary' : 'default'}
-            iconStart={<IconLayoutList className="h-3 w-3" />}
-            onClick={() => handleViewChange('list')}
-            size="small"
-            type="button"
-            variant="outlined"
-          >
-            List
-          </Button>
-          <Button
             aria-pressed={view === 'timeline'}
             color={view === 'timeline' ? 'primary' : 'default'}
             iconStart={<IconTimeline className="h-3 w-3" />}
@@ -203,6 +192,17 @@ export const EventsTab: FC<EventsTabProps> = ({
             variant="outlined"
           >
             Timeline
+          </Button>
+          <Button
+            aria-pressed={view === 'list'}
+            color={view === 'list' ? 'primary' : 'default'}
+            iconStart={<IconLayoutList className="h-3 w-3" />}
+            onClick={() => handleViewChange('list')}
+            size="small"
+            type="button"
+            variant="outlined"
+          >
+            List
           </Button>
         </div>
       </div>
