@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { createCueEvent, createTempoChangeEvent } from '../../../mocks/songEvents';
 import { StoreProvider } from '../../../store/StoreProvider';
@@ -161,5 +161,88 @@ describe('MetronomeControl', () => {
     await user.keyboard('{Escape}');
 
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  describe('floating button', () => {
+    const START_TITLE = 'Start metronome, long press to start from cue';
+    let reportVisibility: (ratio: number) => void;
+
+    beforeEach(() => {
+      vi.stubGlobal(
+        'IntersectionObserver',
+        class {
+          constructor(callback: (entries: { intersectionRatio: number }[]) => void) {
+            reportVisibility = (ratio) => callback([{ intersectionRatio: ratio }]);
+          }
+          disconnect() {}
+          observe() {}
+        },
+      );
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    const renderWithSlot = async () => {
+      const slot = document.createElement('div');
+      document.body.append(slot);
+      await renderComponent({ floatingSlot: slot });
+
+      return slot;
+    };
+
+    it('does not render in the slot while the inline button is fully visible', async () => {
+      const slot = await renderWithSlot();
+      await screen.findByTitle(START_TITLE);
+
+      expect(slot).toBeEmptyDOMElement();
+    });
+
+    it('fades in while the inline button scrolls out of view', async () => {
+      const slot = await renderWithSlot();
+      await screen.findByTitle(START_TITLE);
+
+      act(() => reportVisibility(0.25));
+
+      const floatingButton = within(slot).getByTitle(START_TITLE);
+      expect(floatingButton.parentElement).toHaveStyle({ opacity: '0.75' });
+
+      act(() => reportVisibility(0));
+
+      expect(floatingButton.parentElement).toHaveStyle({ opacity: '1' });
+    });
+
+    it('does not render in the slot when there is none', async () => {
+      await renderComponent();
+      await screen.findByTitle(START_TITLE);
+
+      act(() => reportVisibility(0));
+
+      expect(screen.getAllByTitle(START_TITLE)).toHaveLength(1);
+    });
+
+    it('starts the metronome from the floating button', async () => {
+      const user = userEvent.setup();
+      const slot = await renderWithSlot();
+      await screen.findByTitle(START_TITLE);
+      act(() => reportVisibility(0));
+
+      await user.click(within(slot).getByTitle(START_TITLE));
+
+      await waitFor(() => expect(getLastTransportProps().isRunning).toBe(true));
+    });
+
+    it('opens the cue menu next to the floating button only', async () => {
+      const user = userEvent.setup();
+      const slot = await renderWithSlot();
+      await screen.findByTitle(START_TITLE);
+      act(() => reportVisibility(0));
+
+      await user.pointer({ keys: '[MouseRight]', target: within(slot).getByTitle(START_TITLE) });
+
+      expect(await screen.findAllByRole('menu')).toHaveLength(1);
+      expect(within(slot).getByRole('menu')).toBeInTheDocument();
+    });
   });
 });

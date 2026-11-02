@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
+import { FloatingMetronomeSlotContext } from '../metronome-control/floatingMetronomeSlot';
 import { DrawingToolbar, colorOptions, type DrawingToolbarProps } from './DrawingToolbar';
 
 describe('DrawingToolbar', () => {
@@ -83,5 +84,26 @@ describe('DrawingToolbar', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Blue' }));
 
     expect(onColorSelect).toHaveBeenCalledWith('#3b82f6');
+  });
+
+  it('registers a slot for the floating metronome button before the tools', () => {
+    const setToolbarSlot = vi.fn();
+    render(
+      <FloatingMetronomeSlotContext value={{ setToolbarSlot }}>
+        <DrawingToolbar
+          mode="idle"
+          onClear={vi.fn()}
+          onColorSelect={vi.fn()}
+          onModeChange={vi.fn()}
+          selectedColor="#ef4444"
+        />
+      </FloatingMetronomeSlotContext>,
+    );
+
+    const slot = setToolbarSlot.mock.calls[0][0] as HTMLElement;
+    expect(slot).toBeInstanceOf(HTMLElement);
+    expect(slot.nextElementSibling).toContainElement(
+      screen.getByRole('button', { name: 'Cancel' }),
+    );
   });
 });
