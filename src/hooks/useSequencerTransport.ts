@@ -19,6 +19,8 @@ export interface UseSequencerTransportProps {
   events?: SongEvent[];
   /** Time signature at the start of the song (e.g., "4/4") */
   timeSignature?: string;
+  /** Position to start playing from, after the pre count. Defaults to the start of the song */
+  startPosition?: { beat?: number; measure: number };
   /** Whether playback is running */
   isRunning: boolean;
   /** MIDI output device to send clicks to */
@@ -75,6 +77,7 @@ export function useSequencerTransport({
   metronomeVolume = 50,
   midiOutput,
   preCountVolume = 0,
+  startPosition,
   timeSignature,
   onBeatChange,
   onCue,
@@ -272,6 +275,7 @@ export function useSequencerTransport({
     playClick,
     playPreCountWord,
     preCountVolume: safePreCountVolume,
+    startPosition,
     timeSignature,
   });
   latestRef.current = {
@@ -283,6 +287,7 @@ export function useSequencerTransport({
     playClick,
     playPreCountWord,
     preCountVolume: safePreCountVolume,
+    startPosition,
     timeSignature,
   };
 
@@ -353,6 +358,7 @@ export function useSequencerTransport({
         events: latest.events,
         timeSignature: latest.timeSignature,
       }),
+      startPosition: latest.startPosition,
       startWall: performance.now(),
     });
 

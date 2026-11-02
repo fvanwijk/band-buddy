@@ -196,7 +196,7 @@ describe('SongDetailPage', () => {
 
     expect(await screen.findByText('M0:B0')).toBeInTheDocument();
 
-    await user.click(await screen.findByTitle('Start metronome'));
+    await user.click(await screen.findByTitle('Start metronome, long press to start from cue'));
 
     expect(screen.getByTitle('Stop metronome')).toBeInTheDocument();
   });

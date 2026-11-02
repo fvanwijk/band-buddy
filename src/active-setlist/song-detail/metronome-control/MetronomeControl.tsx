@@ -1,17 +1,19 @@
 import { IconPlayerPlayFilled, IconPlayerStopFilled } from '@tabler/icons-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Output } from 'webmidi';
 
 import { useGetCueOffsetBeats, useGetTtsVoice } from '../../../api/useSettings';
 import { speakText } from '../../../hooks/speakText';
+import { useLongPress } from '../../../hooks/useLongPress';
 import { useSequencerTransport } from '../../../hooks/useSequencerTransport';
 import type { SongLanguage } from '../../../schemas';
-import type { SongEvent } from '../../../types';
+import type { CueEvent, SongEvent } from '../../../types';
 import { Button } from '../../../ui/Button';
+import { CueMenu } from './CueMenu';
 
 const PAUSE_AFTER_ANNOUNCEMENT_MS = 500;
 
-type MetronomeControlProps = {
+export type MetronomeControlProps = {
   bpm?: number;
   events?: SongEvent[];
   isReady: boolean;
@@ -43,7 +45,9 @@ export function MetronomeControl({
   const hasBpm = !!bpm;
   const [isMetronomeRunning, setIsMetronomeRunning] = useState(false);
   const [isAnnouncing, setIsAnnouncing] = useState(false);
+  const [isCueMenuOpen, setIsCueMenuOpen] = useState(false);
   const [metronomePulseKey, setMetronomePulseKey] = useState(0);
+  const [startPosition, setStartPosition] = useState<{ beat: number; measure: number }>();
   const cancelAnnouncementRef = useRef<(() => void) | null>(null);
   const cancelCueRef = useRef<(() => void) | null>(null);
   const ttsVoiceURI = useGetTtsVoice(songLanguage ?? 'en');
@@ -57,6 +61,20 @@ export function MetronomeControl({
     },
     [],
   );
+
+  const cues = useMemo(
+    () =>
+      (events ?? [])
+        .filter((event): event is CueEvent => event.type === 'cue')
+        .toSorted((a, b) => a.measure - b.measure || a.beat - b.beat),
+    [events],
+  );
+  const closeCueMenu = useCallback(() => setIsCueMenuOpen(false), []);
+  const isActive = isMetronomeRunning || isAnnouncing;
+  const { consumeLongPress, handlers: longPressHandlers } = useLongPress({
+    isEnabled: hasBpm && !isActive && cues.length > 0,
+    onLongPress: () => setIsCueMenuOpen(true),
+  });
 
   const metronomeOutput = useMemo(() => {
     if (!isSupported || !isReady || outputs.length === 0) {
@@ -86,6 +104,7 @@ export function MetronomeControl({
     onBeatChange,
     onCue: handleCue,
     preCountVolume: hasBpm ? preCountVolume : 0,
+    startPosition,
     timeSignature,
   });
 
@@ -94,16 +113,58 @@ export function MetronomeControl({
   }
 
   const beatDurationSeconds = 60 / bpm;
-  const isActive = isMetronomeRunning || isAnnouncing;
 
-  const startMetronome = () => {
+  const startMetronome = (position?: { beat: number; measure: number }) => {
+    setStartPosition(position);
     cancelAnnouncementRef.current = null;
     setIsAnnouncing(false);
     setIsMetronomeRunning(true);
     setMetronomePulseKey((key) => key + 1);
   };
 
+  // The pre count starts after the announcement has been spoken
+  const announceAndStart = (
+    text: string,
+    options: {
+      language?: SongLanguage;
+      position?: { beat: number; measure: number };
+      voiceURI?: string;
+    },
+  ) => {
+    setIsAnnouncing(true);
+    const cancelSpeech = speakText(text, {
+      language: options.language,
+      onDone: () => {
+        const timeoutId = window.setTimeout(
+          () => startMetronome(options.position),
+          PAUSE_AFTER_ANNOUNCEMENT_MS,
+        );
+        cancelAnnouncementRef.current = () => window.clearTimeout(timeoutId);
+      },
+      voiceURI: options.voiceURI,
+      volume: preCountVolume ?? 0,
+    });
+    cancelAnnouncementRef.current ??= cancelSpeech;
+  };
+
+  const handleCueSelect = (cue: CueEvent) => {
+    const position = { beat: cue.beat, measure: cue.measure };
+    setIsCueMenuOpen(false);
+
+    // Cues are always English
+    if (preCountVolume && preCountVolume > 0) {
+      announceAndStart(cue.text, { language: 'en', position, voiceURI: cueVoiceURI });
+      return;
+    }
+
+    startMetronome(position);
+  };
+
   const handleMetronomeToggle = () => {
+    if (consumeLongPress()) {
+      return;
+    }
+
     if (isMetronomeRunning || isAnnouncing) {
       cancelAnnouncementRef.current?.();
       cancelAnnouncementRef.current = null;
@@ -115,19 +176,8 @@ export function MetronomeControl({
       return;
     }
 
-    // The pre count starts after the song title has been announced
     if (preCountVolume && preCountVolume > 0 && songTitle) {
-      setIsAnnouncing(true);
-      const cancelSpeech = speakText(songTitle, {
-        language: songLanguage,
-        onDone: () => {
-          const timeoutId = window.setTimeout(startMetronome, PAUSE_AFTER_ANNOUNCEMENT_MS);
-          cancelAnnouncementRef.current = () => window.clearTimeout(timeoutId);
-        },
-        voiceURI: ttsVoiceURI,
-        volume: preCountVolume,
-      });
-      cancelAnnouncementRef.current ??= cancelSpeech;
+      announceAndStart(songTitle, { language: songLanguage, voiceURI: ttsVoiceURI });
       return;
     }
 
@@ -136,22 +186,28 @@ export function MetronomeControl({
 
   return (
     <div className="flex items-center gap-2">
-      <Button
-        key={metronomePulseKey}
-        className="metronome-pulse"
-        isIcon
-        onClick={handleMetronomeToggle}
-        style={{ animationDuration: `${beatDurationSeconds}s` }}
-        title={isActive ? 'Stop metronome' : 'Start metronome'}
-        type="button"
-        variant="outlined"
-      >
-        {isActive ? (
-          <IconPlayerStopFilled className="h-4 w-4" />
-        ) : (
-          <IconPlayerPlayFilled className="h-4 w-4" />
+      <div className="relative">
+        <Button
+          key={metronomePulseKey}
+          className="metronome-pulse select-none"
+          isIcon
+          onClick={handleMetronomeToggle}
+          style={{ animationDuration: `${beatDurationSeconds}s` }}
+          title={isActive ? 'Stop metronome' : 'Start metronome, long press to start from cue'}
+          type="button"
+          variant="outlined"
+          {...longPressHandlers}
+        >
+          {isActive ? (
+            <IconPlayerStopFilled className="h-4 w-4" />
+          ) : (
+            <IconPlayerPlayFilled className="h-4 w-4" />
+          )}
+        </Button>
+        {isCueMenuOpen && !isActive && (
+          <CueMenu cues={cues} onClose={closeCueMenu} onSelect={handleCueSelect} />
         )}
-      </Button>
+      </div>
       <span className="min-w-16 text-xs font-medium text-slate-300" title="Metronome counter">
         M{currentMeasure}:B{currentBeat}
       </span>

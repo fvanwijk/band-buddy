@@ -3,7 +3,13 @@ import type { PreCountWord } from '../hooks/preCount';
 import type { SongEvent } from '../types';
 import { EventScheduler } from '../vendor/signal-player';
 import type { SchedulableEvent } from '../vendor/signal-player';
-import { findSegmentByBeat, getCountIns, positionToBeat } from './songMap';
+import {
+  findSegmentByBeat,
+  findSegmentByMeasure,
+  getCountIns,
+  positionToBeat,
+  positionToMs,
+} from './songMap';
 import type { SongMap, SongPosition, SongSegment } from './songMap';
 
 export const TIMEBASE = 480; // Ticks per beat
@@ -13,6 +19,7 @@ export const POLL_INTERVAL_MS = 50;
 export const CUE_LEAD_MS = 150;
 const CUE_LOOK_AHEAD_MS = LOOK_AHEAD_MS + CUE_LEAD_MS;
 const MS_PER_MINUTE = 60_000;
+const START_TOLERANCE_MS = 1;
 
 export type ClickAccent = 'downbeat' | 'regular' | 'secondary';
 
@@ -69,6 +76,11 @@ export type SongTransportOptions = {
    */
   isSpokenEnabled: boolean;
   map: SongMap;
+  /**
+   * Position to start playing from instead of the beginning of the song. The pre count is played
+   * in the tempo and time signature of that position and everything before it is skipped.
+   */
+  startPosition?: { beat?: number; measure: number };
   /** Wall-clock time (performance.now()) at which the transport starts */
   startWall: number;
 };
@@ -151,17 +163,24 @@ export const createSongTransport = ({
   events = [],
   isSpokenEnabled,
   map,
+  startPosition,
   startWall,
 }: SongTransportOptions): SongTransport => {
   const tracks: Track[] = [];
-  const [firstSegment] = map.segments;
+  const startSegment = startPosition
+    ? findSegmentByMeasure(map, startPosition.measure)
+    : map.segments[0];
+  const startOffsetMs = startPosition
+    ? positionToMs(map, startPosition.measure, startPosition.beat)
+    : 0;
 
-  const preCountBeats = isSpokenEnabled ? getPreCountBeats(firstSegment.beatsPerMeasure) : 0;
-  // All tracks of the song start after the pre count
-  const songStart = startWall + beatsToMs(preCountBeats, firstSegment.bpm);
+  const preCountBeats = isSpokenEnabled ? getPreCountBeats(startSegment.beatsPerMeasure) : 0;
+  const playStart = startWall + beatsToMs(preCountBeats, startSegment.bpm);
+  // Time 0 of the song, which lies in the past when starting from a later position
+  const songStart = playStart - startOffsetMs;
 
   if (preCountBeats > 0) {
-    const { beatsPerMeasure } = firstSegment;
+    const { beatsPerMeasure } = startSegment;
     const words = Array.from({ length: preCountBeats }, (_, beat) => ({
       beat,
       word: getPreCountWord(beat, beatsPerMeasure),
@@ -171,7 +190,7 @@ export const createSongTransport = ({
       createTrack({
         anchor: startWall,
         beatCount: preCountBeats,
-        bpm: firstSegment.bpm,
+        bpm: startSegment.bpm,
         describeBeat: (beat) => ({ accent: getAccent(beat % beatsPerMeasure, beatsPerMeasure) }),
         extraEvents: words.flatMap(({ beat, word }) =>
           word ? [{ output: { type: 'countWord' as const, word }, tick: beat * TIMEBASE }] : [],
@@ -251,6 +270,14 @@ export const createSongTransport = ({
     }
   }
 
+  // Tracks of the song that end before the start position are never played
+  const songTracks = new Set(tracks.slice(preCountBeats > 0 ? 1 : 0));
+  for (const track of songTracks) {
+    if (track.anchor + beatsToMs(track.beatCount, track.bpm) <= playStart) {
+      track.isDone = true;
+    }
+  }
+
   const poll = (now: number) => {
     const outputs: TransportOutput[] = [];
 
@@ -265,7 +292,10 @@ export const createSongTransport = ({
       }
 
       for (const { event, timestamp } of track.scheduler.readNextEvents(track.bpm, now)) {
-        outputs.push({ ...event.output, timestamp });
+        // Events before the start position are only there because the track began earlier
+        if (!songTracks.has(track) || timestamp >= playStart - START_TOLERANCE_MS) {
+          outputs.push({ ...event.output, timestamp });
+        }
       }
 
       track.isDone = track.scheduler.scheduledTick >= track.beatCount * TIMEBASE;

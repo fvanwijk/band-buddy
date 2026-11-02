@@ -18,6 +18,7 @@ type RunOptions = {
   isSpokenEnabled?: boolean;
   /** Time between polls, cycles when it's a list */
   pollSteps?: number[];
+  startPosition?: { beat?: number; measure: number };
   timeSignature?: string;
 };
 
@@ -31,6 +32,7 @@ const run = ({
   events = [],
   isSpokenEnabled = true,
   pollSteps = [POLL_INTERVAL_MS],
+  startPosition,
   timeSignature = '4/4',
 }: RunOptions = {}) => {
   const transport = createSongTransport({
@@ -38,6 +40,7 @@ const run = ({
     events,
     isSpokenEnabled,
     map: buildSongMap({ bpm, events, timeSignature }),
+    startPosition,
     startWall: START_WALL,
   });
   const outputs: TransportOutput[] = [];
@@ -155,6 +158,52 @@ describe('createSongTransport', () => {
       position: { beat: 1, measure: 1 },
     });
     expect(outputs[1]).toMatchObject({ accent: 'regular', position: { beat: 2, measure: 1 } });
+  });
+
+  describe('starting from a position', () => {
+    it('plays the pre count and then continues from the measure and beat', () => {
+      const outputs = run({
+        durationMs: 12_000,
+        events: [createCueEvent({ beat: 1, measure: 3, text: 'Chorus' })],
+        startPosition: { beat: 1, measure: 3 },
+      });
+      const clicks = getClicks(outputs);
+      const preCountClicks = clicks.filter(({ position }) => !position);
+      const songClicks = clicks.filter(({ position }) => position);
+
+      expect(timestamps(preCountClicks)).toEqual([0, 1000, 2000, 3000, 4000, 5000, 6000, 7000]);
+      expect(songClicks[0]).toMatchObject({ position: { beat: 1, measure: 3 }, timestamp: 8000 });
+      expect(songClicks[1]).toMatchObject({ position: { beat: 2, measure: 3 }, timestamp: 9000 });
+      expect(outputs.filter(({ type }) => type === 'cue')).toMatchObject([
+        { text: 'Chorus', timestamp: 8000 },
+      ]);
+    });
+
+    it('skips cues before the start position', () => {
+      const outputs = run({
+        events: [
+          createCueEvent({ beat: 1, measure: 2, text: 'Verse' }),
+          createCueEvent({ beat: 1, measure: 4, text: 'Chorus' }),
+        ],
+        startPosition: { beat: 1, measure: 3 },
+      });
+
+      expect(outputs.flatMap((output) => (output.type === 'cue' ? [output.text] : []))).toEqual([
+        'Chorus',
+      ]);
+    });
+
+    it('counts in with the tempo and time signature at the start position', () => {
+      const outputs = run({
+        events: [createTempoChangeEvent({ bpm: 120, measure: 3 })],
+        startPosition: { beat: 1, measure: 4 },
+      });
+      const songClicks = getClicks(outputs).filter(({ position }) => position);
+
+      // Two measures of 4 beats at 120 bpm
+      expect(songClicks[0]).toMatchObject({ position: { beat: 1, measure: 4 }, timestamp: 4000 });
+      expect(songClicks[1].timestamp).toBe(4500);
+    });
   });
 
   it('only speaks and counts in when enabled', () => {
