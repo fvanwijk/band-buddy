@@ -1,6 +1,7 @@
 import type { Song } from '../../../types';
 import { formatDuration } from '../../../utils/duration';
 import { BpmStat } from '../bpm-stat/BpmStat';
+import { KeyStat } from '../key-stat/KeyStat';
 import { SongStat } from '../song-stat/SongStat';
 
 type SongStatsProps = {
@@ -13,23 +14,7 @@ export function SongStats({ song }: SongStatsProps) {
       {song.bpm && <BpmStat bpm={song.bpm} song={song} />}
       {song.timeSignature && <SongStat label="Time" value={song.timeSignature} />}
       {song.duration && <SongStat label="Duration" value={formatDuration(song.duration)} />}
-      {song.key && (
-        <SongStat
-          label="Key"
-          value={
-            <>
-              {song.key}{' '}
-              {!song.transpose ? (
-                ''
-              ) : (
-                <span className="text-xs text-slate-400">
-                  {song.transpose > 0 ? `+${song.transpose}` : song.transpose}
-                </span>
-              )}
-            </>
-          }
-        />
-      )}
+      {song.key && <KeyStat keyName={song.key} song={song} />}
     </div>
   );
 }
