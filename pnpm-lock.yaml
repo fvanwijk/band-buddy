@@ -130,6 +130,9 @@ importers:
       '@types/spotify-web-playback-sdk':
         specifier: ^0.1.19
         version: 0.1.19
+      '@types/youtube':
+        specifier: ^0.3.0
+        version: 0.3.0
       '@vitejs/plugin-react':
         specifier: ^6.0.2
         version: 6.0.2(@voidzero-dev/vite-plus-core@0.2.4(jiti@2.7.0)(terser@5.46.1)(typescript@6.0.3))
@@ -1831,6 +1834,9 @@ packages:
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
+
+  '@types/youtube@0.3.0':
+    resolution: {integrity: sha512-a+JnwvmYfCShUv2fPs9JL/rUr9JGx5BPjSn7sp3V5UEyyj2AIVkSCRlVoe4CjFBrkBIv9jMpOPakfitMq7tegA==}
 
   '@vitejs/plugin-react@6.0.2':
     resolution: {integrity: sha512-DlSMqo4WhThw4vB8Mpn0Woe9J+Jfq1geJ61AKW0QEgLzGMNwtIMdxbDUzLxcun8W7NbJO0e2Jg/Nxm3cCSVzzg==}
@@ -5295,6 +5301,8 @@ snapshots:
   '@types/spotify-web-playback-sdk@0.1.19': {}
 
   '@types/trusted-types@2.0.7': {}
+
+  '@types/youtube@0.3.0': {}
 
   '@vitejs/plugin-react@6.0.2(@voidzero-dev/vite-plus-core@0.2.4(jiti@2.7.0)(terser@5.46.1)(typescript@6.0.3))':
     dependencies:

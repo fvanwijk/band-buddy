@@ -234,6 +234,39 @@ describe('SongForm', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it('should save a pasted YouTube link as video ID', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const { id, ...initialData } = createSong({ youtubeId: undefined });
+
+    renderComponent({ initialData, onSubmit }, id);
+
+    await user.type(
+      await screen.findByLabelText('YouTube'),
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ youtubeId: 'dQw4w9WgXcQ' }),
+      undefined,
+    );
+  });
+
+  it('should reject an invalid YouTube link', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const { id, ...initialData } = createSong({ youtubeId: undefined });
+
+    renderComponent({ initialData, onSubmit }, id);
+
+    await user.type(await screen.findByLabelText('YouTube'), 'not a link');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(await screen.findByText('Enter a valid YouTube link or ID')).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it('should save edited events', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();

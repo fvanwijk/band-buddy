@@ -37,6 +37,7 @@ describe('SongDetailPage', () => {
     hideEmptyTabs = false,
     isSupported = true,
     showSpotifyPlayer = false,
+    showYoutubePlayer = false,
     skipMidiOnSongChange = false,
     tab,
     triggerState,
@@ -48,6 +49,7 @@ describe('SongDetailPage', () => {
     hideEmptyTabs?: boolean;
     isSupported?: boolean;
     showSpotifyPlayer?: boolean;
+    showYoutubePlayer?: boolean;
     skipMidiOnSongChange?: boolean;
     songCells?: Record<string, string>;
     tab?: string;
@@ -95,6 +97,9 @@ describe('SongDetailPage', () => {
     }
     if (showSpotifyPlayer) {
       store.setValue('showSpotifyPlayer', true);
+    }
+    if (showYoutubePlayer) {
+      store.setValue('showYoutubePlayer', true);
     }
     if (skipMidiOnSongChange) {
       store.setValue('skipMidiOnSongChange', true);
@@ -150,6 +155,26 @@ describe('SongDetailPage', () => {
     await renderComponent({ showSpotifyPlayer: true });
 
     expect(await screen.findByRole('slider', { name: 'Song progress' })).toBeInTheDocument();
+  });
+
+  it('does not render the YouTube player by default', async () => {
+    await renderComponent({ songCells: { youtubeId: 'dQw4w9WgXcQ' } });
+
+    expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
+    expect(screen.queryByRole('slider', { name: 'YouTube progress' })).not.toBeInTheDocument();
+  });
+
+  it('renders the YouTube player when enabled and the song has a YouTube ID', async () => {
+    await renderComponent({ showYoutubePlayer: true, songCells: { youtubeId: 'dQw4w9WgXcQ' } });
+
+    expect(await screen.findByRole('slider', { name: 'YouTube progress' })).toBeInTheDocument();
+  });
+
+  it('does not render the YouTube player for a song without a YouTube ID', async () => {
+    await renderComponent({ showYoutubePlayer: true });
+
+    expect(await screen.findByText('Bohemian Rhapsody')).toBeInTheDocument();
+    expect(screen.queryByRole('slider', { name: 'YouTube progress' })).not.toBeInTheDocument();
   });
 
   it('does not render the Spotify player for a song without a Spotify ID', async () => {

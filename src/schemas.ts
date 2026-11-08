@@ -112,6 +112,7 @@ export const songTableSchema = z.object({
   timeSignature: z.string().optional(),
   title: z.string(),
   transpose: z.number().optional(),
+  youtubeId: z.string().optional(),
 });
 export const songSchema = songTableSchema.extend({
   canvasPaths: z.array(z.unknown()).optional(),
@@ -161,4 +162,5 @@ export const showMidiEventLogPanelSchema = z.boolean().default(false);
 export const hideEmptyTabsSchema = z.boolean().default(false);
 export const skipMidiOnSongChangeSchema = z.boolean().default(false);
 export const showSpotifyPlayerSchema = z.boolean().default(false);
+export const showYoutubePlayerSchema = z.boolean().default(false);
 export const showDrawingToolsSchema = z.boolean().default(false);

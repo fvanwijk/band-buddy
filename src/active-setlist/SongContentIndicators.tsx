@@ -1,6 +1,7 @@
 import {
   IconBinary,
   IconBrandSpotify,
+  IconBrandYoutube,
   IconFileMusic,
   IconMicrophone2,
   IconNotes,
@@ -53,6 +54,11 @@ export const SongContentIndicators: FC<SongContentIndicatorsProps> = ({ song }) 
       icon: <IconBrandSpotify className="h-4 w-4" />,
       isPresent: !!song.spotifyId,
       label: 'Spotify track',
+    },
+    {
+      icon: <IconBrandYoutube className="h-4 w-4" />,
+      isPresent: !!song.youtubeId,
+      label: 'YouTube video',
     },
   ];
 

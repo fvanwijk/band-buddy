@@ -1,5 +1,5 @@
 import * as Slider from '@radix-ui/react-slider';
-import { IconPlayerPauseFilled, IconPlayerPlayFilled } from '@tabler/icons-react';
+import { IconBrandSpotify, IconPlayerPauseFilled, IconPlayerPlayFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 import type { FC } from 'react';
 
@@ -85,6 +85,7 @@ export const SpotifyPlayer: FC<SpotifyPlayerProps> = ({ durationSeconds, spotify
         <span className="w-10 shrink-0 text-xs text-slate-400 tabular-nums">
           {formatDurationToString(Math.floor(durationMs / 1000))}
         </span>
+        <IconBrandSpotify aria-hidden="true" className="h-5 w-5 shrink-0 text-slate-400" />
       </div>
       {errorMessage ? (
         <p className="mt-1 text-xs text-red-400" role="alert">

@@ -9,6 +9,7 @@ import {
   useGetMetronomeVolume,
   useGetPreCountVolume,
   useGetShowSpotifyPlayer,
+  useGetShowYoutubePlayer,
   useGetSkipMidiOnSongChange,
 } from '../../../api/useSettings';
 import { useGetSongs } from '../../../api/useSong';
@@ -35,6 +36,7 @@ import { SheetMusicTab } from '../sheet-music-tab/SheetMusicTab';
 import { SongStats } from '../song-stats/SongStats';
 import { SpotifyPlayer } from '../spotify-player/SpotifyPlayer';
 import { TextNotesBlock } from '../text-notes/TextNotesBlock';
+import { YoutubePlayer } from '../youtube-player/YoutubePlayer';
 import { hasSongChangeTrigger, songChangeTriggerState } from './songChangeTrigger';
 
 export function SongDetailPage() {
@@ -54,6 +56,7 @@ export function SongDetailPage() {
   const metronomeVolume = useGetMetronomeVolume();
   const preCountVolume = useGetPreCountVolume();
   const showSpotifyPlayer = useGetShowSpotifyPlayer();
+  const showYoutubePlayer = useGetShowYoutubePlayer();
   const skipMidiOnSongChange = useGetSkipMidiOnSongChange();
   const { isAuthenticated: isSpotifyConnected } = useSpotify();
   const songs = useGetSongs();
@@ -264,6 +267,16 @@ export function SongDetailPage() {
 
   const spotifyId = currentSong.spotifyId;
   const isSpotifyPlayerVisible = showSpotifyPlayer && isSpotifyConnected && !!spotifyId;
+  const youtubeId = currentSong.youtubeId;
+  const isYoutubePlayerVisible = showYoutubePlayer && !!youtubeId;
+  // Every player adds 52px (3.25rem) at the bottom; classes are listed in full for Tailwind
+  const visiblePlayerCount = (isSpotifyPlayerVisible ? 1 : 0) + (isYoutubePlayerVisible ? 1 : 0);
+  const textNotesHeightClass = [
+    'h-[calc(100dvh-311px)]',
+    'h-[calc(100dvh-363px)]',
+    'h-[calc(100dvh-415px)]',
+  ][visiblePlayerCount];
+  const pagePaddingClass = ['pb-24.25', 'pb-37.25', 'pb-50.25'][visiblePlayerCount];
 
   const hasLyrics = !!currentSong.lyrics && currentSong.lyrics.trim().length > 0;
   const hasSheetMusic = !!currentSong.sheetMusicFilename;
@@ -300,12 +313,7 @@ export function SongDetailPage() {
     },
     {
       content: (
-        <div
-          className={cn(
-            'flex flex-col',
-            isSpotifyPlayerVisible ? 'h-[calc(100dvh-363px)]' : 'h-[calc(100dvh-311px)]',
-          )}
-        >
+        <div className={cn('flex flex-col', textNotesHeightClass)}>
           <DrawingOverlay canvasType="textNotes" songId={currentSongId} zoom={zoom}>
             <TextNotesBlock notes={currentSong.notes} />
           </DrawingOverlay>
@@ -362,7 +370,7 @@ export function SongDetailPage() {
 
   return (
     <FloatingMetronomeSlotContext value={floatingSlotContext}>
-      <Page className={isSpotifyPlayerVisible ? 'pb-37.25' : 'pb-24.25'}>
+      <Page className={pagePaddingClass}>
         <PageHeader
           action={toolbar}
           backPath="/play"
@@ -416,6 +424,9 @@ export function SongDetailPage() {
           </div>
           {isSpotifyPlayerVisible && (
             <SpotifyPlayer durationSeconds={currentSong.duration} spotifyId={spotifyId} />
+          )}
+          {isYoutubePlayerVisible && (
+            <YoutubePlayer durationSeconds={currentSong.duration} youtubeId={youtubeId} />
           )}
         </nav>
       </Page>

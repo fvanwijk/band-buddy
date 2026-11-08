@@ -10,6 +10,7 @@ import { Card } from '../../../ui/Card';
 import { InputField } from '../../../ui/form/InputField';
 import { RadioGroup } from '../../../ui/form/RadioGroup';
 import { parseSpotifyTrackId } from '../../parseSpotifyTrackId';
+import { parseYoutubeId } from '../../parseYoutubeId';
 import type { SongFormData } from '../SongForm';
 import { timeSignatureOptions } from '../timeSignatureOptions';
 import { KeyPicker } from './key-picker/KeyPicker';
@@ -146,6 +147,17 @@ export const DetailsTab: FC<DetailsTabProps> = ({
             !value ||
             parseSpotifyTrackId(value) !== undefined ||
             'Enter a valid Spotify track link',
+        })}
+      />
+      <InputField
+        error={errors.youtubeId}
+        helperText="Paste a YouTube link or video ID to play the audio of this song from YouTube."
+        label="YouTube"
+        placeholder="https://www.youtube.com/watch?v=..."
+        {...register('youtubeId', {
+          setValueAs: (value: string) => (value ? (parseYoutubeId(value) ?? value) : undefined),
+          validate: (value) =>
+            !value || parseYoutubeId(value) !== undefined || 'Enter a valid YouTube link or ID',
         })}
       />
     </Card>

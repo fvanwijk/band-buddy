@@ -134,6 +134,7 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
     'spotifyId',
     'timeSignature',
     'title',
+    'youtubeId',
   ];
   const lyricsFields: (keyof SongFormData)[] = ['lyrics'];
   const settingsFields: (keyof SongFormData)[] = ['defaultTab', 'transpose'];

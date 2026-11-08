@@ -7,10 +7,12 @@ import {
   useGetHideEmptyTabs,
   useGetShowDrawingTools,
   useGetShowSpotifyPlayer,
+  useGetShowYoutubePlayer,
   useGetSkipMidiOnSongChange,
   useSetHideEmptyTabs,
   useSetShowDrawingTools,
   useSetShowSpotifyPlayer,
+  useSetShowYoutubePlayer,
   useSetSkipMidiOnSongChange,
 } from '../../../api/useSettings';
 import { useUpdateSong } from '../../../api/useSong';
@@ -44,6 +46,8 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
   const setShowDrawingTools = useSetShowDrawingTools();
   const showSpotifyPlayer = useGetShowSpotifyPlayer();
   const setShowSpotifyPlayer = useSetShowSpotifyPlayer();
+  const showYoutubePlayer = useGetShowYoutubePlayer();
+  const setShowYoutubePlayer = useSetShowYoutubePlayer();
   const { isAuthenticated: isSpotifyConnected } = useSpotify();
   const skipMidiOnSongChange = useGetSkipMidiOnSongChange();
   const setSkipMidiOnSongChange = useSetSkipMidiOnSongChange();
@@ -131,6 +135,11 @@ export function SettingsPanel({ onZoomChange, song, zoom }: SettingsPanelProps) 
                 onChange={(event) => setShowSpotifyPlayer(event.target.checked)}
               />
             )}
+            <Checkbox
+              checked={showYoutubePlayer}
+              label="Show YouTube player"
+              onChange={(event) => setShowYoutubePlayer(event.target.checked)}
+            />
           </GridCell>
         </Grid>
       </PopoverPanel>

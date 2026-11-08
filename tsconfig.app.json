@@ -6,7 +6,7 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": ["@testing-library/jest-dom", "spotify-web-playback-sdk"],
+    "types": ["@testing-library/jest-dom", "spotify-web-playback-sdk", "youtube"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

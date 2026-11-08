@@ -182,4 +182,19 @@ describe('SettingsPanel', () => {
       expect(getPersistedStore()).toContain('"showSpotifyPlayer":true');
     });
   });
+
+  it('toggles the YouTube player setting', async () => {
+    const user = userEvent.setup();
+    await renderComponent(songWithAllSettings);
+
+    await user.click(screen.getByTitle('Settings'));
+    const checkbox = screen.getByRole('checkbox', { name: 'Show YouTube player' });
+    expect(checkbox).not.toBeChecked();
+
+    await user.click(checkbox);
+
+    await waitFor(() => {
+      expect(getPersistedStore()).toContain('"showYoutubePlayer":true');
+    });
+  });
 });

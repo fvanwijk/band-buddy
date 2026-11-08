@@ -15,6 +15,7 @@ import {
   showMidiEventLogPanelSchema,
   showDrawingToolsSchema,
   showSpotifyPlayerSchema,
+  showYoutubePlayerSchema,
   skipMidiOnSongChangeSchema,
   themeSchema,
   ttsVoiceSchema,
@@ -219,6 +220,22 @@ export function useGetShowSpotifyPlayer(): boolean {
  */
 export function useSetShowSpotifyPlayer() {
   return useSetValueCallback('showSpotifyPlayer', (show: boolean) => show, []);
+}
+
+/**
+ * Hook to get whether the YouTube player is shown on the song detail page
+ */
+export function useGetShowYoutubePlayer(): boolean {
+  const show = useValue('showYoutubePlayer');
+  const result = showYoutubePlayerSchema.safeParse(show);
+  return result.success ? result.data : false;
+}
+
+/**
+ * Hook to set whether the YouTube player is shown on the song detail page
+ */
+export function useSetShowYoutubePlayer() {
+  return useSetValueCallback('showYoutubePlayer', (show: boolean) => show, []);
 }
 
 /**
