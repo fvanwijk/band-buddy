@@ -19,8 +19,8 @@ There are two ways to play, chosen automatically. Both are exposed through `useS
 which `SpotifyPlayer` uses, so the UI is the same for both.
 
 ```
-PlayLayout (route /play)
-└── SpotifyWebPlayerProvider    owns the Web Playback SDK player for the whole /play section
+Layout (all pages except Home)
+└── SpotifyWebPlayerProvider    owns the Web Playback SDK player for the whole app
     └── SpotifyPlayer
         └── useSpotifyPlayback              chooses between the two players, merges their state
             ├── useSpotifyBrowserPlayback   first-class player: this browser is the Spotify device
@@ -40,12 +40,12 @@ BandBuddy runs on.
   straight to the SDK player.
 - Browsers only allow audio after a user gesture, so `activateElement()` is called from the click
   handler.
-- The SDK player is owned by `SpotifyWebPlayerProvider`, which `PlayLayout` (the `/play` route)
-  mounts. The song detail page is remounted for every song, so the player must not live in it:
-  disconnecting and reconnecting on each song stops the music and registers the browser as a
-  device again, after which commands were seen to fail with `Device not found`. The player connects
-  when the setting is on and Spotify is connected, and disconnects when the setting is turned off or
-  `/play` is left.
+- The SDK player is owned by `SpotifyWebPlayerProvider`, which `Layout` mounts.
+  The song detail page is remounted for every song, and left when editing a song, so the player
+  must not live in it: disconnecting and reconnecting stops the music and registers the browser as
+  a device again, after which commands were seen to fail with `Device not found`. The player
+  connects when the setting is on and Spotify is connected, and disconnects when the setting is
+  turned off or Spotify is disconnected.
 - When Spotify answers `Device not found` to a command (the browser device went idle), the device
   is made the active one again with a playback transfer and the command is retried once.
 

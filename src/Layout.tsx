@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
-import { useHasSeenWelcome, useSetHasSeenWelcome } from './api/useSettings';
+import { isMobileBrowser } from './active-setlist/song-detail/spotify-player/isMobileBrowser';
+import { SpotifyWebPlayerProvider } from './active-setlist/song-detail/spotify-player/SpotifyWebPlayerProvider';
+import {
+  useGetShowSpotifyPlayer,
+  useHasSeenWelcome,
+  useSetHasSeenWelcome,
+} from './api/useSettings';
 import { useMidiEventLogContext } from './contexts/MidiEventLogContext';
+import { useSpotify } from './contexts/SpotifyContext';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useMidiEventLog } from './midi/useMidiEventLog';
 import { MidiEventLogPanel } from './settings/instruments/MidiEventLogPanel';
@@ -10,8 +17,14 @@ import { Logo } from './ui/Logo';
 import { TopNav } from './ui/TopNav';
 import { WelcomeModal } from './ui/WelcomeModal';
 
+// Mobile browsers can't play Spotify themselves, so there is no web player to keep alive
+const isMobile = isMobileBrowser();
+
 export function Layout() {
   useWakeLock();
+
+  const showSpotifyPlayer = useGetShowSpotifyPlayer();
+  const { isAuthenticated } = useSpotify();
 
   const hasSeenWelcome = useHasSeenWelcome();
   const setHasSeenWelcome = useSetHasSeenWelcome();
@@ -25,7 +38,7 @@ export function Layout() {
   };
 
   return (
-    <>
+    <SpotifyWebPlayerProvider isEnabled={showSpotifyPlayer && isAuthenticated && !isMobile}>
       <div className="sticky top-0 z-30 border-b border-slate-900 bg-slate-950 backdrop-blur-xs">
         <header className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
           <Link to="/">
@@ -49,6 +62,6 @@ export function Layout() {
           onClose={() => setIsMidiLogOpen(false)}
         />
       )}
-    </>
+    </SpotifyWebPlayerProvider>
   );
 }
