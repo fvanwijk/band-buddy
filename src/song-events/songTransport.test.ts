@@ -273,6 +273,63 @@ describe('createSongTransport', () => {
 
       expect(getCues(outputs)).toEqual([[8000, 'Go']]);
     });
+
+    describe('pre count', () => {
+      // Words of the song's own pre count aren't included, they come before the song starts
+      const getSongWords = (outputs: ReturnType<typeof run>) =>
+        outputs.flatMap((output) =>
+          output.type === 'countWord' && output.timestamp >= 8000
+            ? [[Math.round(output.timestamp), output.word]]
+            : [],
+        );
+      const chorus = (overrides: Parameters<typeof createCueEvent>[0] = {}) =>
+        createCueEvent({ beat: 1, measure: 4, preCount: true, text: 'Chorus', ...overrides });
+
+      it('counts the beats after the cue text up to the cue position', () => {
+        const outputs = run({ cueOffsetBeats: -4, events: [chorus()] });
+
+        // Measure 4 beat 1 is at 12 s + 8 s, the cue text is 4 beats earlier
+        expect(getCues(outputs)).toEqual([[8000 + 8000, 'Chorus']]);
+        expect(getSongWords(outputs)).toEqual([
+          [8000 + 9000, 'two'],
+          [8000 + 10_000, 'three'],
+          [8000 + 11_000, 'four'],
+        ]);
+      });
+
+      it('counts the last beats of the count for a smaller offset', () => {
+        const outputs = run({ cueOffsetBeats: -2, events: [chorus()] });
+
+        expect(getSongWords(outputs)).toEqual([[8000 + 11_000, 'four']]);
+      });
+
+      it('is not audible when the offset is -1 or 0', () => {
+        for (const cueOffsetBeats of [-1, 0]) {
+          const outputs = run({ cueOffsetBeats, events: [chorus()] });
+
+          expect(getSongWords(outputs)).toEqual([]);
+        }
+      });
+
+      it('counts at most two measures', () => {
+        const outputs = run({ cueOffsetBeats: -8, events: [chorus()] });
+
+        // "Chorus . two . | one two three four" where the silent beats have no word
+        expect(getSongWords(outputs).map(([, word]) => word)).toEqual([
+          'two',
+          'one',
+          'two',
+          'three',
+          'four',
+        ]);
+      });
+
+      it('does nothing without the pre count option', () => {
+        const outputs = run({ cueOffsetBeats: -4, events: [chorus({ preCount: false })] });
+
+        expect(getSongWords(outputs)).toEqual([]);
+      });
+    });
   });
 
   it('follows a time signature change without counting in', () => {

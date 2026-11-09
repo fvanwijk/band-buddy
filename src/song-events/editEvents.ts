@@ -21,6 +21,7 @@ export type NewEventDefaults = {
 export type EventPatch = Partial<{
   bpm: number;
   midiEventId: string;
+  preCount: boolean;
   text: string;
   timeSignature: string;
 }>;

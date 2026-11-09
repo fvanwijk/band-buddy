@@ -42,6 +42,7 @@ const songEventPositionSchema = z.object({
   measure: z.number().int().min(1),
 });
 export const cueEventSchema = songEventPositionSchema.extend({
+  preCount: z.boolean().optional(),
   text: z.string().min(1),
   type: z.literal('cue'),
 });

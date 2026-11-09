@@ -76,6 +76,22 @@ describe('EventsTab', () => {
     ]);
   });
 
+  it('toggles the pre count of a cue', async () => {
+    const user = userEvent.setup();
+    const onEventsChange = vi.fn();
+    await renderComponent({ initialEvents: [createCueEvent({ measure: 3 })], onEventsChange });
+
+    const checkbox = getGroup('Measure 3, beat 1').getByRole('checkbox', { name: 'Pre count' });
+    expect(checkbox).not.toBeChecked();
+
+    await user.click(checkbox);
+
+    expect(checkbox).toBeChecked();
+    expect(onEventsChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({ measure: 3, preCount: true, type: 'cue' }),
+    ]);
+  });
+
   it('adds a tempo change on beat 1 of the second measure with the song tempo', async () => {
     const user = userEvent.setup();
     await renderComponent({ bpm: 90 });

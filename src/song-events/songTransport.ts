@@ -207,16 +207,33 @@ export const createSongTransport = ({
       }
 
       // The offset can move a cue into an earlier segment, but not before the start of the song
-      const cueBeat = Math.max(0, positionToBeat(map, event.measure, event.beat) + cueOffsetBeats);
-      const segment = findSegmentByBeat(map, cueBeat);
-      const beatsIntoSegment = cueBeat - segment.startBeat;
-      cueEventsBySegment.set(segment, [
-        ...(cueEventsBySegment.get(segment) ?? []),
-        {
-          output: { text: event.text, type: 'cue' },
-          tick: beatsIntoSegment * TIMEBASE,
-        },
-      ]);
+      const configuredBeat = positionToBeat(map, event.measure, event.beat);
+      const cueBeat = Math.max(0, configuredBeat + cueOffsetBeats);
+      const addToSegment = (beat: number, output: TrackEvent['output']) => {
+        const segment = findSegmentByBeat(map, beat);
+        cueEventsBySegment.set(segment, [
+          ...(cueEventsBySegment.get(segment) ?? []),
+          { output, tick: (beat - segment.startBeat) * TIMEBASE },
+        ]);
+      };
+
+      addToSegment(cueBeat, { text: event.text, type: 'cue' });
+
+      if (event.preCount) {
+        // The cue text takes the place of the first word, the rest of the count leads up to the
+        // cue's configured position like the end of the song's own two measure pre count
+        const { beatsPerMeasure } = findSegmentByBeat(map, configuredBeat);
+        for (let beat = cueBeat + 1; beat < configuredBeat; beat++) {
+          const beatsBefore = configuredBeat - beat;
+          const word =
+            beatsBefore <= getPreCountBeats(beatsPerMeasure)
+              ? getPreCountWord(getPreCountBeats(beatsPerMeasure) - beatsBefore, beatsPerMeasure)
+              : null;
+          if (word) {
+            addToSegment(beat, { type: 'countWord', word });
+          }
+        }
+      }
     }
   }
 
