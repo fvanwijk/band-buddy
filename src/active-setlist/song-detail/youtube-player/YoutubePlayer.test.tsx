@@ -37,6 +37,7 @@ describe('YoutubePlayer', () => {
       pauseVideo: vi.fn(),
       playVideo: vi.fn(),
       seekTo: vi.fn(),
+      setVolume: vi.fn(),
     };
     window.YT = {
       Player: vi.fn(function Player(
@@ -93,6 +94,23 @@ describe('YoutubePlayer', () => {
     await user.keyboard('{ArrowRight}');
 
     expect(fakePlayer.seekTo).toHaveBeenCalledWith(1, true);
+  });
+
+  it('sets the volume with the slider and mutes with the button', async () => {
+    const user = userEvent.setup();
+    await renderComponent();
+    expect(fakePlayer.setVolume).toHaveBeenCalledWith(100);
+
+    await user.hover(screen.getByRole('button', { name: 'Mute YouTube' }));
+    screen.getByRole('slider', { name: 'YouTube volume' }).focus();
+    await user.keyboard('{ArrowDown}');
+    expect(fakePlayer.setVolume).toHaveBeenLastCalledWith(99);
+
+    await user.click(screen.getByRole('button', { name: 'Mute YouTube' }));
+    expect(fakePlayer.setVolume).toHaveBeenLastCalledWith(0);
+
+    await user.click(screen.getByRole('button', { name: 'Unmute YouTube' }));
+    expect(fakePlayer.setVolume).toHaveBeenLastCalledWith(99);
   });
 
   it('shows an error when the video can not be played', async () => {

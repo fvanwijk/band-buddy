@@ -30,6 +30,8 @@ export const useYoutubePlayback = (youtubeId: string, fallbackDurationMs?: numbe
   const [isPlaying, setIsPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [positionMs, setPositionMs] = useState(0);
+  const [volume, setVolumeState] = useState(100);
+  const volumeRef = useRef(volume);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -64,6 +66,7 @@ export const useYoutubePlayback = (youtubeId: string, fallbackDurationMs?: numbe
           events: {
             onError: (event) => setErrorMessage(getErrorMessage(event.data)),
             onReady: (event) => {
+              event.target.setVolume(volumeRef.current);
               syncDuration(event.target);
               setIsReady(true);
             },
@@ -129,5 +132,23 @@ export const useYoutubePlayback = (youtubeId: string, fallbackDurationMs?: numbe
     setPositionMs(ms);
   }, []);
 
-  return { containerRef, durationMs, errorMessage, isPlaying, isReady, positionMs, seek, toggle };
+  // The volume is kept outside the player, so it survives switching to another video
+  const setVolume = useCallback((nextVolume: number) => {
+    volumeRef.current = nextVolume;
+    setVolumeState(nextVolume);
+    playerRef.current?.setVolume(nextVolume);
+  }, []);
+
+  return {
+    containerRef,
+    durationMs,
+    errorMessage,
+    isPlaying,
+    isReady,
+    positionMs,
+    seek,
+    setVolume,
+    toggle,
+    volume,
+  };
 };

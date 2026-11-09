@@ -5,6 +5,7 @@ import type { FC } from 'react';
 
 import { Button } from '../../../ui/Button';
 import { formatDurationToString } from '../../../utils/duration';
+import { VolumeControl } from '../volume-control/VolumeControl';
 import { useYoutubePlayback } from './useYoutubePlayback';
 
 type YoutubePlayerProps = {
@@ -15,8 +16,18 @@ type YoutubePlayerProps = {
 const SEEK_STEP_MS = 1000;
 
 export const YoutubePlayer: FC<YoutubePlayerProps> = ({ durationSeconds, youtubeId }) => {
-  const { containerRef, durationMs, errorMessage, isPlaying, isReady, positionMs, seek, toggle } =
-    useYoutubePlayback(youtubeId, durationSeconds ? durationSeconds * 1000 : undefined);
+  const {
+    containerRef,
+    durationMs,
+    errorMessage,
+    isPlaying,
+    isReady,
+    positionMs,
+    seek,
+    setVolume,
+    toggle,
+    volume,
+  } = useYoutubePlayback(youtubeId, durationSeconds ? durationSeconds * 1000 : undefined);
   const [scrubMs, setScrubMs] = useState<number | null>(null);
 
   const displayedMs = scrubMs ?? positionMs;
@@ -30,6 +41,7 @@ export const YoutubePlayer: FC<YoutubePlayerProps> = ({ durationSeconds, youtube
         ref={containerRef}
       />
       <div className="flex items-center gap-3">
+        <VolumeControl label="YouTube" onChange={setVolume} volume={volume} />
         <Button
           color="primary"
           disabled={!isReady}

@@ -2,6 +2,8 @@ import type { MouseEvent, PointerEvent } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
 const DEFAULT_DELAY_MS = 500;
+// Touch browsers request the context menu right after a long press that already fired
+const CONTEXT_MENU_DEDUPE_MS = 1000;
 
 type UseLongPressOptions = {
   delayMs?: number;
@@ -22,6 +24,7 @@ export const useLongPress = ({
 }: UseLongPressOptions) => {
   const timeoutRef = useRef<number | null>(null);
   const hasFiredRef = useRef(false);
+  const firedAtRef = useRef(0);
   const onLongPressRef = useRef(onLongPress);
   onLongPressRef.current = onLongPress;
 
@@ -37,6 +40,7 @@ export const useLongPress = ({
   const fire = useCallback(() => {
     cancel();
     hasFiredRef.current = true;
+    firedAtRef.current = Date.now();
     onLongPressRef.current();
   }, [cancel]);
 
@@ -56,7 +60,9 @@ export const useLongPress = ({
     }
 
     event.preventDefault();
-    fire();
+    if (Date.now() - firedAtRef.current > CONTEXT_MENU_DEDUPE_MS) {
+      fire();
+    }
   };
 
   /** Whether the click belongs to a long press, resets after it has been consumed */

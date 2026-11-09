@@ -23,7 +23,10 @@ export const useSpotifyPlayback = (spotifyId: string, fallbackDurationMs?: numbe
     [browser, isRemote, positionMs, remote],
   );
 
+  const setVolume = isRemote ? remote.setVolume : browser.setVolume;
+
   return {
+    commitVolume: isRemote ? remote.commitVolume : undefined,
     device: isRemote
       ? {
           devices: remote.devices,
@@ -40,6 +43,8 @@ export const useSpotifyPlayback = (spotifyId: string, fallbackDurationMs?: numbe
     isReady: active.isReady,
     positionMs,
     seek: active.seek,
+    setVolume,
     toggle,
+    volume: active.volume,
   };
 };

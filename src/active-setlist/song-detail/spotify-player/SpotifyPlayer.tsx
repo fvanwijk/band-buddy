@@ -5,6 +5,7 @@ import type { FC } from 'react';
 
 import { Button } from '../../../ui/Button';
 import { formatDurationToString } from '../../../utils/duration';
+import { VolumeControl } from '../volume-control/VolumeControl';
 import { SpotifyDeviceMenu } from './SpotifyDeviceMenu';
 import { useSpotifyPlayback } from './useSpotifyPlayback';
 
@@ -17,6 +18,7 @@ const SEEK_STEP_MS = 1000;
 
 export const SpotifyPlayer: FC<SpotifyPlayerProps> = ({ durationSeconds, spotifyId }) => {
   const {
+    commitVolume,
     device,
     durationMs,
     errorMessage,
@@ -26,7 +28,9 @@ export const SpotifyPlayer: FC<SpotifyPlayerProps> = ({ durationSeconds, spotify
     isReady,
     positionMs,
     seek,
+    setVolume,
     toggle,
+    volume,
   } = useSpotifyPlayback(spotifyId, durationSeconds ? durationSeconds * 1000 : undefined);
   const [scrubMs, setScrubMs] = useState<number | null>(null);
 
@@ -43,6 +47,12 @@ export const SpotifyPlayer: FC<SpotifyPlayerProps> = ({ durationSeconds, spotify
             selectedId={device.selectedId}
           />
         )}
+        <VolumeControl
+          label="Spotify"
+          onChange={setVolume}
+          onCommit={commitVolume ? (value) => void commitVolume(value) : undefined}
+          volume={volume}
+        />
         <Button
           color="primary"
           disabled={isBusy || !isReady}

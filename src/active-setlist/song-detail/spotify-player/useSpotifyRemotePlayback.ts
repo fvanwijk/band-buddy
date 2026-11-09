@@ -71,6 +71,7 @@ export const useSpotifyRemotePlayback = (spotifyId: string, isEnabled: boolean) 
   const [isAwaitingPlayback, setIsAwaitingPlayback] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
   const [snapshot, setSnapshot] = useState<PlaybackSnapshot>(emptySnapshot);
+  const [volumeOverride, setVolumeOverride] = useState<number | null>(null);
   const awaitingDeadlineRef = useRef<number | null>(null);
   const ignorePollsUntilRef = useRef(0);
   const isInAlbumContextRef = useRef(false);
@@ -312,6 +313,27 @@ export const useSpotifyRemotePlayback = (spotifyId: string, isEnabled: boolean) 
     [runCommand, sdk, snapshot.isCurrentTrack, startTrack],
   );
 
+  const volume = volumeOverride ?? targetDevice?.volume_percent ?? 100;
+
+  const setVolume = useCallback((nextVolume: number) => setVolumeOverride(nextVolume), []);
+
+  // Only sent once the user is done, as the Web API is rate limited
+  const commitVolume = useCallback(
+    async (nextVolume: number) => {
+      if (!targetDeviceId) {
+        return;
+      }
+
+      try {
+        await sdk?.player.setPlaybackVolume(nextVolume, targetDeviceId);
+      } catch (error) {
+        console.error('Spotify volume error:', error);
+        setErrorMessage('Could not change the Spotify volume');
+      }
+    },
+    [sdk, targetDeviceId],
+  );
+
   let hint: string | null = null;
   if (!isReady && hasLoadedDevices) {
     hint = selectedDeviceId
@@ -320,6 +342,7 @@ export const useSpotifyRemotePlayback = (spotifyId: string, isEnabled: boolean) 
   }
 
   return {
+    commitVolume,
     devices,
     errorMessage,
     hint,
@@ -329,7 +352,9 @@ export const useSpotifyRemotePlayback = (spotifyId: string, isEnabled: boolean) 
     seek,
     selectDevice: setSelectedDeviceId,
     selectedDeviceId: targetDeviceId ?? '',
+    setVolume,
     snapshot,
     toggle,
+    volume,
   };
 };

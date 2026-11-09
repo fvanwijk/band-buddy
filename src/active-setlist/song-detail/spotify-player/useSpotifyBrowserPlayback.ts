@@ -43,6 +43,7 @@ export const useSpotifyBrowserPlayback = (spotifyId: string) => {
   const [commandErrorMessage, setCommandErrorMessage] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
   const [snapshot, setSnapshot] = useState<PlaybackSnapshot>(emptySnapshot);
+  const [volume, setVolumeState] = useState(100);
   const spotifyIdRef = useRef(spotifyId);
 
   useEffect(() => {
@@ -68,6 +69,19 @@ export const useSpotifyBrowserPlayback = (spotifyId: string) => {
       }
     });
   }, [player, spotifyId]);
+
+  // The player outlives the page, so its volume may have been changed before this mounts
+  useEffect(() => {
+    void player?.getVolume().then((value) => setVolumeState(Math.round(value * 100)));
+  }, [player]);
+
+  const setVolume = useCallback(
+    (nextVolume: number) => {
+      setVolumeState(nextVolume);
+      void player?.setVolume(nextVolume / 100);
+    },
+    [player],
+  );
 
   const runCommand = useCallback(
     async (command: (activePlayer: Spotify.Player) => Promise<unknown>) => {
@@ -144,7 +158,9 @@ export const useSpotifyBrowserPlayback = (spotifyId: string) => {
     isReady: deviceId !== null,
     isUnsupported,
     seek,
+    setVolume,
     snapshot,
     toggle,
+    volume,
   };
 };

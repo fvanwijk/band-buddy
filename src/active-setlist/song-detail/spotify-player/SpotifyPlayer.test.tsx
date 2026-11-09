@@ -66,10 +66,12 @@ describe('SpotifyPlayer', () => {
       connect: vi.fn().mockResolvedValue(true),
       disconnect: vi.fn(),
       getCurrentState: vi.fn().mockResolvedValue(null),
+      getVolume: vi.fn().mockResolvedValue(0.5),
       pause: vi.fn().mockResolvedValue(undefined),
       removeListener: vi.fn(),
       resume: vi.fn().mockResolvedValue(undefined),
       seek: vi.fn().mockResolvedValue(undefined),
+      setVolume: vi.fn().mockResolvedValue(undefined),
     };
     fakePlayer.addListener = vi.fn((event: string, listener: Listener) => {
       listeners[event] = listener;
@@ -105,6 +107,20 @@ describe('SpotifyPlayer', () => {
 
     expect(screen.getByText('3:20')).toBeInTheDocument();
     expect(screen.getByText('0:00')).toBeInTheDocument();
+  });
+
+  it('shows the volume of the browser player and changes it with the slider', async () => {
+    const user = userEvent.setup();
+    await renderComponent();
+
+    await user.hover(await screen.findByRole('button', { name: 'Mute Spotify' }));
+    const slider = await screen.findByRole('slider', { name: 'Spotify volume' });
+    expect(slider).toHaveAttribute('aria-valuenow', '50');
+
+    slider.focus();
+    await user.keyboard('{ArrowUp}');
+
+    expect(fakePlayer.setVolume).toHaveBeenCalledWith(0.51);
   });
 
   it('starts the track on this browser instead of another Spotify device', async () => {
