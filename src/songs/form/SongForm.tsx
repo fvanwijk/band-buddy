@@ -1,15 +1,14 @@
-import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useGetInstruments } from '../../api/useInstruments';
 import { useSheetMusic } from '../../hooks/useSheetMusic';
 import { validateSongEvents } from '../../song-events/validateSongEvents';
 import type { MidiEvent, Song, SongEvent } from '../../types';
 import { Alert } from '../../ui/Alert';
-import { Button } from '../../ui/Button';
+import { FormActions } from '../../ui/form/FormActions';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
@@ -345,20 +344,10 @@ export function SongForm({ backPath, initialData, onSubmit, title }: SongFormPro
           </Alert>
         )}
 
-        <div className="flex gap-3 pt-4">
-          <Button as={Link} className="flex-1" to={backPath} type="button" variant="outlined">
-            Cancel
-          </Button>
-          <Button
-            className="flex-1"
-            color="primary"
-            iconStart={<IconDeviceFloppy className="h-4 w-4" />}
-            type="submit"
-            variant="filled"
-          >
-            {initialData ? 'Save changes' : 'Create song'}
-          </Button>
-        </div>
+        <FormActions
+          backPath={backPath}
+          submitLabel={initialData ? 'Save changes' : 'Create song'}
+        />
       </form>
     </Page>
   );

@@ -1,4 +1,4 @@
-import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
@@ -7,6 +7,7 @@ import type { SetlistSetTable, SetlistSongTable, SetlistTable, SetlistWithSets }
 import { Alert } from '../../ui/Alert';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
+import { FormActions } from '../../ui/form/FormActions';
 import { InputField } from '../../ui/form/InputField';
 import { Page } from '../../ui/Page';
 import { PageHeader } from '../../ui/PageHeader';
@@ -131,22 +132,11 @@ export function SetlistForm({ backPath, initialData, onSubmit, title }: SetlistF
                   />
                 ))}
               </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button as={Link} className="flex-1" to={backPath} type="button" variant="outlined">
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1"
-                  color="primary"
-                  iconStart={<IconDeviceFloppy className="h-4 w-4" />}
-                  type="submit"
-                  variant="filled"
-                >
-                  {initialData ? 'Save changes' : 'Create setlist'}
-                </Button>
-              </div>
             </Card>
+            <FormActions
+              backPath={backPath}
+              submitLabel={initialData ? 'Save changes' : 'Create setlist'}
+            />
           </form>
         </div>
       </Page>
